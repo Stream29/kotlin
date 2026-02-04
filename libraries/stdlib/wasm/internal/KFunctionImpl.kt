@@ -33,13 +33,14 @@ internal abstract class KFunctionImpl(val flags: Int, val arity: Int, val id: St
 }
 
 @UsedFromCompilerGeneratedCode
-internal abstract class KFunctionImplNew<out R>(val flags: Int, val arity: Int, val id: String, val receiver: Any?, override val name: String) : KFunction<R> {
+internal abstract class KFunctionImplNew<out R>(val flags: Int, val arity: Int, val id: Long, val receiver: Any?, override val name: String) : KFunction<R> {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         return other is KFunctionImplNew<*> &&
             this.flags == other.flags &&
             this.arity == other.arity &&
             this.id == other.id &&
+            this.name == other.name &&
             this.receiver == other.receiver
     }
 

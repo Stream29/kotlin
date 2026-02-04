@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.backend.common.lower.VariableRemapper
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.backend.common.lower.declarationsAtFunctionReferenceLowering
+import org.jetbrains.kotlin.backend.common.serialization.cityHash64
 import org.jetbrains.kotlin.backend.wasm.WasmBackendContext
 import org.jetbrains.kotlin.ir.backend.js.lower.WebCallableReferenceLowering.Companion.FUNCTION_REFERENCE_IMPL
 import org.jetbrains.kotlin.ir.backend.js.lower.WebCallableReferenceLowering.Companion.GENERATED_MEMBER_IN_CALLABLE_REFERENCE
@@ -238,7 +239,7 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : Fi
                 listOf(
                     makeValueParameter("flags", context.irBuiltIns.intType),
                     makeValueParameter("arity", context.irBuiltIns.intType),
-                    makeValueParameter("id", context.irBuiltIns.stringType),
+                    makeValueParameter("id", context.irBuiltIns.longType),
                     makeValueParameter("receiver", context.irBuiltIns.anyNType),
                     makeValueParameter("name", context.irBuiltIns.stringType),
                 )
@@ -274,7 +275,8 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : Fi
                         reference.getArity().toIrConst(context.irBuiltIns.intType)
                     }
                     "id" -> {
-                        reference.getId(backendContext).toIrConst(context.irBuiltIns.stringType)
+                        val hash = cityHash64(reference.getId(backendContext).encodeToByteArray()).toLong()
+                        hash.toIrConst(context.irBuiltIns.longType)
                     }
                     "receiver" -> {
                         // Use the temporary variable if provided, otherwise null
