@@ -379,7 +379,7 @@ internal val FirDeclaration.isPartOfClassStructureElement: Boolean
     get() = when (source?.kind) {
         KtFakeSourceElementKind.ImplicitConstructor,
         KtFakeSourceElementKind.DataClassGeneratedMembers,
-        KtFakeSourceElementKind.EnumGeneratedDeclaration,
+        is KtFakeSourceElementKind.EnumGeneratedDeclaration,
         KtFakeSourceElementKind.ClassDelegationField,
         KtFakeSourceElementKind.ReplEvalFunction,
             -> true
