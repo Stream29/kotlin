@@ -110,7 +110,7 @@ object FirDeprecationChecker : FirBasicExpressionChecker(MppCheckerKind.Common) 
     @OptIn(SymbolInternals::class)
     context(context: CheckerContext)
     private fun FirStatement.isDelegatedPropertySelfAccess(referencedSymbol: FirBasedSymbol<*>): Boolean {
-        if (source?.kind != KtFakeSourceElementKind.DelegatedPropertyAccessor) return false
+        if (source?.kind !is KtFakeSourceElementKind.DelegatedPropertyAccessor) return false
         val containers = context.containingDeclarations
         val size = containers.size
 

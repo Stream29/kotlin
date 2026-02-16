@@ -128,10 +128,35 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
     }
 
     /**
-     * for delegated properties, getter & setter calls to the delegate
-     * they have a fake source which refers to the call that creates the delegate
+     * For delegated properties, FIR generates getters and setters with calls to the delegate, which are covered by the various fake
+     * source element kinds defined in this class.
+     *
+     * The fake element kinds must be kept in sync with [ALL_DELEGATED_PROPERTY_ACCESSORS].
      */
-    object DelegatedPropertyAccessor : KtFakeSourceElementKind()
+    sealed class DelegatedPropertyAccessor : KtFakeSourceElementKind() {
+        /**
+         * The delegate expression of a delegated property. Its real source is the call that creates the delegate.
+         */
+        object DelegatedPropertyDelegateExpression : DelegatedPropertyAccessor()
+
+        /**
+         * A delegated property getter. Its real source is the explicit getter declaration if present, or otherwise the call that creates
+         * the delegate.
+         */
+        object DelegatedPropertyGetter : DelegatedPropertyAccessor()
+
+        /**
+         * A delegated property setter. Its real source is the explicit setter declaration if present, or otherwise the call that creates
+         * the delegate.
+         */
+        object DelegatedPropertySetter : DelegatedPropertyAccessor()
+
+        /**
+         * The value parameter of a delegated property setter. Its real source is the explicit setter declaration if present, or otherwise
+         * the call that creates the delegate.
+         */
+        object DelegatedPropertySetterValueParameter : DelegatedPropertyAccessor()
+    }
 
     /**
      * for kt classes without implicit primary constructor one is generated
@@ -739,6 +764,17 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
      */
     object ContextSensitiveAlternative : KtFakeSourceElementKind()
     object ReferenceForContextSensitiveAlternative : KtFakeSourceElementKind()
+
+    // Moving these properties to the companion objects of their respective classes such as `EnumGeneratedDeclaration` is not an option
+    // because then the sealed class can be used as an object (e.g. as a `when` subject), which can lead to programming errors.
+    companion object {
+        val ALL_DELEGATED_PROPERTY_ACCESSORS: Set<DelegatedPropertyAccessor> = setOf(
+            DelegatedPropertyAccessor.DelegatedPropertyDelegateExpression,
+            DelegatedPropertyAccessor.DelegatedPropertyGetter,
+            DelegatedPropertyAccessor.DelegatedPropertySetter,
+            DelegatedPropertyAccessor.DelegatedPropertySetterValueParameter,
+        )
+    }
 }
 
 sealed class AbstractKtSourceElement {

@@ -66,7 +66,7 @@ internal object LLContainingClassCalculator {
                 -> computeContainingClass(symbol, source.psi)
 
             is DefaultAccessor,
-            DelegatedPropertyAccessor,
+            is DelegatedPropertyAccessor,
             PropertyFromParameter,
                 -> computeContainingClass(symbol, (source.psi as? KtDeclaration)?.containingClassOrScript)
 
