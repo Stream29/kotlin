@@ -378,7 +378,7 @@ internal abstract class FirElementContainerRecorder(
 internal val FirDeclaration.isPartOfClassStructureElement: Boolean
     get() = when (source?.kind) {
         KtFakeSourceElementKind.ImplicitConstructor,
-        KtFakeSourceElementKind.DataClassGeneratedMembers,
+        is KtFakeSourceElementKind.DataClassGeneratedMembers,
         is KtFakeSourceElementKind.EnumGeneratedDeclaration,
         KtFakeSourceElementKind.ClassDelegationField,
         KtFakeSourceElementKind.ReplEvalFunction,

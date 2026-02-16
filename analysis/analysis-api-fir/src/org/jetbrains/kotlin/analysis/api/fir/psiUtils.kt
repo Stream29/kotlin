@@ -53,12 +53,11 @@ private val allowedFakeElementKinds: Set<KtFakeSourceElementKind> =
         KtFakeSourceElementKind.FromUseSiteTarget,
         KtFakeSourceElementKind.PropertyFromParameter,
         KtFakeSourceElementKind.ItLambdaParameter,
-        KtFakeSourceElementKind.DataClassGeneratedMembers,
         KtFakeSourceElementKind.ImplicitConstructor,
         KtFakeSourceElementKind.ImplicitJavaAnnotationConstructor,
         KtFakeSourceElementKind.SamConstructor,
         KtFakeSourceElementKind.JavaRecordComponentFunction,
-    )
+    ) + KtFakeSourceElementKind.ALL_DATA_CLASS_GENERATED_MEMBERS
 
 @OptIn(SuspiciousFakeSourceCheck::class)
 internal fun FirElement.getAllowedPsi() = when (val source = source) {

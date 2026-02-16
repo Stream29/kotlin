@@ -58,7 +58,7 @@ internal fun isCallableWithSpecialBody(fir: FirCallableDeclaration): Boolean {
         KtFakeSourceElementKind.DefaultAccessor,
         KtFakeSourceElementKind.ImplicitConstructor,
         KtFakeSourceElementKind.PropertyFromParameter,
-        KtFakeSourceElementKind.DataClassGeneratedMembers
+        is KtFakeSourceElementKind.DataClassGeneratedMembers
             -> true
 
         else -> false
