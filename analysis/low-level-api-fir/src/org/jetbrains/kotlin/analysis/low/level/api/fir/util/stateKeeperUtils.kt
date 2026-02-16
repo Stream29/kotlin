@@ -55,7 +55,7 @@ internal fun isCallableWithSpecialBody(fir: FirCallableDeclaration): Boolean {
     val sourceKind = (fir.source as? KtFakePsiSourceElement)?.kind ?: return false
     return when (sourceKind) {
         is KtFakeSourceElementKind.EnumGeneratedDeclaration,
-        KtFakeSourceElementKind.DefaultAccessor,
+        is KtFakeSourceElementKind.DefaultAccessor,
         KtFakeSourceElementKind.ImplicitConstructor,
         KtFakeSourceElementKind.PropertyFromParameter,
         is KtFakeSourceElementKind.DataClassGeneratedMembers

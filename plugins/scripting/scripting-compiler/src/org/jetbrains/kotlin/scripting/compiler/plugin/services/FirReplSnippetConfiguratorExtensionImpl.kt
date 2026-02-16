@@ -207,7 +207,7 @@ class FirReplSnippetConfiguratorExtensionImpl(
                 origin = origin,
                 source = lastScriptBlock.source?.fakeElement(KtFakeSourceElementKind.DefaultAccessor),
                 annotations = annotations,
-                returnTypeRef = returnTypeRef.copyWithNewSourceKind(KtFakeSourceElementKind.DefaultAccessor),
+                returnTypeRef = returnTypeRef.copyWithNewSourceKind(KtFakeSourceElementKind.DefaultAccessor.DefaultBackingField),
                 isVar = isVar,
                 propertySymbol = symbol,
                 status = status,

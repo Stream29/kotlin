@@ -65,7 +65,7 @@ internal object LLContainingClassCalculator {
             ReplEvalFunction,
                 -> computeContainingClass(symbol, source.psi)
 
-            DefaultAccessor,
+            is DefaultAccessor,
             DelegatedPropertyAccessor,
             PropertyFromParameter,
                 -> computeContainingClass(symbol, (source.psi as? KtDeclaration)?.containingClassOrScript)
