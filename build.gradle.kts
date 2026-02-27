@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.crypto.checksum.Checksum
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
@@ -1281,4 +1282,10 @@ afterEvaluate {
 // workaround for KT-68482
 tasks.withType<org.jetbrains.kotlin.gradle.targets.js.npm.tasks.KotlinNpmInstallTask>().configureEach {
     notCompatibleWithConfigurationCache("KotlinNpmInstallTask is not compatible with Configuration Cache")
+}
+
+// workaround for KTI-3015
+tasks.withType<ShadowJar>().configureEach {
+    outputs.cacheIf { false }
+    outputs.upToDateWhen { false }
 }
