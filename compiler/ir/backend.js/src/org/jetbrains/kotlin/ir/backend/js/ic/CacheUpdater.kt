@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.ir.backend.js.ic
 import org.jetbrains.kotlin.backend.common.serialization.IrInterningService
 import org.jetbrains.kotlin.backend.common.serialization.cityHash64String
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.perfManager
 import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.backend.js.JsIrCompilerWithIC
 import org.jetbrains.kotlin.ir.backend.js.loadWebKlibs
@@ -21,6 +22,8 @@ import org.jetbrains.kotlin.js.config.wasmCompilation
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.loader.KlibPlatformChecker
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.util.PhaseType
+import org.jetbrains.kotlin.util.tryMeasurePhaseTime
 import org.jetbrains.kotlin.utils.memoryOptimizedFilter
 import org.jetbrains.kotlin.utils.memoryOptimizedMap
 import org.jetbrains.kotlin.utils.newHashMapWithExpectedSize
@@ -754,7 +757,7 @@ class CacheUpdater(
         val compilerForIC = icContext.createCompiler(mainModuleFragment, loadedIr.irBuiltIns, compilerConfiguration)
 
         // Load declarations referenced during `context` initialization
-        loadedIr.loadUnboundSymbols()
+        compilerConfiguration.perfManager.tryMeasurePhaseTime(PhaseType.IrLinking) { loadedIr.loadUnboundSymbols() }
 
         val dirtyFiles = dirtyFileExports.entries.associateTo(newHashMapWithExpectedSize(dirtyFileExports.size)) {
             it.key to HashSet(it.value.keys)
@@ -862,7 +865,7 @@ fun rebuildCacheForDirtyFiles(
     )
 
     // Load declarations referenced during `context` initialization
-    loadedIr.loadUnboundSymbols()
+    configuration.perfManager.tryMeasurePhaseTime(PhaseType.IrLinking) { loadedIr.loadUnboundSymbols() }
     irInterner.reset()
 
     val fragments = compilerWithIC.compile(loadedIr.orderedFragments.values, dirtyIrFiles).memoryOptimizedMap { it() }
