@@ -50,6 +50,24 @@ private object WasmBinary {
     }
 }
 
+/**
+ * Annotation data extracted from pseudo-instructions during code emission.
+ * Stores the section name, byte offset, and payload for later section generation.
+ */
+private class ResolvedAnnotation(
+    val sectionName: String,
+    val byteOffset: Int,
+    val payloadWriter: (ByteWriter) -> Unit
+)
+
+/**
+ * Collected resolved annotations for a function, ready for section emission.
+ */
+private class FunctionResolvedAnnotations(
+    val functionIndex: Int,
+    val annotations: List<ResolvedAnnotation>
+)
+
 class WasmIrToBinary(
     val b: ByteWriterWithOffsetWrite,
     val module: WasmModule,
@@ -61,6 +79,13 @@ class WasmIrToBinary(
     private val appendImmediateDelegate = ::appendImmediate
     private val defaultEndInstruction = wasmInstrWithoutLocation(WasmOp.END)
     private val resolver = module.resolver
+
+    // Collected resolved annotations per function for code metadata section emission
+    private val resolvedAnnotationsByFunction = mutableListOf<FunctionResolvedAnnotations>()
+
+    // Context for tracking annotations during function emission
+    private var currentFunctionCodeStart: Int = 0
+    private var currentFunctionAnnotations: MutableList<ResolvedAnnotation>? = null
 
     override fun consumeDebugInformation(debugInformation: DebugInformation) {
         debugInformation.forEach {
@@ -175,8 +200,21 @@ class WasmIrToBinary(
             // code section
             appendSection(WasmBinary.Section.CODE) {
                 appendVectorSize(definedFunctions.size)
-                definedFunctions.forEach { appendCode(it) }
+                val importedFunctionCount = importedFunctions.size
+                definedFunctions.forEachIndexed { index, func ->
+                    appendCode(func, importedFunctionCount + index)
+                }
             }
+
+            // code metadata sections
+            //
+            // Note: We generate the code metadata sections after the code section is appended
+            // because the metadata sections depend on the annotations processed in the instruction
+            // stream. However, if
+            // https://github.com/WebAssembly/branch-hinting/blob/main/proposals/branch-hinting/Overview.md
+            // is to be believed, this section is supposed to come before. It works to generate it
+            // after anyway, so that's what we do, since it's much easier that way.
+            emitCodeMetadataSections()
 
             appendSection(WasmBinary.Section.DATA) {
                 appendVectorSize(data.size)
@@ -189,6 +227,53 @@ class WasmIrToBinary(
             }
 
             debugInformationGenerator?.let { consumeDebugInformation(it.generateDebugInformation()) }
+        }
+    }
+
+    /**
+     * Emit code metadata sections for all collected annotations.
+     */
+    private fun emitCodeMetadataSections() {
+        if (resolvedAnnotationsByFunction.isEmpty()) return
+
+        // Group all annotations by section name
+        val bySectionName = mutableMapOf<String, MutableList<Pair<Int, ResolvedAnnotation>>>()
+        for (funcAnnotations in resolvedAnnotationsByFunction) {
+            for (resolved in funcAnnotations.annotations) {
+                bySectionName.getOrPut(resolved.sectionName) { mutableListOf() }
+                    .add(funcAnnotations.functionIndex to resolved)
+            }
+        }
+
+        // Emit a custom section for each annotation type in the format described here:
+        // https://github.com/WebAssembly/tool-conventions/blob/main/CodeMetadata.md
+        for ((sectionName, entries) in bySectionName) {
+            appendSection(WasmBinary.Section.CUSTOM) {
+                b.writeString(sectionName)
+
+                // Group by function index
+                val byFunction = entries.groupBy({ it.first }, { it.second })
+                    .toSortedMap()
+
+                b.writeVarUInt32(byFunction.size)
+
+                for ((funcIdx, annotations) in byFunction) {
+                    b.writeVarUInt32(funcIdx)
+                    b.writeVarUInt32(annotations.size)
+
+                    for (resolved in annotations.sortedBy { it.byteOffset }) {
+                        b.writeVarUInt32(resolved.byteOffset)
+
+                        // Compute payload size by writing to a temporary buffer first
+                        val tempBuffer = java.io.ByteArrayOutputStream()
+                        resolved.payloadWriter(ByteWriter(tempBuffer))
+                        val payloadBytes = tempBuffer.toByteArray()
+
+                        b.writeVarUInt32(payloadBytes.size)
+                        b.writeBytes(payloadBytes)
+                    }
+                }
+            }
         }
     }
 
@@ -262,8 +347,48 @@ class WasmIrToBinary(
 
         val opcode = instr.operator.opcode
 
-        if (opcode == WASM_OP_PSEUDO_OPCODE)
+        if (opcode == WASM_OP_PSEUDO_OPCODE) {
+            // Handle annotation pseudo-instructions by recording them without emitting bytes
+            val annotations = currentFunctionAnnotations?: error("Annotation context not set up.")
+            val byteOffset = b.written - currentFunctionCodeStart
+            when (instr.operator) {
+                WasmOp.PSEUDO_ANNOTATION_BRANCH_HINT -> {
+                    val likely = (instr.firstImmediateOrNull()!! as WasmImmediate.ConstU8).value.toUInt()
+                    annotations.add(
+                        ResolvedAnnotation(
+                            sectionName = "metadata.code.branch_hint",
+                            byteOffset = byteOffset,
+                            payloadWriter = { writer -> writer.writeVarUInt32(likely) }
+                        )
+                    )
+                }
+                WasmOp.PSEUDO_ANNOTATION_TRACE_INST -> {
+                    val markId = (instr.firstImmediateOrNull()!! as WasmImmediate.ConstI32).value
+                    annotations.add(
+                        ResolvedAnnotation(
+                            sectionName = "metadata.code.trace_inst",
+                            byteOffset = byteOffset,
+                            payloadWriter = { writer -> writer.writeVarInt32(markId) }
+                        )
+                    )
+                }
+                WasmOp.PSEUDO_ANNOTATION_JS_CALLED -> {
+                    require(byteOffset == 0) { "js.called annotation must be emitted at function start." }
+                    annotations.add(
+                        ResolvedAnnotation(
+                            sectionName = "binaryen.js.called",
+                            byteOffset = byteOffset,
+                            payloadWriter = { /* empty payload */ }
+                        )
+                    )
+                }
+                WasmOp.PSEUDO_COMMENT_PREVIOUS_INSTR -> {}
+                WasmOp.PSEUDO_COMMENT_GROUP_START -> {}
+                WasmOp.PSEUDO_COMMENT_GROUP_END -> {}
+                else -> error("Unknown annotation pseudo-instruction: ${instr.operator}")
+            }
             return
+        }
 
         if (opcode > 0xFF) {
             b.writeByte((opcode ushr 8).toByte())
@@ -564,7 +689,7 @@ class WasmIrToBinary(
         }
     }
 
-    private fun appendCode(function: WasmFunction.Defined) {
+    private fun appendCode(function: WasmFunction.Defined, functionIndex: Int) {
         val shouldWriteLocationBeforeFunctionHeader = function.endLocation is SourceLocation.IgnoredLocation
 
         if (shouldWriteLocationBeforeFunctionHeader) {
@@ -584,6 +709,12 @@ class WasmIrToBinary(
                 )
             }
 
+            // Code annotation offsets are relative to the first byte
+            // of the locals.
+            currentFunctionCodeStart = b.written
+            val annotations = mutableListOf<ResolvedAnnotation>()
+            currentFunctionAnnotations = annotations
+
             b.writeVarUInt32(function.locals.count { !it.isParameter })
             function.locals.forEach { local ->
                 if (!local.isParameter) {
@@ -594,6 +725,15 @@ class WasmIrToBinary(
 
             debugInformationGenerator?.startFunction(getCurrentSourceLocationMapping(function.startLocation), function.name)
             appendExpr(function.instructions, function.endLocation)
+
+            // Clear annotation tracking context
+            currentFunctionAnnotations = null
+
+            // Store resolved annotations for later section emission
+            if (annotations.isNotEmpty()) {
+                resolvedAnnotationsByFunction.add(FunctionResolvedAnnotations(functionIndex, annotations))
+            }
+
             debugInformationGenerator?.endFunction(getCurrentSourceLocationMapping(function.endLocation))
         }
     }
