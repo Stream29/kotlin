@@ -711,6 +711,16 @@ public abstract class org/jetbrains/kotlin/analysis/api/platform/projectStructur
 	public fun getTransitiveDependsOnDependencies ()Ljava/util/List;
 }
 
+public abstract interface class org/jetbrains/kotlin/analysis/api/platform/projectStructure/KaModuleConverter : org/jetbrains/kotlin/analysis/api/platform/KotlinOptionalPlatformComponent {
+	public static final field Companion Lorg/jetbrains/kotlin/analysis/api/platform/projectStructure/KaModuleConverter$Companion;
+	public abstract fun asKaModule (Lcom/intellij/openapi/module/Module;)Lorg/jetbrains/kotlin/analysis/api/projectStructure/KaModule;
+	public abstract fun asOpenApiModule (Lorg/jetbrains/kotlin/analysis/api/projectStructure/KaModule;)Lcom/intellij/openapi/module/Module;
+}
+
+public final class org/jetbrains/kotlin/analysis/api/platform/projectStructure/KaModuleConverter$Companion {
+	public final fun getInstance ()Lorg/jetbrains/kotlin/analysis/api/platform/projectStructure/KaModuleConverter;
+}
+
 public abstract class org/jetbrains/kotlin/analysis/api/platform/projectStructure/KaResolutionScope : com/intellij/psi/search/GlobalSearchScope {
 	public static final field Companion Lorg/jetbrains/kotlin/analysis/api/platform/projectStructure/KaResolutionScope$Companion;
 	public fun <init> ()V
