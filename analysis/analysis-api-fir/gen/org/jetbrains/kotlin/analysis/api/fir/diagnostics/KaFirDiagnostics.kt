@@ -3708,6 +3708,11 @@ sealed interface KaFirDiagnostic<PSI : PsiElement> : KaDiagnosticWithPsi<PSI> {
         val lambda: KaSymbol
     }
 
+    interface VarOverwrittenBeforeCapturedLambda : KaFirDiagnostic<KtBinaryExpression> {
+        override val diagnosticClass get() = VarOverwrittenBeforeCapturedLambda::class
+        val variable: KaVariableSymbol
+    }
+
     interface VariableWithNoTypeNoInitializer : KaFirDiagnostic<KtVariableDeclaration> {
         override val diagnosticClass get() = VariableWithNoTypeNoInitializer::class
     }
@@ -3992,6 +3997,11 @@ sealed interface KaFirDiagnostic<PSI : PsiElement> : KaDiagnosticWithPsi<PSI> {
     interface ContractNotAllowed : KaFirDiagnostic<KtElement> {
         override val diagnosticClass get() = ContractNotAllowed::class
         val reason: String
+    }
+
+    interface SmartcastRelyingOnCallsInPlace : KaFirDiagnostic<KtExpression> {
+        override val diagnosticClass get() = SmartcastRelyingOnCallsInPlace::class
+        val info: String
     }
 
     interface NoGetMethod : KaFirDiagnostic<KtArrayAccessExpression> {
