@@ -9,6 +9,7 @@ import java.nio.file.Path
 
 public class IncrementalModule(
     public val name: String,
+    public val outputDir: Path,
     public val buildDir: Path,
     public val buildHistoryDir: Path,
     public val outputKlib: Path? = null,

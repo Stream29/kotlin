@@ -299,7 +299,7 @@ internal class JsKlibCompilationOperationImpl private constructor(
 private fun List<IncrementalModule>.toIncrementalModuleInfo(rootProjectBuildDir: Path): IncrementalModuleInfo {
     val map: Map<IncrementalModule, IncrementalModuleEntry> = associateWith {
         IncrementalModuleEntry(
-            it.buildDir.absolutePathStringOrThrow() + ":" + it.name,
+            it.outputDir.absolutePathStringOrThrow(),
             it.name,
             it.buildDir.toFile(),
             it.buildHistoryDir.resolve(IncrementalCompilerRunner.BUILD_HISTORY_FILE_NAME).toFile(),
@@ -310,7 +310,7 @@ private fun List<IncrementalModule>.toIncrementalModuleInfo(rootProjectBuildDir:
     }
     return IncrementalModuleInfo(
         rootProjectBuildDir.toFile(),
-        map.mapKeys { it.key.buildDir.toFile() },
+        map.mapKeys { it.key.outputDir.toFile() },
         buildMap {
             map.forEach { (_, it) -> (getOrPut(it.name) { mutableSetOf() } as MutableSet<IncrementalModuleEntry>).add(it) }
         },

@@ -92,11 +92,13 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
             val modulesInfo = listOf(
                 IncrementalModule(
                     "app",
+                    appModule.outputDirectory,
                     appModule.buildDirectory,
                     appModule.icWorkingDir
                 ),
                 IncrementalModule(
                     "lib",
+                    appModule.outputDirectory,
                     libModule.buildDirectory,
                     libModule.icWorkingDir,
                     libModule.outputDirectory.resolve("lib.klib")
@@ -168,25 +170,7 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
                     assertEquals(CompilationResult.COMPILATION_SUCCESS, result)
 
                     var expectedCompiledSources = listOf("A.kt", "useAInLibMain.kt")
-                    var actualCompiledSources = (logger.logMessagesByLevel[LogLevel.DEBUG] ?: emptyList())
-                        .map { it.removePrefix("[KOTLIN] ") }
-                        .filter { it.startsWith("compile iteration") }
-                        .flatMap { it.replace("compile iteration: ", "").trim().split(", ") }
-                        .toSet()
-                    var normalizedPaths = expectedCompiledSources
-                        .map { libModule.sourcesDirectory.resolve(it) }
-                        .map { it.relativeTo(libModule.project.projectDirectory) }
-                        .map(Path::toString)
-                        .toSet()
-                    assertEquals(normalizedPaths, actualCompiledSources) {
-                        """
-                            Compiled sources do not match. Set diff:
-                            Unexpected: ${actualCompiledSources - normalizedPaths}
-                            Missing: ${normalizedPaths - actualCompiledSources}
-
-                            Full sets:
-                        """.trimIndent()
-                    }
+                    assertCompiledSources(logger, expectedCompiledSources, libModule)
 
                     logger = TestKotlinLogger()
                     result = it.executeOperation(compilationOperation2.toBuilder().apply {
@@ -200,25 +184,7 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
                     assertEquals(CompilationResult.COMPILATION_SUCCESS, result)
 
                     expectedCompiledSources = listOf("useAInAppMain.kt")
-                    actualCompiledSources = (logger.logMessagesByLevel[LogLevel.DEBUG] ?: emptyList())
-                        .map { it.removePrefix("[KOTLIN] ") }
-                        .filter { it.startsWith("compile iteration") }
-                        .flatMap { it.replace("compile iteration: ", "").trim().split(", ") }
-                        .toSet()
-                    normalizedPaths = expectedCompiledSources
-                        .map { appModule.sourcesDirectory.resolve(it) }
-                        .map { it.relativeTo(appModule.project.projectDirectory) }
-                        .map(Path::toString)
-                        .toSet()
-                    assertEquals(normalizedPaths, actualCompiledSources) {
-                        """
-                            Compiled sources do not match. Set diff:
-                            Unexpected: ${actualCompiledSources - normalizedPaths}
-                            Missing: ${normalizedPaths - actualCompiledSources}
-                            
-                            Full sets:
-                        """.trimIndent()
-                    }
+                    assertCompiledSources(logger, expectedCompiledSources, appModule)
                 } catch (e: Throwable) {
                     logger.printBuildOutput(LogLevel.DEBUG)
                     throw e
@@ -282,5 +248,31 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
                 assertNoOutputSetChanges()
             }
         }
+    }
+}
+
+private fun assertCompiledSources(
+    logger: TestKotlinLogger,
+    expectedCompiledSources: List<String>,
+    appModule: Module,
+) {
+    val actualCompiledSources = (logger.logMessagesByLevel[LogLevel.DEBUG] ?: emptyList())
+        .map { it.removePrefix("[KOTLIN] ") }
+        .filter { it.startsWith("compile iteration") }
+        .flatMap { it.replace("compile iteration: ", "").trim().split(", ") }
+        .toSet()
+    val normalizedPaths = expectedCompiledSources
+        .map { appModule.sourcesDirectory.resolve(it) }
+        .map { it.relativeTo(appModule.project.projectDirectory) }
+        .map(Path::toString)
+        .toSet()
+    assertEquals(normalizedPaths, actualCompiledSources) {
+        """
+            Compiled sources do not match. Set diff:
+            Unexpected: ${actualCompiledSources - normalizedPaths}
+            Missing: ${normalizedPaths - actualCompiledSources}
+            
+            Full sets:
+        """.trimIndent()
     }
 }
