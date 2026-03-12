@@ -4,6 +4,8 @@
 
 import kotlin.contracts.*
 
+fun maybeString(): String? = "ok"
+
 // Helper function with callsInPlace contract
 fun testCallsInPlace(block: () -> Int) {
     contract {
@@ -111,13 +113,23 @@ fun useCaseWithoutContractWithStable() {
             x.length
         }
         inlineFunction {
-            <!SMARTCAST_RELYING_ON_CALLS_IN_PLACE!>x<!>.length
+            x.length
         }
     }
 }
 
-fun funNegativeUseCase() {
-
+fun nestedSmartcastInOtherInPlaceLambda() {
+    var x: String? = maybeString()
+    testCallsInPlaceAtMostOnce {
+        if (x is String) {
+            <!SMARTCAST_RELYING_ON_CALLS_IN_PLACE!>x<!>.length
+        }
+        testCallsInPlaceAtMostOnce {
+            x = null
+            2
+        }
+        2
+    }
 }
 
 /* GENERATED_FIR_TAGS: additiveExpression, andExpression, assignment, comparisonExpression, contractCallsEffect,
