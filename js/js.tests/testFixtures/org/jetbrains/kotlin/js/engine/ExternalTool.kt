@@ -43,6 +43,7 @@ class ExternalTool(val path: String) {
             throw ScriptExecutionException(stdout, stderr)
         }
 
+        println("STDERR: $stderr")
         return stdout
     }
 
