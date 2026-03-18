@@ -376,13 +376,14 @@ class IrBodyDeserializer(
     private fun deserializeDelegatingConstructorCall(
         proto: ProtoDelegatingConstructorCall,
         start: Int,
-        end: Int
+        end: Int,
+        type: IrType,
     ): IrDelegatingConstructorCall {
         val symbol = deserializeTypedSymbol<IrConstructorSymbol>(proto.symbol, CONSTRUCTOR_SYMBOL)
         val call = IrDelegatingConstructorCallImplRaw(
             start,
             end,
-            builtIns.unitType,
+            type,
             symbol,
             null,
         )
@@ -397,12 +398,13 @@ class IrBodyDeserializer(
         proto: ProtoEnumConstructorCall,
         start: Int,
         end: Int,
+        type: IrType,
     ): IrEnumConstructorCall {
         val symbol = deserializeTypedSymbol<IrConstructorSymbol>(proto.symbol, CONSTRUCTOR_SYMBOL)
         val call = IrEnumConstructorCallImplRaw(
             start,
             end,
-            builtIns.unitType,
+            type,
             symbol,
             null,
         )
@@ -574,10 +576,11 @@ class IrBodyDeserializer(
     private fun deserializeInstanceInitializerCall(
         proto: ProtoInstanceInitializerCall,
         start: Int,
-        end: Int
+        end: Int,
+        type: IrType,
     ): IrInstanceInitializerCall {
         val symbol = deserializeTypedSymbol<IrClassSymbol>(proto.symbol, CLASS_SYMBOL)
-        return IrInstanceInitializerCallImpl(start, end, symbol, builtIns.unitType)
+        return IrInstanceInitializerCallImpl(start, end, symbol, type)
     }
 
     private fun deserializeIrLocalDelegatedPropertyReference(
@@ -626,16 +629,16 @@ class IrBodyDeserializer(
         return callable
     }
 
-    private fun deserializeReturn(proto: ProtoReturn, start: Int, end: Int): IrReturn {
+    private fun deserializeReturn(proto: ProtoReturn, start: Int, end: Int, type: IrType): IrReturn {
         val symbol = deserializeTypedSymbol<IrReturnTargetSymbol>(
             proto.returnTarget,
             fallbackSymbolKind = /* just the first possible option */ FUNCTION_SYMBOL
         )
         val value = deserializeExpression(proto.value, start)
-        return IrReturnImpl(start, end, builtIns.nothingType, symbol, value)
+        return IrReturnImpl(start, end, type, symbol, value)
     }
 
-    private fun deserializeSetField(proto: ProtoSetField, start: Int, end: Int): IrSetField {
+    private fun deserializeSetField(proto: ProtoSetField, start: Int, end: Int, type: IrType): IrSetField {
         val access = proto.fieldAccess
         val symbol = deserializeTypedSymbol<IrFieldSymbol>(access.symbol, FIELD_SYMBOL)
         val superQualifier = deserializeTypedSymbolWhen<IrClassSymbol>(access.hasSuper(), CLASS_SYMBOL) { access.`super` }
@@ -645,14 +648,14 @@ class IrBodyDeserializer(
         val value = deserializeExpression(proto.value, start)
         val origin = deserializeIrStatementOrigin(proto.hasOriginName()) { proto.originName }
 
-        return IrSetFieldImpl(start, end, symbol, receiver, value, builtIns.unitType, origin, superQualifier)
+        return IrSetFieldImpl(start, end, symbol, receiver, value, type, origin, superQualifier)
     }
 
-    private fun deserializeSetValue(proto: ProtoSetValue, start: Int, end: Int): IrSetValue {
+    private fun deserializeSetValue(proto: ProtoSetValue, start: Int, end: Int, type: IrType): IrSetValue {
         val symbol = deserializeTypedSymbol<IrValueSymbol>(proto.symbol, fallbackSymbolKind = null)
         val value = deserializeExpression(proto.value, start)
         val origin = deserializeIrStatementOrigin(proto.hasOriginName()) { proto.originName }
-        return IrSetValueImpl(start, end, builtIns.unitType, symbol, value, origin)
+        return IrSetValueImpl(start, end, type, symbol, value, origin)
     }
 
     private fun deserializeSpreadElement(proto: ProtoSpreadElement, parentStart: Int): IrSpreadElement {
@@ -673,8 +676,8 @@ class IrBodyDeserializer(
         return IrStringConcatenationImpl(start, end, type, arguments)
     }
 
-    private fun deserializeThrow(proto: ProtoThrow, start: Int, end: Int): IrThrowImpl {
-        return IrThrowImpl(start, end, builtIns.nothingType, deserializeExpression(proto.value, start))
+    private fun deserializeThrow(proto: ProtoThrow, start: Int, end: Int, type: IrType): IrThrowImpl {
+        return IrThrowImpl(start, end, type, deserializeExpression(proto.value, start))
     }
 
     private fun deserializeTry(proto: ProtoTry, start: Int, end: Int, type: IrType): IrTryImpl {
@@ -911,9 +914,9 @@ class IrBodyDeserializer(
             OP_COMPOSITE -> deserializeComposite(proto.opComposite, start, end, type)
             OP_CONST -> deserializeConst(proto.opConst, start, end, type)
             OP_CONTINUE -> deserializeContinue(proto.opContinue, start, end, type)
-            OP_DELEGATING_CONSTRUCTOR_CALL -> deserializeDelegatingConstructorCall(proto.opDelegatingConstructorCall, start, end)
+            OP_DELEGATING_CONSTRUCTOR_CALL -> deserializeDelegatingConstructorCall(proto.opDelegatingConstructorCall, start, end, type)
             OP_DO_WHILE -> deserializeDoWhile(proto.opDoWhile, start, end, type)
-            OP_ENUM_CONSTRUCTOR_CALL -> deserializeEnumConstructorCall(proto.opEnumConstructorCall, start, end)
+            OP_ENUM_CONSTRUCTOR_CALL -> deserializeEnumConstructorCall(proto.opEnumConstructorCall, start, end, type)
             OP_FUNCTION_REFERENCE -> deserializeFunctionReference(proto.opFunctionReference, start, end, type)
             OP_GET_ENUM_VALUE -> deserializeGetEnumValue(proto.opGetEnumValue, start, end, type)
             OP_GET_CLASS -> deserializeGetClass(proto.opGetClass, start, end, type)
@@ -922,13 +925,13 @@ class IrBodyDeserializer(
             OP_GET_VALUE -> deserializeGetValue(proto.opGetValue, start, end, type)
             OP_LOCAL_DELEGATED_PROPERTY_REFERENCE ->
                 deserializeIrLocalDelegatedPropertyReference(proto.opLocalDelegatedPropertyReference, start, end, type)
-            OP_INSTANCE_INITIALIZER_CALL -> deserializeInstanceInitializerCall(proto.opInstanceInitializerCall, start, end)
+            OP_INSTANCE_INITIALIZER_CALL -> deserializeInstanceInitializerCall(proto.opInstanceInitializerCall, start, end, type)
             OP_PROPERTY_REFERENCE -> deserializePropertyReference(proto.opPropertyReference, start, end, type)
-            OP_RETURN -> deserializeReturn(proto.opReturn, start, end)
-            OP_SET_FIELD -> deserializeSetField(proto.opSetField, start, end)
-            OP_SET_VALUE -> deserializeSetValue(proto.opSetValue, start, end)
+            OP_RETURN -> deserializeReturn(proto.opReturn, start, end, type)
+            OP_SET_FIELD -> deserializeSetField(proto.opSetField, start, end, type)
+            OP_SET_VALUE -> deserializeSetValue(proto.opSetValue, start, end, type)
             OP_STRING_CONCAT -> deserializeStringConcat(proto.opStringConcat, start, end, type)
-            OP_THROW -> deserializeThrow(proto.opThrow, start, end)
+            OP_THROW -> deserializeThrow(proto.opThrow, start, end, type)
             OP_TRY -> deserializeTry(proto.opTry, start, end, type)
             OP_TYPE_OP -> deserializeTypeOp(proto.opTypeOp, start, end, type)
             OP_VARARG -> deserializeVararg(proto.opVararg, start, end, type)
@@ -957,9 +960,9 @@ class IrBodyDeserializer(
             COMPOSITE -> deserializeComposite(proto.composite, start, end, type)
             CONST -> deserializeConst(proto.const, start, end, type)
             CONTINUE -> deserializeContinue(proto.`continue`, start, end, type)
-            DELEGATING_CONSTRUCTOR_CALL -> deserializeDelegatingConstructorCall(proto.delegatingConstructorCall, start, end)
+            DELEGATING_CONSTRUCTOR_CALL -> deserializeDelegatingConstructorCall(proto.delegatingConstructorCall, start, end, type)
             DO_WHILE -> deserializeDoWhile(proto.doWhile, start, end, type)
-            ENUM_CONSTRUCTOR_CALL -> deserializeEnumConstructorCall(proto.enumConstructorCall, start, end)
+            ENUM_CONSTRUCTOR_CALL -> deserializeEnumConstructorCall(proto.enumConstructorCall, start, end, type)
             FUNCTION_REFERENCE -> deserializeFunctionReference(proto.functionReference, start, end, type)
             GET_ENUM_VALUE -> deserializeGetEnumValue(proto.getEnumValue, start, end, type)
             GET_CLASS -> deserializeGetClass(proto.getClass, start, end, type)
@@ -968,13 +971,13 @@ class IrBodyDeserializer(
             GET_VALUE -> deserializeGetValue(proto.getValue, start, end, type)
             LOCAL_DELEGATED_PROPERTY_REFERENCE ->
                 deserializeIrLocalDelegatedPropertyReference(proto.localDelegatedPropertyReference, start, end, type)
-            INSTANCE_INITIALIZER_CALL -> deserializeInstanceInitializerCall(proto.instanceInitializerCall, start, end)
+            INSTANCE_INITIALIZER_CALL -> deserializeInstanceInitializerCall(proto.instanceInitializerCall, start, end, type)
             PROPERTY_REFERENCE -> deserializePropertyReference(proto.propertyReference, start, end, type)
-            RETURN -> deserializeReturn(proto.`return`, start, end)
-            SET_FIELD -> deserializeSetField(proto.setField, start, end)
-            SET_VALUE -> deserializeSetValue(proto.setValue, start, end)
+            RETURN -> deserializeReturn(proto.`return`, start, end, type)
+            SET_FIELD -> deserializeSetField(proto.setField, start, end, type)
+            SET_VALUE -> deserializeSetValue(proto.setValue, start, end, type)
             STRING_CONCAT -> deserializeStringConcat(proto.stringConcat, start, end, type)
-            THROW -> deserializeThrow(proto.`throw`, start, end)
+            THROW -> deserializeThrow(proto.`throw`, start, end, type)
             TRY -> deserializeTry(proto.`try`, start, end, type)
             TYPE_OP -> deserializeTypeOp(proto.typeOp, start, end, type)
             VARARG -> deserializeVararg(proto.vararg, start, end, type)
