@@ -25,7 +25,6 @@ import kotlin.test.fail
 @AndroidGradlePluginTests
 class ExplicitApiIT : KGPBaseTest() {
 
-    @AndroidTestVersions(minVersion = TestVersions.AGP.AGP_813)
     @GradleAndroidTest
     fun `test - explicit API - warning builds`(
         gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
@@ -101,7 +100,6 @@ class ExplicitApiIT : KGPBaseTest() {
         }
     }
 
-    @AndroidTestVersions(minVersion = TestVersions.AGP.AGP_813)
     @GradleAndroidTest
     fun `test - explicit API - strict fails`(
         gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
@@ -176,7 +174,6 @@ class ExplicitApiIT : KGPBaseTest() {
         }
     }
 
-    @AndroidTestVersions(minVersion = TestVersions.AGP.AGP_813)
     @GradleAndroidTest
     fun `test - explicit API - positive warning builds`(
         gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
@@ -252,7 +249,6 @@ class ExplicitApiIT : KGPBaseTest() {
         }
     }
 
-    @AndroidTestVersions(minVersion = TestVersions.AGP.AGP_813)
     @GradleAndroidTest
     fun `test - explicit API - positive strict builds`(
         gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
