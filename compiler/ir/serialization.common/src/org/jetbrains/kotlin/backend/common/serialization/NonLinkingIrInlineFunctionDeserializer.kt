@@ -124,7 +124,6 @@ class NonLinkingIrInlineFunctionDeserializer(
 
         private val fileEntryDeserializer = FileEntryDeserializer(irInterner)
         private val declarationDeserializer = IrDeclarationDeserializer(
-            builtIns = irBuiltIns,
             symbolTable = detachedSymbolTable,
             irFactory = irBuiltIns.irFactory,
             libraryFile = fileReader,
