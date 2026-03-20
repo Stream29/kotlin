@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.backend.wasm
 import org.jetbrains.kotlin.backend.common.IrModuleInfo
 import org.jetbrains.kotlin.backend.common.linkage.issues.checkNoUnboundSymbols
 import org.jetbrains.kotlin.backend.common.serialization.IrModuleDependencyTrackerImpl
+import org.jetbrains.kotlin.backend.common.serialization.KotlinIrLinker
 import org.jetbrains.kotlin.backend.common.serialization.kotlinLibrary
 import org.jetbrains.kotlin.backend.wasm.export.ExportModelGenerator
 import org.jetbrains.kotlin.backend.wasm.ic.overrideBuiltInsSignatures
@@ -20,7 +21,6 @@ import org.jetbrains.kotlin.backend.wasm.utils.SourceMapGenerator
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.config.perfManager
 import org.jetbrains.kotlin.config.phaser.PhaserState
 import org.jetbrains.kotlin.ir.backend.js.MainModule
 import org.jetbrains.kotlin.ir.backend.js.WholeWorldStageController
@@ -37,8 +37,6 @@ import org.jetbrains.kotlin.js.config.useDebuggerCustomFormatters
 import org.jetbrains.kotlin.library.isWasmStdlib
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.platform.wasm.WasmTarget
-import org.jetbrains.kotlin.util.PhaseType
-import org.jetbrains.kotlin.util.tryMeasurePhaseTime
 import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
 import org.jetbrains.kotlin.wasm.config.WasmConfigurationKeys
@@ -87,43 +85,46 @@ data class LoweredIrWithExtraArtifacts(
     val moduleDependencies: (IrModuleFragment) -> Set<IrModuleFragment>,
 )
 
-fun compileToLoweredIr(
+fun linkIr(
     irModuleInfo: IrModuleInfo,
-    mainModule: MainModule,
     configuration: CompilerConfiguration,
-    exportedDeclarations: Set<FqName> = emptySet(),
-): LoweredIrWithExtraArtifacts {
+    mainModule: MainModule,
+): Pair<List<IrModuleFragment>, WasmBackendContext> {
     val (moduleFragment, moduleDependencies, irBuiltIns, symbolTable, irLinker) = irModuleInfo
 
-    val moduleDescriptor = moduleFragment.descriptor
     val context = WasmBackendContext(
-        module = moduleDescriptor,
+        module = moduleFragment.descriptor,
         irBuiltIns = irBuiltIns,
         symbolTable = symbolTable,
         irModuleFragment = moduleFragment,
         configuration = configuration,
     )
 
-    val allModules = configuration.perfManager.tryMeasurePhaseTime(PhaseType.IrLinking) {
-        // Create stubs
-        ExternalDependenciesGenerator(symbolTable, listOf(irLinker)).generateUnboundSymbolsAsDependencies()
+    // Create stubs
+    ExternalDependenciesGenerator(symbolTable, listOf(irLinker)).generateUnboundSymbolsAsDependencies()
 
-        // Sort dependencies after IR linkage.
-        val sortedModuleDependencies = irLinker.moduleDependencyTracker.reverseTopoOrder(moduleDependencies)
+    // Sort dependencies after IR linkage.
+    val sortedModuleDependencies = irLinker.moduleDependencyTracker.reverseTopoOrder(moduleDependencies)
 
-        val allModules = when (mainModule) {
-            is MainModule.SourceFiles -> error("Main module must be klib")
-            is MainModule.Klib -> sortedModuleDependencies.all
-        }
-        allModules.forEach { it.patchDeclarationParents() }
-
-        irLinker.postProcess(inOrAfterLinkageStep = true)
-        irLinker.checkNoUnboundSymbols(symbolTable, "at the end of IR linkage process")
-        irLinker.clear()
-
-        allModules
+    val allModules = when (mainModule) {
+        is MainModule.SourceFiles -> error("Main module must be klib")
+        is MainModule.Klib -> sortedModuleDependencies.all
     }
+    allModules.forEach { it.patchDeclarationParents() }
 
+    irLinker.postProcess(inOrAfterLinkageStep = true)
+    irLinker.checkNoUnboundSymbols(symbolTable, "at the end of IR linkage process")
+    irLinker.clear()
+    return allModules to context
+}
+
+fun compileToLoweredIr(
+    configuration: CompilerConfiguration,
+    irLinker: KotlinIrLinker,
+    exportedDeclarations: Set<FqName> = emptySet(),
+    allModules: List<IrModuleFragment>,
+    context: WasmBackendContext,
+): LoweredIrWithExtraArtifacts {
     for (module in allModules)
         for (file in module.files)
             markExportedDeclarations(context, file, exportedDeclarations)
@@ -135,13 +136,11 @@ fun compileToLoweredIr(
         TypeScriptFragment(exportModelToDtsTranslator.generateTypeScript("", listOf(fragment)))
     }
 
-    configuration.perfManager.tryMeasurePhaseTime(PhaseType.IrLowering) {
-        lowerPreservingTags(
-            allModules,
-            context,
-            context.irFactory.stageController as WholeWorldStageController,
-        )
-    }
+    lowerPreservingTags(
+        allModules,
+        context,
+        context.irFactory.stageController as WholeWorldStageController,
+    )
 
     overrideBuiltInsSignatures(context)
 
