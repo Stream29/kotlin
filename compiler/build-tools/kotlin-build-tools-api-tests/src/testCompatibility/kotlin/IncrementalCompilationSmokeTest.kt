@@ -5,20 +5,34 @@
 
 package org.jetbrains.kotlin.buildtools.tests
 
+import org.jetbrains.kotlin.buildtools.api.BaseIncrementalCompilationConfiguration
+import org.jetbrains.kotlin.buildtools.api.CompilationResult
+import org.jetbrains.kotlin.buildtools.api.SourcesChanges
+import org.jetbrains.kotlin.buildtools.api.arguments.CommonJsAndWasmArguments
 import org.jetbrains.kotlin.buildtools.api.arguments.CommonToolArguments.Companion.VERBOSE
+import org.jetbrains.kotlin.buildtools.api.arguments.ExperimentalCompilerArgument
+import org.jetbrains.kotlin.buildtools.api.js.IncrementalModule
+import org.jetbrains.kotlin.buildtools.api.js.JsHistoryBasedIncrementalCompilationConfiguration
+import org.jetbrains.kotlin.buildtools.api.js.JsPlatformToolchain.Companion.js
+import org.jetbrains.kotlin.buildtools.api.js.jsKlibCompilationOperation
+import org.jetbrains.kotlin.buildtools.api.js.operations.JsKlibCompilationOperation.Companion.INCREMENTAL_COMPILATION
 import org.jetbrains.kotlin.buildtools.api.jvm.operations.JvmCompilationOperation
 import org.jetbrains.kotlin.buildtools.tests.compilation.BaseCompilationTest
 import org.jetbrains.kotlin.buildtools.tests.compilation.assertions.assertCompiledSources
 import org.jetbrains.kotlin.buildtools.tests.compilation.assertions.assertLogContainsSubstringExactlyTimes
 import org.jetbrains.kotlin.buildtools.tests.compilation.assertions.assertOutputs
-import org.jetbrains.kotlin.buildtools.tests.compilation.model.DefaultStrategyAgnosticCompilationTest
-import org.jetbrains.kotlin.buildtools.tests.compilation.model.LogLevel
+import org.jetbrains.kotlin.buildtools.tests.compilation.model.*
 import org.jetbrains.kotlin.buildtools.tests.compilation.scenario.assertNoOutputSetChanges
 import org.jetbrains.kotlin.buildtools.tests.compilation.scenario.scenario
 import org.jetbrains.kotlin.test.TestMetadata
 import org.jetbrains.kotlin.tooling.core.KotlinToolingVersion
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.DisplayName
+import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.*
 
 class IncrementalCompilationSmokeTest : BaseCompilationTest() {
     @DisplayName("IC works with the externally tracked changes, similarly to Gradle")
@@ -57,6 +71,160 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
     @TestMetadata("kotlin-java-mixed")
     fun mixedModuleExternallyTracked(strategyConfig: CompilerExecutionStrategyConfiguration) {
         runMixedModuleTest(strategyConfig, useTrackedModules = false)
+    }
+
+    @OptIn(ExperimentalCompilerArgument::class)
+    @DisplayName("Basic IC setup works for JS project")
+    @BtaV2StrategyAgnosticCompilationTest
+    @TestMetadata("js-ic-basic")
+    fun jsBasicIcWorks(strategyConfig: CompilerExecutionStrategyConfiguration) {
+        assumeTrue(strategyConfig.first.getCompilerVersion().startsWith("2.4"))
+        val toolchain = strategyConfig.first
+        val stdlibKlib = System.getProperty("kotlin.build-tools-api.test.jsStdlibClasspath")
+
+        project(strategyConfig) {
+            val appModule = module("js-ic-basic-app")
+            val libModule = module("js-ic-basic-lib")
+
+            val libSources = libModule.sourcesDirectory.walk().filter { it.name.endsWith(".kt") }.toList()
+            val appSources = appModule.sourcesDirectory.walk().filter { it.name.endsWith(".kt") }.toList()
+
+            val modulesInfo = listOf(
+                IncrementalModule(
+                    "app",
+                    appModule.buildDirectory,
+                    appModule.icWorkingDir
+                ),
+                IncrementalModule(
+                    "lib",
+                    libModule.buildDirectory,
+                    libModule.icWorkingDir,
+                    libModule.outputDirectory.resolve("lib.klib")
+                ),
+            )
+
+            val compilationOperation1 = toolchain.js.jsKlibCompilationOperation(
+                libSources,
+                libModule.outputDirectory
+            ) {
+                compilerArguments[CommonJsAndWasmArguments.LIBRARIES] = stdlibKlib
+                compilerArguments[CommonJsAndWasmArguments.IR_OUTPUT_NAME] = "lib"
+                compilerArguments[CommonJsAndWasmArguments.X_IR_PRODUCE_KLIB_FILE] = true
+                this[INCREMENTAL_COMPILATION] = this.historyBasedIcConfigurationBuilder(
+                    libModule.icCachesDir,
+                    SourcesChanges.ToBeCalculated,
+                    modulesInfo
+                ).apply {
+                    this[BaseIncrementalCompilationConfiguration.ROOT_PROJECT_DIR] = projectDirectory
+                    this[BaseIncrementalCompilationConfiguration.MODULE_BUILD_DIR] = libModule.buildDirectory
+                    this[JsHistoryBasedIncrementalCompilationConfiguration.ROOT_PROJECT_BUILD_DIR] = projectDirectory.resolve("build")
+                    this[JsHistoryBasedIncrementalCompilationConfiguration.HISTORY_FILE_DIR] = libModule.icWorkingDir
+                }.build()
+            }
+
+            fun JsHistoryBasedIncrementalCompilationConfiguration.Builder.applyAppIc() {
+                this[BaseIncrementalCompilationConfiguration.ROOT_PROJECT_DIR] = projectDirectory
+                this[BaseIncrementalCompilationConfiguration.MODULE_BUILD_DIR] = appModule.buildDirectory
+                this[JsHistoryBasedIncrementalCompilationConfiguration.ROOT_PROJECT_BUILD_DIR] = projectDirectory.resolve("build")
+                this[JsHistoryBasedIncrementalCompilationConfiguration.HISTORY_FILE_DIR] = appModule.icWorkingDir
+            }
+
+            val compilationOperation2 = toolchain.js.jsKlibCompilationOperation(
+                appSources,
+                appModule.outputDirectory
+            ) {
+                compilerArguments[CommonJsAndWasmArguments.LIBRARIES] =
+                    stdlibKlib + File.pathSeparator + libModule.outputDirectory.resolve("lib.klib").absolutePathString()
+                compilerArguments[CommonJsAndWasmArguments.IR_OUTPUT_NAME] = "app"
+                compilerArguments[CommonJsAndWasmArguments.X_IR_PRODUCE_KLIB_FILE] = true
+                this[INCREMENTAL_COMPILATION] = this.historyBasedIcConfigurationBuilder(
+                    appModule.icCachesDir,
+                    SourcesChanges.Unknown,
+                    modulesInfo
+                ).apply {
+                    applyAppIc()
+                }.build()
+            }
+            toolchain.createBuildSession().use {
+                var logger = TestKotlinLogger()
+                try {
+                    var result = it.executeOperation(compilationOperation1, strategyConfig.second, logger)
+                    assertEquals(CompilationResult.COMPILATION_SUCCESS, result)
+
+                    logger = TestKotlinLogger()
+                    result = it.executeOperation(compilationOperation2, strategyConfig.second, logger)
+                    assertEquals(CompilationResult.COMPILATION_SUCCESS, result)
+
+                    val modifiedFile = libSources.find { file -> file.name == "A.kt" } ?: error("No A.kt file in test project")
+                    modifiedFile.writeText(
+                        """
+                    class A {
+                        val x = "a"
+                    }
+                """.trimIndent()
+                    )
+                    logger = TestKotlinLogger()
+                    result = it.executeOperation(compilationOperation1.toBuilder().build(), strategyConfig.second, logger)
+                    assertEquals(CompilationResult.COMPILATION_SUCCESS, result)
+
+                    var expectedCompiledSources = listOf("A.kt", "useAInLibMain.kt")
+                    var actualCompiledSources = (logger.logMessagesByLevel[LogLevel.DEBUG] ?: emptyList())
+                        .map { it.removePrefix("[KOTLIN] ") }
+                        .filter { it.startsWith("compile iteration") }
+                        .flatMap { it.replace("compile iteration: ", "").trim().split(", ") }
+                        .toSet()
+                    var normalizedPaths = expectedCompiledSources
+                        .map { libModule.sourcesDirectory.resolve(it) }
+                        .map { it.relativeTo(libModule.project.projectDirectory) }
+                        .map(Path::toString)
+                        .toSet()
+                    assertEquals(normalizedPaths, actualCompiledSources) {
+                        """
+                            Compiled sources do not match. Set diff:
+                            Unexpected: ${actualCompiledSources - normalizedPaths}
+                            Missing: ${normalizedPaths - actualCompiledSources}
+
+                            Full sets:
+                        """.trimIndent()
+                    }
+
+                    logger = TestKotlinLogger()
+                    result = it.executeOperation(compilationOperation2.toBuilder().apply {
+                        val previousIc = this[INCREMENTAL_COMPILATION] as JsHistoryBasedIncrementalCompilationConfiguration
+                        this[INCREMENTAL_COMPILATION] = historyBasedIcConfigurationBuilder(
+                            previousIc.workingDirectory,
+                            SourcesChanges.Known(listOf(libModule.outputDirectory.resolve("lib.klib").toFile()), emptyList()),
+                            previousIc.modulesInformation
+                        ).apply { applyAppIc() }.build()
+                    }.build(), strategyConfig.second, logger)
+                    assertEquals(CompilationResult.COMPILATION_SUCCESS, result)
+
+                    expectedCompiledSources = listOf("useAInAppMain.kt")
+                    actualCompiledSources = (logger.logMessagesByLevel[LogLevel.DEBUG] ?: emptyList())
+                        .map { it.removePrefix("[KOTLIN] ") }
+                        .filter { it.startsWith("compile iteration") }
+                        .flatMap { it.replace("compile iteration: ", "").trim().split(", ") }
+                        .toSet()
+                    normalizedPaths = expectedCompiledSources
+                        .map { appModule.sourcesDirectory.resolve(it) }
+                        .map { it.relativeTo(appModule.project.projectDirectory) }
+                        .map(Path::toString)
+                        .toSet()
+                    assertEquals(normalizedPaths, actualCompiledSources) {
+                        """
+                            Compiled sources do not match. Set diff:
+                            Unexpected: ${actualCompiledSources - normalizedPaths}
+                            Missing: ${normalizedPaths - actualCompiledSources}
+                            
+                            Full sets:
+                        """.trimIndent()
+                    }
+                } catch (e: Throwable) {
+                    logger.printBuildOutput(LogLevel.DEBUG)
+                    throw e
+                }
+            }
+        }
     }
 
     private fun runMixedModuleTest(strategyConfig: CompilerExecutionStrategyConfiguration, useTrackedModules: Boolean) {
@@ -110,7 +278,7 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
                 assertOutputs("SecretKt.class", "Bar.class", "FooKt.class")
             }
             module2.compile {
-                assertCompiledSources( "b.kt")
+                assertCompiledSources("b.kt")
                 assertNoOutputSetChanges()
             }
         }
