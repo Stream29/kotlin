@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.buildtools.api.KotlinReleaseVersion
 import org.jetbrains.kotlin.buildtools.api.RemovedCompilerArgument
 
 /**
- * @since 2.3.0
+ * @since 2.4.0
  */
 @ExperimentalCompilerArgument
 public interface JsArguments : CommonJsAndWasmArguments {

@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.buildtools.api.DeprecatedCompilerArgument
 import org.jetbrains.kotlin.buildtools.api.KotlinReleaseVersion
 
 /**
- * @since 2.3.0
+ * @since 2.4.0
  */
 @ExperimentalCompilerArgument
 public interface WasmArguments : CommonJsAndWasmArguments {

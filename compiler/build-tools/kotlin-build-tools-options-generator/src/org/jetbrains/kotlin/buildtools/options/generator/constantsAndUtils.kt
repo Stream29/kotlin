@@ -11,11 +11,6 @@ import org.jetbrains.kotlin.arguments.description.CompilerArgumentsLevelNames
 import org.jetbrains.kotlin.arguments.dsl.base.KotlinCompilerArgumentsLevel
 import org.jetbrains.kotlin.arguments.dsl.base.KotlinReleaseVersion
 import org.jetbrains.kotlin.arguments.dsl.types.ProfileCompilerCommand
-import org.jetbrains.kotlin.arguments.dsl.types.ExplicitApiMode
-import org.jetbrains.kotlin.arguments.dsl.types.JvmTarget
-import org.jetbrains.kotlin.arguments.dsl.types.KlibIrInlinerMode
-import org.jetbrains.kotlin.arguments.dsl.types.KotlinVersion
-import org.jetbrains.kotlin.arguments.dsl.types.ReturnValueCheckerMode
 import org.jetbrains.kotlin.generators.util.GeneratorsFileUtil
 import kotlin.math.max
 import kotlin.reflect.KClass
@@ -70,6 +65,16 @@ internal val experimentalLevelNames = listOf(
     CompilerArgumentsLevelNames.jsArguments,
     CompilerArgumentsLevelNames.commonJsAndWasmArguments,
     CompilerArgumentsLevelNames.wasmArguments,
+)
+
+internal val levelsSince = mapOf(
+    CompilerArgumentsLevelNames.commonToolArguments to KDOC_SINCE_2_3_0,
+    CompilerArgumentsLevelNames.commonCompilerArguments to KDOC_SINCE_2_3_0,
+    CompilerArgumentsLevelNames.jvmCompilerArguments to KDOC_SINCE_2_3_0,
+    CompilerArgumentsLevelNames.jsArguments to KDOC_SINCE_2_4_0,
+    CompilerArgumentsLevelNames.wasmArguments to KDOC_SINCE_2_4_0,
+    CompilerArgumentsLevelNames.commonJsAndWasmArguments to KDOC_SINCE_2_4_0,
+    CompilerArgumentsLevelNames.commonKlibBasedArguments to KDOC_SINCE_2_4_0,
 )
 
 internal fun BtaCompilerArgument<*>.extractName(): String = name.uppercase().replace("-", "_").let {

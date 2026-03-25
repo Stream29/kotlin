@@ -30,7 +30,7 @@ internal class BtaApiGenerator(
         val mainFileAppendable = createGeneratedFileAppendable()
         val mainFile = FileSpec.builder(targetPackage, className).apply {
             interfaceType(className) {
-                addKdoc(KDOC_SINCE_2_3_0)
+                addKdoc(levelsSince[level.name] ?: error("Level ${level.name} is missing in levelSince map"))
                 if (level.name in experimentalLevelNames) {
                     addAnnotation(ANNOTATION_EXPERIMENTAL)
                 }
@@ -65,7 +65,7 @@ internal class BtaApiGenerator(
                 }
                 generateGetPutFunctions(argumentTypeName, deprecateSet = true)
                 addType(TypeSpec.companionObjectBuilder().apply {
-                    generateOptions(level.transformApiArguments(), argumentTypeName)
+                    generateOptions(level.transformApiArguments(), argumentTypeName, level)
                 }.build())
             }
         }.build()
@@ -77,6 +77,7 @@ internal class BtaApiGenerator(
     private fun TypeSpec.Builder.generateOptions(
         arguments: Collection<BtaCompilerArgument<*>>,
         argumentTypeName: ClassName,
+        level: KotlinCompilerArgumentsLevel,
     ) {
         val enumsToGenerate = mutableMapOf<KClass<*>, TypeSpec.Builder>()
         val enumsExperimental = mutableMapOf<KClass<*>, Boolean>()
@@ -98,7 +99,7 @@ internal class BtaApiGenerator(
                 val enumConstants = type.java.enumConstants.filterIsInstance<Enum<*>>()
                 @Suppress("UNCHECKED_CAST")
                 enumConstants as List<WithStringRepresentation>
-                enumsToGenerate[type] = generateEnumTypeBuilder(enumConstants)
+                enumsToGenerate[type] = generateEnumTypeBuilder(enumConstants, level)
                 if (type !in enumsExperimental && experimental) {
                     enumsExperimental[type] = true
                 } else if (type in enumsExperimental && !experimental) {
@@ -146,7 +147,7 @@ internal class BtaApiGenerator(
                     val type = argumentType.classifier as? KClass<*> ?: error("Type is not a KClass: $argumentType")
                     when {
                         type.java.isEnum -> {
-                            generatedEnumType(type)
+                            generatedEnumType(type,)
                         }
                         type.isCustomType -> {
                             generatedCustomType(type)
@@ -221,13 +222,14 @@ internal class BtaApiGenerator(
 
     fun <T> generateEnumTypeBuilder(
         sourceEnum: Collection<T>,
+        level: KotlinCompilerArgumentsLevel,
     ): TypeSpec.Builder where T : Enum<*>, T : WithStringRepresentation{
         val className = sourceEnum.first()::class.toBtaEnumClassName()
         return TypeSpec.enumBuilder(className).apply {
             property<String>("stringValue") {
                 initializer("stringValue")
             }
-            addKdoc(KDOC_SINCE_2_3_0)
+            addKdoc(levelsSince[level.name] ?: error("Level ${level.name} is missing in levelSince map"))
             primaryConstructor(FunSpec.constructorBuilder().addParameter("stringValue", String::class).build())
             val nameAccessor = WithStringRepresentation::stringRepresentation
             sourceEnum.forEach {
