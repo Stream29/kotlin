@@ -90,9 +90,6 @@ async function loop() {
                 case "!restoreGlobalState":
                     restoreGlobalState();
                     break;
-                case "!exit":
-                    print("Exiting REPL. Goodbye!");
-                    return;
                 default:
                     print(await Realm.eval(currentRealmIndex, code));
             }
