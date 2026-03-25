@@ -1,9 +1,9 @@
 package org.jetbrains.kotlin.gradle.android
 
+import org.gradle.api.logging.LogLevel
+import org.gradle.kotlin.dsl.kotlin
 import org.gradle.util.GradleVersion
 import org.jetbrains.kotlin.gradle.testbase.*
-import kotlin.io.path.writeText
-import kotlin.test.fail
 
 @AndroidTestVersions(minVersion = TestVersions.AGP.AGP_813)
 @AndroidGradlePluginTests
@@ -14,54 +14,58 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
         gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
     ) {
         project(
-            "externalAndroidTarget-simple",
+            "empty",
             gradleVersion,
             buildOptions = defaultBuildOptions
-                .copy(androidVersion = androidVersion),
+                .copy(androidVersion = androidVersion, logLevel = LogLevel.DEBUG),
             buildJdk = jdkVersion.location,
         ) {
-            configureAndroidHostTest()
-            writeCommonSource(publicApi = false)
-            writeAndroidSource(publicApi = false)
+            addAgpToBuildScriptCompilationClasspath(androidVersion)
+            addKgpToBuildScriptCompilationClasspath()
+            plugins {
+                kotlin("multiplatform")
+                id("com.android.kotlin.multiplatform.library")
+            }
+            configureKmpAndroidLibrary()
+            injectSources(publicApi = false)
             buildScriptInjection {
                 kotlinMultiplatform.explicitApiWarning()
             }
-            build(":compileCommonMainKotlinMetadata", ":compileAndroidMain", forwardBuildOutput = true) {
-                assertTasksExecuted(":compileCommonMainKotlinMetadata", ":compileAndroidMain")
-                val relevant = output.lineSequence()
-                    .filter { it.contains("CommonMain.kt") || it.contains("AndroidMain.kt") }
-                    .toList()
-                if (relevant.none { it.contains("explicit API") }) {
-                    fail("Expected explicit API diagnostics for CommonMain.kt/AndroidMain.kt")
-                }
+            build(":compileKotlinMetadata", ":compileAndroidMain", forwardBuildOutput = true) {
+                assertTasksExecuted(":compileAndroidMain")
+                assertCompilerArgument(":compileAndroidMain", "-Xexplicit-api=warning")
+                assertOutputContains(Regex("explicit api mode", RegexOption.IGNORE_CASE))
             }
         }
     }
 
     @GradleAndroidTest
     fun `test - explicit API - strict fails`(
-        gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
+        gradleVersion: GradleVersion,
+        androidVersion: String,
+        jdkVersion: JdkVersions.ProvidedJdk,
     ) {
         project(
-            "externalAndroidTarget-simple",
+            "empty",
             gradleVersion,
             buildOptions = defaultBuildOptions
-                .copy(androidVersion = androidVersion),
+                .copy(androidVersion = androidVersion, logLevel = LogLevel.DEBUG),
             buildJdk = jdkVersion.location,
         ) {
-            configureAndroidHostTest()
-            writeCommonSource(publicApi = false)
-            writeAndroidSource(publicApi = false)
+            addAgpToBuildScriptCompilationClasspath(androidVersion)
+            addKgpToBuildScriptCompilationClasspath()
+            plugins {
+                kotlin("multiplatform")
+                id("com.android.kotlin.multiplatform.library")
+            }
+            configureKmpAndroidLibrary()
+            injectSources(publicApi = false)
             buildScriptInjection {
                 kotlinMultiplatform.explicitApi()
             }
-            buildAndFail(":compileCommonMainKotlinMetadata", ":compileAndroidMain", forwardBuildOutput = true) {
-                val relevant = output.lineSequence()
-                    .filter { it.contains("CommonMain.kt") || it.contains("AndroidMain.kt") }
-                    .toList()
-                if (relevant.none { it.contains("explicit API") }) {
-                    fail("Expected explicit API diagnostics for CommonMain.kt/AndroidMain.kt")
-                }
+            buildAndFail(":compileKotlinMetadata", ":compileAndroidMain", forwardBuildOutput = true) {
+                assertCompilerArgument(":compileAndroidMain", "-Xexplicit-api=strict")
+                assertOutputContains(Regex("explicit api mode", RegexOption.IGNORE_CASE))
             }
         }
     }
@@ -71,26 +75,26 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
         gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
     ) {
         project(
-            "externalAndroidTarget-simple",
+            "empty",
             gradleVersion,
             buildOptions = defaultBuildOptions
                 .copy(androidVersion = androidVersion),
             buildJdk = jdkVersion.location,
         ) {
-            configureAndroidHostTest()
-            writeCommonSource(publicApi = true)
-            writeAndroidSource(publicApi = true)
+            addAgpToBuildScriptCompilationClasspath(androidVersion)
+            addKgpToBuildScriptCompilationClasspath()
+            plugins {
+                kotlin("multiplatform")
+                id("com.android.kotlin.multiplatform.library")
+            }
+            configureKmpAndroidLibrary()
+            injectSources(publicApi = true)
             buildScriptInjection {
                 kotlinMultiplatform.explicitApiWarning()
             }
-            build(":compileCommonMainKotlinMetadata", ":compileAndroidMain", forwardBuildOutput = true) {
-                assertTasksExecuted(":compileCommonMainKotlinMetadata", ":compileAndroidMain")
-                val relevant = output.lineSequence()
-                    .filter { it.contains("CommonMain.kt") || it.contains("AndroidMain.kt") }
-                    .toList()
-                if (relevant.any { it.contains("explicit API") }) {
-                    fail("Unexpected explicit API diagnostics for CommonMain.kt/AndroidMain.kt")
-                }
+            build(":compileAndroidMain", forwardBuildOutput = true) {
+                assertTasksExecuted(":compileAndroidMain")
+                assertOutputDoesNotContain(Regex("explicit api mode", RegexOption.IGNORE_CASE))
             }
         }
     }
@@ -100,111 +104,120 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
         gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
     ) {
         project(
-            "externalAndroidTarget-simple",
+            "empty",
             gradleVersion,
             buildOptions = defaultBuildOptions
                 .copy(androidVersion = androidVersion),
             buildJdk = jdkVersion.location,
         ) {
-            configureAndroidHostTest()
-            writeCommonSource(publicApi = true)
-            writeAndroidSource(publicApi = true)
+            addAgpToBuildScriptCompilationClasspath(androidVersion)
+            addKgpToBuildScriptCompilationClasspath()
+            plugins {
+                kotlin("multiplatform")
+                id("com.android.kotlin.multiplatform.library")
+            }
+            configureKmpAndroidLibrary()
+            injectSources(publicApi = true)
             buildScriptInjection {
                 kotlinMultiplatform.explicitApi()
             }
-            build(":compileCommonMainKotlinMetadata", ":compileAndroidMain", forwardBuildOutput = true) {
-                assertTasksExecuted(":compileCommonMainKotlinMetadata", ":compileAndroidMain")
-                val relevant = output.lineSequence()
-                    .filter { it.contains("CommonMain.kt") || it.contains("AndroidMain.kt") }
-                    .toList()
-                if (relevant.any { it.contains("explicit API") }) {
-                    fail("Unexpected explicit API diagnostics for CommonMain.kt/AndroidMain.kt")
-                }
+            build(":compileAndroidMain", forwardBuildOutput = true) {
+                assertTasksExecuted(":compileAndroidMain")
+                assertOutputDoesNotContain(Regex("explicit api mode", RegexOption.IGNORE_CASE))
             }
         }
     }
 
-    private fun TestProject.configureAndroidHostTest() {
-        buildGradleKts.modify {
-            it.replace("<host-test-dsl>", "withHostTest {}")
-                .replace("<host-test-source-set-name>", "androidHostTest")
+    private fun TestProject.configureKmpAndroidLibrary() = buildScriptInjection {
+        val target = kotlinMultiplatform.targets.getByName("android")
+        val klass = target::class.java.classLoader.loadClass(
+            "com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension"
+        )
+        val setCompileSdk = klass.getMethod("setCompileSdk", Int::class.javaObjectType)
+        setCompileSdk.invoke(target, 34)
+        val setNamespace = klass.getMethod("setNamespace", String::class.java)
+        setNamespace.invoke(target, "org.jetbrains.sample")
+        runCatching {
+            val withHostTest = klass.getMethod("withHostTest")
+            withHostTest.invoke(target)
         }
     }
 
-    private fun TestProject.writeCommonSource(publicApi: Boolean) {
-        val content = if (!publicApi) {
-            """
-            object CommonMain {
-                val greeting = "Hello"
-                fun greet(name: String) = "${'$'}greeting, ${'$'}name"
-                override fun toString(): String {
-                    return "CommonMain"
-                }
-            }
-            """.trimIndent()
-        } else {
-            """
-            public object CommonMain {
-                public val greeting: String = "Hello"
-                public fun greet(name: String): String = "${'$'}greeting, ${'$'}name"
-                public override fun toString(): String {
-                    return "CommonMain"
-                }
-            }
-            """.trimIndent()
-        }
-        projectPath.resolve("src/commonMain/kotlin/CommonMain.kt").writeText(content)
-    }
-
-    private fun TestProject.writeAndroidSource(publicApi: Boolean) {
-        val content = if (!publicApi) {
-            """
-            import android.content.Context
-            import android.util.Log
-            
-            class AndroidMain(val context: Context) {
-                val counter = 0
-                fun increment() = counter + 1
-                fun useContext() {
-                    context.getSystemService(Context.LOCATION_SERVICE)
-                }
-            
-                fun useLog() {
-                    Log.d("test", CommonMain.toString())
-                }
-            
-                companion object {
-                    fun useCommonMain() {
-                        println("useCommonMain: ${'$'}{CommonMain}")
+    private fun TestProject.injectSources(publicApi: Boolean) = buildScriptInjection {
+        // Inject sources with/without explicit API
+        if (!publicApi) {
+            kotlinMultiplatform.sourceSets.getByName("commonMain").compileSource(
+                """
+                object CommonMain {
+                    val greeting = "Hello"
+                    fun greet(name: String) = "${'$'}greeting, ${'$'}name"
+                    override fun toString(): String {
+                        return "CommonMain"
                     }
                 }
-            }
-            """.trimIndent()
-        } else {
-            """
-            import android.content.Context
-            import android.util.Log
-            
-            public class AndroidMain(public val context: Context) {
-                public val counter: Int = 0
-                public fun increment(): Int = counter + 1
-                public fun useContext(): Unit {
-                    context.getSystemService(Context.LOCATION_SERVICE)
-                }
-            
-                public fun useLog(): Unit {
-                    Log.d("test", CommonMain.toString())
-                }
-            
-                public companion object {
-                    public fun useCommonMain(): Unit {
-                        println("useCommonMain: ${'$'}{CommonMain}")
+                """.trimIndent()
+            )
+            kotlinMultiplatform.sourceSets.getByName("androidMain").compileSource(
+                """
+                import android.content.Context
+                import android.util.Log
+                
+                class AndroidMain(val context: Context) {
+                    val counter = 0
+                    fun increment() = counter + 1
+                    fun useContext() {
+                        context.getSystemService(Context.LOCATION_SERVICE)
+                    }
+                
+                    fun useLog() {
+                        Log.d("test", CommonMain.toString())
+                    }
+                
+                    companion object {
+                        fun useCommonMain() {
+                            println("useCommonMain: ${'$'}{CommonMain}")
+                        }
                     }
                 }
-            }
-            """.trimIndent()
+                """.trimIndent()
+            )
+        } else {
+            kotlinMultiplatform.sourceSets.getByName("commonMain").compileSource(
+                """
+                public object CommonMain {
+                    public val greeting: String = "Hello"
+                    public fun greet(name: String): String = "${'$'}greeting, ${'$'}name"
+                    public override fun toString(): String {
+                        return "CommonMain"
+                    }
+                }
+                """.trimIndent()
+            )
+            kotlinMultiplatform.sourceSets.getByName("androidMain").compileSource(
+                """
+                import android.content.Context
+                import android.util.Log
+                
+                public class AndroidMain(public val context: Context) {
+                    public val counter: Int = 0
+                    public fun increment(): Int = counter + 1
+                    public fun useContext(): Unit {
+                        context.getSystemService(Context.LOCATION_SERVICE)
+                    }
+                
+                    public fun useLog(): Unit {
+                        Log.d("test", CommonMain.toString())
+                    }
+                
+                    public companion object {
+                        public fun useCommonMain(): Unit {
+                            println("useCommonMain: ${'$'}{CommonMain}")
+                        }
+                    }
+                }
+                """.trimIndent()
+            )
         }
-        projectPath.resolve("src/androidMain/kotlin/AndroidMain.kt").writeText(content)
     }
 
 }
