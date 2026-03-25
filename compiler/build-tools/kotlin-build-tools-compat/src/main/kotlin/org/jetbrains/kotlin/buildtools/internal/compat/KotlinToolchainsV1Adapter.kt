@@ -454,6 +454,10 @@ private class JvmCompilationOperationV1Adapter private constructor(
     override fun createSnapshotBasedIcOptions(): JvmSnapshotBasedIncrementalCompilationOptions {
         return JvmSnapshotBasedIncrementalCompilationOptionsV1Adapter(options.deepCopy())
     }
+
+    override fun <V> set(key: BaseCompilationOperation.Option<V>, value: V) {
+        options[key.id] = value
+    }
 }
 
 private fun Path.absolutePathStringOrThrow(): String = toFile().absolutePath
@@ -596,10 +600,6 @@ public fun CompilationService.asKotlinToolchains(): KotlinToolchains = KotlinToo
 
 private abstract class BaseCompilationOperationImpl : BuildOperationImpl<CompilationResult>(), BaseCompilationOperation {
     override fun <V> get(key: BaseCompilationOperation.Option<V>): V = options[key.id]
-    @Deprecated("Build operations will become immutable in an upcoming release. Obtain an instance of a mutable builder for the operation from the appropriate `Toolchain` instead.")
-    override fun <V> set(key: BaseCompilationOperation.Option<V>, value: V) {
-        options[key] = value
-    }
 }
 
 @OptIn(ExperimentalAtomicApi::class)

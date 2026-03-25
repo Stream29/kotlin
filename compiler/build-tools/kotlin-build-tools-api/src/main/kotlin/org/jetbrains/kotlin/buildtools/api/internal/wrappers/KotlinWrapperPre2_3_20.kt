@@ -268,7 +268,7 @@ internal class KotlinWrapperPre2_3_20(
                 }
 
                 override fun <V> set(key: BaseIncrementalCompilationConfiguration.Option<V>, value: V) {
-                    val oldOption = JvmSnapshotBasedIncrementalCompilationConfiguration.Option<V>(key.id)
+                    val oldOption = Option<V>(key.id)
                     options[oldOption] = value
                 }
             }
@@ -290,6 +290,11 @@ internal class KotlinWrapperPre2_3_20(
                             }
                         newOperation.compilerArguments.applyArgumentStrings(this.compilerArguments.toArgumentStrings())
                     }
+            }
+
+            override fun <V> set(key: BaseCompilationOperation.Option<V>, value: V) {
+                val oldOption = JvmCompilationOperation.Option<V>(key.id)
+                this[oldOption] = value
             }
         }
 

@@ -21,17 +21,6 @@ public interface BaseCompilationOperation : BuildOperation<CompilationResult> {
     public operator fun <V> get(key: Option<V>): V
 
     /**
-     * Set the [value] for option specified by [key], overriding any previous value for that option.
-     *
-     * @since 2.4.0
-     */
-    @Deprecated(
-        "Build operations will become immutable in an upcoming release. " +
-                "Obtain an instance of a mutable builder for the operation from the appropriate `Toolchain` instead."
-    )
-    public operator fun <V> set(key: Option<V>, value: V)
-
-    /**
      * An option for configuring a [BaseCompilationOperation].
      *
      * @see get
