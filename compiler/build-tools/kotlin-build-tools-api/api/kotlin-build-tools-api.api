@@ -5,7 +5,6 @@ public abstract interface class org/jetbrains/kotlin/buildtools/api/BaseCompilat
 	public static final field GENERATE_COMPILER_REF_INDEX Lorg/jetbrains/kotlin/buildtools/api/BaseCompilationOperation$Option;
 	public static final field LOOKUP_TRACKER Lorg/jetbrains/kotlin/buildtools/api/BaseCompilationOperation$Option;
 	public abstract fun get (Lorg/jetbrains/kotlin/buildtools/api/BaseCompilationOperation$Option;)Ljava/lang/Object;
-	public abstract fun set (Lorg/jetbrains/kotlin/buildtools/api/BaseCompilationOperation$Option;Ljava/lang/Object;)V
 }
 
 public abstract interface class org/jetbrains/kotlin/buildtools/api/BaseCompilationOperation$Builder : org/jetbrains/kotlin/buildtools/api/BuildOperation$Builder {
@@ -406,13 +405,11 @@ public abstract interface class org/jetbrains/kotlin/buildtools/api/arguments/Co
 	public static final field X_STRICT_IMPLICIT_EXPORT_TYPES Lorg/jetbrains/kotlin/buildtools/api/arguments/CommonJsAndWasmArguments$CommonJsAndWasmArgument;
 	public abstract fun contains (Lorg/jetbrains/kotlin/buildtools/api/arguments/CommonJsAndWasmArguments$CommonJsAndWasmArgument;)Z
 	public abstract fun get (Lorg/jetbrains/kotlin/buildtools/api/arguments/CommonJsAndWasmArguments$CommonJsAndWasmArgument;)Ljava/lang/Object;
-	public abstract fun set (Lorg/jetbrains/kotlin/buildtools/api/arguments/CommonJsAndWasmArguments$CommonJsAndWasmArgument;Ljava/lang/Object;)V
 }
 
 public abstract interface class org/jetbrains/kotlin/buildtools/api/arguments/CommonJsAndWasmArguments$Builder : org/jetbrains/kotlin/buildtools/api/arguments/CommonKlibBasedArguments$Builder {
 	public abstract fun contains (Lorg/jetbrains/kotlin/buildtools/api/arguments/CommonJsAndWasmArguments$CommonJsAndWasmArgument;)Z
 	public abstract fun get (Lorg/jetbrains/kotlin/buildtools/api/arguments/CommonJsAndWasmArguments$CommonJsAndWasmArgument;)Ljava/lang/Object;
-	public abstract fun set (Lorg/jetbrains/kotlin/buildtools/api/arguments/CommonJsAndWasmArguments$CommonJsAndWasmArgument;Ljava/lang/Object;)V
 }
 
 public final class org/jetbrains/kotlin/buildtools/api/arguments/CommonJsAndWasmArguments$CommonJsAndWasmArgument {
@@ -438,13 +435,11 @@ public abstract interface class org/jetbrains/kotlin/buildtools/api/arguments/Co
 	public static final field X_SKIP_LIBRARY_SPECIAL_COMPATIBILITY_CHECKS Lorg/jetbrains/kotlin/buildtools/api/arguments/CommonKlibBasedArguments$CommonKlibBasedArgument;
 	public abstract fun contains (Lorg/jetbrains/kotlin/buildtools/api/arguments/CommonKlibBasedArguments$CommonKlibBasedArgument;)Z
 	public abstract fun get (Lorg/jetbrains/kotlin/buildtools/api/arguments/CommonKlibBasedArguments$CommonKlibBasedArgument;)Ljava/lang/Object;
-	public abstract fun set (Lorg/jetbrains/kotlin/buildtools/api/arguments/CommonKlibBasedArguments$CommonKlibBasedArgument;Ljava/lang/Object;)V
 }
 
 public abstract interface class org/jetbrains/kotlin/buildtools/api/arguments/CommonKlibBasedArguments$Builder : org/jetbrains/kotlin/buildtools/api/arguments/CommonCompilerArguments$Builder {
 	public abstract fun contains (Lorg/jetbrains/kotlin/buildtools/api/arguments/CommonKlibBasedArguments$CommonKlibBasedArgument;)Z
 	public abstract fun get (Lorg/jetbrains/kotlin/buildtools/api/arguments/CommonKlibBasedArguments$CommonKlibBasedArgument;)Ljava/lang/Object;
-	public abstract fun set (Lorg/jetbrains/kotlin/buildtools/api/arguments/CommonKlibBasedArguments$CommonKlibBasedArgument;Ljava/lang/Object;)V
 }
 
 public final class org/jetbrains/kotlin/buildtools/api/arguments/CommonKlibBasedArguments$CommonKlibBasedArgument {
@@ -542,14 +537,12 @@ public abstract interface class org/jetbrains/kotlin/buildtools/api/arguments/Js
 	public static final field X_TYPED_ARRAYS Lorg/jetbrains/kotlin/buildtools/api/arguments/JsArguments$JsArgument;
 	public abstract fun contains (Lorg/jetbrains/kotlin/buildtools/api/arguments/JsArguments$JsArgument;)Z
 	public abstract fun get (Lorg/jetbrains/kotlin/buildtools/api/arguments/JsArguments$JsArgument;)Ljava/lang/Object;
-	public abstract fun set (Lorg/jetbrains/kotlin/buildtools/api/arguments/JsArguments$JsArgument;Ljava/lang/Object;)V
 }
 
 public abstract interface class org/jetbrains/kotlin/buildtools/api/arguments/JsArguments$Builder : org/jetbrains/kotlin/buildtools/api/arguments/CommonJsAndWasmArguments$Builder {
 	public abstract fun build ()Lorg/jetbrains/kotlin/buildtools/api/arguments/JsArguments;
 	public abstract fun contains (Lorg/jetbrains/kotlin/buildtools/api/arguments/JsArguments$JsArgument;)Z
 	public abstract fun get (Lorg/jetbrains/kotlin/buildtools/api/arguments/JsArguments$JsArgument;)Ljava/lang/Object;
-	public abstract fun set (Lorg/jetbrains/kotlin/buildtools/api/arguments/JsArguments$JsArgument;Ljava/lang/Object;)V
 }
 
 public final class org/jetbrains/kotlin/buildtools/api/arguments/JsArguments$Companion {
@@ -679,14 +672,12 @@ public abstract interface class org/jetbrains/kotlin/buildtools/api/arguments/Wa
 	public static final field X_WASM_USE_TRAPS_INSTEAD_OF_EXCEPTIONS Lorg/jetbrains/kotlin/buildtools/api/arguments/WasmArguments$WasmArgument;
 	public abstract fun contains (Lorg/jetbrains/kotlin/buildtools/api/arguments/WasmArguments$WasmArgument;)Z
 	public abstract fun get (Lorg/jetbrains/kotlin/buildtools/api/arguments/WasmArguments$WasmArgument;)Ljava/lang/Object;
-	public abstract fun set (Lorg/jetbrains/kotlin/buildtools/api/arguments/WasmArguments$WasmArgument;Ljava/lang/Object;)V
 }
 
 public abstract interface class org/jetbrains/kotlin/buildtools/api/arguments/WasmArguments$Builder : org/jetbrains/kotlin/buildtools/api/arguments/CommonJsAndWasmArguments$Builder {
 	public abstract fun build ()Lorg/jetbrains/kotlin/buildtools/api/arguments/WasmArguments;
 	public abstract fun contains (Lorg/jetbrains/kotlin/buildtools/api/arguments/WasmArguments$WasmArgument;)Z
 	public abstract fun get (Lorg/jetbrains/kotlin/buildtools/api/arguments/WasmArguments$WasmArgument;)Ljava/lang/Object;
-	public abstract fun set (Lorg/jetbrains/kotlin/buildtools/api/arguments/WasmArguments$WasmArgument;Ljava/lang/Object;)V
 }
 
 public final class org/jetbrains/kotlin/buildtools/api/arguments/WasmArguments$Companion {

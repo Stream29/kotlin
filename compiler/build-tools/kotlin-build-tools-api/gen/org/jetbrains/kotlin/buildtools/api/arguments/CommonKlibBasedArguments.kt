@@ -5,7 +5,6 @@ package org.jetbrains.kotlin.buildtools.api.arguments
 
 import kotlin.Array
 import kotlin.Boolean
-import kotlin.Deprecated
 import kotlin.Int
 import kotlin.String
 import kotlin.jvm.JvmField
@@ -25,12 +24,6 @@ public interface CommonKlibBasedArguments : CommonCompilerArguments {
    * @throws IllegalStateException if the option was not set and has no default value
    */
   public operator fun <V> `get`(key: CommonKlibBasedArgument<V>): V
-
-  /**
-   * Set the [value] for option specified by [key], overriding any previous value for that option.
-   */
-  @Deprecated(message = "Compiler argument classes will become immutable in an upcoming release. Use a Builder instance to create and modify compiler arguments.")
-  public operator fun <V> `set`(key: CommonKlibBasedArgument<V>, `value`: V)
 
   /**
    * Check if an option specified by [key] has a value set.
@@ -54,8 +47,6 @@ public interface CommonKlibBasedArguments : CommonCompilerArguments {
 
   /**
    * A builder for [CommonKlibBasedArguments].
-   *
-   * @since 2.3.20
    */
   public interface Builder : CommonCompilerArguments.Builder {
     /**

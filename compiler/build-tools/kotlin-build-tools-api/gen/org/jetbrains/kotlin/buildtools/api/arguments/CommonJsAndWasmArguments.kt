@@ -4,7 +4,6 @@
 package org.jetbrains.kotlin.buildtools.api.arguments
 
 import kotlin.Boolean
-import kotlin.Deprecated
 import kotlin.String
 import kotlin.jvm.JvmField
 import org.jetbrains.kotlin.buildtools.api.KotlinReleaseVersion
@@ -21,12 +20,6 @@ public interface CommonJsAndWasmArguments : CommonKlibBasedArguments {
    * @throws IllegalStateException if the option was not set and has no default value
    */
   public operator fun <V> `get`(key: CommonJsAndWasmArgument<V>): V
-
-  /**
-   * Set the [value] for option specified by [key], overriding any previous value for that option.
-   */
-  @Deprecated(message = "Compiler argument classes will become immutable in an upcoming release. Use a Builder instance to create and modify compiler arguments.")
-  public operator fun <V> `set`(key: CommonJsAndWasmArgument<V>, `value`: V)
 
   /**
    * Check if an option specified by [key] has a value set.
@@ -50,8 +43,6 @@ public interface CommonJsAndWasmArguments : CommonKlibBasedArguments {
 
   /**
    * A builder for [CommonJsAndWasmArguments].
-   *
-   * @since 2.3.20
    */
   public interface Builder : CommonKlibBasedArguments.Builder {
     /**

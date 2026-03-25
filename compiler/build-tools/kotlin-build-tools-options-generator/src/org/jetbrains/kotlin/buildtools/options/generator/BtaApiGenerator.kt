@@ -45,11 +45,16 @@ internal class BtaApiGenerator(
                 val argumentTypeName = ClassName(targetPackage, className, argument)
                 if (parentClass == null) {
                     addToArgumentStringsFun()
-                    maybeAddApplyArgumentStringsFun(deprecated = true)
+                    if (levelsSince[level.name] == KDOC_SINCE_2_3_0) {
+                        addApplyArgumentStringsFun(deprecated = true)
+                    }
                 }
                 interfaceType("Builder") {
-                    addKdoc("A builder for [$className].\n\n@since 2.3.20")
-                    generateGetPutFunctions(argumentTypeName)
+                    addKdoc("A builder for [$className].")
+                    if (levelsSince[level.name] == KDOC_SINCE_2_3_0) {
+                        addKdoc("\n\n@since 2.3.20")
+                    }
+                    generateGetPutFunctions(argumentTypeName, level)
                     if (level.isLeaf()) {
                         function("build") {
                             addKdoc("Constructs a new immutable [$className] instance with the options set in this builder.")
@@ -58,12 +63,12 @@ internal class BtaApiGenerator(
                         }
                     }
                     if (parentClass == null) {
-                        maybeAddApplyArgumentStringsFun()
+                        addApplyArgumentStringsFun()
                     } else {
                         addSuperinterface(parentClass.nestedClass("Builder"))
                     }
                 }
-                generateGetPutFunctions(argumentTypeName, deprecateSet = true)
+                generateGetPutFunctions(argumentTypeName, level, deprecateSet = true)
                 addType(TypeSpec.companionObjectBuilder().apply {
                     generateOptions(level.transformApiArguments(), argumentTypeName, level)
                 }.build())
@@ -296,7 +301,7 @@ internal class BtaApiGenerator(
         outputs += Path(file.relativePath) to fileAppendable.toString()
     }
 
-    fun TypeSpec.Builder.generateGetPutFunctions(parameter: ClassName, deprecateSet: Boolean = false) {
+    fun TypeSpec.Builder.generateGetPutFunctions(parameter: ClassName, level: KotlinCompilerArgumentsLevel, deprecateSet: Boolean = false) {
         function("get") {
             addKdoc(KDOC_OPTIONS_GET)
             addModifiers(KModifier.OPERATOR, KModifier.ABSTRACT)
@@ -305,16 +310,17 @@ internal class BtaApiGenerator(
             addTypeVariable(typeParameter)
             addParameter("key", parameter.parameterizedBy(typeParameter))
         }
-        function("set") {
-            maybeAddMutabilityDeprecationAnnotation(deprecateSet)
-            addKdoc(KDOC_OPTIONS_SET)
-            addModifiers(KModifier.OPERATOR, KModifier.ABSTRACT)
-            val typeParameter = TypeVariableName("V")
-            addTypeVariable(typeParameter)
-            addParameter("key", parameter.parameterizedBy(typeParameter))
-            addParameter("value", typeParameter)
+        if (levelsSince[level.name] == KDOC_SINCE_2_3_0 || !deprecateSet) {
+            function("set") {
+                maybeAddMutabilityDeprecationAnnotation(deprecateSet)
+                addKdoc(KDOC_OPTIONS_SET)
+                addModifiers(KModifier.OPERATOR, KModifier.ABSTRACT)
+                val typeParameter = TypeVariableName("V")
+                addTypeVariable(typeParameter)
+                addParameter("key", parameter.parameterizedBy(typeParameter))
+                addParameter("value", typeParameter)
+            }
         }
-
         function("contains") {
             addKdoc(KDOC_OPTIONS_CONTAINS)
             addModifiers(KModifier.OPERATOR, KModifier.ABSTRACT)
@@ -364,7 +370,7 @@ private fun FunSpec.Builder.addParameterIf(name: String, type: ClassName, condit
     return this
 }
 
-private fun TypeSpec.Builder.maybeAddApplyArgumentStringsFun(deprecated: Boolean = false) {
+private fun TypeSpec.Builder.addApplyArgumentStringsFun(deprecated: Boolean = false) {
     function("applyArgumentStrings") {
         maybeAddMutabilityDeprecationAnnotation(deprecated)
         addKdoc("Takes a list of string arguments in the format recognized by the Kotlin CLI compiler and applies the options parsed from them into this instance.")
