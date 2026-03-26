@@ -14,24 +14,7 @@ import org.jetbrains.kotlin.arguments.dsl.defaultNull
 import org.jetbrains.kotlin.arguments.dsl.defaultTrue
 import org.jetbrains.kotlin.arguments.dsl.types.*
 
-val actualCommonKlibBasedArguments by compilerArgumentsLevel(CompilerArgumentsLevelNames.commonKlibBasedArguments) {
-    compilerArgument {
-        name = "Xklib-relative-path-base"
-        compilerName = "relativePathBases"
-        description = ReleaseDependent(
-            current = """Relativize all the paths stored in a klib using the given path prefixes.
-The supplied prefixes should be absolute paths to the directories containing the source code files.
-Note: The prefixes are applied in the same order as they are passed in this CLI argument.""",
-            KotlinReleaseVersion.v2_0_20..KotlinReleaseVersion.v2_3_20 to
-                    "Provide a base path to compute the source's relative paths in klib (default is empty)."
-        )
-        valueType = StringArrayType.defaultNull
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v2_0_20,
-        )
-    }
-
+val actualCommonKlibBasedArgumentsKlibStage by compilerArgumentsLevel(CompilerArgumentsLevelNames.commonKlibBasedArguments) {
     compilerArgument {
         name = "Xklib-normalize-absolute-path"
         compilerName = "normalizeAbsolutePath"
@@ -54,6 +37,62 @@ Note: The prefixes are applied in the same order as they are passed in this CLI 
         )
     }
 
+    compilerArgument {
+        name = "Xklib-relative-path-base"
+        compilerName = "relativePathBases"
+        description = ReleaseDependent(
+            current = """Relativize all the paths stored in a klib using the given path prefixes.
+The supplied prefixes should be absolute paths to the directories containing the source code files.
+Note: The prefixes are applied in the same order as they are passed in this CLI argument.""",
+            KotlinReleaseVersion.v2_0_20..KotlinReleaseVersion.v2_3_20 to
+                    "Provide a base path to compute the source's relative paths in klib (default is empty)."
+        )
+        valueType = StringArrayType.defaultNull
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v2_0_20,
+        )
+    }
+
+    compilerArgument {
+        name = "Xklib-ir-inliner"
+        compilerName = "irInlinerBeforeKlibSerialization"
+        description = """Set the mode of the experimental IR inliner on the first compilation stage.
+- `intra-module` mode enforces inlining of the functions only from the compiled module
+- `full` mode enforces inlining of all functions (from the compiled module and from all dependencies)
+   Warning: This mode will trigger setting the `pre-release` flag for the compiled library.
+- `disabled` mode completely disables the IR inliner
+- `default` mode lets the IR inliner run in `intra-module`, `full` or `disabled` mode based on the current language version
+        """.asReleaseDependent()
+        valueType = KlibIrInlinerModeType()
+        valueDescription = ReleaseDependent(
+            current = KlibIrInlinerMode.entries.joinToString(prefix = "{", separator = "|", postfix = "}") { it.modeState }
+        )
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v2_1_20,
+        )
+    }
+
+    compilerArgument {
+        name = "Xklib-abi-version"
+        compilerName = "customKlibAbiVersion"
+        description = """Specify the custom ABI version to be written in KLIB. This option is intended only for tests.
+Warning: This option does not affect KLIB ABI. Neither allows it making a KLIB backward-compatible with older ABI versions.
+The only observable effect is that a custom ABI version is written to KLIB manifest file.""".asReleaseDependent()
+        valueType = StringType.defaultNull
+        valueDescription = "<version>".asReleaseDependent()
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v2_2_0,
+        )
+    }
+}
+val actualCommonKlibBasedArgumentsLinkingStage by compilerArgumentsLevel(CompilerArgumentsLevelNames.commonKlibBasedArguments) {
+
+}
+
+val actualCommonKlibBasedArguments by compilerArgumentsLevel(CompilerArgumentsLevelNames.commonKlibBasedArguments) {
     compilerArgument {
         name = "Xpartial-linkage"
         compilerName = "partialLinkageMode"
@@ -106,40 +145,6 @@ Note: The prefixes are applied in the same order as they are passed in this CLI 
 
         lifecycle(
             introducedVersion = KotlinReleaseVersion.v2_1_0,
-        )
-    }
-
-    compilerArgument {
-        name = "Xklib-ir-inliner"
-        compilerName = "irInlinerBeforeKlibSerialization"
-        description = """Set the mode of the experimental IR inliner on the first compilation stage.
-- `intra-module` mode enforces inlining of the functions only from the compiled module
-- `full` mode enforces inlining of all functions (from the compiled module and from all dependencies)
-   Warning: This mode will trigger setting the `pre-release` flag for the compiled library.
-- `disabled` mode completely disables the IR inliner
-- `default` mode lets the IR inliner run in `intra-module`, `full` or `disabled` mode based on the current language version
-        """.asReleaseDependent()
-        valueType = KlibIrInlinerModeType()
-        valueDescription = ReleaseDependent(
-            current = KlibIrInlinerMode.entries.joinToString(prefix = "{", separator = "|", postfix = "}") { it.modeState }
-        )
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v2_1_20,
-        )
-    }
-
-    compilerArgument {
-        name = "Xklib-abi-version"
-        compilerName = "customKlibAbiVersion"
-        description = """Specify the custom ABI version to be written in KLIB. This option is intended only for tests.
-Warning: This option does not affect KLIB ABI. Neither allows it making a KLIB backward-compatible with older ABI versions.
-The only observable effect is that a custom ABI version is written to KLIB manifest file.""".asReleaseDependent()
-        valueType = StringType.defaultNull
-        valueDescription = "<version>".asReleaseDependent()
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v2_2_0,
         )
     }
 

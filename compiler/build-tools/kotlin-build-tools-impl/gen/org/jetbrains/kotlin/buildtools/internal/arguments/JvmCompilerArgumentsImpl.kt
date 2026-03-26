@@ -139,6 +139,15 @@ internal class JvmCompilerArgumentsImpl(
   }
 
   @Suppress("UNCHECKED_CAST")
+  public operator fun <V> `get`(key: JvmCompilerArgument<V>): V = optionsMap[key.id] as V
+
+  private operator fun <V> `set`(key: JvmCompilerArgument<V>, `value`: V) {
+    optionsMap[key.id] = `value`
+  }
+
+  public operator fun contains(key: JvmCompilerArgument<*>): Boolean = key.id in optionsMap
+
+  @Suppress("UNCHECKED_CAST")
   @UseFromImplModuleRestricted
   override operator fun <V> `get`(key: JvmCompilerArguments.JvmCompilerArgument<V>): V {
     check(key.id in optionsMap) { "Argument ${key.id} is not set and has no default value" }
@@ -155,18 +164,9 @@ internal class JvmCompilerArgumentsImpl(
 
   override operator fun contains(key: JvmCompilerArguments.JvmCompilerArgument<*>): Boolean = key.id in optionsMap
 
-  @Suppress("UNCHECKED_CAST")
-  public operator fun <V> `get`(key: JvmCompilerArgument<V>): V = optionsMap[key.id] as V
-
-  private operator fun <V> `set`(key: JvmCompilerArgument<V>, `value`: V) {
-    optionsMap[key.id] = `value`
-  }
-
-  public operator fun contains(key: JvmCompilerArgument<*>): Boolean = key.id in optionsMap
-
   override fun deepCopy(): JvmCompilerArgumentsImpl = JvmCompilerArgumentsImpl(adapter).also { newArgs -> newArgs.applyArgumentStrings(toArgumentStrings()) }
 
-  override fun build(): JvmCompilerArguments = deepCopy()
+  override fun build(): JvmCompilerArgumentsImpl = deepCopy()
 
   @Suppress("DEPRECATION")
   public fun toCompilerArguments(arguments: K2JVMCompilerArguments = K2JVMCompilerArguments()): K2JVMCompilerArguments {

@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.buildtools.api.BaseIncrementalCompilationConfigurati
 import org.jetbrains.kotlin.buildtools.api.CompilationResult
 import org.jetbrains.kotlin.buildtools.api.SourcesChanges
 import org.jetbrains.kotlin.buildtools.api.arguments.CommonJsAndWasmArguments
+import org.jetbrains.kotlin.buildtools.api.arguments.CommonJsAndWasmCompilerKlibArguments.Companion.X_IR_PRODUCE_KLIB_FILE
 import org.jetbrains.kotlin.buildtools.api.arguments.CommonToolArguments.Companion.VERBOSE
 import org.jetbrains.kotlin.buildtools.api.arguments.ExperimentalCompilerArgument
 import org.jetbrains.kotlin.buildtools.api.js.IncrementalModule
@@ -111,7 +112,7 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
             ) {
                 compilerArguments[CommonJsAndWasmArguments.LIBRARIES] = stdlibKlib
                 compilerArguments[CommonJsAndWasmArguments.IR_OUTPUT_NAME] = "lib"
-                compilerArguments[CommonJsAndWasmArguments.X_IR_PRODUCE_KLIB_FILE] = true
+                compilerArguments[X_IR_PRODUCE_KLIB_FILE] = true
                 this[INCREMENTAL_COMPILATION] = this.historyBasedIcConfigurationBuilder(
                     libModule.icCachesDir,
                     SourcesChanges.ToBeCalculated,
@@ -138,7 +139,7 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
                 compilerArguments[CommonJsAndWasmArguments.LIBRARIES] =
                     stdlibKlib + File.pathSeparator + libModule.outputDirectory.resolve("lib.klib").absolutePathString()
                 compilerArguments[CommonJsAndWasmArguments.IR_OUTPUT_NAME] = "app"
-                compilerArguments[CommonJsAndWasmArguments.X_IR_PRODUCE_KLIB_FILE] = true
+                compilerArguments[X_IR_PRODUCE_KLIB_FILE] = true
                 this[INCREMENTAL_COMPILATION] = this.historyBasedIcConfigurationBuilder(
                     appModule.icCachesDir,
                     SourcesChanges.Unknown,

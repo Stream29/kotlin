@@ -15,21 +15,7 @@ import org.jetbrains.kotlin.arguments.dsl.defaultTrue
 import org.jetbrains.kotlin.arguments.dsl.types.BooleanType
 import org.jetbrains.kotlin.arguments.dsl.types.StringType
 
-
-val actualWasmArguments by compilerArgumentsLevel(CompilerArgumentsLevelNames.wasmArguments) {
-    compilerArgument {
-        name = "Xwasm"
-        description = "Use the WebAssembly compiler backend.".asReleaseDependent()
-        valueType = BooleanType.defaultFalse
-        additionalAnnotations(
-            Deprecated("This flag is deprecated. Use kotlinc-wasm or the KotlinWasmCompiler class instead to compile to WebAssembly.")
-        )
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v2_1_20,
-            deprecatedVersion = KotlinReleaseVersion.v2_4_0,
-        )
-    }
-
+val actualWasmArgumentsKlibStage by compilerArgumentsLevel(CompilerArgumentsLevelNames.wasmArguments) {
     compilerArgument {
         name = "Xwasm-target"
         description = "Set up the Wasm target (wasm-js or wasm-wasi).".asReleaseDependent()
@@ -40,6 +26,19 @@ val actualWasmArguments by compilerArgumentsLevel(CompilerArgumentsLevelNames.wa
         )
     }
 
+    compilerArgument {
+        name = "Xwasm-kclass-fqn"
+        compilerName = "wasmKClassFqn"
+        description = "Enable support for 'KClass.qualifiedName'.".asReleaseDependent()
+        valueType = BooleanType.defaultTrue
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v2_1_20,
+        )
+    }
+}
+
+val actualWasmArgumentsLinkingStage by compilerArgumentsLevel(CompilerArgumentsLevelNames.wasmArguments) {
     compilerArgument {
         name = "Xwasm-debug-info"
         compilerName = "wasmDebug"
@@ -89,17 +88,6 @@ val actualWasmArguments by compilerArgumentsLevel(CompilerArgumentsLevelNames.wa
         name = "Xwasm-generate-wat"
         description = "Generate a .wat file.".asReleaseDependent()
         valueType = BooleanType.defaultFalse
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v2_1_20,
-        )
-    }
-
-    compilerArgument {
-        name = "Xwasm-kclass-fqn"
-        compilerName = "wasmKClassFqn"
-        description = "Enable support for 'KClass.qualifiedName'.".asReleaseDependent()
-        valueType = BooleanType.defaultTrue
 
         lifecycle(
             introducedVersion = KotlinReleaseVersion.v2_1_20,
@@ -242,3 +230,20 @@ val actualWasmArguments by compilerArgumentsLevel(CompilerArgumentsLevelNames.wa
         )
     }
 }
+
+val actualWasmArguments by compilerArgumentsLevel(CompilerArgumentsLevelNames.wasmArguments) {
+    compilerArgument {
+        name = "Xwasm"
+        description = "Use the WebAssembly compiler backend.".asReleaseDependent()
+        valueType = BooleanType.defaultFalse
+        additionalAnnotations(
+            Deprecated("This flag is deprecated. Use kotlinc-wasm or the KotlinWasmCompiler class instead to compile to WebAssembly.")
+        )
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v2_1_20,
+            deprecatedVersion = KotlinReleaseVersion.v2_4_0,
+        )
+    }
+}
+
+val actualWasmArgumentsLegacy = actualWasmArguments.mergeWith(actualWasmArgumentsKlibStage).mergeWith(actualWasmArgumentsLinkingStage)

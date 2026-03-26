@@ -24,27 +24,46 @@ val kotlinCompilerArguments = compilerArguments {
             ) {}
             subLevel(
                 name = CompilerArgumentsLevelNames.commonKlibBasedArguments,
-                mergeWith = setOf(actualCommonKlibBasedArguments, removedCommonKlibBasedCompilerArguments)
+                mergeWith = setOf(
+                    actualCommonKlibBasedArguments,
+                    actualCommonKlibBasedArgumentsKlibStage,
+                    actualCommonKlibBasedArgumentsLinkingStage,
+                    removedCommonKlibBasedCompilerArguments
+                )
             ) {
                 subLevel(
                     name = CompilerArgumentsLevelNames.commonJsAndWasmArguments,
-                    mergeWith = setOf(actualCommonJsAndWasmArguments)
+                    mergeWith = setOf(
+                        actualCommonJsAndWasmArguments,
+                        actualCommonJsAndWasmArgumentsKlibStage,
+                        actualCommonJsAndWasmArgumentsLinkingStage
+                    )
                 ) {
                     modifier(Modifier.SEALED)
                     subLevel(
                         name = CompilerArgumentsLevelNames.legacyWasmArguments,
-                        mergeWith = setOf(actualWasmArguments, removedWasmArguments)
+                        mergeWith = setOf(actualWasmArguments, actualWasmArgumentsKlibStage, actualWasmArgumentsLinkingStage, removedWasmArguments)
                     ) {
                         modifier(Modifier.DEPRECATED)
                         modifier(Modifier.SEALED)
                         subLevel(
                             name = CompilerArgumentsLevelNames.jsArguments,
-                            mergeWith = setOf(actualJsArguments, removedJsArguments)
+                            mergeWith = setOf(
+                                actualJsArguments,
+                                actualJsArgumentsKlibStage,
+                                actualJsArgumentsLinkingStage,
+                                removedJsArguments
+                            )
                         ) {}
                     }
                     subLevel(
                         name = CompilerArgumentsLevelNames.wasmArguments,
-                        mergeWith = setOf(actualWasmArguments, removedWasmArguments)
+                        mergeWith = setOf(
+                            actualWasmArguments,
+                            actualWasmArgumentsKlibStage,
+                            actualWasmArgumentsLinkingStage,
+                            removedWasmArguments
+                        )
                     ) {}
                 }
                 subLevel(

@@ -5,6 +5,7 @@
 package org.jetbrains.kotlin.buildtools.options.generator
 
 import com.squareup.kotlinpoet.ClassName
+import org.jetbrains.kotlin.arguments.description.CompilerArgumentsLevelNames
 import org.jetbrains.kotlin.arguments.description.kotlinCompilerArguments
 import org.jetbrains.kotlin.arguments.dsl.base.KotlinCompilerArgumentsLevel
 import org.jetbrains.kotlin.arguments.dsl.base.KotlinReleaseVersion
@@ -35,6 +36,7 @@ import kotlin.io.path.walk
  * You must specify at least one of "api" or "impl", and if both are specified "api" must come before "impl".
  */
 fun main(args: Array<String>) {
+    println("GENERATOR ARGS: " + args.joinToString(" "))
     val genDir = Paths.get(args[0])
     val kotlinVersion = args[1].let { argVersionString ->
         try {
@@ -49,12 +51,12 @@ fun main(args: Array<String>) {
     val generatedFiles = mutableListOf<Path>()
     listOfNotNull(
         apiArgsStart?.let { args.copyOfRange(apiArgsStart, implArgsStart ?: args.size) },
-        implArgsStart?.let { args.copyOfRange(implArgsStart, args.size) }
-    ).map { localArgs ->
+        implArgsStart?.let { args.copyOfRange(implArgsStart, args.size) }).map { localArgs ->
         val allowedLevels = if (localArgs[1] == "*") {
             null
         } else {
-            localArgs[1].split(",").flatMap { leafName -> kotlinCompilerArguments.topLevel.findPathToLeaf(leafName) }.toSet()
+            localArgs[1].split(",").flatMap { leafName -> kotlinCompilerArguments.topLevel.findPathToLeaf(leafName) }.map { it.name }
+                .toSet()
         }
         val targetPackage = if (localArgs.size > 2) {
             localArgs[2]
@@ -78,12 +80,20 @@ fun main(args: Array<String>) {
         }
     }.forEach { (generator, allowedLevels) ->
         val levelsToProcess = mutableListOf(LevelWithParent(kotlinCompilerArguments.topLevel, null))
+
+        if (generator is BtaApiGenerator) {
+            levelsToProcess.addAll(syntheticArgumentInterfaces.map { it.toLevelWithParent(generator.targetPackage) })
+        }
+
         while (levelsToProcess.isNotEmpty()) {
             val currentLevel = levelsToProcess.popLast()
-            if (allowedLevels != null && currentLevel.level !in allowedLevels) {
+            if (currentLevel.level == DummyLevel) {
                 continue
             }
-            val output = generator.generateArgumentsForLevel(currentLevel.level, currentLevel.parentName)
+            if (allowedLevels != null && currentLevel.level.name !in allowedLevels && currentLevel.level.name !in syntheticArgumentInterfaces.map { it.name }) {
+                continue
+            }
+            val output = generator.generateArgumentsForLevel(currentLevel.level, currentLevel.parentName, currentLevel.additionalInterfaces)
             output.generatedFiles.forEach { (path, content) ->
                 val genFile = genDir.resolve(path)
                 GeneratorsFileUtil.writeFileIfContentChanged(genFile.toFile(), content, logNotChanged = false)
@@ -92,10 +102,12 @@ fun main(args: Array<String>) {
             levelsToProcess += currentLevel.level.nestedLevels.flatMap { level ->
                 // "Skip" the deprecated and soon to be removed Wasm arguments level from the JS arguments hierarchy.
                 // There is a separate Wasm-only level in another arguments branch to avoid mixing JS and Wasm hierarchies.
-                if (level.name == "legacyWasmArguments") {
-                    level.nestedLevels.map { LevelWithParent(it, output.argumentTypeName) }
+                if (level.name == CompilerArgumentsLevelNames.legacyWasmArguments) {
+                    level.nestedLevels
                 } else {
-                    listOf(LevelWithParent(level, output.argumentTypeName))
+                    listOf(level)
+                }.map {
+                    LevelWithParent(it, output.argumentTypeName)
                 }
             }
         }
@@ -108,15 +120,34 @@ fun main(args: Array<String>) {
     }
 }
 
+private fun AdditionalInterface.toLevelWithParent(
+    targetPackage: String,
+): LevelWithParent = LevelWithParent(
+    KotlinCompilerArgumentsLevel(
+        name, level.arguments, if (syntheticArgumentInterfaces.any { this in it.parentInterfaces }) {
+            setOf(DummyLevel)
+        } else emptySet(), level.modifiers
+    ), parentInterfaces.firstOrNull()?.let {
+        ClassName(targetPackage, it.name)
+    } ?: ClassName(targetPackage, "CommonCompilerArguments"), parentInterfaces.map { ClassName(targetPackage, it.name) })
+
+val DummyLevel = KotlinCompilerArgumentsLevel("", emptySet(), emptySet(), emptySet())
+
 internal interface BtaGenerator {
+    val targetPackage: String
     fun generateArgumentsForLevel(
         level: KotlinCompilerArgumentsLevel,
         parentClass: ClassName? = null,
+        additionalInterfaces: List<ClassName> = emptyList(),
     ): GeneratorOutputs
 }
 
 internal class GeneratorOutputs(val argumentTypeName: ClassName, val generatedFiles: List<Pair<Path, String>>)
-private class LevelWithParent(val level: KotlinCompilerArgumentsLevel, val parentName: ClassName?)
+private class LevelWithParent(
+    val level: KotlinCompilerArgumentsLevel,
+    val parentName: ClassName?,
+    val additionalInterfaces: List<ClassName> = emptyList(),
+)
 
 private fun KotlinCompilerArgumentsLevel.findPathToLeaf(leafName: String): Set<KotlinCompilerArgumentsLevel> {
     if (name == leafName) {
@@ -144,8 +175,6 @@ private fun parseLastKotlinReleaseVersion(kotlinVersionString: String): KotlinRe
     val patchVersion = baseVersionSplit.getOrNull(2)?.toIntOrNull() ?: 0
 
     return KotlinReleaseVersion.entries.last { releaseVersion ->
-        releaseVersion.major < majorVersion ||
-                (releaseVersion.major == majorVersion && releaseVersion.minor < minorVersion) ||
-                (releaseVersion.major == majorVersion && releaseVersion.minor == minorVersion && releaseVersion.patch <= patchVersion)
+        releaseVersion.major < majorVersion || (releaseVersion.major == majorVersion && releaseVersion.minor < minorVersion) || (releaseVersion.major == majorVersion && releaseVersion.minor == minorVersion && releaseVersion.patch <= patchVersion)
     }
 }

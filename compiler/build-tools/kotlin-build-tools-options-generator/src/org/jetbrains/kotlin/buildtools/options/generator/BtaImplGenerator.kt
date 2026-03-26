@@ -18,7 +18,7 @@ import kotlin.io.path.Path
 import kotlin.reflect.KClass
 
 internal class BtaImplGenerator(
-    private val targetPackage: String,
+    override val targetPackage: String,
     private val skipXX: Boolean,
     private val kotlinVersion: KotlinReleaseVersion,
     private val generateCompatLayer: Boolean,
@@ -26,7 +26,11 @@ internal class BtaImplGenerator(
 
     private val outputs = mutableListOf<Pair<Path, String>>()
 
-    override fun generateArgumentsForLevel(level: KotlinCompilerArgumentsLevel, parentClass: ClassName?): GeneratorOutputs {
+    override fun generateArgumentsForLevel(
+        level: KotlinCompilerArgumentsLevel,
+        parentClass: ClassName?,
+        additionalInterfaces: List<ClassName>,
+    ): GeneratorOutputs {
         val apiClassName = level.name.capitalizeAsciiOnly()
         val implClassName = apiClassName + "Impl"
         val mainFileAppendable = createGeneratedFileAppendable()
@@ -44,6 +48,17 @@ internal class BtaImplGenerator(
                 if (!level.isLeaf()) {
                     addModifiers(KModifier.ABSTRACT)
                 }
+                val syntheticInterfaces = syntheticArgumentInterfaces.filter { it.concreteClassName == implClassName }
+                if (syntheticInterfaces.isEmpty()) {
+                    addSuperinterface(ClassName(API_ARGUMENTS_PACKAGE, level.name.capitalizeAsciiOnly()))
+                    addSuperinterface(ClassName(API_ARGUMENTS_PACKAGE, level.name.capitalizeAsciiOnly()).nestedClass("Builder"))
+                } else {
+                    syntheticInterfaces.forEach {
+                        addSuperinterface(ClassName(API_ARGUMENTS_PACKAGE, it.name))
+                        addSuperinterface(ClassName(API_ARGUMENTS_PACKAGE, it.name).nestedClass("Builder"))
+                    }
+                }
+
                 if (parentClass != null) {
                     superclass(parentClass)
                     addSuperclassConstructorParameter("adapter")
@@ -57,9 +72,6 @@ internal class BtaImplGenerator(
                     }
                 }
 
-                addSuperinterface(ClassName(API_ARGUMENTS_PACKAGE, level.name.capitalizeAsciiOnly()))
-                addSuperinterface(ClassName(API_ARGUMENTS_PACKAGE, level.name.capitalizeAsciiOnly()).nestedClass("Builder"))
-
                 val toCompilerConverterFun = toCompilerConverterFunBuilder(level, parentClass)
                 val toCompilerArgumentsAffectingOutcomeFun = toCompilerArgumentsAffectingOutcomeFunBuilder(level, parentClass)
                 val applyCompilerArgumentsFun = applyCompilerArgumentsFunBuilder(level, parentClass)
@@ -67,11 +79,29 @@ internal class BtaImplGenerator(
 
                 val argumentTypeNameString =
                     generateArgumentType(apiClassName, includeSinceVersion = false, registerAsKnownArgument = true)
-                val argumentTypeName = ClassName(API_ARGUMENTS_PACKAGE, apiClassName, argumentTypeNameString)
+
                 val argumentImplTypeName = ClassName(targetPackage, implClassName, argumentTypeNameString)
                 val constructorSpecBuilder = constructorSpecBuilder(argumentTypeNameString)
 
-                generateGetPutFunctions(argumentTypeName, argumentImplTypeName)
+                val mapProperty = property(
+                    "optionsMap",
+                    ClassName("kotlin.collections", "MutableMap").parameterizedBy(typeNameOf<String>(), ANY.copy(nullable = true))
+                ) {
+                    addModifiers(KModifier.PRIVATE)
+                    initializer("%M()", MemberName("kotlin.collections", "mutableMapOf"))
+                }
+                generateOwnGetPutFunctions(argumentImplTypeName, mapProperty)
+
+                if (syntheticInterfaces.isEmpty()) {
+                    val argumentTypeName = ClassName(API_ARGUMENTS_PACKAGE, apiClassName, argumentTypeNameString)
+                    generateGetPutFunctions(argumentTypeName, mapProperty)
+                } else {
+                    syntheticInterfaces.forEach { syntheticInterface ->
+                        val argumentTypeName =
+                            ClassName(API_ARGUMENTS_PACKAGE, syntheticInterface.name, syntheticInterface.name.removeSuffix("s"))
+                        generateGetPutFunctions(argumentTypeName, mapProperty)
+                    }
+                }
 
                 addType(TypeSpec.companionObjectBuilder().apply {
                     property(
@@ -106,7 +136,7 @@ internal class BtaImplGenerator(
                     }
                     function("build") {
                         addModifiers(KModifier.OVERRIDE)
-                        returns(ClassName(API_ARGUMENTS_PACKAGE, apiClassName))
+                        returns(ClassName(targetPackage, implClassName))
                         addStatement("return deepCopy()")
                     }
                     addSuperinterface(
@@ -528,14 +558,36 @@ internal class BtaImplGenerator(
         }
     }
 
-    fun TypeSpec.Builder.generateGetPutFunctions(parameter: ClassName, implParameter: ClassName) {
-        val mapProperty = property(
-            "optionsMap",
-            ClassName("kotlin.collections", "MutableMap").parameterizedBy(typeNameOf<String>(), ANY.copy(nullable = true))
-        ) {
-            addModifiers(KModifier.PRIVATE)
-            initializer("%M()", MemberName("kotlin.collections", "mutableMapOf"))
+    fun TypeSpec.Builder.generateOwnGetPutFunctions(implParameter: ClassName, mapProperty: PropertySpec) {
+        function("get") {
+            val typeParameter = TypeVariableName("V")
+            annotation<Suppress> {
+                addMember("%S", "UNCHECKED_CAST")
+            }
+            returns(typeParameter)
+            addModifiers(KModifier.OPERATOR)
+            addTypeVariable(typeParameter)
+            addParameter("key", implParameter.parameterizedBy(typeParameter))
+            addStatement("return %N[key.id] as %T", mapProperty, typeParameter)
         }
+        function("set") {
+            val typeParameter = TypeVariableName("V")
+            addModifiers(KModifier.OPERATOR, KModifier.PRIVATE)
+            addTypeVariable(typeParameter)
+            addParameter("key", implParameter.parameterizedBy(typeParameter))
+            addParameter("value", typeParameter)
+            addStatement("%N[key.id] = %N", mapProperty, "value")
+        }
+
+        function("contains") {
+            addModifiers(KModifier.OPERATOR)
+            returns(BOOLEAN)
+            addParameter("key", implParameter.parameterizedBy(STAR))
+            addStatement("return key.id in optionsMap")
+        }
+    }
+
+    fun TypeSpec.Builder.generateGetPutFunctions(parameter: ClassName, mapProperty: PropertySpec) {
         function("get") {
             val typeParameter = TypeVariableName("V")
             annotation<Suppress> {
@@ -596,33 +648,6 @@ internal class BtaImplGenerator(
             addModifiers(KModifier.OVERRIDE, KModifier.OPERATOR)
             returns(BOOLEAN)
             addParameter("key", parameter.parameterizedBy(STAR))
-            addStatement("return key.id in optionsMap")
-        }
-
-        function("get") {
-            val typeParameter = TypeVariableName("V")
-            annotation<Suppress> {
-                addMember("%S", "UNCHECKED_CAST")
-            }
-            returns(typeParameter)
-            addModifiers(KModifier.OPERATOR)
-            addTypeVariable(typeParameter)
-            addParameter("key", implParameter.parameterizedBy(typeParameter))
-            addStatement("return %N[key.id] as %T", mapProperty, typeParameter)
-        }
-        function("set") {
-            val typeParameter = TypeVariableName("V")
-            addModifiers(KModifier.OPERATOR, KModifier.PRIVATE)
-            addTypeVariable(typeParameter)
-            addParameter("key", implParameter.parameterizedBy(typeParameter))
-            addParameter("value", typeParameter)
-            addStatement("%N[key.id] = %N", mapProperty, "value")
-        }
-
-        function("contains") {
-            addModifiers(KModifier.OPERATOR)
-            returns(BOOLEAN)
-            addParameter("key", implParameter.parameterizedBy(STAR))
             addStatement("return key.id in optionsMap")
         }
     }

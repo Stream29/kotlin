@@ -4,10 +4,7 @@
  */
 package org.jetbrains.kotlin.buildtools.options.generator
 
-import org.jetbrains.kotlin.arguments.description.actualCommonCompilerArguments
-import org.jetbrains.kotlin.arguments.description.actualCommonToolsArguments
-import org.jetbrains.kotlin.arguments.description.actualJvmCompilerArguments
-import org.jetbrains.kotlin.arguments.description.actualMetadataArguments
+import org.jetbrains.kotlin.arguments.description.*
 import org.jetbrains.kotlin.arguments.description.removed.removedCommonCompilerArguments
 import org.jetbrains.kotlin.arguments.description.removed.removedJvmCompilerArguments
 import org.jetbrains.kotlin.arguments.dsl.base.KotlinCompilerArgument
@@ -76,6 +73,76 @@ private val levelsToArgumentTransforms: Map<String, Map<String, ArgumentTransfor
             drop("Xjavac-arguments")
         }
     })
+}
+
+internal class AdditionalInterface(
+    val name: String,
+    val level: KotlinCompilerArgumentsLevel,
+    val parentInterfaces: List<AdditionalInterface>,
+    val concreteClassName: String? = null,
+)
+
+internal val syntheticArgumentInterfaces = buildList {
+    val commonKlibBasedCompilerArguments = AdditionalInterface(
+        "CommonKlibBasedArguments",
+        actualCommonKlibBasedArguments,
+        emptyList(),
+        "CommonKlibBasedArgumentsImpl"
+    ).also(::add)
+    val commonKlibBasedCompilerKlibArguments = AdditionalInterface(
+        "CommonKlibBasedArgumentsKlibArguments",
+        actualCommonKlibBasedArgumentsKlibStage,
+        listOf(commonKlibBasedCompilerArguments),
+        "CommonKlibBasedArgumentsImpl"
+    ).also(::add)
+    val commonKlibBasedCompilerLinkingArguments = AdditionalInterface(
+        "CommonKlibBasedArgumentsLinkingArguments",
+        actualCommonKlibBasedArgumentsLinkingStage,
+        listOf(commonKlibBasedCompilerArguments),
+        "CommonKlibBasedArgumentsImpl"
+    ).also(::add)
+
+    val commonJsAndWasmCompilerArguments = AdditionalInterface(
+        "CommonJsAndWasmArguments",
+        actualCommonJsAndWasmArguments,
+        listOf(commonKlibBasedCompilerArguments),
+        "CommonJsAndWasmArgumentsImpl"
+    ).also(::add)
+
+    val commonJsAndWasmCompilerKlibArguments = AdditionalInterface(
+        "CommonJsAndWasmCompilerKlibArguments",
+        actualCommonJsAndWasmArgumentsKlibStage,
+        listOf(commonJsAndWasmCompilerArguments, commonKlibBasedCompilerKlibArguments),
+        "CommonJsAndWasmArgumentsImpl"
+    ).also(::add)
+
+    val commonJsAndWasmCompilerLinkingArguments = AdditionalInterface(
+        "CommonJsAndWasmCompilerLinkingArguments",
+        actualCommonJsAndWasmArgumentsLinkingStage,
+        listOf(commonJsAndWasmCompilerArguments, commonKlibBasedCompilerLinkingArguments),
+        "CommonJsAndWasmArgumentsImpl"
+    ).also(::add)
+
+    val jsCompilerArguments = AdditionalInterface(
+        "JsCompilerArguments",
+        actualJsArguments,
+        listOf(commonJsAndWasmCompilerArguments),
+        "JsArgumentsImpl"
+    ).also(::add)
+
+    val jsCompilerKlibArguments = AdditionalInterface(
+        "JsCompilerKlibArguments",
+        actualJsArgumentsKlibStage,
+        listOf(jsCompilerArguments, commonJsAndWasmCompilerKlibArguments),
+        "JsArgumentsImpl"
+    ).also(::add)
+
+    val jsCompilerLinkingArguments = AdditionalInterface(
+        "JsCompilerLinkingArguments",
+        actualJsArgumentsLinkingStage,
+        listOf(jsCompilerArguments, commonJsAndWasmCompilerLinkingArguments),
+        "JsArgumentsImpl"
+    ).also(::add)
 }
 
 context(level: KotlinCompilerArgumentsLevel)

@@ -11,121 +11,7 @@ import org.jetbrains.kotlin.arguments.dsl.defaultNull
 import org.jetbrains.kotlin.arguments.dsl.types.BooleanType
 import org.jetbrains.kotlin.arguments.dsl.types.StringType
 
-val actualCommonJsAndWasmArguments by compilerArgumentsLevel(CompilerArgumentsLevelNames.commonJsAndWasmArguments) {
-    compilerArgument {
-        name = "Xir-produce-js"
-        description = "Generate a JS file using the IR backend.".asReleaseDependent()
-        valueType = BooleanType.defaultFalse
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_3_70,
-        )
-    }
-
-    compilerArgument {
-        name = "source-map"
-        description = "Generate a source map.".asReleaseDependent()
-        valueType = BooleanType.defaultFalse
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_0_0,
-            stabilizedVersion = KotlinReleaseVersion.v1_0_0,
-        )
-    }
-
-    compilerArgument {
-        name = "Xinclude"
-        compilerName = "includes"
-        description = "Path to an intermediate library that should be processed in the same manner as source files.".asReleaseDependent()
-        valueType = StringType.defaultNull
-        valueDescription = "<path>".asReleaseDependent()
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_4_0,
-        )
-    }
-
-    compilerArgument {
-        name = "ir-output-dir"
-        compilerName = "outputDir"
-        description = "Destination for generated files.".asReleaseDependent()
-        valueType = StringType.defaultNull
-        valueDescription = "<directory>".asReleaseDependent()
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_8_20,
-            stabilizedVersion = KotlinReleaseVersion.v1_8_20
-        )
-    }
-
-    compilerArgument {
-        name = "ir-output-name"
-        compilerName = "moduleName"
-        description = "Base name of generated files.".asReleaseDependent()
-        valueType = StringType.defaultNull
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_8_20,
-            stabilizedVersion = KotlinReleaseVersion.v1_8_20,
-        )
-    }
-
-    compilerArgument {
-        name = "Xir-module-name"
-        description = "Specify the name of the compilation module for the IR backend.".asReleaseDependent()
-        valueType = StringType.defaultNull
-        valueDescription = "<name>".asReleaseDependent()
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_4_0,
-        )
-    }
-
-    compilerArgument {
-        name = "Xir-produce-klib-file"
-        description = "Generate a packed klib into the directory specified by '-ir-output-dir'.".asReleaseDependent()
-        valueType = BooleanType.defaultFalse
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_3_70,
-        )
-    }
-
-    compilerArgument {
-        name = "libraries"
-        description =
-            "Paths to Kotlin libraries with .meta.js and .kjsm files, separated by the system path separator.".asReleaseDependent()
-        valueType = StringType.defaultNull
-        valueDescription = "<path>".asReleaseDependent()
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_1_0,
-            stabilizedVersion = KotlinReleaseVersion.v1_1_0,
-        )
-    }
-
-    compilerArgument {
-        name = "Xfriend-modules"
-        description = "Paths to friend modules.".asReleaseDependent()
-        valueType = StringType.defaultNull
-        valueDescription = "<path>".asReleaseDependent()
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_1_3,
-        )
-    }
-
-    compilerArgument {
-        name = "Xcache-directory"
-        description = "Path to the cache directory.".asReleaseDependent()
-        valueType = StringType.defaultNull
-        valueDescription = "<path>".asReleaseDependent()
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_8_20,
-        )
-    }
-
+val actualCommonJsAndWasmArgumentsKlibStage by compilerArgumentsLevel(CompilerArgumentsLevelNames.commonJsAndWasmArguments) {
     compilerArgument {
         name = "Xir-produce-klib-dir"
         description = "Generate an unpacked klib into the parent directory of the output JS file.".asReleaseDependent()
@@ -137,21 +23,8 @@ val actualCommonJsAndWasmArguments by compilerArgumentsLevel(CompilerArgumentsLe
     }
 
     compilerArgument {
-        name = "Xir-property-lazy-initialization"
-        description = "Perform lazy initialization for properties.".asReleaseDependent()
-        valueType = BooleanType(
-            isNullable = false.asReleaseDependent(),
-            defaultValue = true.asReleaseDependent()
-        )
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_4_30,
-        )
-    }
-
-    compilerArgument {
-        name = "Xir-dce"
-        description = "Perform experimental dead code elimination.".asReleaseDependent()
+        name = "Xir-produce-klib-file"
+        description = "Generate a packed klib into the directory specified by '-ir-output-dir'.".asReleaseDependent()
         valueType = BooleanType.defaultFalse
 
         lifecycle(
@@ -168,12 +41,56 @@ val actualCommonJsAndWasmArguments by compilerArgumentsLevel(CompilerArgumentsLe
             introducedVersion = KotlinReleaseVersion.v1_5_30,
         )
     }
+}
+
+val actualCommonJsAndWasmArgumentsLinkingStage by compilerArgumentsLevel(CompilerArgumentsLevelNames.commonJsAndWasmArguments) {
+    compilerArgument {
+        name = "Xir-dce"
+        description = "Perform experimental dead code elimination.".asReleaseDependent()
+        valueType = BooleanType.defaultFalse
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v1_3_70,
+        )
+    }
 
     compilerArgument {
-        name = "main"
-        description = "Specify whether the 'main' function should be called upon execution.".asReleaseDependent()
-        valueType = StringType.defaultNull
-        valueDescription = "{call|noCall}".asReleaseDependent()
+        name = "Xgenerate-dts"
+        description = "Generate a TypeScript declaration .d.ts file alongside the JS file.".asReleaseDependent()
+        valueType = BooleanType.defaultFalse
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v1_3_70,
+        )
+    }
+
+    compilerArgument {
+        name = "Xstrict-implicit-export-types"
+        compilerName = "strictImplicitExportType"
+        description = "Generate strict types for implicitly exported entities inside d.ts files.".asReleaseDependent()
+        valueType = BooleanType.defaultFalse
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v1_8_0,
+        )
+    }
+    compilerArgument {
+        name = "Xir-property-lazy-initialization"
+        description = "Perform lazy initialization for properties.".asReleaseDependent()
+        valueType = BooleanType(
+            isNullable = false.asReleaseDependent(),
+            defaultValue = true.asReleaseDependent()
+        )
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v1_4_30,
+        )
+    }
+
+    compilerArgument {
+        name = "source-map"
+        description = "Generate a source map.".asReleaseDependent()
+        valueType = BooleanType.defaultFalse
 
         lifecycle(
             introducedVersion = KotlinReleaseVersion.v1_0_0,
@@ -231,34 +148,16 @@ val actualCommonJsAndWasmArguments by compilerArgumentsLevel(CompilerArgumentsLe
             stabilizedVersion = KotlinReleaseVersion.v1_8_20,
         )
     }
-    compilerArgument {
-        name = "Xfriend-modules-disabled"
-        description = "Disable internal declaration export.".asReleaseDependent()
-        valueType = BooleanType.defaultFalse
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_1_3,
-        )
-    }
 
     compilerArgument {
-        name = "Xir-dce-print-reachability-info"
-        description = "Print reachability information about declarations to 'stdout' while performing DCE.".asReleaseDependent()
-        valueType = BooleanType.defaultFalse
-        affectsCompilationOutcome = false
+        name = "main"
+        description = "Specify whether the 'main' function should be called upon execution.".asReleaseDependent()
+        valueType = StringType.defaultNull
+        valueDescription = "{call|noCall}".asReleaseDependent()
 
         lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_4_0,
-        )
-    }
-
-    compilerArgument {
-        name = "Xfake-override-validator"
-        description = "Enable the IR fake override validator.".asReleaseDependent()
-        valueType = BooleanType.defaultFalse
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_4_30,
+            introducedVersion = KotlinReleaseVersion.v1_0_0,
+            stabilizedVersion = KotlinReleaseVersion.v1_0_0,
         )
     }
 
@@ -274,8 +173,19 @@ val actualCommonJsAndWasmArguments by compilerArgumentsLevel(CompilerArgumentsLe
     }
 
     compilerArgument {
-        name = "Xgenerate-dts"
-        description = "Generate a TypeScript declaration .d.ts file alongside the JS file.".asReleaseDependent()
+        name = "Xcache-directory"
+        description = "Path to the cache directory.".asReleaseDependent()
+        valueType = StringType.defaultNull
+        valueDescription = "<path>".asReleaseDependent()
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v1_8_20,
+        )
+    }
+
+    compilerArgument {
+        name = "Xir-produce-js"
+        description = "Generate a JS file using the IR backend.".asReleaseDependent()
         valueType = BooleanType.defaultFalse
 
         lifecycle(
@@ -284,13 +194,108 @@ val actualCommonJsAndWasmArguments by compilerArgumentsLevel(CompilerArgumentsLe
     }
 
     compilerArgument {
-        name = "Xstrict-implicit-export-types"
-        compilerName = "strictImplicitExportType"
-        description = "Generate strict types for implicitly exported entities inside d.ts files.".asReleaseDependent()
+        name = "Xir-dce-print-reachability-info"
+        description = "Print reachability information about declarations to 'stdout' while performing DCE.".asReleaseDependent()
+        valueType = BooleanType.defaultFalse
+        affectsCompilationOutcome = false
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v1_4_0,
+        )
+    }
+}
+
+val actualCommonJsAndWasmArguments by compilerArgumentsLevel(CompilerArgumentsLevelNames.commonJsAndWasmArguments) {
+    compilerArgument {
+        name = "Xinclude"
+        compilerName = "includes"
+        description = "Path to an intermediate library that should be processed in the same manner as source files.".asReleaseDependent()
+        valueType = StringType.defaultNull
+        valueDescription = "<path>".asReleaseDependent()
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v1_4_0,
+        )
+    }
+
+    compilerArgument {
+        name = "ir-output-dir"
+        compilerName = "outputDir"
+        description = "Destination for generated files.".asReleaseDependent()
+        valueType = StringType.defaultNull
+        valueDescription = "<directory>".asReleaseDependent()
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v1_8_20,
+            stabilizedVersion = KotlinReleaseVersion.v1_8_20
+        )
+    }
+
+    compilerArgument {
+        name = "ir-output-name"
+        compilerName = "moduleName"
+        description = "Base name of generated files.".asReleaseDependent()
+        valueType = StringType.defaultNull
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v1_8_20,
+            stabilizedVersion = KotlinReleaseVersion.v1_8_20,
+        )
+    }
+
+    compilerArgument {
+        name = "Xir-module-name"
+        description = "Specify the name of the compilation module for the IR backend.".asReleaseDependent()
+        valueType = StringType.defaultNull
+        valueDescription = "<name>".asReleaseDependent()
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v1_4_0,
+        )
+    }
+
+
+    compilerArgument {
+        name = "libraries"
+        description =
+            "Paths to Kotlin libraries with .meta.js and .kjsm files, separated by the system path separator.".asReleaseDependent()
+        valueType = StringType.defaultNull
+        valueDescription = "<path>".asReleaseDependent()
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v1_1_0,
+            stabilizedVersion = KotlinReleaseVersion.v1_1_0,
+        )
+    }
+
+    compilerArgument {
+        name = "Xfriend-modules"
+        description = "Paths to friend modules.".asReleaseDependent()
+        valueType = StringType.defaultNull
+        valueDescription = "<path>".asReleaseDependent()
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v1_1_3,
+        )
+    }
+
+    compilerArgument {
+        name = "Xfriend-modules-disabled"
+        description = "Disable internal declaration export.".asReleaseDependent()
         valueType = BooleanType.defaultFalse
 
         lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_8_0,
+            introducedVersion = KotlinReleaseVersion.v1_1_3,
+        )
+    }
+
+    compilerArgument {
+        name = "Xfake-override-validator"
+        description = "Enable the IR fake override validator.".asReleaseDependent()
+        valueType = BooleanType.defaultFalse
+
+        lifecycle(
+            introducedVersion = KotlinReleaseVersion.v1_4_30,
         )
     }
 }

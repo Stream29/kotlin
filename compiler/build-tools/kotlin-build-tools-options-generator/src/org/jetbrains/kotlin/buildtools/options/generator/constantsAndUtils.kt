@@ -75,7 +75,7 @@ internal val levelsSince = mapOf(
     CompilerArgumentsLevelNames.wasmArguments to KDOC_SINCE_2_4_0,
     CompilerArgumentsLevelNames.commonJsAndWasmArguments to KDOC_SINCE_2_4_0,
     CompilerArgumentsLevelNames.commonKlibBasedArguments to KDOC_SINCE_2_4_0,
-)
+) + syntheticArgumentInterfaces.associate { it.name to KDOC_SINCE_2_4_0 }
 
 internal fun BtaCompilerArgument<*>.extractName(): String = name.uppercase().replace("-", "_").let {
     when {

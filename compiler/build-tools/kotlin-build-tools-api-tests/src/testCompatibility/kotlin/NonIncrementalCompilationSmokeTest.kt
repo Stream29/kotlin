@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.buildtools.tests
 import org.jetbrains.kotlin.buildtools.api.CompilationResult
 import org.jetbrains.kotlin.buildtools.api.RemovedCompilerArgument
 import org.jetbrains.kotlin.buildtools.api.arguments.CommonJsAndWasmArguments
+import org.jetbrains.kotlin.buildtools.api.arguments.CommonJsAndWasmCompilerKlibArguments
 import org.jetbrains.kotlin.buildtools.api.arguments.CommonToolArguments
 import org.jetbrains.kotlin.buildtools.api.arguments.ExperimentalCompilerArgument
 import org.jetbrains.kotlin.buildtools.api.arguments.JvmCompilerArguments
@@ -137,7 +138,7 @@ class NonIncrementalCompilationSmokeTest : BaseCompilationTest() {
         ) {
             compilerArguments[CommonJsAndWasmArguments.LIBRARIES] = stdlibKlib
             compilerArguments[CommonJsAndWasmArguments.IR_OUTPUT_NAME] = "some_module"
-            compilerArguments[CommonJsAndWasmArguments.X_IR_PRODUCE_KLIB_FILE] = true
+            compilerArguments[CommonJsAndWasmCompilerKlibArguments.X_IR_PRODUCE_KLIB_FILE] = true
             compilerArguments[CommonToolArguments.VERBOSE] = true
         }
         toolchain.createBuildSession().use {
