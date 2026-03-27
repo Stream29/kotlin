@@ -109,10 +109,19 @@ enum class PhaseType {
     Initialization,
     Analysis,
     TranslationToIr,
+
+    /** Phase: IR lowerings of the first compilation stage (applicable only to Klib-based compilers). */
     IrPreLowering,
+
+    /** Phase: Serialization of IR and metadata trees into byte arrays (applicable only to Klib-based compilers). */
     IrSerialization,
+
+    /** Phase: Writing the IR and metadata (as raw byte arrays) to a file system (applicable only to Klib-based compilers). */
     KlibWriting,
+
+    /** Phase: Deserialization and linkage of IR, building fake overrides and the partial linkage (applicable only to Klib-based compilers). */
     IrLinking,
+
     IrLowering,
     Backend,
 }
