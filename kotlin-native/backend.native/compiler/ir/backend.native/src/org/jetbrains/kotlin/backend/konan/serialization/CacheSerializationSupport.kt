@@ -140,6 +140,11 @@ internal class InlineFunctionDeserializer(
         if (packageFragment is IrFile)
             linker.deserializeAllReachableTopLevels()
 
+        // This links C-Interop symbols before the PL process below, TODO: find a cleaner way to do it.
+        for (moduleDeserializer in linker.deserializersForModules.values) {
+            moduleDeserializer.postProcess()
+        }
+
         linker.partialLinkageSupport.exploreClassifiers(linker.fakeOverrideBuilder)
         linker.partialLinkageSupport.exploreClassifiersInInlineLazyIrFunction(function)
 
