@@ -68,8 +68,8 @@ interface FakeOverrideClassFilter {
 }
 
 interface FileLocalAwareLinker {
-    fun tryReferencingSimpleFunctionByLocalSignature(file: IrFile, idSignature: IdSignature): IrSimpleFunctionSymbol?
-    fun tryReferencingPropertyByLocalSignature(file: IrFile, idSignature: IdSignature): IrPropertySymbol?
+    fun tryReferencingSimpleFunctionByLocalSignature(file: IrFile?, idSignature: IdSignature): IrSimpleFunctionSymbol?
+    fun tryReferencingPropertyByLocalSignature(file: IrFile?, idSignature: IdSignature): IrPropertySymbol?
 }
 
 object DefaultFakeOverrideClassFilter : FakeOverrideClassFilter {
@@ -190,7 +190,7 @@ private class IrLinkerFakeOverrideBuilderStrategy(
         function: IrFunctionWithLateBinding,
         manglerCompatibleMode: Boolean
     ): Pair<IdSignature, IrSimpleFunctionSymbol> {
-        val file = function.parentAsClass.file
+        val file = function.parentAsClass.fileOrNull
 
         val signature = composeSignature(function, manglerCompatibleMode)
         val symbol = linker.tryReferencingSimpleFunctionByLocalSignature(file, signature)
@@ -224,7 +224,7 @@ private class IrLinkerFakeOverrideBuilderStrategy(
         property: IrPropertyWithLateBinding,
         manglerCompatibleMode: Boolean
     ): Pair<IdSignature, IrPropertySymbol> {
-        val file = property.parentAsClass.file
+        val file = property.parentAsClass.fileOrNull
 
         val signature = composeSignature(property, manglerCompatibleMode)
         val symbol = linker.tryReferencingPropertyByLocalSignature(file, signature)

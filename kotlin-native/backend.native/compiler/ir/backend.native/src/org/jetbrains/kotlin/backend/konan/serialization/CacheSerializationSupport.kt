@@ -140,6 +140,10 @@ internal class InlineFunctionDeserializer(
         if (packageFragment is IrFile)
             linker.deserializeAllReachableTopLevels()
 
+        for (moduleDeserializer in linker.deserializersForModules.values) {
+            moduleDeserializer.postProcess()
+        }
+
         linker.partialLinkageSupport.exploreClassifiers(linker.fakeOverrideBuilder)
         linker.partialLinkageSupport.exploreClassifiersInInlineLazyIrFunction(function)
 

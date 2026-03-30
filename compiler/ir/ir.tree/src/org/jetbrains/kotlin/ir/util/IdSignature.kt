@@ -321,9 +321,10 @@ sealed class IdSignature {
 
         override fun equals(other: Any?): Boolean =
             other is CommonSignature && packageFqName == other.packageFqName && declarationFqName == other.declarationFqName &&
-                    id == other.id && mask == other.mask
+                    id == other.id && ((mask xor other.mask) and Flags.IS_NATIVE_INTEROP_LIBRARY.encode(true).inv()) == 0L
 
-        private val hashCode = ((packageFqName.hashCode() * 31 + declarationFqName.hashCode()) * 31 + id.hashCode()) * 31 + mask.hashCode()
+        private val hashCode = ((packageFqName.hashCode() * 31 + declarationFqName.hashCode()) * 31 + id.hashCode()) * 31 +
+                (mask and Flags.IS_NATIVE_INTEROP_LIBRARY.encode(true).inv()).hashCode()
 
         override fun hashCode(): Int = hashCode
     }
