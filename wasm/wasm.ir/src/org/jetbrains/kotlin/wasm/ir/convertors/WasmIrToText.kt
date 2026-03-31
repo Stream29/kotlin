@@ -129,7 +129,8 @@ class WasmIrToText(
                 }
                 WasmOp.PSEUDO_ANNOTATION_BRANCH_HINT -> {
                     val likely = (wasmInstr.firstImmediateOrNull() as WasmImmediate.ConstU8).value != 0u.toUByte()
-                    stringBuilder.append("  ;; @metadata.code.branch_hint ${if (likely) "likely" else "unlikely"}")
+                    newLine()
+                    stringBuilder.append("@metadata.code.branch_hint ${if (likely) "likely" else "unlikely"}")
                 }
                 WasmOp.PSEUDO_ANNOTATION_TRACE_INST -> {
                     val markId = (wasmInstr.firstImmediateOrNull() as WasmImmediate.ConstI32).value
