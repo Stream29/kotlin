@@ -210,10 +210,10 @@ class WasmIrToBinary(
             //
             // Note: We generate the code metadata sections after the code section is appended
             // because the metadata sections depend on the annotations processed in the instruction
-            // stream. However, if
+            // stream. However,
             // https://github.com/WebAssembly/branch-hinting/blob/main/proposals/branch-hinting/Overview.md
-            // is to be believed, this section is supposed to come before. It works to generate it
-            // after anyway, so that's what we do, since it's much easier that way.
+            // specifies that the section comes before. This is actually not a problem for us,
+            // because binaryen itself reorders the section if necessary.
             emitCodeMetadataSections()
 
             appendSection(WasmBinary.Section.DATA) {
