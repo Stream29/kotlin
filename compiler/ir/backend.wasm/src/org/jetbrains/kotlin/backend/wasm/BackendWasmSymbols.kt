@@ -181,6 +181,8 @@ class BackendWasmSymbols(
 
     val wasmTypeId = CallableIds.wasmTypeId.functionSymbol()
     val wasmGetTypeRtti = CallableIds.wasmGetTypeRtti.functionSymbol()
+    val likely = CallableIds.likely.functionSymbol()
+    val unlikely = CallableIds.unlikely.functionSymbol()
     val wasmGetRttiSupportedInterfaces = CallableIds.wasmGetRttiSupportedInterfaces.functionSymbol()
     val wasmGetRttiIntField = CallableIds.wasmGetRttiIntField.functionSymbol()
     val wasmGetRttiLongField = CallableIds.wasmGetRttiLongField.functionSymbol()
@@ -191,6 +193,9 @@ class BackendWasmSymbols(
     val wasmArrayAnyIndexOfValue = CallableIds.wasmArrayAnyIndexOfValue.functionSymbol()
 
     val wasmIsInterface = CallableIds.wasmIsInterface.functionSymbol()
+
+    val wasmBranchHintLikely = ClassIds.BranchHintLikely.classSymbol()
+    val wasmBranchHintUnlikely = ClassIds.BranchHintUnlikely.classSymbol()
 
     val nullableEquals = CallableIds.nullableEquals.functionSymbol()
     val anyNtoString = CallableIds.anyNtoString.functionSymbol()
@@ -352,6 +357,8 @@ private object ClassIds {
     val KMutableProperty1Impl = "KMutableProperty1Impl".wasmClassId
     val KMutableProperty2Impl = "KMutableProperty2Impl".wasmClassId
     val KExternalClassImpl = "KExternalClassImpl".wasmClassId
+    val BranchHintLikely = "BranchHintLikely".wasmClassId
+    val BranchHintUnlikely = "BranchHintUnlikely".wasmClassId
     val Void = "Void".wasmClassId
 
     // JS class
@@ -443,6 +450,8 @@ private object CallableIds {
     val getWasmAbiVersion = "getWasmAbiVersion".wasmCallableId
     val wasmTypeId = "wasmTypeId".wasmCallableId
     val wasmGetTypeRtti = "wasmGetTypeRtti".wasmCallableId
+    val likely = "likely".wasmCallableId
+    val unlikely = "unlikely".wasmCallableId
     val wasmGetRttiSupportedInterfaces = "wasmGetRttiSupportedInterfaces".wasmCallableId
     val wasmGetRttiIntField = "wasmGetRttiIntField".wasmCallableId
     val wasmGetRttiLongField = "wasmGetRttiLongField".wasmCallableId

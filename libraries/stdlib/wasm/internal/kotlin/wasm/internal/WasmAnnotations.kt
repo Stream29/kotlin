@@ -59,3 +59,17 @@ internal val implementedAsIntrinsic: Nothing
 @Target(AnnotationTarget.CONSTRUCTOR)
 @Retention(AnnotationRetention.BINARY)
 internal annotation class WasmPrimitiveConstructor
+
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.BINARY)
+public annotation class BranchHintLikely
+
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.BINARY)
+public annotation class BranchHintUnlikely
+
+@BranchHintLikely
+public fun likely(cond: Boolean): Boolean = cond
+
+@BranchHintUnlikely
+public fun unlikely(cond: Boolean): Boolean = cond

@@ -1224,6 +1224,10 @@ class BodyGenerator(
                 )
             }
 
+            wasmSymbols.likely, wasmSymbols.unlikely -> {
+                return true
+            }
+
             else -> {
                 return false
             }
@@ -1426,6 +1430,26 @@ class BodyGenerator(
         }
     }
 
+    private fun extractBranchHint(expression: IrExpression): Pair<IrExpression, Boolean?> {
+        if (expression is IrFunctionAccessExpression) {
+            if (expression.symbol == wasmSymbols.likely) return expression.arguments[0]!! to true
+            if (expression.symbol == wasmSymbols.unlikely) return expression.arguments[0]!! to false
+        }
+
+        val annotationContainer = when (expression) {
+            is IrAnnotationContainer -> expression
+            is IrBlock -> expression.statements.lastOrNull() as? IrAnnotationContainer
+            else -> null
+        }
+
+        if (annotationContainer != null) {
+            if (annotationContainer.hasWasmBranchHintLikelyAnnotation()) return expression to true
+            if (annotationContainer.hasWasmBranchHintUnlikelyAnnotation()) return expression to false
+        }
+
+        return expression to null
+    }
+
     override fun visitWhen(expression: IrWhen) {
         if (!backendContext.isDebugFriendlyCompilation && tryGenerateOptimisedWhen(
                 expression,
@@ -1455,7 +1479,11 @@ class BodyGenerator(
         for (branch in branches) {
             if (!isElseBranch(branch)) {
                 if (ifCount > 0) body.buildElse()
-                generateExpression(branch.condition)
+                val (condition, hint) = extractBranchHint(branch.condition)
+                generateExpression(condition)
+                if (hint != null) {
+                    body.buildBranchHint(hint)
+                }
                 body.buildIf(null, resultType)
                 generateWithExpectedType(branch.result, expression.type)
                 ifCount++
@@ -1500,7 +1528,11 @@ class BodyGenerator(
                     functionContext.defineLoopLevel(loop, LoopLabelType.CONTINUE, wasmContinueBlock)
                     loop.body?.let { generateAsStatement(it) }
                 }
-                generateExpression(loop.condition)
+                val (condition, hint) = extractBranchHint(loop.condition)
+                generateExpression(condition)
+                if (hint != null) {
+                    body.buildBranchHint(hint)
+                }
                 body.buildBrIf(wasmLoop, loop.condition.getSourceLocation())
             }
         }
@@ -1522,7 +1554,11 @@ class BodyGenerator(
                 functionContext.defineLoopLevel(loop, LoopLabelType.BREAK, wasmBreakBlock)
                 functionContext.defineLoopLevel(loop, LoopLabelType.CONTINUE, wasmLoop)
 
-                generateExpression(loop.condition)
+                val (condition, hint) = extractBranchHint(loop.condition)
+                generateExpression(condition)
+                if (hint != null) {
+                    body.buildBranchHint(hint)
+                }
                 val location = loop.condition.getSourceLocation()
                 body.buildInstr(WasmOp.I32_EQZ, location)
                 body.buildBrIf(wasmBreakBlock, location)
