@@ -11,12 +11,7 @@ import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.config.IrVerificationMode
 import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.IrElement
-import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationBase
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.declarations.IrReplSnippet
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.types.IrType
@@ -80,17 +75,18 @@ private class IrFileValidator(
 
     private val checkersPerElementCache = hashMapOf<Class<out IrElement>, List<IrElementChecker<*>>>()
 
+    private fun runWithContextUpdaters(element: IrElement, block: () -> Unit) {
+        contextUpdaters
+            .fold(block) { currentBlock, updater -> { updater.runInNewContext(context, element, currentBlock) } }
+            .invoke()
+    }
+
     private fun getCheckersFor(type: Class<out IrElement>) = checkersPerElementCache.computeIfAbsent(type) {
         elementCheckers.filter { it.elementClass.isAssignableFrom(type) }
     }
 
     override fun visitElement(element: IrElement) {
-        var block = { element.acceptChildrenVoid(this) }
-        for (contextUpdater in contextUpdaters) {
-            val currentBlock = block
-            block = { contextUpdater.runInNewContext(context, element, currentBlock) }
-        }
-        block()
+        runWithContextUpdaters(element) { element.acceptChildrenVoid(this) }
 
         for (checker in getCheckersFor(element.javaClass)) {
             @Suppress("UNCHECKED_CAST")
@@ -111,7 +107,7 @@ private class IrFileValidator(
     }
 
     override fun visitType(container: IrElement, type: IrType) {
-        super.visitType(container, type)
+        runWithContextUpdaters(container) { super.visitType(container, type) }
         for (checker in typeCheckers) {
             checker.check(type, container, context)
         }
