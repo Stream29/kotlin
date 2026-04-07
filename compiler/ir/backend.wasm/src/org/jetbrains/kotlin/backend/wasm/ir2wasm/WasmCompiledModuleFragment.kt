@@ -307,8 +307,10 @@ class WasmCompiledModuleFragment(
         val heapTypeResolver: (WasmHeapType.Type) -> WasmTypeDeclaration = definedDeclarations::resolve
 
         val recursiveGroups = with(RecursiveGroupBuilder(heapTypeResolver)) {
-            addTypes(definedDeclarations.gcTypes.values)
-            addTypes(definedDeclarations.vTableGcTypes.values)
+            // Use distinct() because after rebinding equivalent declarations, multiple keys may point
+            // to the same canonical type object.
+            addTypes(definedDeclarations.gcTypes.values.distinct())
+            addTypes(definedDeclarations.vTableGcTypes.values.distinct())
             addTypes(allFunctionTypes.values.toSet())
             build()
         }
@@ -409,10 +411,13 @@ class WasmCompiledModuleFragment(
 
     private fun getGlobals(definedDeclarations: DefinedDeclarationsResolver) = mutableListOf<WasmGlobal>().apply {
         addAll(definedDeclarations.globalFields.values)
-        addAll(definedDeclarations.globalVTables.values)
-        addAll(definedDeclarations.globalClassITables.values)
+        // Use distinct() because after rebinding equivalent declarations, multiple keys may point
+        // to the same canonical global object.
+        addAll(definedDeclarations.globalVTables.values.distinct())
+        addAll(definedDeclarations.globalClassITables.values.distinct())
 
-        val rttiGlobals = mutableMapOf<IdSignature, WasmGlobal>()
+        // Use the already-deduplicated globalRTTI from definedDeclarations
+        val rttiGlobals = definedDeclarations.globalRTTI
         val rttiSuperTypes = mutableMapOf<IdSignature, IdSignature?>()
 
         wasmCompiledFileFragments.forEach { fragment ->
@@ -423,7 +428,7 @@ class WasmCompiledModuleFragment(
         fun wasmRttiGlobalOrderKey(superType: IdSignature?): Int =
             superType?.let { wasmRttiGlobalOrderKey(rttiSuperTypes[it]) + 1 } ?: 0
 
-        rttiGlobals.keys.sortedBy(::wasmRttiGlobalOrderKey).mapTo(this) { rttiGlobals[it]!! }
+        rttiGlobals.keys.sortedBy(::wasmRttiGlobalOrderKey).map { rttiGlobals[it]!! }.distinct().forEach { add(it) }
 
         addAll(definedDeclarations.globalLiteralGlobals.values)
     }
@@ -851,10 +856,16 @@ class WasmCompiledModuleFragment(
             putAllChecked(fragmentDeclarations.definedRttiGlobal, resolver.globalRTTI, "globalRTTI")
             putAllChecked(fragmentTypes.definedGcTypes, resolver.gcTypes, "gcTypes")
             putAllChecked(fragmentTypes.definedVTableGcTypes, resolver.vTableGcTypes, "vTableGcTypes")
-            putAllChecked(fragmentTypes.definedFunctionTypes, resolver.functionTypes, "functionTypes")
+            // functionTypes are deduplicated by WASM signature structure, duplicates are expected and equivalent
+            resolver.functionTypes.putAll(fragmentTypes.definedFunctionTypes)
         }
 
         rebindEquivalentFunctions(resolver.functions)
+        rebindEquivalentDeclarations(resolver.gcTypes) { it.equivalentTypes }
+        rebindEquivalentDeclarations(resolver.vTableGcTypes) { it.equivalentTypes }
+        rebindEquivalentDeclarations(resolver.globalRTTI) { it.equivalentTypes }
+        rebindEquivalentDeclarations(resolver.globalVTables) { it.equivalentTypes }
+        rebindEquivalentDeclarations(resolver.globalClassITables) { it.equivalentTypes }
         bindUniqueJsFunNames()
         return resolver
     }
@@ -970,6 +981,25 @@ class WasmCompiledModuleFragment(
                     // Rebind adapter function to the single instance
                     // There might not be any unbound references in case it's called only from JS side
                     allDefinedFunctions[idSignature] = func
+                }
+            }
+        }
+    }
+
+    private fun <T> rebindEquivalentDeclarations(
+        allDefinedDeclarations: MutableMap<IdSignature, T>,
+        equivalentDeclarationsSelector: (WasmCompiledLinkerDataFileFragment) -> List<Pair<String, IdSignature>>
+    ) {
+        val canonicalDeclarations = mutableMapOf<String, T>()
+        forEachLinkerData { linkerData ->
+            for ((equivalenceKey, idSignature) in equivalentDeclarationsSelector(linkerData)) {
+                val canonical = canonicalDeclarations[equivalenceKey]
+                if (canonical == null) {
+                    // First occurrence, register it as canonical (if not removed by DCE).
+                    canonicalDeclarations[equivalenceKey] = allDefinedDeclarations[idSignature] ?: continue
+                } else {
+                    // Already exists, rebind to the canonical instance.
+                    allDefinedDeclarations[idSignature] = canonical
                 }
             }
         }
