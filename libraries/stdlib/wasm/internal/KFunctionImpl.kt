@@ -32,6 +32,7 @@ internal abstract class KFunctionImpl(val flags: Int, val arity: Int, val id: St
     }
 }
 
+// To be renamed to KFunctionImpl after bootstrap.
 @UsedFromCompilerGeneratedCode
 internal abstract class KFunctionImplNew<out R>(val flags: Int, val arity: Int, val id: Long, val receiver: Any?, override val name: String) : KFunction<R> {
     override fun equals(other: Any?): Boolean {
