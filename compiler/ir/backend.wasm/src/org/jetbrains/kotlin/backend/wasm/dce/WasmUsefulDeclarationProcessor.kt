@@ -30,11 +30,6 @@ internal class WasmUsefulDeclarationProcessor(
         fileContext.kotlinClosureToJsConverters.entries.associate { (k, v) -> v to fileContext.closureCallExports[k] }
     }
 
-    private val staticFunctionReferenceInitializers =
-        context.fileContexts.values
-            .flatMap { it.staticFunctionReferenceInitializers.entries }
-            .associate { it.toPair() }
-
     override val bodyVisitor: BodyVisitorBase = object : BodyVisitorBase() {
         override fun visitConst(expression: IrConst, data: IrDeclaration) = when (expression.kind) {
             is IrConstKind.Null -> expression.type.enqueueType(data, "expression type")
@@ -73,7 +68,7 @@ internal class WasmUsefulDeclarationProcessor(
             }
 
             if (field.origin == STATIC_FUNCTION_REFERENCE) {
-                val initializer = staticFunctionReferenceInitializers[field]
+                val initializer = context.fileContexts.getValue(field.file).staticFunctionReferenceInitializers[field]
                 initializer?.accept(this, data)
             }
 
