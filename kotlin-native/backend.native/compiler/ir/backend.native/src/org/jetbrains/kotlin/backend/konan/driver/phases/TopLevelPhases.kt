@@ -260,7 +260,6 @@ internal fun <C : NativeBackendPhaseContext> PhaseEngine<C>.runBackend(backendCo
                             generationStateEngine.compileAndLinkForHotReloadGuest(
                                     guestOutput,
                                     outputFiles,
-                                    tempFiles,
                             )
                         }
 
