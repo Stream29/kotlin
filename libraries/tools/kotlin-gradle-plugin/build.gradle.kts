@@ -14,6 +14,7 @@ plugins {
     id("android-sdk-provisioner")
     id("asm-deprecating-transformer")
     id("project-tests-convention")
+    id("test-inputs-check")
     `java-test-fixtures`
 }
 
