@@ -49,3 +49,50 @@ public interface CompilerMessageRenderer {
         public val lineContent: String?,
     )
 }
+
+/**
+ * Optional extension of [CompilerMessageRenderer] that receives the compiler diagnostic identifier
+ * for messages backed by a diagnostic factory.
+ *
+ * Implementors only need to override [render] with the four-parameter signature.
+ * The three-parameter overload inherited from [CompilerMessageRenderer] is bridged automatically
+ * and calls [render] with `diagnosticId = null`.
+ */
+public interface CompilerMessageRendererWithDiagnosticId : CompilerMessageRenderer {
+    /**
+     * Renders a compiler message. Delegates to [render] with `diagnosticId = null` for plain messages.
+     */
+    override fun render(severity: CompilerMessageRenderer.Severity, message: String, location: CompilerMessageRenderer.SourceLocation?): String =
+        render(severity, message, location, diagnosticId = null)
+
+    /**
+     * Renders a compiler message.
+     *
+     * @param severity the severity level of the message
+     * @param message the message text
+     * @param location the source location, or `null` if not applicable
+     * @param diagnosticId the diagnostic factory name, or `null` for plain messages that are not backed by a diagnostic factory
+     * @return the formatted message
+     */
+    public fun render(
+        severity: CompilerMessageRenderer.Severity,
+        message: String,
+        location: CompilerMessageRenderer.SourceLocation?,
+        diagnosticId: String?,
+    ): String
+}
+
+/**
+ * Renders a compiler message and passes the optional structured diagnostic identifier when the renderer supports it.
+ */
+public fun CompilerMessageRenderer.render(
+    severity: CompilerMessageRenderer.Severity,
+    message: String,
+    location: CompilerMessageRenderer.SourceLocation?,
+    diagnosticId: String?,
+): String {
+    return when (this) {
+        is CompilerMessageRendererWithDiagnosticId -> render(severity, message, location, diagnosticId)
+        else -> render(severity, message, location)
+    }
+}
