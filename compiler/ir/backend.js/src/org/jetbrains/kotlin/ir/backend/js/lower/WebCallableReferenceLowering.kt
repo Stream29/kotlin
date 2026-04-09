@@ -162,6 +162,12 @@ abstract class WebCallableReferenceLowering(context: JsCommonBackendContext) :
         }
     }
 
+    
+    protected fun IrRichFunctionReference.getId(backendContext: JsCommonBackendContext): String = when {
+        isFunInterfaceConstructorAdapter() -> invokeFunction.returnType.getClass()!!.fqNameForIrSerialization.toString()
+        else -> (backendContext.irFactory as IdSignatureRetriever).declarationSignature(reflectionTargetSymbol!!.owner).toString()
+    }
+
     companion object {
         val LAMBDA_IMPL by IrDeclarationOriginImpl.Regular
         val FUNCTION_REFERENCE_IMPL by IrDeclarationOriginImpl.Regular
@@ -179,11 +185,6 @@ fun IrRichFunctionReference.getFlags(): Int = listOfNotNull(
 
 fun IrRichFunctionReference.getArity(): Int =
     invokeFunction.parameters.size - boundValues.size + if (invokeFunction.isSuspend) 1 else 0
-
-fun IrRichFunctionReference.getId(backendContext: JsCommonBackendContext): String = when {
-    isFunInterfaceConstructorAdapter() -> invokeFunction.returnType.getClass()!!.fqNameForIrSerialization.toString()
-    else -> (backendContext.irFactory as IdSignatureRetriever).declarationSignature(reflectionTargetSymbol!!.owner).toString()
-}
 
 fun IrRichFunctionReference.isFunInterfaceConstructorAdapter() =
     invokeFunction.origin == IrDeclarationOrigin.ADAPTER_FOR_FUN_INTERFACE_CONSTRUCTOR
