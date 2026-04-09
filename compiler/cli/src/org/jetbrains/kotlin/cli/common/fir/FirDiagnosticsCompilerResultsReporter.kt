@@ -127,12 +127,13 @@ object FirDiagnosticsCompilerResultsReporter {
     ) {
         val severity = diagnostic.severity.toCompilerMessageSeverity()
         val message = diagnostic.renderMessage()
+        val diagnosticId = diagnostic.factory.name
         val textToRender = when (renderDiagnosticName) {
-            true -> "[${diagnostic.factoryName}] $message"
+            true -> "[$diagnosticId] $message"
             false -> message
         }
 
-        reporter.report(severity, textToRender, location)
+        reporter.report(severity, textToRender, location, diagnosticId)
     }
 
     private fun throwErrorDiagnosticAsException(
