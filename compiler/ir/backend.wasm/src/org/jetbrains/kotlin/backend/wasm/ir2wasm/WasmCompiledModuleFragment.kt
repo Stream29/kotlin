@@ -986,7 +986,7 @@ class WasmCompiledModuleFragment(
         }
     }
 
-    private fun <T> rebindEquivalentDeclarations(
+    private fun <T : WasmNamedModuleField> rebindEquivalentDeclarations(
         allDefinedDeclarations: MutableMap<IdSignature, T>,
         equivalentDeclarationsSelector: (WasmCompiledLinkerDataFileFragment) -> List<Pair<String, IdSignature>>
     ) {
@@ -999,6 +999,9 @@ class WasmCompiledModuleFragment(
                     canonicalDeclarations[equivalenceKey] = allDefinedDeclarations[idSignature] ?: continue
                 } else {
                     // Already exists, rebind to the canonical instance.
+                    allDefinedDeclarations[idSignature]?.let { duplicate ->
+                        linkerData.exports.removeAll { it.field == duplicate }
+                    }
                     allDefinedDeclarations[idSignature] = canonical
                 }
             }
