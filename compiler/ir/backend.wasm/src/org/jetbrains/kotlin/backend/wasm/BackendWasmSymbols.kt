@@ -194,9 +194,6 @@ class BackendWasmSymbols(
 
     val wasmIsInterface = CallableIds.wasmIsInterface.functionSymbol()
 
-    val wasmBranchHintLikely = ClassIds.BranchHintLikely.classSymbol()
-    val wasmBranchHintUnlikely = ClassIds.BranchHintUnlikely.classSymbol()
-
     val nullableEquals = CallableIds.nullableEquals.functionSymbol()
     val anyNtoString = CallableIds.anyNtoString.functionSymbol()
 
@@ -357,8 +354,6 @@ private object ClassIds {
     val KMutableProperty1Impl = "KMutableProperty1Impl".wasmClassId
     val KMutableProperty2Impl = "KMutableProperty2Impl".wasmClassId
     val KExternalClassImpl = "KExternalClassImpl".wasmClassId
-    val BranchHintLikely = "BranchHintLikely".wasmClassId
-    val BranchHintUnlikely = "BranchHintUnlikely".wasmClassId
     val Void = "Void".wasmClassId
 
     // JS class

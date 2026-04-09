@@ -32,8 +32,6 @@ private val jsFunFqName = FqName("kotlin.JsFun")
 private val jsPrimitiveFqName = FqName("kotlin.wasm.internal.JsPrimitive")
 private val wasmExportFqName = FqName("kotlin.wasm.WasmExport")
 private val jsBuiltinFqName = FqName("kotlin.wasm.internal.JsBuiltin")
-private val wasmBranchHintLikelyFqName = FqName("kotlin.wasm.internal.BranchHintLikely")
-private val wasmBranchHintUnlikelyFqName = FqName("kotlin.wasm.internal.BranchHintUnlikely")
 
 fun IrAnnotationContainer.hasExcludedFromCodegenAnnotation(): Boolean =
     hasAnnotation(excludedFromCodegenFqName)
@@ -75,12 +73,6 @@ fun IrAnnotationContainer.hasWasmAutoboxedAnnotation(): Boolean =
 
 fun IrAnnotationContainer.hasWasmPrimitiveConstructorAnnotation(): Boolean =
     hasAnnotation(wasmPrimitiveConstructorFqName)
-
-fun IrAnnotationContainer.hasWasmBranchHintLikelyAnnotation(): Boolean =
-    hasAnnotation(wasmBranchHintLikelyFqName)
-
-fun IrAnnotationContainer.hasWasmBranchHintUnlikelyAnnotation(): Boolean =
-    hasAnnotation(wasmBranchHintUnlikelyFqName)
 
 class WasmArrayInfo(val klass: IrClass, val isNullable: Boolean, val isMutable: Boolean) {
     val type = klass.defaultType.let { if (isNullable) it.makeNullable() else it }

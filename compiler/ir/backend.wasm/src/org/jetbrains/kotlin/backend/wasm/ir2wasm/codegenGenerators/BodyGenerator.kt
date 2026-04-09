@@ -1435,18 +1435,6 @@ class BodyGenerator(
             if (expression.symbol == wasmSymbols.likely) return expression.arguments[0]!! to true
             if (expression.symbol == wasmSymbols.unlikely) return expression.arguments[0]!! to false
         }
-
-        val annotationContainer = when (expression) {
-            is IrAnnotationContainer -> expression
-            is IrBlock -> expression.statements.lastOrNull() as? IrAnnotationContainer
-            else -> null
-        }
-
-        if (annotationContainer != null) {
-            if (annotationContainer.hasWasmBranchHintLikelyAnnotation()) return expression to true
-            if (annotationContainer.hasWasmBranchHintUnlikelyAnnotation()) return expression to false
-        }
-
         return expression to null
     }
 
