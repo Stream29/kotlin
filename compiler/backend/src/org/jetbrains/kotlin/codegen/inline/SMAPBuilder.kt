@@ -130,6 +130,8 @@ class SourceMapper(val sourceInfo: SourceInfo?) {
         fileMappings.getOrPut(name to path) { FileMapping(name, path) }
 
     fun mapLineNumber(inlineSource: SourcePosition, inlineCallSite: SourcePosition?): Int {
+        if (inlineSource.line < 0 || (inlineCallSite != null && inlineCallSite.line < 0))
+            return -1
         val fileMapping = getOrRegisterNewSource(inlineSource.file, inlineSource.path)
         val mappedLineIndex = fileMapping.mapNewLineNumber(inlineSource.line, maxUsedValue, inlineCallSite)
         maxUsedValue = max(maxUsedValue, mappedLineIndex)

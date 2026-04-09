@@ -50,7 +50,8 @@ class MethodInliner(
     private val isInlineOnlyMethod: Boolean = false,
     private val shouldPreprocessApiVersionCalls: Boolean = false,
     private val defaultMaskStart: Int = -1,
-    private val defaultMaskEnd: Int = -1
+    private val defaultMaskEnd: Int = -1,
+    private val skipLineNumbers: Boolean = false,
 ) {
     private val languageVersionSettings = inliningContext.state.config.languageVersionSettings
     private val invokeCalls = ArrayList<InvokeCall>()
@@ -166,6 +167,8 @@ class MethodInliner(
             }
 
             override fun visitLineNumber(line: Int, start: Label) {
+                if (skipLineNumbers) return
+
                 if (!isInlineOnlyMethod) {
                     currentLineNumber = line
                 }
@@ -276,7 +279,7 @@ class MethodInliner(
                     }
 
                     val firstLine = info.node.node.instructions.asSequence().mapNotNull { it as? LineNumberNode }.firstOrNull()?.line ?: -1
-                    if ((info is DefaultLambda != isInlineOnlyMethod) && currentLineNumber >= 0 && firstLine == currentLineNumber) {
+                    if ((info is DefaultLambda != isInlineOnlyMethod) && !skipLineNumbers && currentLineNumber >= 0 && firstLine == currentLineNumber) {
                         // This can happen in two cases:
                         //   1. `someInlineOnlyFunction { singleLineLambda }`: in this case line numbers are removed
                         //      from the inline function, so the entirety of its bytecode has the line number of
@@ -336,7 +339,9 @@ class MethodInliner(
                     inlineScopesGenerator?.apply {
                         inlinedScopes += inlineScopeNumberIncrement
                         currentCallSiteLineNumber =
-                            if (isInlineOnlyMethod) {
+                            if (currentLineNumber == -1)
+                                0
+                            else if (isInlineOnlyMethod) {
                                 currentLineNumber
                             } else {
                                 sourceMapper.mapLineNumber(currentLineNumber)
@@ -359,7 +364,7 @@ class MethodInliner(
                     setLambdaInlining(false)
                     addInlineMarker(this, false)
 
-                    if (currentLineNumber != -1) {
+                    if (currentLineNumber != -1 && !skipLineNumbers) {
                         val endLabel = Label()
                         mv.visitLabel(endLabel)
                         if (isInlineOnlyMethod) {

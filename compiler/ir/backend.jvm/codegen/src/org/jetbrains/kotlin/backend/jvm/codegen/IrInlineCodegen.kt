@@ -336,6 +336,7 @@ class IrInlineCodegen(
             !isInlinedToInlineFunInKotlinRuntime(),
             maskStartIndex,
             maskStartIndex + maskValues.size,
+            skipLineNumbers = codegen.isNoLineNumberScope,
         ) //with captured
 
         val remapper = LocalVarRemapper(parameters, initialFrameSize)
