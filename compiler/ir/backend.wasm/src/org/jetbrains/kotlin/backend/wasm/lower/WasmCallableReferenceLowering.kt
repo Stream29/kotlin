@@ -23,7 +23,6 @@ import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.backend.js.JsStatementOrigins
 import org.jetbrains.kotlin.ir.backend.js.lower.getArity
 import org.jetbrains.kotlin.ir.backend.js.lower.getFlags
-import org.jetbrains.kotlin.ir.backend.js.lower.getId
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
 import org.jetbrains.kotlin.ir.builders.declarations.addFunction
 import org.jetbrains.kotlin.ir.builders.irBlockBody
@@ -803,6 +802,14 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : Fi
         reference.reflectionTargetSymbol != null -> backendContext.wasmSymbols.reflectionSymbols.kFunctionImpl.defaultType
         else -> backendContext.irBuiltIns.anyType
     }
+}
+
+private fun IrRichFunctionReference.getId(backendContext: WasmBackendContext): String {
+    val target = if (invokeFunction.origin == IrDeclarationOrigin.ADAPTER_FOR_FUN_INTERFACE_CONSTRUCTOR)
+        invokeFunction.returnType.getClass()!!
+    else
+        reflectionTargetSymbol!!.owner
+    return backendContext.idSignatureRetriever.declarationSignature(target).toString()
 }
 
 private fun IrRichFunctionReference.getLinkageErrorIfAny(backendContext: WasmBackendContext): String? =
