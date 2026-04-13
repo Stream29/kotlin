@@ -65,7 +65,17 @@ public class GroupingMessageCollector implements MessageCollectorWithDiagnosticI
             MessageCollectorKt.report(delegate, severity, message, location, diagnosticId);
         }
         else {
-            groupedMessages.put(location, new Message(severity, message, location, diagnosticId));
+            Message newMessage = new Message(severity, message, location, diagnosticId);
+            Message previousMessage = findMessageIgnoringDiagnosticId(location, newMessage);
+            if (previousMessage == null) {
+                groupedMessages.put(location, newMessage);
+            } else if (previousMessage.diagnosticId == null && diagnosticId != null) {
+                // Upgrade: replace a message without a diagnostic ID with one that has it.
+                // If a non-null ID is already present, keep the first one — the rendered message
+                // is identical, so the first factory that produced it is as good as any other.
+                groupedMessages.remove(location, previousMessage);
+                groupedMessages.put(location, newMessage);
+            }
         }
     }
 
@@ -102,6 +112,16 @@ public class GroupingMessageCollector implements MessageCollectorWithDiagnosticI
         groupedMessages.clear();
     }
 
+    @Nullable
+    private Message findMessageIgnoringDiagnosticId(@Nullable CompilerMessageSourceLocation location, @NotNull Message candidate) {
+        for (Message message : groupedMessages.get(location)) {
+            if (message.equalsIgnoringDiagnosticId(candidate)) {
+                return message;
+            }
+        }
+        return null;
+    }
+
     private static class CompilerMessageLocationComparator implements Comparator<CompilerMessageSourceLocation> {
         public static final CompilerMessageLocationComparator INSTANCE = new CompilerMessageLocationComparator();
 
@@ -130,7 +150,7 @@ public class GroupingMessageCollector implements MessageCollectorWithDiagnosticI
         private final CompilerMessageSeverity severity;
         private final String message;
         private final CompilerMessageSourceLocation location;
-        private final String diagnosticId;
+        @Nullable private final String diagnosticId;
 
         private Message(
                 @NotNull CompilerMessageSeverity severity,
@@ -144,6 +164,17 @@ public class GroupingMessageCollector implements MessageCollectorWithDiagnosticI
             this.diagnosticId = diagnosticId;
         }
 
+        private boolean equalsIgnoringDiagnosticId(@NotNull Message other) {
+            if (severity != other.severity) return false;
+            if (!message.equals(other.message)) return false;
+            if (!Objects.equals(location, other.location)) return false;
+
+            return true;
+        }
+
+        // equals/hashCode include diagnosticId so that LinkedHashMultimap can distinguish entries internally.
+        // Semantic deduplication (ignoring diagnosticId) is handled by findMessageIgnoringDiagnosticId
+        // in the report() method, which uses equalsIgnoringDiagnosticId for matching.
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -151,10 +182,8 @@ public class GroupingMessageCollector implements MessageCollectorWithDiagnosticI
 
             Message other = (Message) o;
 
-            if (!Objects.equals(location, other.location)) return false;
-            if (!message.equals(other.message)) return false;
+            if (!equalsIgnoringDiagnosticId(other)) return false;
             if (!Objects.equals(diagnosticId, other.diagnosticId)) return false;
-            if (severity != other.severity) return false;
 
             return true;
         }
