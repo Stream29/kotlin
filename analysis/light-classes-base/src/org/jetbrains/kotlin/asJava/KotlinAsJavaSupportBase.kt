@@ -104,9 +104,7 @@ abstract class KotlinAsJavaSupportBase<TModule : Any>(protected val project: Pro
     protected abstract fun facadeIsApplicable(module: TModule, file: KtFile): Boolean
     protected abstract fun createInstanceOfLightFacade(facadeFqName: FqName, files: List<KtFile>): KtLightClassForFacade?
     protected abstract fun createInstanceOfDecompiledLightFacade(facadeFqName: FqName, files: List<KtFile>): KtLightClassForFacade?
-    protected open fun createInstanceOfLightFacade(facadeFqName: FqName, module: TModule, files: List<KtFile>): KtLightClassForFacade? {
-        return createInstanceOfLightFacade(facadeFqName, files)
-    }
+    protected abstract fun createInstanceOfLightFacade(facadeFqName: FqName, module: TModule, files: List<KtFile>): KtLightClassForFacade?
 
     private fun KtFile.canHaveAdditionalFilesInFacade(): Boolean = !isCompiled && isJvmMultifileClassFile
     //endregion

@@ -402,14 +402,16 @@ internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupport
         module: KaModule,
         provider: () -> R?
     ): R? {
-        @Suppress("UNCHECKED_CAST")
-        return if (isMultiplatformSupportAvailable) {
+        val computedValue = if (isMultiplatformSupportAvailable) {
             KMP_CACHE.get().computeIfAbsent(element) { provider() }
         } else {
             moduleBasedLightClassCache.getOrPut(module, element) { _, _ ->
                 provider()
             }
-        } as R?
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        return computedValue as R?
     }
     //endregion
 }

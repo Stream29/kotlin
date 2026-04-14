@@ -11,6 +11,7 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import org.jetbrains.kotlin.asJava.classes.KtLightClass
 import org.jetbrains.kotlin.asJava.classes.KtLightClassForFacade
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.*
 
 /**
@@ -57,6 +58,10 @@ abstract class KotlinAsJavaSupportK1Base<TModule : Any>(project: Project) : Kotl
             }
             cachedValueResult(cachedValue)
         }
+    }
+
+    override fun createInstanceOfLightFacade(facadeFqName: FqName, module: TModule, files: List<KtFile>): KtLightClassForFacade? {
+        return createInstanceOfLightFacade(facadeFqName, files)
     }
 
     override fun getLightClassForScript(script: KtScript): KtLightClass? = ifValid(script) {
