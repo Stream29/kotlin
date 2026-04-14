@@ -365,21 +365,19 @@ internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupport
         }
 
         val moduleConverter = KaModuleConverter.getInstance() ?: return declarationModule
-        return analyzeForLightClasses(this) {
-            if (declarationModule is KaSourceModule && declarationModule.targetPlatform.isCommon()) {
-                val project = this@findContextModule.project
+        return if (declarationModule is KaSourceModule && declarationModule.targetPlatform.isCommon()) {
+            val project = this@findContextModule.project
 
-                val dependents = KotlinModuleDependentsProvider.getInstance(project).getRefinementDependents(declarationModule)
+            val dependents = KotlinModuleDependentsProvider.getInstance(project).getRefinementDependents(declarationModule)
 
-                dependents.filter { it.targetPlatform.isJvm() }.firstNotNullOfOrNull { dependentModule ->
-                    val ideaModule = moduleConverter.asOpenApiModule(dependentModule) ?: return@firstNotNullOfOrNull null
-                    dependentModule.takeIf { scope.isSearchInModuleContent(ideaModule) }
-                }
-            } else if (declarationModule.targetPlatform.isJvm()) {
-                declarationModule
-            } else {
-                null
+            dependents.filter { it.targetPlatform.isJvm() }.firstNotNullOfOrNull { dependentModule ->
+                val ideaModule = moduleConverter.asOpenApiModule(dependentModule) ?: return@firstNotNullOfOrNull null
+                dependentModule.takeIf { scope.isSearchInModuleContent(ideaModule) }
             }
+        } else if (declarationModule.targetPlatform.isJvm()) {
+            declarationModule
+        } else {
+            null
         }
     }
 

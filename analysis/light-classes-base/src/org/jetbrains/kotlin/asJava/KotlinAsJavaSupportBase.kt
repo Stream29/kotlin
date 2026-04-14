@@ -100,7 +100,7 @@ abstract class KotlinAsJavaSupportBase<TModule : Any>(protected val project: Pro
 
     protected abstract fun facadeIsApplicable(module: TModule, file: KtFile): Boolean
 
-    protected open fun getLightFacade(file: KtFile, module: TModule?): KtLightClassForFacade? = getLightFacade(file)
+    protected abstract fun getLightFacade(file: KtFile, module: TModule?): KtLightClassForFacade?
     protected abstract fun createInstanceOfLightFacade(facadeFqName: FqName, files: List<KtFile>): KtLightClassForFacade?
     protected abstract fun createInstanceOfDecompiledLightFacade(
         facadeFqName: FqName,
@@ -176,7 +176,7 @@ abstract class KotlinAsJavaSupportBase<TModule : Any>(protected val project: Pro
         return null
     }
 
-    protected open fun getLightClass(classOrObject: KtClassOrObject, module: TModule?): KtLightClass? = getLightClass(classOrObject)
+    protected abstract fun getLightClass(classOrObject: KtClassOrObject, module: TModule?): KtLightClass?
     protected abstract fun createInstanceOfLightClass(classOrObject: KtClassOrObject, module: TModule?): KtLightClass?
     protected abstract fun createInstanceOfDecompiledLightClass(classOrObject: KtClassOrObject, module: TModule?): KtLightClass?
     //endregion
@@ -202,7 +202,7 @@ abstract class KotlinAsJavaSupportBase<TModule : Any>(protected val project: Pro
      *
      * [moduleFilter] is called on the containing module to ensure that this module is allowed for the light class creation.
      * If [moduleFilter] returns `false` on the containing module, returns `null`.
-     * If [scope] is `null`, the containing odule is returned.
+     * If [scope] is `null`, the containing module is returned.
      */
     protected abstract fun KtElement.findContextModule(
         scope: GlobalSearchScope? = null,

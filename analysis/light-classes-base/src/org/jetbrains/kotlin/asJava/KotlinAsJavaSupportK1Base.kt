@@ -22,6 +22,8 @@ import org.jetbrains.kotlin.psi.*
  * The user-data is stored in the corresponding [KtElement]s.
  */
 abstract class KotlinAsJavaSupportK1Base<TModule : Any>(project: Project) : KotlinAsJavaSupportBase<TModule>(project) {
+    override fun getLightClass(classOrObject: KtClassOrObject, module: TModule?): KtLightClass? = getLightClass(classOrObject)
+
     override fun getLightClass(classOrObject: KtClassOrObject, searchScope: GlobalSearchScope?): KtLightClass? = ifValid(classOrObject) {
         cacheLightClass(classOrObject) {
             val lightClass = createLightClass(classOrObject, null) ?: return@cacheLightClass cachedValueResult(null)
@@ -42,6 +44,8 @@ abstract class KotlinAsJavaSupportK1Base<TModule : Any>(project: Project) : Kotl
             cachedValueResult(cachedValue)
         }
     }
+
+    override fun getLightFacade(file: KtFile, module: TModule?): KtLightClassForFacade? = getLightFacade(file)
 
     override fun getLightFacade(file: KtFile, searchScope: GlobalSearchScope?): KtLightClassForFacade? = ifValid(file) {
         cacheLightClass(file) {
