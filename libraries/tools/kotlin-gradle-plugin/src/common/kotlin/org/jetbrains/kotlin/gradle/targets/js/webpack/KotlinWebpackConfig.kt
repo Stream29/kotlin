@@ -312,6 +312,24 @@ data class KotlinWebpackConfig(
         appendLine()
     }
 
+    internal fun Appendable.appendPluginFromResources(pluginName: String, vararg params: String) {
+        val content = KotlinWebpackConfig::class.java
+            .getResourceAsStream("/org/jetbrains/kotlin/gradle/targets/js/webpack/plugins/$pluginName.js")
+            ?.bufferedReader()
+            ?.readText() ?: return
+        appendLine(
+            """
+            ;(function(config) {
+                var pluginFactory = function() {
+                    // $pluginName.js
+                    $content
+                }();
+                config.plugins.push(new pluginFactory(${params.joinToString(", ")}))
+            })(config);
+        """.trimIndent())
+        appendLine()
+    }
+
     private fun Appendable.appendDevServer() {
         if (devServer != null) {
 
@@ -352,14 +370,24 @@ data class KotlinWebpackConfig(
                         use: ["source-map-loader"],
                         enforce: "pre"
                 });
-                config.devtool = ${devtool?.let { "'$it'" } ?: false};
+                config.devtool = false;
                 config.ignoreWarnings = [
                     /Failed to parse source map/,
                     /Accessing import\.meta directly is unsupported \(only property access or destructuring is supported\)/
-                ]
-                
+                ];  
             """.trimIndent()
         )
+
+        val sourceMapPlugin =
+            when (devtool) {
+                WebpackDevtool.EVAL_SOURCE_MAP -> "EvalSourceMapDevToolPlugin"
+                WebpackDevtool.SOURCE_MAP -> "SourceMapDevToolPlugin"
+                else -> null
+            }
+
+        sourceMapPlugin?.let {
+            appendPluginFromResources(it, """{ ignoreList: /NATIVE_IMPLEMENTATIONS.kt/ }""")
+        }
     }
 
     private fun Appendable.appendOptimization() {
