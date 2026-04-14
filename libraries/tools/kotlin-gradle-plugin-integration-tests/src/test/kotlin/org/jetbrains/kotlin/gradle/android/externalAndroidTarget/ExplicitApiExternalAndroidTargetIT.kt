@@ -16,19 +16,13 @@ import org.jetbrains.kotlin.gradle.testbase.*
 class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
 
     @GradleAndroidTest
-    fun `test - explicit API - warning builds`(
+    fun `test - explicit API - warning builds with implicit declarations`(
         gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
     ) {
         project(
             "empty",
             gradleVersion,
-            buildOptions = defaultBuildOptions
-                .copy(
-                    androidVersion = androidVersion,
-                    // disabled for stable test run with js target
-                    configurationCache = BuildOptions.ConfigurationCacheValue.DISABLED,
-                    isolatedProjects = BuildOptions.IsolatedProjectsMode.DISABLED,
-                ),
+            buildOptions = defaultBuildOptions.copy(androidVersion = androidVersion),
             buildJdk = jdkVersion.location,
         ) {
             plugins {
@@ -40,15 +34,29 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
                     androidLibrary {
                         compileSdk = 34
                         namespace = "org.jetbrains.sample"
-                        withHostTest { }
                     }
-                    js {
-                        nodejs()
-                    }
+                    iosArm64()
                     explicitApiWarning()
                 }
             }
-            injectSourcesImplicitVisibility()
+            buildScriptInjection {
+                val commonMain = kotlinMultiplatform.sourceSets.getByName("commonMain")
+                commonMain.compileSource(
+                    """
+                    public val version = 1
+                    public fun compute() = version + 1
+                    """.trimIndent()
+                )
+                val androidMain = kotlinMultiplatform.sourceSets.getByName("androidMain")
+                androidMain.compileSource(
+                    """
+                    class AndroidMain {
+                        val counter = 0
+                        fun increment() = counter + 1
+                    }
+                    """.trimIndent()
+                )
+            }
             build(":compileKotlinMetadata", ":compileAndroidMain") {
                 assertTasksExecuted(":compileAndroidMain")
                 assertCompilerArgument(":compileAndroidMain", "-Xexplicit-api=warning", LogLevel.INFO)
@@ -57,7 +65,7 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
     }
 
     @GradleAndroidTest
-    fun `test - explicit API - strict fails`(
+    fun `test - explicit API - strict fails with implicit declarations`(
         gradleVersion: GradleVersion,
         androidVersion: String,
         jdkVersion: JdkVersions.ProvidedJdk,
@@ -65,12 +73,7 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
         project(
             "empty",
             gradleVersion,
-            buildOptions = defaultBuildOptions
-                .copy(
-                    androidVersion = androidVersion,
-                    configurationCache = BuildOptions.ConfigurationCacheValue.DISABLED,
-                    isolatedProjects = BuildOptions.IsolatedProjectsMode.DISABLED,
-                ),
+            buildOptions = defaultBuildOptions.copy(androidVersion = androidVersion),
             buildJdk = jdkVersion.location,
         ) {
             plugins {
@@ -82,18 +85,188 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
                     androidLibrary {
                         compileSdk = 34
                         namespace = "org.jetbrains.sample"
-                        withHostTest { }
                     }
-                    js {
-                        nodejs()
-                    }
+                    iosArm64()
                     explicitApi()
                 }
             }
-            injectSourcesImplicitVisibility()
-            buildAndFail(":compileKotlinMetadata", ":compileAndroidMain", forwardBuildOutput = true) {
+            buildScriptInjection {
+                val commonMain = kotlinMultiplatform.sourceSets.getByName("commonMain")
+                commonMain.compileSource(
+                    """
+                    public val version = 1
+                    public fun compute() = version + 1
+                    """.trimIndent()
+                )
+                val androidMain = kotlinMultiplatform.sourceSets.getByName("androidMain")
+                androidMain.compileSource(
+                    """
+                    class AndroidMain {
+                        val counter = 0
+                        fun increment() = counter + 1
+                    }
+                    """.trimIndent()
+                )
+            }
+            buildAndFail(":compileKotlinMetadata", ":compileAndroidMain") {
                 assertCompilerArgument(":compileAndroidMain", "-Xexplicit-api=strict", LogLevel.INFO)
                 assertOutputContains("Visibility must be specified in explicit API mode")
+                assertOutputContains("Return type must be specified in explicit API mode")
+            }
+        }
+    }
+
+    @GradleAndroidTest
+    fun `test - explicit API disabled - implicit declarations build`(
+        gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
+    ) {
+        project(
+            "empty",
+            gradleVersion,
+            buildOptions = defaultBuildOptions.copy(androidVersion = androidVersion),
+            buildJdk = jdkVersion.location,
+        ) {
+            plugins {
+                kotlin("multiplatform")
+                id("com.android.kotlin.multiplatform.library")
+            }
+            buildScriptInjection {
+                kotlinMultiplatform.apply {
+                    androidLibrary {
+                        compileSdk = 34
+                        namespace = "org.jetbrains.sample"
+                    }
+                    iosArm64()
+                }
+            }
+            buildScriptInjection {
+                val commonMain = kotlinMultiplatform.sourceSets.getByName("commonMain")
+                commonMain.compileSource(
+                    """
+                    object CommonMain {
+                        val greeting = "Hello"
+                        fun greet(name: String) = "${'$'}greeting, ${'$'}name"
+                    }
+                    """.trimIndent()
+                )
+                val androidMain = kotlinMultiplatform.sourceSets.getByName("androidMain")
+                androidMain.compileSource(
+                    """
+                    import android.content.Context
+                    
+                    class AndroidMain(val context: Context) {
+                        val counter = 0
+                        fun increment() = counter + 1
+                    }
+                    """.trimIndent()
+                )
+            }
+            build(":compileKotlinMetadata", ":compileAndroidMain") {
+                assertTasksExecuted(":compileAndroidMain")
+                assertNoCompilerArgument(":compileAndroidMain", "-Xexplicit-api=", LogLevel.INFO)
+            }
+        }
+    }
+
+    @GradleAndroidTest
+    fun `test - explicit API - strict - androidMain missing explicit types fails`(
+        gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
+    ) {
+        project(
+            "empty",
+            gradleVersion,
+            buildOptions = defaultBuildOptions.copy(androidVersion = androidVersion),
+            buildJdk = jdkVersion.location,
+        ) {
+            plugins {
+                kotlin("multiplatform")
+                id("com.android.kotlin.multiplatform.library")
+            }
+            buildScriptInjection {
+                kotlinMultiplatform.apply {
+                    androidLibrary {
+                        compileSdk = 34
+                        namespace = "org.jetbrains.sample"
+                    }
+                    iosArm64()
+                    explicitApi()
+                }
+            }
+            buildScriptInjection {
+                val commonMain = kotlinMultiplatform.sourceSets.getByName("commonMain")
+                commonMain.compileSource(
+                    """
+                    public object CommonMain {
+                        public val greeting: String = "Hello"
+                        public fun greet(name: String): String = "${'$'}greeting, ${'$'}name"
+                    }
+                    """.trimIndent()
+                )
+                val androidMain = kotlinMultiplatform.sourceSets.getByName("androidMain")
+                androidMain.compileSource(
+                    """
+                    import android.content.Context
+                    
+                    class AndroidMain(val context: Context) {
+                        fun increment() = 1
+                    }
+                    """.trimIndent()
+                )
+            }
+            buildAndFail(":compileKotlinMetadata", ":compileAndroidMain") {
+                assertTasksFailed(":compileAndroidMain")
+                assertCompilerArgument(":compileAndroidMain", "-Xexplicit-api=strict", LogLevel.INFO)
+                assertOutputContains("Visibility must be specified in explicit API mode")
+                assertOutputContains("Return type must be specified in explicit API mode")
+            }
+        }
+    }
+
+    @GradleAndroidTest
+    fun `test - explicit API - strict - commonMain missing explicit types fails`(
+        gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
+    ) {
+        project(
+            "empty",
+            gradleVersion,
+            buildOptions = defaultBuildOptions.copy(androidVersion = androidVersion),
+            buildJdk = jdkVersion.location,
+        ) {
+            plugins {
+                kotlin("multiplatform")
+                id("com.android.kotlin.multiplatform.library")
+            }
+            buildScriptInjection {
+                kotlinMultiplatform.apply {
+                    androidLibrary {
+                        compileSdk = 34
+                        namespace = "org.jetbrains.sample"
+                    }
+                    iosArm64()
+                    explicitApi()
+                }
+            }
+            buildScriptInjection {
+                val commonMain = kotlinMultiplatform.sourceSets.getByName("commonMain")
+                commonMain.compileSource(
+                    """
+                    public val version = 1
+                    public fun compute() = version + 1
+                    """.trimIndent()
+                )
+                val androidMain = kotlinMultiplatform.sourceSets.getByName("androidMain")
+                androidMain.compileSource(
+                    """
+                    import android.content.Context
+                    
+                    public class AndroidMain(public val context: Context) {
+                        public fun increment(): Int = 1
+                    }
+                    """.trimIndent()
+                )
+            }
+            buildAndFail(":compileKotlinMetadata", ":compileAndroidMain") {
+                assertCompilerArgument(":compileAndroidMain", "-Xexplicit-api=strict", LogLevel.INFO)
                 assertOutputContains("Return type must be specified in explicit API mode")
             }
         }
@@ -106,12 +279,7 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
         project(
             "empty",
             gradleVersion,
-            buildOptions = defaultBuildOptions
-                .copy(
-                    androidVersion = androidVersion,
-                    configurationCache = BuildOptions.ConfigurationCacheValue.DISABLED,
-                    isolatedProjects = BuildOptions.IsolatedProjectsMode.DISABLED,
-                ),
+            buildOptions = defaultBuildOptions.copy(androidVersion = androidVersion),
             buildJdk = jdkVersion.location,
         ) {
             plugins {
@@ -123,16 +291,30 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
                     androidLibrary {
                         compileSdk = 34
                         namespace = "org.jetbrains.sample"
-                        withHostTest { }
                     }
-                    js {
-                        nodejs()
-                    }
+                    iosArm64()
                     explicitApiWarning()
                 }
             }
-            injectSourcesExplicitVisibility()
-            build(":compileAndroidMain") {
+            buildScriptInjection {
+                val commonMain = kotlinMultiplatform.sourceSets.getByName("commonMain")
+                commonMain.compileSource(
+                    """
+                    public object CommonMain {
+                        public fun greet(name: String): String = name
+                    }
+                    """.trimIndent()
+                )
+                val androidMain = kotlinMultiplatform.sourceSets.getByName("androidMain")
+                androidMain.compileSource(
+                    """
+                    public class AndroidMain {
+                        public fun increment(): Int = 1
+                    }
+                    """.trimIndent()
+                )
+            }
+            build(":compileKotlinMetadata", ":compileAndroidMain") {
                 assertTasksExecuted(":compileAndroidMain")
                 assertCompilerArgument(":compileAndroidMain", "-Xexplicit-api=warning", LogLevel.INFO)
             }
@@ -146,12 +328,7 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
         project(
             "empty",
             gradleVersion,
-            buildOptions = defaultBuildOptions
-                .copy(
-                    androidVersion = androidVersion,
-                    configurationCache = BuildOptions.ConfigurationCacheValue.DISABLED,
-                    isolatedProjects = BuildOptions.IsolatedProjectsMode.DISABLED,
-                ),
+            buildOptions = defaultBuildOptions.copy(androidVersion = androidVersion),
             buildJdk = jdkVersion.location,
         ) {
             plugins {
@@ -163,121 +340,33 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
                     androidLibrary {
                         compileSdk = 34
                         namespace = "org.jetbrains.sample"
-                        withHostTest { }
                     }
-                    js {
-                        nodejs()
-                    }
+                    iosArm64()
                     explicitApi()
                 }
             }
-            injectSourcesExplicitVisibility()
-            build(":compileAndroidMain") {
+            buildScriptInjection {
+                val commonMain = kotlinMultiplatform.sourceSets.getByName("commonMain")
+                commonMain.compileSource(
+                    """
+                    public object CommonMain {
+                        public fun greet(name: String): String = name
+                    }
+                    """.trimIndent()
+                )
+                val androidMain = kotlinMultiplatform.sourceSets.getByName("androidMain")
+                androidMain.compileSource(
+                    """
+                    public class AndroidMain {
+                        public fun increment(): Int = 1
+                    }
+                    """.trimIndent()
+                )
+            }
+            build(":compileKotlinMetadata", ":compileAndroidMain") {
                 assertTasksExecuted(":compileAndroidMain")
                 assertCompilerArgument(":compileAndroidMain", "-Xexplicit-api=strict", LogLevel.INFO)
             }
         }
-    }
-
-    private fun TestProject.injectSourcesImplicitVisibility() = buildScriptInjection {
-        kotlinMultiplatform.sourceSets.getByName("commonMain").compileSource(
-            """
-            object CommonMain {
-                val greeting = "Hello"
-                fun greet(name: String) = "${'$'}greeting, ${'$'}name"
-                override fun toString(): String {
-                    return "CommonMain"
-                }
-            }
-            """.trimIndent()
-        )
-        kotlinMultiplatform.sourceSets.getByName("commonMain").compileSource(
-            """
-            public val version = 1
-            public fun compute() = version + 1
-            open class Base {
-                open fun foo(): String = "base"
-            }
-            class Child : Base() {
-                override fun foo() = super.foo()
-            }
-            """.trimIndent()
-        )
-        val androidMain = kotlinMultiplatform.sourceSets.getByName("androidMain")
-        androidMain.compileSource(
-            """
-                    import android.content.Context
-                    import android.util.Log
-                    
-                    class AndroidMain(val context: Context) {
-                        val counter = 0
-                        fun increment() = counter + 1
-                        fun useContext() {
-                            context.getSystemService(Context.LOCATION_SERVICE)
-                        }
-                    
-                        fun useLog() {
-                            Log.d("test", CommonMain.toString())
-                        }
-                    
-                        companion object {
-                            fun useCommonMain() {
-                                println("useCommonMain: ${'$'}{CommonMain}")
-                            }
-                        }
-                    }
-                    """.trimIndent()
-        )
-    }
-
-    private fun TestProject.injectSourcesExplicitVisibility() = buildScriptInjection {
-        kotlinMultiplatform.sourceSets.getByName("commonMain").compileSource(
-            """
-            public object CommonMain {
-                public val greeting: String = "Hello"
-                public fun greet(name: String): String = "${'$'}greeting, ${'$'}name"
-                public override fun toString(): String {
-                    return "CommonMain"
-                }
-            }
-            """.trimIndent()
-        )
-        kotlinMultiplatform.sourceSets.getByName("commonMain").compileSource(
-            """
-            public val version: Int = 1
-            public fun compute(): Int = version + 1
-            public open class Base {
-                public open fun foo(): String = "base"
-            }
-            public class Child : Base() {
-                public override fun foo(): String = super.foo()
-            }
-            """.trimIndent()
-        )
-        val androidMain = kotlinMultiplatform.sourceSets.getByName("androidMain")
-        androidMain.compileSource(
-            """
-                    import android.content.Context
-                    import android.util.Log
-                    
-                    public class AndroidMain(public val context: Context) {
-                        public val counter: Int = 0
-                        public fun increment(): Int = counter + 1
-                        public fun useContext(): Unit {
-                            context.getSystemService(Context.LOCATION_SERVICE)
-                        }
-                    
-                        public fun useLog(): Unit {
-                            Log.d("test", CommonMain.toString())
-                        }
-                    
-                        public companion object {
-                            public fun useCommonMain(): Unit {
-                                println("useCommonMain: ${'$'}{CommonMain}")
-                            }
-                        }
-                    }
-                    """.trimIndent()
-        )
     }
 }
