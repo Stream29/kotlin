@@ -151,7 +151,7 @@ public abstract class AbstractClassBuilder implements ClassBuilder {
         // Generate trivial SMAPs for inline functions, since after inlining them they are no longer trivial
         if (GENERATE_SMAP && !(smap.isTrivial() && !intoInline) && !smap.getResultMappings().isEmpty()) {
             List<FileMapping> fileMappings = smap.getResultMappings();
-            visitSource(fileMappings.get(0).getName(), SMAPBuilder.INSTANCE.build(fileMappings, backwardsCompatibleSyntax));
+            visitSource(fileMappings.get(0).getName(), SMAPBuilder.INSTANCE.build(fileMappings, backwardsCompatibleSyntax, true));
         } else {
             SourceInfo sourceInfo = smap.getSourceInfo();
             if (sourceInfo == null) return;
