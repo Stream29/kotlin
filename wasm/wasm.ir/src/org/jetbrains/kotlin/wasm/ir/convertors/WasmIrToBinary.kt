@@ -377,7 +377,7 @@ class WasmIrToBinary(
                     annotations.add(
                         ResolvedAnnotation(
                             sectionName = "binaryen.js.called",
-                            byteOffset = byteOffset,
+                            byteOffset = 0,
                             payloadWriter = { /* empty payload */ }
                         )
                     )
