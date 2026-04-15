@@ -315,7 +315,8 @@ class MethodInliner(
                         if (info is DefaultLambda) isSameModule else true /*cause all nested objects in same module as lambda*/,
                         { "Lambda inlining " + info.lambdaClassType.internalName },
                         SourceMapCopier(sourceMapper.parent, info.node.classSMAP, callSite), inlineCallSiteInfo,
-                        isInlineOnlyMethod = false
+                        isInlineOnlyMethod = false,
+                        skipLineNumbers = skipLineNumbers,
                     )
 
                     val varRemapper = LocalVarRemapper(lambdaParameters, valueParamShift)
