@@ -713,7 +713,8 @@ public abstract class org/jetbrains/kotlin/analysis/api/platform/projectStructur
 
 public abstract interface class org/jetbrains/kotlin/analysis/api/platform/projectStructure/KaModuleConverter : org/jetbrains/kotlin/analysis/api/platform/KotlinOptionalPlatformComponent {
 	public static final field Companion Lorg/jetbrains/kotlin/analysis/api/platform/projectStructure/KaModuleConverter$Companion;
-	public abstract fun asKaModule (Lcom/intellij/openapi/module/Module;)Lorg/jetbrains/kotlin/analysis/api/projectStructure/KaModule;
+	public abstract fun asKaModuleForProduction (Lcom/intellij/openapi/module/Module;)Lorg/jetbrains/kotlin/analysis/api/projectStructure/KaModule;
+	public abstract fun asKaModuleForTest (Lcom/intellij/openapi/module/Module;)Lorg/jetbrains/kotlin/analysis/api/projectStructure/KaModule;
 	public abstract fun asOpenApiModule (Lorg/jetbrains/kotlin/analysis/api/projectStructure/KaModule;)Lcom/intellij/openapi/module/Module;
 }
 

@@ -18,9 +18,14 @@ import org.jetbrains.kotlin.analysis.api.projectStructure.KaModule
 @KaIdeApi
 public interface KaModuleConverter : KotlinOptionalPlatformComponent {
     /**
-     * Returns [KaModule] corresponding to [module] or `null` if not found.
+     * Returns [KaModule] representing [module] production roots or `null` if not found.
      */
-    public fun asKaModule(module: Module): KaModule?
+    public fun asKaModuleForProduction(module: Module): KaModule?
+
+    /**
+     * Returns [KaModule] representing [module] test roots or `null` if not found.
+     */
+    public fun asKaModuleForTest(module: Module): KaModule?
 
     /**
      * Returns [Module] corresponding to [module] or `null` if not found.
