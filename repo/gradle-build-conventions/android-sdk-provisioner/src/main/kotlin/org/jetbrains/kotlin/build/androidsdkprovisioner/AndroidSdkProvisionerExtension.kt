@@ -60,7 +60,13 @@ abstract class AndroidSdkProvisionerExtension {
         val sdkProvider = project.provider { sdkConfiguration.singleFile }
         when (provisioningType.type) {
             ProvisionedFileType.FILE -> inputs.file(sdkProvider)
-            ProvisionedFileType.DIRECTORY -> inputs.dir(sdkProvider)
+            // Track the directory path as a string input instead of using inputs.dir(),
+            // which expands the entire directory tree into individual file inputs.
+            // This avoids generating 127K+ entries in test-inputs-check security policies.
+            ProvisionedFileType.DIRECTORY -> inputs.property(
+                "${provisioningType.configurationName}Path",
+                sdkProvider.map { it.canonicalPath },
+            )
         }
         return sdkProvider.map { it.canonicalPath }
     }
