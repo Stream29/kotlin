@@ -20,4 +20,18 @@ inline fun test2(i: Int = 5): Int {
 
 inline fun callInt(lambda: () -> Int): Int = 3 + lambda()
 
+@JvmOverloads
+suspend inline fun test3(i: Int = 5): Int {
+    try {
+        callIntSuspend() {
+            return i + 6
+        }
+        return -1
+    } finally {
+        callIntSuspend() { 7 }
+    }
+}
+
+suspend inline fun callIntSuspend(lambda: suspend () -> Int): Int = 3 + lambda()
+
 fun box() = "OK"
