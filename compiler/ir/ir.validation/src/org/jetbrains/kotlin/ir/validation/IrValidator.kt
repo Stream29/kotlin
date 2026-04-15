@@ -107,9 +107,11 @@ private class IrFileValidator(
     }
 
     override fun visitType(container: IrElement, type: IrType) {
-        runWithContextUpdaters(container) { super.visitType(container, type) }
-        for (checker in typeCheckers) {
-            checker.check(type, container, context)
+        runWithContextUpdaters(container) {
+            super.visitType(container, type)
+            for (checker in typeCheckers) {
+                checker.check(type, container, context)
+            }
         }
     }
 }
