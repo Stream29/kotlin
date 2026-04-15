@@ -118,9 +118,12 @@ class IrSourceCompilerForInline(
         ExpressionCodegen(
             codegen.irFunction, codegen.signature, codegen.frameMap, InstructionAdapter(finallyNode), codegen.classCodegen,
             sourceMapper, codegen.reifiedTypeParametersUsages
-        ).also {
-            it.finallyDepth = curFinallyDepth
-        }.generateFinallyBlocksIfNeeded(returnType, afterReturnLabel, data, target)
+        ).run {
+            finallyDepth = curFinallyDepth
+            noLineNumberScopeWithCondition(codegen.isNoLineNumberScope) {
+                generateFinallyBlocksIfNeeded(returnType, afterReturnLabel, data, target)
+            }
+        }
     }
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)

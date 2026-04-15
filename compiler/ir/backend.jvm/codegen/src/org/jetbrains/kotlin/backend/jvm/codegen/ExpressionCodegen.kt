@@ -210,6 +210,10 @@ class ExpressionCodegen(
         lineNumberMapper.noLineNumberScope(block)
     }
 
+    fun noLineNumberScopeWithCondition(flag: Boolean, block: () -> Unit) {
+        lineNumberMapper.noLineNumberScopeWithCondition(flag, block)
+    }
+
     fun markLineNumberAfterInlineIfNeeded(registerLineNumberAfterwards: Boolean) {
         lineNumberMapper.markLineNumberAfterInlineIfNeeded(registerLineNumberAfterwards)
     }
