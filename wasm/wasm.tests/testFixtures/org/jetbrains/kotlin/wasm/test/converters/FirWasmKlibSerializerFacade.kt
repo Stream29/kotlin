@@ -36,6 +36,7 @@ import org.jetbrains.kotlin.wasm.config.WasmConfigurationKeys
 import org.jetbrains.kotlin.wasm.config.wasmTarget
 import org.jetbrains.kotlin.wasm.test.handlers.WASM_BASE_FILE_NAME
 
+// TODO(REVIEW): probably delete (the whole file) (?)
 class FirWasmKlibSerializerFacade(
     testServices: TestServices,
     private val firstTimeCompilation: Boolean
