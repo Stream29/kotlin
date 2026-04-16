@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.analysis.decompiler.psi
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.StandardFileSystems
 import com.intellij.openapi.vfs.VirtualFile
@@ -40,7 +41,23 @@ abstract class BuiltinsVirtualFileProviderBaseImpl : BuiltinsVirtualFileProvider
 
     override fun createBuiltinsScope(project: Project): GlobalSearchScope {
         val builtInFiles = getBuiltinVirtualFiles()
-        return GlobalSearchScope.filesScope(project, builtInFiles)
+
+        /**
+         * [GlobalSearchScope.FilesScope] could not be used here,
+         * as it has a misleading constant `true` value for [GlobalSearchScope.isSearchInModuleContent].
+         * Furthermore, these builtin files are not supposed to cover any module content.
+         * Some Kotlin logic relies on the correctness of [GlobalSearchScope.isSearchInModuleContent] return value,
+         * so it has to be explicitly set to `false`.
+         */
+        return object : GlobalSearchScope(project) {
+            override fun contains(file: VirtualFile): Boolean = file in builtInFiles
+
+            override fun isSearchInModuleContent(aModule: Module): Boolean = false
+
+            override fun isSearchInLibraries(): Boolean = false
+
+            override fun toString(): String = "Kotlin Builtin Files Scope: $builtInFiles"
+        }
     }
 
     protected abstract fun findVirtualFile(url: URL): VirtualFile?
