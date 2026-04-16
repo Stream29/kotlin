@@ -1225,7 +1225,7 @@ class BodyGenerator(
             }
 
             wasmSymbols.likely, wasmSymbols.unlikely -> {
-                return true
+                error("Hint instrinsics likely and unlikely must occur in conditional contexts.")
             }
 
             else -> {
