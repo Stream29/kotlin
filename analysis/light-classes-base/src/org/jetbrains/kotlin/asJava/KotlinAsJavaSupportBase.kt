@@ -186,6 +186,11 @@ abstract class KotlinAsJavaSupportBase<TModule : Any>(protected val project: Pro
     // ============ TRACKERS AND UTILS ============
     //region Trackers and Utils
 
+    /**
+     * Default implementation of resolution scope for [file] used by Java
+     * to query [org.jetbrains.kotlin.asJava.finder.JavaElementFinder] with
+     * when resolving declarations in this file.
+     */
     override fun getResolutionScope(file: FakeFileForLightClass): GlobalSearchScope {
         return ResolveScopeManager.getInstance(project).getDefaultResolveScope(file.virtualFile)
     }

@@ -338,9 +338,9 @@ internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupport
      *   Numbered actualizations (`FunctionN`) are platform-specific. So if some LC uses `kotlin.jvm.Function1`, Java won't find it
      *   in the resolve scope of the containing common module. In this case, we need to include all platform stdlibs in the resolve scope.
      *
-     * [getResolutionScope] returns a union of resolution scopes of all JVM modules represented by this file.
+     * [getResolutionScope] returns a union of resolution scopes of all modules represented by this file.
      * These modules are context modules of light classes taken from [FakeFileForLightClass.getClasses].
-     * If no JVM modules were found, returns the default common scope.
+     * If no modules were found, returns the default common scope.
      *
      * Note that [getResolutionScope] doesn't do any target platform adjustments by itself.
      * It's expected that all classes created through [JavaElementFinder] are constructed with some JVM module as a context:
@@ -350,8 +350,8 @@ internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupport
      *   In this case, [getResolutionScope] returns the scope of this implementation module.
      */
     override fun getResolutionScope(file: FakeFileForLightClass): GlobalSearchScope {
-        val analysisScopesForJvmModules = file.classes.mapNotNullTo(mutableSetOf()) { lightClass ->
-            (lightClass as? SymbolLightClassBase)?.ktModule?.takeIf { it.targetPlatform.isJvm() }
+        val analysisScopesForContextModules = file.classes.mapNotNullTo(mutableSetOf()) { lightClass ->
+            (lightClass as? SymbolLightClassBase)?.ktModule
         }.map { module ->
             analyzeForLightClasses(module) {
                 analysisScope
@@ -359,9 +359,9 @@ internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupport
         }
 
         return when {
-            analysisScopesForJvmModules.isEmpty() -> super.getResolutionScope(file)
-            analysisScopesForJvmModules.size == 1 -> analysisScopesForJvmModules.single()
-            else -> GlobalSearchScope.union(analysisScopesForJvmModules)
+            analysisScopesForContextModules.isEmpty() -> super.getResolutionScope(file)
+            analysisScopesForContextModules.size == 1 -> analysisScopesForContextModules.single()
+            else -> GlobalSearchScope.union(analysisScopesForContextModules)
         }
     }
 
