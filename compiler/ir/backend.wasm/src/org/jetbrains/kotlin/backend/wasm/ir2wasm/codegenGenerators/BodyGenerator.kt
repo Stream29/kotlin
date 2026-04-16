@@ -1544,11 +1544,11 @@ class BodyGenerator(
 
                 val (condition, hint) = extractBranchHint(loop.condition)
                 generateExpression(condition)
-                if (hint != null) {
-                    body.buildBranchHint(hint)
-                }
                 val location = loop.condition.getSourceLocation()
                 body.buildInstr(WasmOp.I32_EQZ, location)
+                if (hint != null) {
+                    body.buildBranchHint(!hint)
+                }
                 body.buildBrIf(wasmBreakBlock, location)
                 loop.body?.let {
                     generateAsStatement(it)

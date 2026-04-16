@@ -22,7 +22,27 @@ fun box(): String {
         result += "d"
     }
 
+    var result2 = 0
+
+    while (likely(Random.nextInt(10) != 0)) {
+        result2 += 1
+    }
+
+    while (unlikely(Random.nextInt(10) == 0)) {
+        result2 -= 1
+    }
+
+    do {
+        result2 += 1
+    } while (likely(Random.nextInt(10) != 0)
+    )
+
+    do {
+        result2 -= 1
+    } while (unlikely(Random.nextInt(10) == 0))
+
     if (result == "bc") return "Fail"
+    println(result2)
 
     return "OK"
 }
