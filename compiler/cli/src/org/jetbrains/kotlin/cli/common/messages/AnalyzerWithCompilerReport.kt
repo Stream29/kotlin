@@ -130,8 +130,9 @@ class AnalyzerWithCompilerReport(private val configuration: CompilerConfiguratio
             if (!diagnostic.isValid) return false
 
             val message = (diagnostic as? MyDiagnostic<*>)?.message ?: DefaultErrorMessages.render(diagnostic)
+            val diagnosticFactoryName = diagnostic.factoryNameOrNull()
             val textToRender = when (renderDiagnosticName) {
-                true -> "[${diagnostic.factoryName}] $message"
+                true -> diagnosticFactoryName?.let { "[$it] $message" } ?: message
                 false -> message
             }
 

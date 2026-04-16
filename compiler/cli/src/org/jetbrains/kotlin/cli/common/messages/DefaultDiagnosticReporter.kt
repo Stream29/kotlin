@@ -32,6 +32,8 @@ interface MessageCollectorBasedReporter : DiagnosticMessageReporter {
         diagnostic.severity.toCompilerMessageSeverity(),
         render,
         MessageUtil.psiFileToMessageLocation(file, file.name, DiagnosticUtils.getLineAndColumnRange(diagnostic)),
-        diagnostic.factoryName
+        diagnostic.factoryNameOrNull()
     )
 }
+
+internal fun Diagnostic.factoryNameOrNull(): String? = factory.nameOrNull
