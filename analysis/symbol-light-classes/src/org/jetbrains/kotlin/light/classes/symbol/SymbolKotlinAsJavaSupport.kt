@@ -41,9 +41,7 @@ import org.jetbrains.kotlin.light.classes.symbol.utils.SafeNestedCaffeineCache
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.parentOrNull
-import org.jetbrains.kotlin.platform.has
 import org.jetbrains.kotlin.platform.isCommon
-import org.jetbrains.kotlin.platform.jvm.JvmPlatform
 import org.jetbrains.kotlin.platform.jvm.isJvm
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtElement
@@ -110,8 +108,13 @@ fun <T> withMultiplatformLightClassSupport(block: () -> T): T {
     }
 }
 
-private fun KaModule.isLightClassSupportAvailable(): Boolean {
-    return targetPlatform.has<JvmPlatform>() || isMultiplatformSupportAvailable
+/**
+ * Light classes should only be created in the context of some JVM module.
+ * The only exception is when [isMultiplatformSupportAvailable] is `true`.
+ * Then, a declaration-site module is always used as a context one.
+ */
+private fun KaModule.isValidContextModule(): Boolean {
+    return targetPlatform.isJvm() || isMultiplatformSupportAvailable
 }
 
 internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupportBase<KaModule>(project) {
@@ -179,8 +182,8 @@ internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupport
         return SymbolLightClassForFacade(facadeFqName, files, module)
     }
 
-    override fun facadeIsApplicable(module: KaModule, file: KtFile): Boolean =
-        module.isFromSourceOrLibraryBinary() && module.isLightClassSupportAvailable()
+    override fun facadeIsApplicable(module: KaModule, file: KtFile): Boolean = module.isFromSourceOrLibraryBinary()
+
     //endregion
 
     // ============ LIGHT SCRIPTS ============
@@ -349,40 +352,39 @@ internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupport
             }
         )
 
-    override fun KtElement.getContainingModule(): KaModule? {
+    override fun KtElement.getContainingModule(): KaModule {
         return projectStructureProvider.getModule(
             element = this,
             useSiteModule = null,
-        ).takeIf(KaModule::isLightClassSupportAvailable)
+        )
     }
 
     @OptIn(KaIdeApi::class)
     override fun KtElement.findContextModule(scope: GlobalSearchScope?, moduleFilter: (KaModule) -> Boolean): KaModule? {
-        val declarationModule = this.getContainingModule()?.takeIf(moduleFilter) ?: return null
+        val declarationModule = this.getContainingModule().takeIf(moduleFilter) ?: return null
 
-        if (scope == null) {
+        if (scope == null || declarationModule.isValidContextModule()) {
             return declarationModule
         }
 
-        val moduleConverter = KaModuleConverter.getInstance() ?: return declarationModule
-        return if (declarationModule is KaSourceModule && declarationModule.targetPlatform.isCommon()) {
-            val project = this@findContextModule.project
+        // If the module converter is not available and the declaration module is not valid, then
+        // the only correct fallback value is `null`
+        val moduleConverter = KaModuleConverter.getInstance() ?: return null
 
+        if (declarationModule is KaSourceModule && declarationModule.targetPlatform.isCommon()) {
             val dependents = KotlinModuleDependentsProvider.getInstance(project).getRefinementDependents(declarationModule)
 
-            dependents.filter { it.targetPlatform.isJvm() }.firstNotNullOfOrNull { dependentModule ->
+            return dependents.filter { it.isValidContextModule() }.firstNotNullOfOrNull { dependentModule ->
                 val ideaModule = moduleConverter.asOpenApiModule(dependentModule) ?: return@firstNotNullOfOrNull null
                 dependentModule.takeIf { scope.isSearchInModuleContent(ideaModule) }
             }
-        } else if (declarationModule.targetPlatform.isJvm()) {
-            declarationModule
-        } else {
-            null
         }
+
+        return null
     }
 
     private fun KtElement.isFromSourceOrLibraryBinary(): Boolean =
-        getContainingModule()?.isFromSourceOrLibraryBinary() == true
+        getContainingModule().isFromSourceOrLibraryBinary()
 
     private fun KaModule.isFromSourceOrLibraryBinary(): Boolean {
         return when (this) {

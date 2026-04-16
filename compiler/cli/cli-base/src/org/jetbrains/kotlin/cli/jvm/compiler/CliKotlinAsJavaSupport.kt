@@ -44,7 +44,7 @@ class CliKotlinAsJavaSupport(project: Project, private val traceHolder: CliTrace
         ?.filter { PsiSearchScopeUtil.isInScope(searchScope, it) }
         .orEmpty()
 
-    override fun KtElement.getContainingModule(): KtFile? = this as? KtFile
+    override fun KtElement.getContainingModule(): KtFile = this.containingKtFile
 
     override fun createInstanceOfDecompiledLightFacade(facadeFqName: FqName, module: KtFile, files: List<KtFile>): KtLightClassForFacade? {
         error("Should not be called")

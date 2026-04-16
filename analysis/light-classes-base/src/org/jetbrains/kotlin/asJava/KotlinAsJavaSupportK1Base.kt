@@ -91,7 +91,7 @@ abstract class KotlinAsJavaSupportK1Base<TModule : Any>(project: Project) : Kotl
     }
 
     override fun KtElement.findContextModule(scope: GlobalSearchScope?, moduleFilter: (TModule) -> Boolean): TModule? {
-        return getContainingModule()?.takeIf(moduleFilter)
+        return getContainingModule().takeIf(moduleFilter)
     }
 
     private class LightClassCachedValue<T : KtLightClass>(val value: T?, val tracker: ModificationTracker)

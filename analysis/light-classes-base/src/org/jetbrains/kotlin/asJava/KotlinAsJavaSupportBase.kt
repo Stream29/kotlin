@@ -71,7 +71,7 @@ abstract class KotlinAsJavaSupportBase<TModule : Any>(protected val project: Pro
     override fun getFacadeNames(packageFqName: FqName, scope: GlobalSearchScope): Collection<String> {
         return findFilesForFacadeByPackage(packageFqName, scope).mapNotNullTo(mutableSetOf()) { file ->
             file.takeIf { it.facadeIsPossible() }
-                ?.takeIf { it.getContainingModule()?.let { module -> facadeIsApplicable(module, file) } == true }
+                ?.takeIf { facadeIsApplicable(it.getContainingModule(), file) }
                 ?.javaFileFacadeFqName
                 ?.shortName()
                 ?.asString()
@@ -195,7 +195,7 @@ abstract class KotlinAsJavaSupportBase<TModule : Any>(protected val project: Pro
     /**
      * Returns a containing module for [this].
      */
-    protected abstract fun KtElement.getContainingModule(): TModule?
+    protected abstract fun KtElement.getContainingModule(): TModule
 
     /**
      * Returns a module covered by [scope] which should be used as a context for the light class creation for [this].
