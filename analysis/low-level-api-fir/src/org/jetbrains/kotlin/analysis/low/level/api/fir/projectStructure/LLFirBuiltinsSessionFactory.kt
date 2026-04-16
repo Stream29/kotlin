@@ -127,6 +127,7 @@ class LLFirBuiltinsSessionFactory(private val project: Project) {
         }
     }
 
+    @LLFirInternals
     companion object {
         fun getInstance(project: Project): LLFirBuiltinsSessionFactory = project.service()
     }

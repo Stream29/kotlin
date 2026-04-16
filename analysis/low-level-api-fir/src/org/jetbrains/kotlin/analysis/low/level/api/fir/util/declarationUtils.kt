@@ -8,8 +8,8 @@ package org.jetbrains.kotlin.analysis.low.level.api.fir.util
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.kotlin.analysis.api.KaImplementationDetail
+import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.kotlin.analysis.api.platform.projectStructure.KotlinProjectStructureProvider
 import org.jetbrains.kotlin.analysis.api.projectStructure.copyOrigin
 import org.jetbrains.kotlin.analysis.api.utils.errors.withPsiEntry
@@ -209,7 +209,7 @@ private fun KtDeclaration.findSourceNonLocalFirDeclarationByProvider(
     return candidate?.takeIf { it.psi == this }
 }
 
-fun FirAnonymousInitializer.containingClassIdOrNull(): ClassId? =
+internal fun FirAnonymousInitializer.containingClassIdOrNull(): ClassId? =
     (containingDeclarationSymbol as? FirClassSymbol<*>)?.classId
 
 private fun KtClassLikeDeclaration.findFir(provider: FirProvider): FirClassLikeDeclaration? {
@@ -228,7 +228,7 @@ val FirFile.codeFragment: FirCodeFragment
             ?: errorWithFirSpecificEntries("Code fragment not found in a FirFile", fir = this)
     }
 
-val FirDeclaration.isGeneratedDeclaration
+internal val FirDeclaration.isGeneratedDeclaration
     get() = realPsi == null
 
 internal inline fun FirScript.forEachDeclaration(action: (FirDeclaration) -> Unit) {
@@ -316,7 +316,7 @@ internal val FirCallableSymbol<*>.isLocalForLazyResolutionPurposes: Boolean
         }
     }
 
-val PsiElement.parentsWithSelfCodeFragmentAware: Sequence<PsiElement>
+internal val PsiElement.parentsWithSelfCodeFragmentAware: Sequence<PsiElement>
     get() = generateSequence(this) { element ->
         when (element) {
             is KtCodeFragment -> element.context
@@ -325,7 +325,7 @@ val PsiElement.parentsWithSelfCodeFragmentAware: Sequence<PsiElement>
         }
     }
 
-val PsiElement.parentsCodeFragmentAware: Sequence<PsiElement>
+internal val PsiElement.parentsCodeFragmentAware: Sequence<PsiElement>
     get() = parentsWithSelfCodeFragmentAware.drop(1)
 
 internal fun <T : PsiElement> T.unwrapCopy(containingFile: PsiFile = this.containingFile): T? {
@@ -341,6 +341,7 @@ internal fun <T : PsiElement> T.unwrapCopy(containingFile: PsiFile = this.contai
     }
 }
 
+@KaImplementationDetail
 fun findStringPlusSymbol(session: FirSession): FirNamedFunctionSymbol? {
     val stringClassSymbol = session.builtinTypes.stringType.toRegularClassSymbol(session)
     return stringClassSymbol?.fir?.declarations?.singleOrNull {

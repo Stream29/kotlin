@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.analysis.low.level.api.fir.util
 
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.analysis.api.KaImplementationDetail
 import org.jetbrains.kotlin.analysis.low.level.api.fir.api.FirDesignation
 import org.jetbrains.kotlin.analysis.low.level.api.fir.api.LLResolutionFacade
 import org.jetbrains.kotlin.analysis.low.level.api.fir.api.targets.LLPartialBodyAnalysisState
@@ -58,7 +59,9 @@ import org.jetbrains.kotlin.util.PrivateForInline
 import org.jetbrains.kotlin.utils.exceptions.errorWithAttachment
 import org.jetbrains.kotlin.utils.exceptions.requireWithAttachment
 
+@KaImplementationDetail
 object ContextCollector {
+    @KaImplementationDetail
     enum class ContextKind {
         /** Represents the context of the declaration itself. */
         SELF,
@@ -77,11 +80,13 @@ object ContextCollector {
      * stability. Only stable smart casts impact data flow. Check the "Smart cast sink stability" in the Kotlin language specification.
      * Unstable smart casts are still provided for more precise checking and diagnosing.
      */
+    @KaImplementationDetail
     class Context(
         val towerDataContext: FirTowerDataContext,
         val smartCasts: Map<RealVariable, Set<ConeKotlinType>>,
     )
 
+    @KaImplementationDetail
     enum class FilterResponse {
         /** Store context for the element and continue the traversal. */
         CONTINUE,
@@ -204,6 +209,7 @@ object ContextCollector {
         return ContextProvider { element, kind -> visitor[element, kind] }
     }
 
+    @KaImplementationDetail
     fun interface ContextProvider {
         operator fun get(element: PsiElement, kind: ContextKind): Context?
     }

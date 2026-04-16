@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.analysis.low.level.api.fir.sessions.cache
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import org.jetbrains.kotlin.analysis.api.KaImplementationDetail
 import org.jetbrains.kotlin.analysis.api.platform.KaCachedService
 import org.jetbrains.kotlin.analysis.api.platform.projectStructure.KotlinModuleInformationProvider
 import org.jetbrains.kotlin.analysis.api.projectStructure.*
@@ -187,6 +188,7 @@ class LLFirSessionCache(
     override fun dispose() {
     }
 
+    @LLFirInternals
     companion object {
         fun getInstance(project: Project): LLFirSessionCache = project.service()
     }
@@ -199,6 +201,7 @@ internal fun LLFirSessionConfigurator.Companion.configure(session: LLFirSession)
     }
 }
 
+@KaImplementationDetail
 @Deprecated(
     "This is a dirty hack used only for one usage (building fir for psi from stubs) and it should be removed after fix of that usage",
     level = DeprecationLevel.ERROR
