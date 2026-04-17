@@ -191,19 +191,19 @@ class KotlinLibraryResolverResultImpl(
 
     private val all: List<KotlinResolvedLibrary>
             by lazy {
-                val result = mutableSetOf<KotlinResolvedLibrary>()
-                val queue = ArrayDeque(roots) // Use a queue for traversal
-                result.addAll(roots)
-
-                while (queue.isNotEmpty()) {
-                    val current = queue.removeFirst()
-                    for (dependency in current.resolvedDependencies) {
-                        if (result.add(dependency)) {
-                            queue.add(dependency)
-                        }
+                buildList {
+                    val visiting = mutableSetOf<KotlinResolvedLibrary>()
+                    val visited = mutableSetOf<KotlinResolvedLibrary>()
+                    fun dfs(current: KotlinResolvedLibrary) {
+                        if (current in visited) return
+                        if (current in visiting) error("Cyclic dependency in library graph for: ${current.library.location}")
+                        visiting.add(current)
+                        current.resolvedDependencies.forEach(::dfs)
+                        add(current)
+                        visited.add(current)
                     }
+                    roots.forEach(::dfs)
                 }
-                result.toList()
             }
 
     override fun filterRoots(predicate: (KotlinResolvedLibrary) -> Boolean) =
