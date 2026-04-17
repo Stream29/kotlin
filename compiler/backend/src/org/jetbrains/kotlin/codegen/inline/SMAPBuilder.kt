@@ -16,14 +16,16 @@ import java.util.*
 import kotlin.math.max
 
 object SMAPBuilder {
-    fun build(fileMappings: List<FileMapping>, backwardsCompatibleSyntax: Boolean, validate: Boolean = false): String? {
+    fun build(fileMappings: List<FileMapping>, backwardsCompatibleSyntax: Boolean, validate: Boolean): String? {
         if (fileMappings.isEmpty()) {
             return null
         }
 
         if (validate) {
-            fileMappings.forEach { fileMapping ->
-                fileMapping.lineMappings.forEach { it.validate() }
+            for (fileMapping in fileMappings) {
+                for (rangeMapping in fileMapping.lineMappings) {
+                    rangeMapping.validate()
+                }
             }
         }
 
