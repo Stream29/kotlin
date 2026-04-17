@@ -89,11 +89,7 @@ class FieldInitializersLowering(val context: WasmBackendContext) : FileLoweringP
 
                 val currentFunction = initializeFunction ?: run {
                     context.irFactory.stageController.restrictTo(declaration) {
-                        createInitializerFunction(if (forObjectInitializer) {
-                                                      "objectInitializer"
-                                                  } else {
-                                                      "nonConstantInitializer"
-                                                  })
+                        createInitializerFunction(if (forObjectInitializer) "objectInitializer" else "nonConstantInitializer")
                     }.also {
                         when {
                             forObjectInitializer -> objectInstanceFieldInitializer = it
