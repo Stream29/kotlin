@@ -50,14 +50,20 @@ private object WasmBinary {
     }
 }
 
+private enum class AnnotationKind(val sectionName: String) {
+    BRANCH_HINT("metadata.code.branch_hint"),
+    TRACE_INST("metadata.code.trace_inst"),
+    JS_CALLED("binaryen.js.called"),
+}
+
 /**
  * Annotation data extracted from pseudo-instructions during code emission.
- * Stores the section name, byte offset, and payload for later section generation.
+ * Stores the kind, byte offset, and raw payload value for later section generation.
  */
 private class ResolvedAnnotation(
-    val sectionName: String,
+    val kind: AnnotationKind,
     val byteOffset: Int,
-    val payloadWriter: (ByteWriter) -> Unit
+    val value: Int = 0,
 )
 
 /**
@@ -236,20 +242,20 @@ class WasmIrToBinary(
     private fun emitCodeMetadataSections() {
         if (resolvedAnnotationsByFunction.isEmpty()) return
 
-        // Group all annotations by section name
-        val bySectionName = mutableMapOf<String, MutableList<Pair<Int, ResolvedAnnotation>>>()
+        // Group all annotations by kind
+        val byKind = mutableMapOf<AnnotationKind, MutableList<Pair<Int, ResolvedAnnotation>>>()
         for (funcAnnotations in resolvedAnnotationsByFunction) {
             for (resolved in funcAnnotations.annotations) {
-                bySectionName.getOrPut(resolved.sectionName) { mutableListOf() }
+                byKind.getOrPut(resolved.kind) { mutableListOf() }
                     .add(funcAnnotations.functionIndex to resolved)
             }
         }
 
         // Emit a custom section for each annotation type in the format described here:
         // https://github.com/WebAssembly/tool-conventions/blob/main/CodeMetadata.md
-        for ((sectionName, entries) in bySectionName) {
+        for ((kind, entries) in byKind) {
             appendSection(WasmBinary.Section.CUSTOM) {
-                b.writeString(sectionName)
+                b.writeString(kind.sectionName)
 
                 // Group by function index
                 val byFunction = entries.groupBy({ it.first }, { it.second })
@@ -263,14 +269,17 @@ class WasmIrToBinary(
 
                     for (resolved in annotations.sortedBy { it.byteOffset }) {
                         b.writeVarUInt32(resolved.byteOffset)
-
-                        // Compute payload size by writing to a temporary buffer first
-                        val tempBuffer = java.io.ByteArrayOutputStream()
-                        resolved.payloadWriter(ByteWriter(tempBuffer))
-                        val payloadBytes = tempBuffer.toByteArray()
-
-                        b.writeVarUInt32(payloadBytes.size)
-                        b.writeBytes(payloadBytes)
+                        withVarUInt32PayloadSizePrepended {
+                            when (kind) {
+                                AnnotationKind.BRANCH_HINT -> {
+                                    b.writeVarUInt32(resolved.value)
+                                }
+                                AnnotationKind.TRACE_INST -> {
+                                    b.writeVarInt32(resolved.value)
+                                }
+                                AnnotationKind.JS_CALLED -> {}
+                            }
+                        }
                     }
                 }
             }
@@ -354,34 +363,16 @@ class WasmIrToBinary(
             val byteOffset = b.written - codeStart
             when (instr.operator) {
                 WasmOp.PSEUDO_ANNOTATION_BRANCH_HINT -> {
-                    val likely = (instr.firstImmediateOrNull()!! as WasmImmediate.ConstU8).value.toUInt()
-                    annotations.add(
-                        ResolvedAnnotation(
-                            sectionName = "metadata.code.branch_hint",
-                            byteOffset = byteOffset,
-                            payloadWriter = { writer -> writer.writeVarUInt32(likely) }
-                        )
-                    )
+                    val likely = (instr.firstImmediateOrNull()!! as WasmImmediate.ConstU8).value.toInt()
+                    annotations.add(ResolvedAnnotation(AnnotationKind.BRANCH_HINT, byteOffset, likely))
                 }
                 WasmOp.PSEUDO_ANNOTATION_TRACE_INST -> {
                     val markId = (instr.firstImmediateOrNull()!! as WasmImmediate.ConstI32).value
-                    annotations.add(
-                        ResolvedAnnotation(
-                            sectionName = "metadata.code.trace_inst",
-                            byteOffset = byteOffset,
-                            payloadWriter = { writer -> writer.writeVarInt32(markId) }
-                        )
-                    )
+                    annotations.add(ResolvedAnnotation(AnnotationKind.TRACE_INST, byteOffset, markId))
                 }
                 WasmOp.PSEUDO_ANNOTATION_JS_CALLED -> {
                     require(byteOffset == 0) { "js.called annotation must be emitted at function start." }
-                    annotations.add(
-                        ResolvedAnnotation(
-                            sectionName = "binaryen.js.called",
-                            byteOffset = 0,
-                            payloadWriter = { /* empty payload */ }
-                        )
-                    )
+                    annotations.add(ResolvedAnnotation(AnnotationKind.JS_CALLED, byteOffset))
                 }
                 WasmOp.PSEUDO_COMMENT_PREVIOUS_INSTR -> {}
                 WasmOp.PSEUDO_COMMENT_GROUP_START -> {}
