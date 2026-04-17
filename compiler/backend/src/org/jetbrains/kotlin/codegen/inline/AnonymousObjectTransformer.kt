@@ -196,7 +196,10 @@ class AnonymousObjectTransformer(
 
         if (GENERATE_SMAP && !inliningContext.isInliningLambda) {
             classBuilder.visitSMAP(
-                sourceMapper, !state.config.languageVersionSettings.supportsFeature(LanguageFeature.CorrectSourceMappingSyntax), true
+                sourceMapper,
+                !state.config.languageVersionSettings.supportsFeature(LanguageFeature.CorrectSourceMappingSyntax),
+                true,
+                state.config.shouldValidateBytecode
             )
         } else if (debugFileName != null) {
             classBuilder.visitSource(debugFileName, debugInfo)
