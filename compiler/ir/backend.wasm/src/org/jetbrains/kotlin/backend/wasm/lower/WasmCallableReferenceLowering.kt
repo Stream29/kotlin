@@ -677,7 +677,7 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : Fi
                         val erasedParameter = this@apply.parameters[i]
                         put(invokeParameter, irTemporary(irGet(erasedParameter).implicitCastTo(invokeParameter.type)))
                     }
-                    for (i in 0 until functionReference.boundValues.size) {
+                    for (i in functionReference.boundValues.indices) {
                         val invokeParameter = invokeFunction.parameters[i]
                         val erasedParameter = this@apply.parameters[i]
                         put(invokeParameter, irTemporary(irGet(erasedParameter).implicitCastTo(invokeParameter.type)))
