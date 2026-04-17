@@ -307,10 +307,8 @@ class WasmCompiledModuleFragment(
         val heapTypeResolver: (WasmHeapType.Type) -> WasmTypeDeclaration = definedDeclarations::resolve
 
         val recursiveGroups = with(RecursiveGroupBuilder(heapTypeResolver)) {
-            // Use distinct() because after rebinding equivalent declarations, multiple keys may point
-            // to the same canonical type object.
-            addTypes(definedDeclarations.gcTypes.values.distinct())
-            addTypes(definedDeclarations.vTableGcTypes.values.distinct())
+            addTypes(definedDeclarations.gcTypes.values.toSet())
+            addTypes(definedDeclarations.vTableGcTypes.values.toSet())
             addTypes(allFunctionTypes.values.toSet())
             build()
         }
@@ -409,14 +407,11 @@ class WasmCompiledModuleFragment(
         }
     }
 
-    private fun getGlobals(definedDeclarations: DefinedDeclarationsResolver) = mutableListOf<WasmGlobal>().apply {
+    private fun getGlobals(definedDeclarations: DefinedDeclarationsResolver) = mutableSetOf<WasmGlobal>().apply {
         addAll(definedDeclarations.globalFields.values)
-        // Use distinct() because after rebinding equivalent declarations, multiple keys may point
-        // to the same canonical global object.
-        addAll(definedDeclarations.globalVTables.values.distinct())
-        addAll(definedDeclarations.globalClassITables.values.distinct())
+        addAll(definedDeclarations.globalVTables.values)
+        addAll(definedDeclarations.globalClassITables.values)
 
-        // Use the already-deduplicated globalRTTI from definedDeclarations
         val rttiGlobals = definedDeclarations.globalRTTI
         val rttiSuperTypes = mutableMapOf<IdSignature, IdSignature?>()
 
@@ -428,7 +423,7 @@ class WasmCompiledModuleFragment(
         fun wasmRttiGlobalOrderKey(superType: IdSignature?): Int =
             superType?.let { wasmRttiGlobalOrderKey(rttiSuperTypes[it]) + 1 } ?: 0
 
-        rttiGlobals.keys.sortedBy(::wasmRttiGlobalOrderKey).map { rttiGlobals[it]!! }.distinct().forEach { add(it) }
+        rttiGlobals.keys.sortedBy(::wasmRttiGlobalOrderKey).forEach { add(rttiGlobals[it]!!) }
 
         addAll(definedDeclarations.globalLiteralGlobals.values)
     }
