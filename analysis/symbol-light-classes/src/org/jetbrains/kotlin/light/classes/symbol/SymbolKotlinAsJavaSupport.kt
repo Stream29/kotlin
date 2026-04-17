@@ -363,8 +363,12 @@ internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupport
     override fun KtElement.findContextModule(scope: GlobalSearchScope?, moduleFilter: (KaModule) -> Boolean): KaModule? {
         val declarationModule = this.getContainingModule().takeIf(moduleFilter) ?: return null
 
-        if (scope == null || declarationModule.isValidContextModule()) {
+        if (declarationModule.isValidContextModule()) {
             return declarationModule
+        }
+
+        if (scope == null) {
+            return null
         }
 
         // If the module converter is not available and the declaration module is not valid, then
