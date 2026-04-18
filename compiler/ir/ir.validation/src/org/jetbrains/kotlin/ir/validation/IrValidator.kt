@@ -69,13 +69,13 @@ private class IrFileValidator(
     private val context: CheckerContext
 ) : IrTreeSymbolsVisitor() {
     private val elementCheckers: List<IrElementChecker<*>> = config.checkers.filterIsInstance<IrElementChecker<*>>()
-    private val elementContextUpdaters: List<ContextUpdater> = listOf(ParentChainUpdater) + elementCheckers.flatMap { it.requiredContextUpdaters }
+    private val contextUpdaters: List<ContextUpdater> = listOf(ParentChainUpdater) + config.checkers.flatMap { it.requiredContextUpdaters }
 
     private val symbolCheckers: List<IrSymbolChecker> = config.checkers.filterIsInstance<IrSymbolChecker>()
-    private val symbolContextUpdaters: List<ContextUpdater> = listOf(ParentChainUpdater) + symbolCheckers.flatMap { it.requiredContextUpdaters }
+    private val symbolContextUpdaters: List<ContextUpdater> = symbolCheckers.flatMap { it.requiredContextUpdaters }
 
     private val typeCheckers: List<IrTypeChecker> = config.checkers.filterIsInstance<IrTypeChecker>()
-    private val typeContextUpdaters: List<ContextUpdater> = listOf(ParentChainUpdater) + typeCheckers.flatMap { it.requiredContextUpdaters }
+    private val typeContextUpdaters: List<ContextUpdater> = typeCheckers.flatMap { it.requiredContextUpdaters }
 
     private val checkersPerElementCache = hashMapOf<Class<out IrElement>, List<IrElementChecker<*>>>()
 
@@ -90,7 +90,7 @@ private class IrFileValidator(
     }
 
     override fun visitElement(element: IrElement) {
-        elementContextUpdaters.runWithContextUpdaters(element) { element.acceptChildrenVoid(this) }
+        contextUpdaters.runWithContextUpdaters(element) { element.acceptChildrenVoid(this) }
 
         for (checker in getCheckersFor(element.javaClass)) {
             @Suppress("UNCHECKED_CAST")
