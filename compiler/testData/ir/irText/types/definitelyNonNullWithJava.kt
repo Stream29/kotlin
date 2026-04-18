@@ -1,4 +1,3 @@
-// IGNORE_BACKEND: JKLIB
 // LANGUAGE: +DefinitelyNonNullableTypes
 // TARGET_BACKEND: JVM
 
