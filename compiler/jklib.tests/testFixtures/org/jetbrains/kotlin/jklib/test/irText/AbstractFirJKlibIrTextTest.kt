@@ -73,6 +73,11 @@ abstract class AbstractFirJKlibIrTextTest : AbstractKotlinCompilerWithTargetBack
             setupIrTextDumpHandlers()
         }
 
+        facadeStep(::JKlibIrCompilationCliFacade)
+        deserializedIrHandlersStep {
+            setupIrTextDumpHandlers()
+        }
+
         setupDefaultDirectivesForIrTextTest()
         defaultDirectives {
             +CodegenTestDirectives.IGNORE_IR_EXPECT_FLAG
