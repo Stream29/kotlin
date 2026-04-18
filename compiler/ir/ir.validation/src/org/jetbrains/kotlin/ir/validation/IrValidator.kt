@@ -68,15 +68,19 @@ private class IrFileValidator(
     config: IrValidatorConfig,
     private val context: CheckerContext
 ) : IrTreeSymbolsVisitor() {
-    private val contextUpdaters: List<ContextUpdater> = listOf(ParentChainUpdater) + config.checkers.flatMap { it.requiredContextUpdaters }
     private val elementCheckers: List<IrElementChecker<*>> = config.checkers.filterIsInstance<IrElementChecker<*>>()
+    private val elementContextUpdaters: List<ContextUpdater> = listOf(ParentChainUpdater) + elementCheckers.flatMap { it.requiredContextUpdaters }
+
     private val symbolCheckers: List<IrSymbolChecker> = config.checkers.filterIsInstance<IrSymbolChecker>()
+    private val symbolContextUpdaters: List<ContextUpdater> = listOf(ParentChainUpdater) + symbolCheckers.flatMap { it.requiredContextUpdaters }
+
     private val typeCheckers: List<IrTypeChecker> = config.checkers.filterIsInstance<IrTypeChecker>()
+    private val typeContextUpdaters: List<ContextUpdater> = listOf(ParentChainUpdater) + typeCheckers.flatMap { it.requiredContextUpdaters }
 
     private val checkersPerElementCache = hashMapOf<Class<out IrElement>, List<IrElementChecker<*>>>()
 
-    private fun runWithContextUpdaters(element: IrElement, block: () -> Unit) {
-        contextUpdaters
+    private fun List<ContextUpdater>.runWithContextUpdaters(element: IrElement, block: () -> Unit) {
+        this
             .fold(block) { currentBlock, updater -> { updater.runInNewContext(context, element, currentBlock) } }
             .invoke()
     }
@@ -86,7 +90,7 @@ private class IrFileValidator(
     }
 
     override fun visitElement(element: IrElement) {
-        runWithContextUpdaters(element) { element.acceptChildrenVoid(this) }
+        elementContextUpdaters.runWithContextUpdaters(element) { element.acceptChildrenVoid(this) }
 
         for (checker in getCheckersFor(element.javaClass)) {
             @Suppress("UNCHECKED_CAST")
@@ -101,13 +105,15 @@ private class IrFileValidator(
     }
 
     override fun visitSymbol(container: IrElement, symbol: IrSymbol) {
-        for (checker in symbolCheckers) {
-            checker.check(symbol, container, context)
+        symbolContextUpdaters.runWithContextUpdaters(container) {
+            for (checker in symbolCheckers) {
+                checker.check(symbol, container, context)
+            }
         }
     }
 
     override fun visitType(container: IrElement, type: IrType) {
-        runWithContextUpdaters(container) {
+        typeContextUpdaters.runWithContextUpdaters(container) {
             super.visitType(container, type)
             for (checker in typeCheckers) {
                 checker.check(type, container, context)
