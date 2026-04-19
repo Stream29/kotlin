@@ -67,16 +67,14 @@ class JKlibJavaSourceConfigurator(testServices: TestServices) : EnvironmentConfi
             )
         })
         
-        val jvmClasspathRoots = configuration.jvmClasspathRoots.map { it.absolutePath } +
-                java.security.AccessController.doPrivileged(java.security.PrivilegedAction {
-                    ForTestCompileRuntime.jvmAnnotationsForTests().absolutePath
-                }) +
-                java8AnnotationsJar.absolutePath
-        
-        configuration.addJvmClasspathRoot(java.security.AccessController.doPrivileged(java.security.PrivilegedAction {
+        val jvmAnnotationsJar = java.security.AccessController.doPrivileged(java.security.PrivilegedAction {
             ForTestCompileRuntime.jvmAnnotationsForTests()
-        }))
+        })
+        
+        configuration.addJvmClasspathRoot(jvmAnnotationsJar)
         configuration.addJvmClasspathRoot(java8AnnotationsJar)
+        
+        val jvmClasspathRoots = configuration.jvmClasspathRoots.map { it.absolutePath }
 
         try {
             val compiledJar = MockLibraryUtil.compileJavaFilesLibraryToJar(
