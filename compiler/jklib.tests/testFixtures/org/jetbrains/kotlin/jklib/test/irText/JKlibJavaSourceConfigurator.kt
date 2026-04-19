@@ -67,9 +67,7 @@ class JKlibJavaSourceConfigurator(testServices: TestServices) : EnvironmentConfi
             )
         })
         
-        val jvmAnnotationsJar = java.security.AccessController.doPrivileged(java.security.PrivilegedAction {
-            ForTestCompileRuntime.jvmAnnotationsForTests()
-        })
+        val jvmAnnotationsJar = ForTestCompileRuntime.jvmAnnotationsForTests()
         
         configuration.addJvmClasspathRoot(jvmAnnotationsJar)
         configuration.addJvmClasspathRoot(java8AnnotationsJar)
