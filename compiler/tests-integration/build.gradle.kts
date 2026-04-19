@@ -80,19 +80,21 @@ projectTests {
 
         useJUnitPlatform()
 
-        systemProperty("kotlin.test.script.classpath", testSourceSet.output.classesDirs.joinToString(File.pathSeparator))
-        val antLauncherJarPathProvider = project.provider {
-            antLauncherJar.asPath
-        }
-        doFirst {
-            systemProperty("kotlin.ant.classpath", antLauncherJarPathProvider.get())
-            systemProperty("kotlin.ant.launcher.class", "org.apache.tools.ant.Main")
-        }
+        jvmArgumentProviders.add(
+            project.objects.newInstance(SystemPropertyClasspathProvider::class.java).apply {
+                property.set("kotlin.test.script.classpath")
+                classpath.from(testSourceSet.output.classesDirs)
+            }
+        )
+        addClasspathProperty(antLauncherJar, "kotlin.ant.classpath")
+        systemProperty("kotlin.ant.launcher.class", "org.apache.tools.ant.Main")
     }
 
     testGenerator("org.jetbrains.kotlin.TestGeneratorForTestsIntegrationTestsKt")
 
     withJvmStdlibAndReflect()
+    withStdlibCommon()
+    withJsRuntime()
 }
 
 testsJar()
