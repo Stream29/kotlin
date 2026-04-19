@@ -47,7 +47,7 @@ class FirKotlinKaptIntegrationTest(private val testInfo: TestInfo) {
         ).apply {
             initTestInfo(testInfo)
             try {
-                runTest(file.absolutePath)
+                runTest(file.path)
                 if (expectFailure) throw AssertionError("Expected compilation to fail, but it didn't.")
             } catch (ex: CompilationErrorException) {
                 if (!expectFailure) throw ex
