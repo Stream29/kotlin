@@ -106,17 +106,38 @@ private fun processEnum(
     markerInsn: MethodInsnNode,
     typeParameterValue: LightIrType,
 ) {
+    val enumInternalName = typeParameterValue.classifier.mapTypeParameterInternalName
     val next1 = markerInsn.next ?: error("no next instruction")
     val next2 = next1.next ?: error("no next instruction")
 
-    if (next1.opcode == Opcodes.ACONST_NULL && next2.opcode == Opcodes.ALOAD) {
-        val next3 = (next2.next ?: error("no next instruction")) as MethodInsnNode
-        if (next3.name != "valueOf") error("next3 must be 'valueOf'")
-        instructions.set(next1, InsnNode(Opcodes.NOP))
-        next3.owner = typeParameterValue.classifier.mapTypeParameterInternalName
-        next3.desc = "(Ljava/lang/String;)L${typeParameterValue.classifier.mapTypeParameterInternalName};"
-    } else {
-        TODO("unimplemented ENUM_REIFIED variant")
+    when {
+        // enumValueOf
+        next1.opcode == Opcodes.ACONST_NULL && next2.opcode == Opcodes.ALOAD -> {
+            val next3 = (next2.next ?: error("no next instruction")) as MethodInsnNode
+            if (next3.name != "valueOf") error("next3 must be 'valueOf'")
+            instructions.set(next1, InsnNode(Opcodes.NOP))
+            next3.owner = enumInternalName
+            next3.desc = "(Ljava/lang/String;)L$enumInternalName;"
+        }
+
+        // enumValues
+        next1.opcode == Opcodes.ICONST_0 && next2.opcode == Opcodes.ANEWARRAY -> {
+            instructions.set(next1, InsnNode(Opcodes.NOP))
+            instructions.set(next2, MethodInsnNode(Opcodes.INVOKESTATIC, enumInternalName, "values", "()[L$enumInternalName;", false))
+        }
+
+        // enumEntries
+        next1.opcode == Opcodes.ACONST_NULL && next2.opcode == Opcodes.CHECKCAST -> {
+            // TODO: support enumEntries via field acccess
+            // val getField = intrinsicsSupport.generateExternalEntriesForEnumTypeIfNeeded(type)
+            instructions.set(next1, InsnNode(Opcodes.NOP))
+            instructions.set(
+                next2,
+                MethodInsnNode(Opcodes.INVOKESTATIC, enumInternalName, "getEntries", "()Lkotlin/enums/EnumEntries;", false)
+            )
+        }
+
+        else -> error("unexpected enum reification instruction")
     }
 
     instructions.set(markerInsn, InsnNode(Opcodes.NOP))
