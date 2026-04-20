@@ -11,8 +11,10 @@ import org.jetbrains.kotlin.codegen.util.inlinecodegen.ReifiedOperationKind
 import org.jetbrains.kotlin.codegen.util.inlinecodegen.reificationArgument
 import org.jetbrains.kotlin.codegen.util.inlinecodegen.reifiedOperationKind
 import org.jetbrains.org.objectweb.asm.Opcodes
+import org.jetbrains.org.objectweb.asm.Type
 import org.jetbrains.org.objectweb.asm.tree.InsnList
 import org.jetbrains.org.objectweb.asm.tree.InsnNode
+import org.jetbrains.org.objectweb.asm.tree.LdcInsnNode
 import org.jetbrains.org.objectweb.asm.tree.MethodInsnNode
 import org.jetbrains.org.objectweb.asm.tree.TypeInsnNode
 
@@ -45,7 +47,10 @@ internal fun reify(
         ReifiedOperationKind.AS -> processAs(instructions, markerInsn, typeParameterValue, safe = false)
         ReifiedOperationKind.SAFE_AS -> processAs(instructions, markerInsn, typeParameterValue, safe = true)
         ReifiedOperationKind.IS -> processIs(instructions, markerInsn, typeParameterValue)
-        ReifiedOperationKind.JAVA_CLASS -> TODO()
+        ReifiedOperationKind.JAVA_CLASS -> {
+            (markerInsn.next as LdcInsnNode).cst = Type.getObjectType(typeParameterValue.classifier.mapTypeParameterInternalName)
+            instructions.set(markerInsn, InsnNode(Opcodes.NOP))
+        }
         ReifiedOperationKind.ENUM_REIFIED -> TODO()
         ReifiedOperationKind.TYPE_OF -> TODO()
         ReifiedOperationKind.CATCH -> TODO()
