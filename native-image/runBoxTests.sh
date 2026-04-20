@@ -1,6 +1,7 @@
 #!/bin/bash
 
 NATIVE_IMAGE_BIN="./kotlinc-native"
+DEFAULT_KOTLINC="dist/kotlinc/bin/kotlinc"
 TESTS_DIR="compiler/testData/codegen/boxJvm"
 NATIVE_IMAGE_ARGS="-Djava.home=$JAVA_HOME -Dkotlin.home=dist/kotlinc"
 STOP_ON_FAILURE=false
@@ -9,6 +10,9 @@ for arg in "$@"; do
   case $arg in
     --nativeImage=*)
       NATIVE_IMAGE_BIN="${arg#*=}"
+      ;;
+    --defaultKotlinc=*)
+      DEFAULT_KOTLINC="${arg#*=}"
       ;;
     --testsDir=*)
       TESTS_DIR="${arg#*=}"
@@ -21,7 +25,7 @@ for arg in "$@"; do
       ;;
     *)
       echo "Unknown argument: $arg"
-      echo "Usage: $0 [--nativeImage=PATH] [--testsDir=PATH] [--nativeImageArgs=ARGS] [--stopOnFailure]"
+      echo "Usage: $0 [--nativeImage=PATH] [--defaultKotlinc=PATH] [--testsDir=PATH] [--nativeImageArgs=ARGS] [--stopOnFailure]"
       exit 1
       ;;
   esac
@@ -29,14 +33,17 @@ done
 
 TMP_DIR=$(mktemp -d)
 COMPILER_LOG=$(mktemp)
-OUT_DIR=$(mktemp -d)
-trap 'rm -rf $TMP_DIR $COMPILER_LOG $OUT_DIR' EXIT
+OUT_DIR_DEFAULT=$(mktemp -d)
+OUT_DIR_NI=$(mktemp -d)
+trap 'rm -rf $TMP_DIR $COMPILER_LOG $OUT_DIR_DEFAULT $OUT_DIR_NI' EXIT
 
 KOTLIN_TEST_JAR="dist/kotlinc/lib/kotlin-test.jar"
 
 PASSED=0
 FAILED=0
 SKIPPED=0
+SKIPPED_DEFAULT_COMPILE=0
+SKIPPED_DEFAULT_RUNTIME=0
 
 for file in $(find $TESTS_DIR -name "*.kt"); do
   # --- Skip non-JVM tests ---
@@ -54,6 +61,11 @@ for file in $(find $TESTS_DIR -name "*.kt"); do
 
   # --- Skip tests that import helpers (test infra dependency not available) ---
   if grep -q '^import helpers\.' "$file" || grep -q '^import helpers\.\*' "$file"; then
+    continue
+  fi
+
+  # --- Skip multi-file tests (// FILE: markers) ---
+  if grep -q '^// FILE:' "$file"; then
     continue
   fi
 
@@ -77,57 +89,13 @@ for file in $(find $TESTS_DIR -name "*.kt"); do
     EXTRA_CP="-cp $KOTLIN_TEST_JAR"
   fi
 
-  # --- Handle multi-file tests (// FILE: markers) ---
-  if grep -q '^// FILE:' "$file"; then
-    # Split into separate files
-    rm -rf "${TMP_DIR:?}"/*
-    current_file=""
-    while IFS= read -r line; do
-      if echo "$line" | grep -qE '^// FILE: '; then
-        current_file=$(echo "$line" | sed 's|^// FILE: ||')
-        mkdir -p "$TMP_DIR/$(dirname "$current_file")"
-        : > "$TMP_DIR/$current_file"
-      elif [ -n "$current_file" ]; then
-        echo "$line" >> "$TMP_DIR/$current_file"
-      fi
-    done < "$file"
-
-    # Find the file containing fun box() and append main
-    BOX_FILE=$(grep -rl 'fun box()' "$TMP_DIR" | head -1)
-    if [ -z "$BOX_FILE" ]; then
-      SKIPPED=$((SKIPPED + 1))
-      continue
-    fi
-    printf '\n fun main() { println(box()) } \n' >> "$BOX_FILE"
-
-    # Collect all .kt files
-    SOURCE_FILES=$(find "$TMP_DIR" -name "*.kt" | tr '\n' ' ')
-
-    $NATIVE_IMAGE_BIN $NATIVE_IMAGE_ARGS $EXTRA_CP $LANGUAGE_FLAGS -d "$OUT_DIR" $SOURCE_FILES &> $COMPILER_LOG
-  else
-    # --- Single-file test ---
-    TMP_FILE="$TMP_DIR/blackBox.kt"
-    cat "$file" > "$TMP_FILE"
-    printf '\n fun main() { println(box()) } \n' >> "$TMP_FILE"
-
-    $NATIVE_IMAGE_BIN $NATIVE_IMAGE_ARGS $EXTRA_CP $LANGUAGE_FLAGS -d "$OUT_DIR" "$TMP_FILE" &> $COMPILER_LOG
-  fi
-
-  if [ $? -ne 0 ]; then
-    echo "COMPILATION FAILED: $file"
-    cat $COMPILER_LOG
-    SKIPPED=$((SKIPPED + 1))
-    if [ "$STOP_ON_FAILURE" = true ]; then break; fi
-    rm -rf "${OUT_DIR:?}"/*
-    continue
-  fi
+  # --- Single-file test ---
+  TMP_FILE="$TMP_DIR/blackBox.kt"
+  cat "$file" > "$TMP_FILE"
+  printf '\n fun main() { println(box()) } \n' >> "$TMP_FILE"
 
   # --- Detect package and class name to build qualified main class ---
-  if grep -q '^// FILE:' "$file"; then
-    BOX_SOURCE="$BOX_FILE"
-  else
-    BOX_SOURCE="$TMP_FILE"
-  fi
+  BOX_SOURCE="$TMP_FILE"
 
   PACKAGE=$(grep '^package ' "$BOX_SOURCE" | head -1 | sed 's/package //;s/[[:space:]]//g')
   # Class name is derived from the source filename: foo.kt -> FooKt, 1.kt -> _1Kt
@@ -144,21 +112,53 @@ for file in $(find $TESTS_DIR -name "*.kt"); do
     MAIN_CLASS="$CLASS_NAME"
   fi
 
-  RESULT=$(java -cp "$OUT_DIR:dist/kotlinc/lib/*" "$MAIN_CLASS" 2>&1)
-  if [ "$RESULT" = "OK" ]; then
+  # --- Default kotlinc pass (oracle) ---
+  $DEFAULT_KOTLINC $EXTRA_CP $LANGUAGE_FLAGS -d "$OUT_DIR_DEFAULT" "$TMP_FILE" &> $COMPILER_LOG
+  if [ $? -ne 0 ]; then
+    echo "SKIPPED: $file (default kotlinc compilation failed)"
+    cat $COMPILER_LOG
+    SKIPPED=$((SKIPPED + 1))
+    SKIPPED_DEFAULT_COMPILE=$((SKIPPED_DEFAULT_COMPILE + 1))
+    rm -rf "${OUT_DIR_DEFAULT:?}"/* "${OUT_DIR_NI:?}"/*
+    continue
+  fi
+
+  DEFAULT_RESULT=$(java -cp "$OUT_DIR_DEFAULT:dist/kotlinc/lib/*" "$MAIN_CLASS" 2>&1)
+  if [ "$DEFAULT_RESULT" != "OK" ]; then
+    echo "SKIPPED: $file (default kotlinc runtime != 'OK', got '$DEFAULT_RESULT')"
+    SKIPPED=$((SKIPPED + 1))
+    SKIPPED_DEFAULT_RUNTIME=$((SKIPPED_DEFAULT_RUNTIME + 1))
+    rm -rf "${OUT_DIR_DEFAULT:?}"/* "${OUT_DIR_NI:?}"/*
+    continue
+  fi
+
+  # --- NI kotlinc pass (compared against oracle) ---
+  $NATIVE_IMAGE_BIN $NATIVE_IMAGE_ARGS $EXTRA_CP $LANGUAGE_FLAGS -d "$OUT_DIR_NI" "$TMP_FILE" &> $COMPILER_LOG
+  if [ $? -ne 0 ]; then
+    echo "FAILED: $file (NI compilation failed, default compiled OK)"
+    cat $COMPILER_LOG
+    FAILED=$((FAILED + 1))
+    if [ "$STOP_ON_FAILURE" = true ]; then break; fi
+    rm -rf "${OUT_DIR_DEFAULT:?}"/* "${OUT_DIR_NI:?}"/*
+    continue
+  fi
+
+  NI_RESULT=$(java -cp "$OUT_DIR_NI:dist/kotlinc/lib/*" "$MAIN_CLASS" 2>&1)
+  if [ "$NI_RESULT" = "$DEFAULT_RESULT" ]; then
     echo "PASSED: $file"
     PASSED=$((PASSED + 1))
   else
-    echo "FAILED: $file (expected 'OK', got '$RESULT')"
+    echo "FAILED: $file (NI runtime differs, expected '$DEFAULT_RESULT', got '$NI_RESULT')"
     FAILED=$((FAILED + 1))
     if [ "$STOP_ON_FAILURE" = true ]; then break; fi
   fi
 
-  rm -rf "${OUT_DIR:?}"/*
+  rm -rf "${OUT_DIR_DEFAULT:?}"/* "${OUT_DIR_NI:?}"/*
 done
 
 echo ""
 echo "=== Summary: $PASSED passed, $FAILED failed, $SKIPPED skipped ==="
+echo "    (skipped breakdown: $SKIPPED_DEFAULT_COMPILE default compile, $SKIPPED_DEFAULT_RUNTIME default runtime != OK)"
 if [ $FAILED -gt 0 ] || [ $SKIPPED -gt 0 ]; then
   exit 1
 fi

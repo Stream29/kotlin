@@ -439,6 +439,10 @@
       "type": "org.jetbrains.kotlin.com.intellij.openapi.extensions.impl.ExtensionPointImpl"
     },
     {
+      "type": "org.jetbrains.kotlin.com.intellij.openapi.fileTypes.BinaryFileTypeDecompilers",
+      "allDeclaredConstructors": true
+    },
+    {
       "type": "org.jetbrains.kotlin.com.intellij.openapi.util.SimpleModificationTracker"
     },
     {

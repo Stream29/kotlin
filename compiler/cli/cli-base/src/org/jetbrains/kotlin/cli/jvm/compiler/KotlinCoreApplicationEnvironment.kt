@@ -68,7 +68,7 @@ class KotlinCoreApplicationEnvironment private constructor(
         return if (mock.isUnitTestMode) {
             KotlinCoreUnitTestApplication(parentDisposable)
         } else {
-            MockApplicationWithoutInvokeLater(parentDisposable)
+            mock
         }
     }
 
@@ -162,25 +162,6 @@ private class KotlinCoreUnitTestApplication(parentDisposable: Disposable) : Mock
         withWriteAccessAllowedInThread { computation.compute() }
 
     private inline fun <A> withWriteAccessAllowedInThread(action: () -> A): A = PlatformWriteAccessSupport.withWriteAccessAllowedInThread(action)
-}
-
-
-private class MockApplicationWithoutInvokeLater(parentDisposable: Disposable) : MockApplication(parentDisposable) {
-    override fun invokeLater(runnable: Runnable, expired: Condition<*>) {
-        runnable.run()
-    }
-
-    override fun invokeLater(runnable: Runnable, state: ModalityState, expired: Condition<*>) {
-        runnable.run()
-    }
-
-    override fun invokeLater(runnable: Runnable) {
-        runnable.run()
-    }
-
-    override fun invokeLater(runnable: Runnable, state: ModalityState) {
-        runnable.run()
-    }
 }
 
 /**
