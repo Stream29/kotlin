@@ -22,7 +22,7 @@ class SpecializationTransformer : MethodTransformer() {
         val localToArgumentIndex = buildMap {
             var local = 0
             var idx = 0
-            if (methodNode.access and Opcodes.ACC_STATIC != 0) {
+            if (methodNode.access and Opcodes.ACC_STATIC == 0) {
                 put(local++, idx++)
             }
             for (argumentType in Type.getArgumentTypes(methodNode.desc)) {
