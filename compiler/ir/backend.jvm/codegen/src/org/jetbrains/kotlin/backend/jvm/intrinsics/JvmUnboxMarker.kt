@@ -7,11 +7,11 @@ package org.jetbrains.kotlin.backend.jvm.intrinsics
 
 import org.jetbrains.kotlin.backend.jvm.codegen.BlockInfo
 import org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen
-import org.jetbrains.kotlin.backend.jvm.codegen.MaterialValue
 import org.jetbrains.kotlin.backend.jvm.codegen.PromisedValue
-import org.jetbrains.kotlin.backend.jvm.codegen.materialize
 import org.jetbrains.kotlin.backend.jvm.mapping.asSpecTypeParameterUsage
 import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.org.objectweb.asm.Type
 
 object JvmUnboxMarker : IntrinsicMethod() {
     override fun invoke(
@@ -23,15 +23,21 @@ object JvmUnboxMarker : IntrinsicMethod() {
         val typeUsage = type.asSpecTypeParameterUsage()!!
 
         val value = expression.arguments[0]!!.accept(codegen, data)
-        value.materialize()
 
-        codegen.mv.invokestatic(
-            "kotlin/jvm/internal/Intrinsics",
-            "unboxMarker${typeUsage.encode()}",
-            "(Ljava/lang/Object;)Lkotlin/jvm/internal/SpecUnboxedDecoy${typeUsage.encode()};",
-            false,
-        )
+        return object : PromisedValue(codegen, value.type, value.irType) {
+            override fun materializeAt(target: Type, irTarget: IrType, castForReified: Boolean) {
+                value.materializeAt(target, irTarget, castForReified)
+                codegen.mv.invokestatic(
+                    "kotlin/jvm/internal/Intrinsics",
+                    "unboxMarker${typeUsage.encode()}",
+                    "(${target})Lkotlin/jvm/internal/SpecUnboxedDecoy${typeUsage.encode()};",
+                    false,
+                )
+            }
 
-        return MaterialValue(codegen, value.type, value.irType)
+            override fun discard() {
+                value.discard()
+            }
+        }
     }
 }
