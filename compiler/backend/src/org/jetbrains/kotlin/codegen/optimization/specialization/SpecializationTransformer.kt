@@ -69,5 +69,15 @@ class SpecializationTransformer : MethodTransformer() {
         }
         methodNode.invisibleAnnotations.removeAll { it.desc == JvmSpecializeMetadataValue.ANNOTATION_DESCRIPTOR_NAME }
         methodNode.invisibleAnnotations.add(metadataValue.copy(specializedSlots = specializedSlots).toAnnotationNode())
+
+        methodNode.instructions.forEach { insn ->
+            if (insn is MethodInsnNode &&
+                insn.owner == "kotlin/jvm/internal/Intrinsics" &&
+                (insn.name.startsWith("boxMarker") || insn.name.startsWith("unboxMarker"))
+            ) {
+                val argType = Type.getArgumentTypes(insn.desc)[0]
+                insn.desc = Type.getMethodDescriptor(argType, argType)
+            }
+        }
     }
 }
