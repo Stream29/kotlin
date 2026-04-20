@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.cli.js.K2JSCompiler;
 import org.jetbrains.kotlin.cli.js.KotlinWasmCompiler;
 import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler;
 import org.jetbrains.kotlin.cli.metadata.KotlinMetadataCompiler;
+import org.jetbrains.kotlin.codegen.forTestCompile.ForTestCompileRuntime;
 import org.jetbrains.kotlin.test.*;
 import org.jetbrains.kotlin.test.util.KtTestUtil;
 import org.jetbrains.kotlin.util.PerformanceManager;
@@ -88,7 +89,7 @@ public abstract class AbstractCliTest extends TestCaseWithTmpdir {
             @NotNull String testDataDir,
             @NotNull String tmpdir
     ) {
-        String testDataAbsoluteDir = new File(testDataDir).getAbsolutePath();
+        String testDataAbsoluteDir = ForTestCompileRuntime.transformTestDataPath(testDataDir).getAbsolutePath();
         String output = pureOutput
                 .replace(testDataAbsoluteDir, TESTDATA_DIR)
                 .replace(FileUtil.toSystemIndependentName(testDataAbsoluteDir), TESTDATA_DIR);
