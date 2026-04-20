@@ -18,12 +18,12 @@ data class SpecTypeParametersUsages(
             return type
         }
 
-        fun encode() = "$genericIndex${if (nullable) "?" else ""}"
+        fun encode() = "$genericIndex${if (nullable) "N" else ""}"
 
         companion object {
             fun decode(str: String): Usage {
-                val nullable = str.endsWith("?")
-                val index = str.removeSuffix("?").toInt()
+                val nullable = str.endsWith("N")
+                val index = str.removeSuffix("N").toInt()
                 return Usage(index, nullable)
             }
         }
