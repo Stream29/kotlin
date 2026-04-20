@@ -51,7 +51,7 @@ internal fun reify(
             (markerInsn.next as LdcInsnNode).cst = Type.getObjectType(typeParameterValue.classifier.mapTypeParameterInternalName)
             instructions.set(markerInsn, InsnNode(Opcodes.NOP))
         }
-        ReifiedOperationKind.ENUM_REIFIED -> TODO()
+        ReifiedOperationKind.ENUM_REIFIED -> processEnum(instructions, markerInsn, typeParameterValue)
         ReifiedOperationKind.TYPE_OF -> TODO()
         ReifiedOperationKind.CATCH -> TODO()
     }
@@ -98,5 +98,26 @@ private fun processIs(
     ) { instructions.insertBefore(markerInsn, it) }
 
     instructions.set(markerInsn.next, InsnNode(Opcodes.NOP))
+    instructions.set(markerInsn, InsnNode(Opcodes.NOP))
+}
+
+private fun processEnum(
+    instructions: InsnList,
+    markerInsn: MethodInsnNode,
+    typeParameterValue: LightIrType,
+) {
+    val next1 = markerInsn.next ?: error("no next instruction")
+    val next2 = next1.next ?: error("no next instruction")
+
+    if (next1.opcode == Opcodes.ACONST_NULL && next2.opcode == Opcodes.ALOAD) {
+        val next3 = (next2.next ?: error("no next instruction")) as MethodInsnNode
+        if (next3.name != "valueOf") error("next3 must be 'valueOf'")
+        instructions.set(next1, InsnNode(Opcodes.NOP))
+        next3.owner = typeParameterValue.classifier.mapTypeParameterInternalName
+        next3.desc = "(Ljava/lang/String;)L${typeParameterValue.classifier.mapTypeParameterInternalName};"
+    } else {
+        TODO("unimplemented ENUM_REIFIED variant")
+    }
+
     instructions.set(markerInsn, InsnNode(Opcodes.NOP))
 }
