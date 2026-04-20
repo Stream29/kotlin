@@ -10,16 +10,17 @@ import org.jetbrains.org.objectweb.asm.tree.AbstractInsnNode
 import org.jetbrains.org.objectweb.asm.tree.InvokeDynamicInsnNode
 import org.jetbrains.org.objectweb.asm.tree.analysis.SourceInterpreter
 import org.jetbrains.org.objectweb.asm.tree.analysis.SourceValue
+import java.util.IdentityHashMap
 
 internal class AdjustSpecializedCallsInterpreter : SourceInterpreter(API_VERSION) {
-    val specializedCalls = mutableListOf<SpecializedCall>()
+    val specializedCalls = IdentityHashMap<InvokeDynamicInsnNode, SpecializedCall>()
 
     override fun naryOperation(
         insn: AbstractInsnNode,
         values: List<SourceValue>,
     ): SourceValue {
         if (insn is InvokeDynamicInsnNode && insn.isSpecBootstrapCall) {
-            specializedCalls.add(SpecializedCall(insn, values))
+            specializedCalls[insn] = SpecializedCall(insn, values)
         }
         return super.naryOperation(insn, values)
     }

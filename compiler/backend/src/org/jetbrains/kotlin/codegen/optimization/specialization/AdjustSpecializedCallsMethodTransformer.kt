@@ -27,7 +27,7 @@ class AdjustSpecializedCallsMethodTransformer : MethodTransformer() {
         ) { nLocals, nStack -> Frame(nLocals, nStack) }
         analyzer.analyze()
 
-        for (specCall in interpreter.specializedCalls) {
+        for (specCall in interpreter.specializedCalls.values) {
             adjustSpecializedCall(node.instructions, specCall)
         }
     }
