@@ -20,7 +20,7 @@ import org.jetbrains.org.objectweb.asm.tree.VarInsnNode
 import org.jetbrains.org.objectweb.asm.tree.analysis.Interpreter
 
 internal class SpecializationInterpreter(
-    val argumentTypes: Array<Type>,
+    val localToArgumentIndex: Map<Int, Int>,
     val metadataValue: JvmSpecializeMetadataValue,
 ) : Interpreter<SpecializationValue>(Opcodes.ASM9) {
     val specializedLoadStore = mutableListOf<Pair<VarInsnNode, SpecTypeParametersUsages.Usage>>()
@@ -37,17 +37,7 @@ internal class SpecializationInterpreter(
     }
 
     override fun newParameterValue(isInstanceMethod: Boolean, local: Int, type: Type?): SpecializationValue? {
-        if (isInstanceMethod && local == 0) return SpecializationValue(1)
-        val local = if (isInstanceMethod) local - 1 else local
-        var argumentIndex = 0
-        var argumentOffset = 0
-        while (argumentOffset < local) {
-            argumentOffset += argumentTypes[argumentIndex].size
-            argumentIndex += 1
-        }
-        if (argumentOffset != local) error("bad local variable index")
-        if (argumentTypes[argumentIndex] != type) error("bad local variable index")
-        if (isInstanceMethod) argumentIndex += 1
+        val argumentIndex = localToArgumentIndex[local] ?: error("bad local variable index")
         metadataValue.specTypeParametersUsages.parameterGenericIndices[argumentIndex]?.let { return SpecializationValue(it) }
         return newValue(type)
     }

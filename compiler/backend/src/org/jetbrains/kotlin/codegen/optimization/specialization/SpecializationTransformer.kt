@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.codegen.util.inlinecodegen.extractJvmSpecializeMetad
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.Type
 import org.jetbrains.org.objectweb.asm.tree.MethodNode
-import org.jetbrains.org.objectweb.asm.tree.AnnotationNode
 import org.jetbrains.org.objectweb.asm.tree.MethodInsnNode
 import org.jetbrains.org.objectweb.asm.tree.analysis.Analyzer
 import java.util.TreeSet
@@ -19,8 +18,20 @@ import java.util.TreeSet
 class SpecializationTransformer : MethodTransformer() {
     override fun transform(internalClassName: String, methodNode: MethodNode) {
         val metadataValue = methodNode.extractJvmSpecializeMetadataValue() ?: return
-        val argumentTypes = Type.getArgumentTypes(methodNode.desc)
-        val interpreter = SpecializationInterpreter(argumentTypes, metadataValue)
+
+        val localToArgumentIndex = buildMap {
+            var local = 0
+            var idx = 0
+            if (methodNode.access and Opcodes.ACC_STATIC != 0) {
+                put(local++, idx++)
+            }
+            for (argumentType in Type.getArgumentTypes(methodNode.desc)) {
+                put(local, idx++)
+                local += argumentType.size
+            }
+        }
+
+        val interpreter = SpecializationInterpreter(localToArgumentIndex, metadataValue)
         val analyzer = Analyzer(interpreter)
         val frames = analyzer.analyze(internalClassName, methodNode)
 
