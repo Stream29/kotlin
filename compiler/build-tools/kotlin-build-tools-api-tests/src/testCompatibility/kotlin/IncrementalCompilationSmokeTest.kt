@@ -5,8 +5,7 @@
 
 package org.jetbrains.kotlin.buildtools.tests
 
-import org.jetbrains.kotlin.buildtools.api.CompilationResult
-import org.jetbrains.kotlin.buildtools.api.SourcesChanges
+import org.jetbrains.kotlin.buildtools.api.*
 import org.jetbrains.kotlin.buildtools.api.arguments.CommonJsAndWasmArguments
 import org.jetbrains.kotlin.buildtools.api.arguments.CommonToolArguments.Companion.VERBOSE
 import org.jetbrains.kotlin.buildtools.api.arguments.ExperimentalCompilerArgument
@@ -21,17 +20,16 @@ import org.jetbrains.kotlin.buildtools.tests.compilation.assertions.assertCompil
 import org.jetbrains.kotlin.buildtools.tests.compilation.assertions.assertLogContainsSubstringExactlyTimes
 import org.jetbrains.kotlin.buildtools.tests.compilation.assertions.assertOutputs
 import org.jetbrains.kotlin.buildtools.tests.compilation.model.*
-import org.jetbrains.kotlin.buildtools.tests.compilation.scenario.assertNoOutputSetChanges
-import org.jetbrains.kotlin.buildtools.tests.compilation.scenario.scenario
+import org.jetbrains.kotlin.buildtools.tests.compilation.scenario.*
 import org.jetbrains.kotlin.test.TestMetadata
 import org.jetbrains.kotlin.tooling.core.KotlinToolingVersion
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.condition.OS
 import java.nio.file.Path
 import kotlin.io.path.*
-import org.junit.jupiter.api.condition.OS
 
 class IncrementalCompilationSmokeTest : BaseCompilationTest() {
     @DisplayName("IC works with the externally tracked changes, similarly to Gradle")
@@ -46,7 +44,7 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
     @TestMetadata("jvm-module-1")
     fun multiModuleInternallyTracked(strategyConfig: CompilerExecutionStrategyConfiguration) {
         val kotlinToolchain = strategyConfig.first
-        Assumptions.assumeTrue(
+        assumeTrue(
             KotlinToolingVersion(kotlinToolchain.getCompilerVersion()) >= KotlinToolingVersion(2, 1, 20, "Beta1"),
             "Internal tracking is supported only since Kotlin 2.1.20-Beta1: KT-70556, the current version is ${kotlinToolchain.getCompilerVersion()}"
         )
@@ -58,7 +56,7 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
     @TestMetadata("kotlin-java-mixed")
     fun mixedModuleInternallyTracked(strategyConfig: CompilerExecutionStrategyConfiguration) {
         val kotlinToolchain = strategyConfig.first
-        Assumptions.assumeTrue(
+        assumeTrue(
             KotlinToolingVersion(kotlinToolchain.getCompilerVersion()) >= KotlinToolingVersion(2, 1, 20, "Beta1"),
             "Internal tracking is supported only since Kotlin 2.1.20-Beta1: KT-70556, the current version is ${kotlinToolchain.getCompilerVersion()}"
         )
@@ -97,7 +95,7 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
                 ),
                 IncrementalModule(
                     "lib",
-                    libModule.outputDirectory.resolve("lib.klib"),
+                    libModule.outputDirectory,
                     libModule.buildDirectory,
                     libModule.icCachesDir,
                 ),
@@ -123,13 +121,13 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
             ) {
                 compilerArguments[CommonJsAndWasmArguments.LIBRARIES] = listOf(
                     stdlibKlib,
-                    libModule.outputDirectory.resolve("lib.klib")
+                    libModule.outputDirectory
                 )
                 compilerArguments[CommonJsAndWasmArguments.IR_OUTPUT_NAME] = "app"
                 this[INCREMENTAL_COMPILATION] = this.historyBasedIcConfigurationBuilder(
                     projectDirectory,
                     appModule.icCachesDir,
-                    SourcesChanges.Unknown,
+                    SourcesChanges.ToBeCalculated,
                     modulesInfo
                 ).build()
             }
@@ -164,7 +162,7 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
                         this[INCREMENTAL_COMPILATION] = historyBasedIcConfigurationBuilder(
                             projectDirectory,
                             previousIc.workingDirectory,
-                            SourcesChanges.Known(listOf(libModule.outputDirectory.resolve("lib.klib").toFile()), emptyList()),
+                            SourcesChanges.Known(libModule.outputDirectory.walk().map(Path::toFile).toList(), emptyList()),
                             previousIc.modulesInformation
                         ).build()
                     }.build(), strategyConfig.second, logger)
@@ -181,7 +179,7 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
     }
 
     private fun runMixedModuleTest(strategyConfig: CompilerExecutionStrategyConfiguration, useTrackedModules: Boolean) {
-        scenario(strategyConfig) {
+        jvmScenario(strategyConfig) {
             val compilerArgumentsConf: (JvmCompilationOperation.Builder) -> Unit = {
                 it.compilerArguments[VERBOSE] = true
             }
@@ -214,17 +212,16 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
             KotlinToolingVersion(kotlinToolchain.getCompilerVersion()) == KotlinToolingVersion("2.2.21") && OS.MAC.isCurrentOs,
             "Known failure on Mac with 2.2.21"
         )
-        scenario(strategyConfig) {
-            val module1 = if (useTrackedModules) {
-                trackedModule("jvm-module-1")
-            } else {
-                module("jvm-module-1")
-            }
 
-            val module2 = if (useTrackedModules) {
-                trackedModule("jvm-module-2", listOf(module1))
+        val action = fun Scenario<BaseCompilationOperation.Builder, BaseIncrementalCompilationConfiguration.Builder>.() {
+            val moduleSpecs: List<ModuleSpec<BaseCompilationOperation.Builder, BaseIncrementalCompilationConfiguration.Builder>> = listOf(
+                ModuleSpec("jvm-module-1"),
+                ModuleSpec("jvm-module-2", dependencies = listOf("jvm-module-1"))
+            )
+            val (module1, module2) = if (useTrackedModules) {
+                trackedModules(*moduleSpecs.toTypedArray())
             } else {
-                module("jvm-module-2", listOf(module1))
+                modules(*moduleSpecs.toTypedArray())
             }
 
             module1.createPredefinedFile("secret.kt", "new-file")
@@ -232,13 +229,21 @@ class IncrementalCompilationSmokeTest : BaseCompilationTest() {
             module1.deleteFile("baz.kt")
             module1.compile {
                 assertCompiledSources("secret.kt", "bar.kt")
-                // SecretKt is added, BazKt is removed
-                assertOutputs("SecretKt.class", "Bar.class", "FooKt.class")
+                if (this is JvmCompilationOperation.Builder) {
+                    // SecretKt is added, BazKt is removed
+                    assertOutputs("SecretKt.class", "Bar.class", "FooKt.class")
+                }
             }
             module2.compile {
                 assertCompiledSources("b.kt")
                 assertNoOutputSetChanges()
             }
+        }
+
+        jvmScenario(strategyConfig, action)
+        workingDirectory.deleteRecursively()
+        if (strategyConfig.first.supportsJs() && !useTrackedModules) {
+            jsScenario(strategyConfig, action)
         }
     }
 }
@@ -268,3 +273,6 @@ private fun assertCompiledSources(
         """.trimIndent()
     }
 }
+
+fun KotlinToolchains.supportsJs() = this::class.java.simpleName == "KotlinToolchainsImpl"
+        && KotlinToolingVersion(getCompilerVersion()) >= KotlinToolingVersion(2, 4, 20, null)

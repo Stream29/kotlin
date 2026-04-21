@@ -8,7 +8,6 @@ package org.jetbrains.kotlin.buildtools.tests
 import org.jetbrains.kotlin.buildtools.api.CompilationResult
 import org.jetbrains.kotlin.buildtools.api.RemovedCompilerArgument
 import org.jetbrains.kotlin.buildtools.api.arguments.CommonJsAndWasmArguments
-import org.jetbrains.kotlin.buildtools.api.arguments.CommonToolArguments
 import org.jetbrains.kotlin.buildtools.api.arguments.ExperimentalCompilerArgument
 import org.jetbrains.kotlin.buildtools.api.arguments.JvmCompilerArguments
 import org.jetbrains.kotlin.buildtools.api.js.JsPlatformToolchain.Companion.js
@@ -17,17 +16,17 @@ import org.jetbrains.kotlin.buildtools.api.js.jsLinkingOperation
 import org.jetbrains.kotlin.buildtools.tests.compilation.BaseCompilationTest
 import org.jetbrains.kotlin.buildtools.tests.compilation.assertions.assertLogContainsSubstringExactlyTimes
 import org.jetbrains.kotlin.buildtools.tests.compilation.assertions.assertOutputs
-import org.jetbrains.kotlin.buildtools.tests.compilation.model.BtaV2StrategyAgnosticCompilationTest
-import org.jetbrains.kotlin.buildtools.tests.compilation.model.DefaultStrategyAgnosticCompilationTest
-import org.jetbrains.kotlin.buildtools.tests.compilation.model.LogLevel
-import org.jetbrains.kotlin.buildtools.tests.compilation.model.TestKotlinLogger
-import org.jetbrains.kotlin.buildtools.tests.compilation.model.project
+import org.jetbrains.kotlin.buildtools.tests.compilation.model.*
+import org.jetbrains.kotlin.buildtools.tests.compilation.util.currentKotlinJsStdlibKlibLocation
 import org.jetbrains.kotlin.test.TestMetadata
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.assertThrows
-import kotlin.io.path.*
+import kotlin.io.path.createDirectories
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 class NonIncrementalCompilationSmokeTest : BaseCompilationTest() {
     @DisplayName("Non-incremental compilation produces only expected outputs in multi-module setup")
@@ -129,13 +128,12 @@ class NonIncrementalCompilationSmokeTest : BaseCompilationTest() {
         val sources = listOf(
             workingDirectory.resolve("a.kt")
                 .also { it.writeText("@OptIn(kotlin.js.ExperimentalJsExport::class) @JsExport fun main() {println(\"aaa\")}") })
-        val stdlibKlib = Path(System.getProperty("kotlin.build-tools-api.test.jsStdlibClasspath"))
         val destination = workingDirectory.resolve("klib").also { it.createDirectories() }
         val compilationOperation = toolchain.js.jsKlibCompilationOperation(
             sources,
             destination
         ) {
-            compilerArguments[CommonJsAndWasmArguments.LIBRARIES] = listOf(stdlibKlib)
+            compilerArguments[CommonJsAndWasmArguments.LIBRARIES] = listOf(currentKotlinJsStdlibKlibLocation)
             compilerArguments[CommonJsAndWasmArguments.IR_OUTPUT_NAME] = "some_module"
         }
         toolchain.createBuildSession().use {
@@ -145,13 +143,17 @@ class NonIncrementalCompilationSmokeTest : BaseCompilationTest() {
 
         val linkingDestination = workingDirectory.resolve("out").also { it.createDirectories() }
         val linkingOperation =
-            toolchain.js.jsLinkingOperation(destination.listDirectoryEntries("*.klib").single(), linkingDestination) {
-                compilerArguments[CommonJsAndWasmArguments.LIBRARIES] = listOf(stdlibKlib)
+            toolchain.js.jsLinkingOperation(destination, linkingDestination) {
+                compilerArguments[CommonJsAndWasmArguments.LIBRARIES] = listOf(currentKotlinJsStdlibKlibLocation)
                 compilerArguments[CommonJsAndWasmArguments.IR_OUTPUT_NAME] = "some_module"
             }
         toolchain.createBuildSession().use {
             val result = it.executeOperation(linkingOperation, strategyConfig.second, TestKotlinLogger())
             assertEquals(CompilationResult.COMPILATION_SUCCESS, result)
         }
+        assertTrue(
+            linkingDestination.resolve("some_module.js").readText().contains("println('aaa')"),
+            "JS file should contain \"println('aaa')\" string"
+        )
     }
 }

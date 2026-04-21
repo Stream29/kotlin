@@ -5,12 +5,12 @@
 
 package org.jetbrains.kotlin.buildtools.tests.compilation.scenario
 
+import org.jetbrains.kotlin.buildtools.api.BaseCompilationOperation
+import org.jetbrains.kotlin.buildtools.api.BaseIncrementalCompilationConfiguration
 import org.jetbrains.kotlin.buildtools.api.jvm.ClassSnapshotGranularity
-import org.jetbrains.kotlin.buildtools.api.jvm.JvmSnapshotBasedIncrementalCompilationConfiguration
-import org.jetbrains.kotlin.buildtools.api.jvm.operations.JvmCompilationOperation
 import org.jetbrains.kotlin.buildtools.tests.compilation.model.SnapshotConfig
 
-interface Scenario {
+interface Scenario<out B : BaseCompilationOperation.Builder, out IC : BaseIncrementalCompilationConfiguration.Builder> {
     /**
      * Creates a module for a scenario.
      *
@@ -29,9 +29,24 @@ interface Scenario {
         moduleName: String,
         dependencies: List<ScenarioModule> = emptyList(),
         snapshotConfig: SnapshotConfig = SnapshotConfig(ClassSnapshotGranularity.CLASS_MEMBER_LEVEL, true),
-        compilationConfigAction: (JvmCompilationOperation.Builder) -> Unit = {},
-        icOptionsConfigAction: ((JvmSnapshotBasedIncrementalCompilationConfiguration.Builder) -> Unit) = {},
+        compilationConfigAction: (B) -> Unit = {},
+        icOptionsConfigAction: (IC) -> Unit = {},
     ): ScenarioModule
+
+    fun modules(vararg moduleSpecs: ModuleSpec<B, IC>): List<ScenarioModule> {
+        return moduleSpecs.fold(mutableListOf<Pair<String, ScenarioModule>>()) { acc, spec ->
+            acc.add(
+                spec.moduleName to module(
+                    spec.moduleName,
+                    spec.dependencies.map { dependency -> acc.first { it.first == dependency }.second },
+                    spec.snapshotConfig,
+                    spec.compilationConfigAction,
+                    spec.icOptionsConfigAction
+                )
+            )
+            acc
+        }.map { it.second }
+    }
 
     /**
      * Creates a module for a scenario.
@@ -53,7 +68,30 @@ interface Scenario {
         moduleName: String,
         dependencies: List<ScenarioModule> = emptyList(),
         snapshotConfig: SnapshotConfig = SnapshotConfig(ClassSnapshotGranularity.CLASS_MEMBER_LEVEL, true),
-        compilationConfigAction: (JvmCompilationOperation.Builder) -> Unit = {},
-        icOptionsConfigAction: ((JvmSnapshotBasedIncrementalCompilationConfiguration.Builder) -> Unit) = {},
+        compilationConfigAction: (B) -> Unit = {},
+        icOptionsConfigAction: (IC) -> Unit = {},
     ): ScenarioModule
+
+    fun trackedModules(vararg moduleSpecs: ModuleSpec<B, IC>): List<ScenarioModule> {
+        return moduleSpecs.fold(mutableListOf<Pair<String, ScenarioModule>>()) { acc, spec ->
+            acc.add(
+                spec.moduleName to trackedModule(
+                    spec.moduleName,
+                    spec.dependencies.map { dependency -> acc.first { it.first == dependency }.second },
+                    spec.snapshotConfig,
+                    spec.compilationConfigAction,
+                    spec.icOptionsConfigAction
+                )
+            )
+            acc
+        }.map { it.second }
+    }
 }
+
+data class ModuleSpec<in B, in IC>(
+    val moduleName: String,
+    val dependencies: List<String> = emptyList(),
+    val snapshotConfig: SnapshotConfig = SnapshotConfig(ClassSnapshotGranularity.CLASS_MEMBER_LEVEL, true),
+    val compilationConfigAction: (B) -> Unit = {},
+    val icOptionsConfigAction: (IC) -> Unit = {},
+)
