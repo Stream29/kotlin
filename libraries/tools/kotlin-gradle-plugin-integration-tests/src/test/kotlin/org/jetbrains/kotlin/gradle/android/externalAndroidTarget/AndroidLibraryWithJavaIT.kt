@@ -40,10 +40,10 @@ class AndroidLibraryWithJavaIT : KGPBaseTest() {
                 }
             }
 
-            val javaSrcFile = projectPath.resolve("src/androidMain/java/sample/JavaClass.java")
-            javaSrcFile.parent.toFile().mkdirs()
-            javaSrcFile.toFile().writeText(
-                """
+            javaSourcesDir("androidMain").resolve("sample/JavaClass.java").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText(
+                    """
                 package sample;
                 public class JavaClass {
                     public String ping() {
@@ -54,19 +54,21 @@ class AndroidLibraryWithJavaIT : KGPBaseTest() {
                     }
                 }
                 """.trimIndent()
-            )
+                )
+            }
 
-            val kotlinSrcFile = projectPath.resolve("src/androidMain/kotlin/sample/KotlinClass.kt")
-            kotlinSrcFile.parent.toFile().mkdirs()
-            kotlinSrcFile.toFile().writeText(
-                """
+            kotlinSourcesDir("androidMain").resolve("sample/KotlinClass.kt").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText(
+                    """
                 package sample
                 class KotlinClass {
                     fun ping(): String = "kotlin"
                     fun callJava(): String = JavaClass().ping()
                 }
                 """.trimIndent()
-            )
+                )
+            }
 
             build("assemble") {
                 assertTasksExecuted(":compileAndroidMainJavaWithJavac")
@@ -100,20 +102,22 @@ class AndroidLibraryWithJavaIT : KGPBaseTest() {
                 }
             }
 
-            val javaSrcFile = projectPath.resolve("src/androidMain/java/sample/JavaClass.java")
-            javaSrcFile.parent.toFile().mkdirs()
-            javaSrcFile.toFile().writeText("package sample; public class JavaClass {}")
+            javaSourcesDir("androidMain").resolve("sample/JavaClass.java").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText("package sample; public class JavaClass {}")
+            }
 
-            val kotlinSrcFile = projectPath.resolve("src/androidMain/kotlin/sample/KotlinClass.kt")
-            kotlinSrcFile.parent.toFile().mkdirs()
-            kotlinSrcFile.toFile().writeText(
-                """
+            kotlinSourcesDir("androidMain").resolve("sample/KotlinClass.kt").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText(
+                    """
                 package sample
                 class KotlinClass {
                     fun useJava(): String = JavaClass().toString()
                 }
                 """.trimIndent()
-            )
+                )
+            }
 
             buildAndFail("assemble") {
                 assertTasksFailed(":compileAndroidMain")
@@ -147,19 +151,251 @@ class AndroidLibraryWithJavaIT : KGPBaseTest() {
                 }
             }
 
-            val ktAndroid = projectPath.resolve("src/androidMain/kotlin/sample/OnlyKotlin.kt")
-            ktAndroid.parent.toFile().mkdirs()
-            ktAndroid.toFile().writeText(
-                """
+            kotlinSourcesDir("androidMain").resolve("sample/OnlyKotlin.kt").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText(
+                    """
                 package sample
                 class OnlyKotlin { fun ok() = "ok" }
                 """.trimIndent()
-            )
+                )
+            }
 
             build("assemble") {
                 assertFileInProjectExists("build/outputs/aar/empty.aar")
                 assertTasksNoSource(":compileAndroidMainJavaWithJavac")
                 assertAarContainsClass("build/outputs/aar/empty.aar", "sample/OnlyKotlin.class")
+            }
+        }
+    }
+
+    @GradleAndroidTest
+    fun `test - withJava enabled - androidMain Java sees declarations from commonMain and sharedMain`(
+        gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
+    ) {
+        project(
+            "empty",
+            gradleVersion = gradleVersion,
+            buildOptions = defaultBuildOptions.copy(androidVersion = androidVersion),
+            buildJdk = jdkVersion.location,
+        ) {
+            plugins {
+                kotlin("multiplatform")
+                id("com.android.kotlin.multiplatform.library")
+            }
+            buildScriptInjection {
+                kotlinMultiplatform.apply {
+                    androidLibrary {
+                        compileSdk = 34
+                        namespace = "org.jetbrains.sample.shared"
+                        withJava()
+                    }
+
+                    val sharedMain = sourceSets.create("sharedMain").apply {
+                        dependsOn(sourceSets.getByName("commonMain"))
+                    }
+                    sourceSets.getByName("androidMain").dependsOn(sharedMain)
+                }
+            }
+
+            kotlinSourcesDir("commonMain").resolve("sample/CommonBase.kt").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText(
+                    """
+                package sample
+
+                open class CommonBase {
+                    fun commonValue(): String = "common"
+                }
+                """.trimIndent()
+                )
+            }
+
+            kotlinSourcesDir("sharedMain").resolve("sample/SharedBase.kt").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText(
+                    """
+                package sample
+
+                open class SharedBase : CommonBase() {
+                    fun sharedValue(): String = "shared:" + commonValue()
+                }
+                """.trimIndent()
+                )
+            }
+
+            javaSourcesDir("androidMain").resolve("sample/JavaClass.java").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText(
+                    """
+                package sample;
+
+                public class JavaClass extends SharedBase {
+                    public String ping() {
+                        return sharedValue() + ":" + commonValue();
+                    }
+                }
+                """.trimIndent()
+                )
+            }
+
+            build("assemble") {
+                assertTasksExecuted(":compileAndroidMainJavaWithJavac")
+                assertFileInProjectExists("build/outputs/aar/empty.aar")
+                assertAarContainsClass("build/outputs/aar/empty.aar", "sample/CommonBase.class")
+                assertAarContainsClass("build/outputs/aar/empty.aar", "sample/SharedBase.class")
+                assertAarContainsClass("build/outputs/aar/empty.aar", "sample/JavaClass.class")
+            }
+        }
+    }
+
+    @GradleAndroidTest
+    fun `test - withJava enabled - androidMain actual declaration can delegate to Java class`(
+        gradleVersion: GradleVersion,
+        androidVersion: String,
+        jdkVersion: JdkVersions.ProvidedJdk,
+    ) {
+        project(
+            "empty",
+            gradleVersion = gradleVersion,
+            buildOptions = defaultBuildOptions.copy(androidVersion = androidVersion),
+            buildJdk = jdkVersion.location,
+        ) {
+            plugins {
+                kotlin("multiplatform")
+                id("com.android.kotlin.multiplatform.library")
+            }
+
+            buildScriptInjection {
+                kotlinMultiplatform.apply {
+                    androidLibrary {
+                        compileSdk = 34
+                        namespace = "org.jetbrains.sample.expectactual"
+                        withJava()
+                    }
+                }
+            }
+
+            kotlinSourcesDir("commonMain").resolve("sample/PlatformGreeter.kt").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText(
+                    """
+                package sample
+
+                expect class PlatformGreeter() {
+                    fun ping(): String
+                }
+
+                class KotlinCaller {
+                    fun call(): String = PlatformGreeter().ping()
+                }
+                """.trimIndent()
+                )
+            }
+
+            kotlinSourcesDir("androidMain").resolve("sample/PlatformGreeter.kt").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText(
+                    """
+                package sample
+
+                actual class PlatformGreeter actual constructor() {
+                    actual fun ping(): String = JavaPlatformGreeter().ping()
+                }
+                """.trimIndent()
+                )
+            }
+
+            javaSourcesDir("androidMain").resolve("sample/JavaPlatformGreeter.java").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText(
+                    """
+                package sample;
+
+                public final class JavaPlatformGreeter {
+                    public String ping() {
+                        return "java";
+                    }
+                }
+                """.trimIndent()
+                )
+            }
+
+            build("assemble") {
+                assertTasksExecuted(":compileAndroidMainJavaWithJavac")
+                assertFileInProjectExists("build/outputs/aar/empty.aar")
+                assertAarContainsClass("build/outputs/aar/empty.aar", "sample/PlatformGreeter.class")
+                assertAarContainsClass("build/outputs/aar/empty.aar", "sample/KotlinCaller.class")
+                assertAarContainsClass("build/outputs/aar/empty.aar", "sample/JavaPlatformGreeter.class")
+            }
+        }
+    }
+
+    @GradleAndroidTest
+    fun `test - withJava enabled - androidHostTest Java sees declarations from commonTest`(
+        gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
+    ) {
+        project(
+            "empty",
+            gradleVersion = gradleVersion,
+            buildOptions = defaultBuildOptions.copy(androidVersion = androidVersion),
+            buildJdk = jdkVersion.location,
+        ) {
+            plugins {
+                kotlin("multiplatform")
+                id("com.android.kotlin.multiplatform.library")
+            }
+            buildScriptInjection {
+                kotlinMultiplatform.apply {
+                    androidLibrary {
+                        compileSdk = 34
+                        namespace = "org.jetbrains.sample.hosttest"
+                        withJava()
+                        withHostTest {}
+                    }
+                }
+            }
+
+            kotlinSourcesDir("commonTest").resolve("test/CommonTestBase.kt").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText(
+                    """
+                package test
+                open class CommonTestBase {
+                    fun commonTestValue(): String = "common-test"
+                }
+                """.trimIndent()
+                )
+            }
+
+            javaSourcesDir("androidHostTest").resolve("test/HostTestJava.java").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText(
+                    """
+                package test;
+                public class HostTestJava extends CommonTestBase {
+                    public String ping() {
+                        return commonTestValue();
+                    }
+                }
+                """.trimIndent()
+                )
+            }
+
+            kotlinSourcesDir("androidHostTest").resolve("test/HostTestKotlin.kt").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText(
+                    """
+                package test
+                class HostTestKotlin {
+                    fun callJava(): String = HostTestJava().ping()
+                }
+                """.trimIndent()
+                )
+            }
+
+            build(":compileAndroidHostTest") {
+                assertTasksExecuted(":compileAndroidHostTest")
             }
         }
     }
