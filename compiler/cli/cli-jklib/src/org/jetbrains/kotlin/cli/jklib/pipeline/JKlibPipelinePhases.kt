@@ -5,15 +5,20 @@
 
 package org.jetbrains.kotlin.cli.jklib.pipeline
 
+import org.jetbrains.kotlin.backend.common.CommonBackendErrors
+import org.jetbrains.kotlin.backend.common.diagnostics.SerializationErrors
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
+import org.jetbrains.kotlin.backend.common.linkage.partial.PartialLinkageDiagnostics
 import org.jetbrains.kotlin.backend.common.serialization.IrSerializationSettings
 import org.jetbrains.kotlin.backend.common.serialization.serializeModuleIntoKlib
+import org.jetbrains.kotlin.backend.jvm.JvmBackendErrors
 import org.jetbrains.kotlin.cli.CliDiagnostics.CLASSPATH_RESOLUTION_ERROR
 import org.jetbrains.kotlin.cli.CliDiagnostics.COMPILER_ARGUMENTS_ERROR
 import org.jetbrains.kotlin.cli.common.*
 import org.jetbrains.kotlin.cli.common.arguments.K2JKlibCompilerArguments
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.ERROR
+import org.jetbrains.kotlin.cli.diagnosticFactoriesStorage
 import org.jetbrains.kotlin.cli.jklib.prepareJKlibSessions
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.legacy.pipeline.convertToIrAndActualizeForJvm
@@ -64,6 +69,17 @@ object JKlibConfigurationPhase : AbstractConfigurationPhase<K2JKlibCompilerArgum
     postActions = setOf(CheckCompilationErrors.CheckDiagnosticCollector),
     configurationUpdaters = listOf(JKlibConfigurationUpdater)
 ) {
+    override fun executePhase(input: ArgumentsPipelineArtifact<K2JKlibCompilerArguments>): ConfigurationPipelineArtifact {
+        return super.executePhase(input).also {
+            it.configuration.diagnosticFactoriesStorage?.registerDiagnosticContainers(
+                PartialLinkageDiagnostics,
+                CommonBackendErrors,
+                SerializationErrors,
+                JvmBackendErrors,
+            )
+        }
+    }
+
     override fun createMetadataVersion(versionArray: IntArray): BinaryVersion {
         return MetadataVersion(*versionArray)
     }

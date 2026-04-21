@@ -7,11 +7,15 @@
 
 package org.jetbrains.kotlin.cli.pipeline
 
+import org.jetbrains.kotlin.backend.common.CommonBackendErrors
+import org.jetbrains.kotlin.backend.common.actualizer.IrActualizationErrors
+import org.jetbrains.kotlin.backend.common.diagnostics.SerializationErrors
 import org.jetbrains.kotlin.cli.common.*
 import org.jetbrains.kotlin.cli.common.CLICompiler.Companion.SCRIPT_PLUGIN_COMMANDLINE_PROCESSOR_NAME
 import org.jetbrains.kotlin.cli.common.CLICompiler.Companion.SCRIPT_PLUGIN_K2_REGISTRAR_NAME
 import org.jetbrains.kotlin.cli.common.CLICompiler.Companion.SCRIPT_PLUGIN_REGISTRAR_NAME
 import org.jetbrains.kotlin.cli.common.arguments.CommonCompilerArguments
+import org.jetbrains.kotlin.cli.diagnosticFactoriesStorage
 import org.jetbrains.kotlin.cli.jvm.plugins.PluginCliParser
 import org.jetbrains.kotlin.cli.plugins.extractPluginClasspathAndOptions
 import org.jetbrains.kotlin.cli.plugins.processCompilerPluginsOptions
@@ -42,9 +46,15 @@ abstract class AbstractConfigurationPhase<A : CommonCompilerArguments>(
     postActions: Set<Action<ConfigurationPipelineArtifact, PipelineContext>> = emptySet(),
     val configurationUpdaters: List<ConfigurationUpdater<A>>
 ) : PipelinePhase<ArgumentsPipelineArtifact<A>, ConfigurationPipelineArtifact>(name, preActions, postActions) {
-    override fun executePhase(input: ArgumentsPipelineArtifact<A>): ConfigurationPipelineArtifact? {
+    override fun executePhase(input: ArgumentsPipelineArtifact<A>): ConfigurationPipelineArtifact {
         val configuration = input.configuration
         configuration.setupCommonConfiguration(input)
+
+        configuration.diagnosticFactoriesStorage?.registerDiagnosticContainers(
+            IrActualizationErrors,
+            CommonBackendErrors,
+            SerializationErrors
+        )
 
         for (filler in configurationUpdaters) {
             filler.fillConfiguration(input, configuration)

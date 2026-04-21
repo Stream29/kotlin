@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.native.pipeline
 
+import org.jetbrains.kotlin.backend.common.CommonBackendErrors
+import org.jetbrains.kotlin.backend.common.diagnostics.SerializationErrors
+import org.jetbrains.kotlin.backend.common.linkage.partial.PartialLinkageDiagnostics
 import org.jetbrains.kotlin.backend.common.linkage.partial.setupPartialLinkageConfig
 import org.jetbrains.kotlin.cli.CliDiagnostics.KONAN_ARGUMENT_ERROR
 import org.jetbrains.kotlin.cli.CliDiagnostics.KONAN_ARGUMENT_WARNING
@@ -14,9 +17,11 @@ import org.jetbrains.kotlin.cli.common.checkForUnexpectedKlibLibraries
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
 import org.jetbrains.kotlin.cli.common.createPhaseConfig
 import org.jetbrains.kotlin.cli.common.setupCommonKlibArguments
+import org.jetbrains.kotlin.cli.diagnosticFactoriesStorage
 import org.jetbrains.kotlin.cli.pipeline.*
 import org.jetbrains.kotlin.cli.report
 import org.jetbrains.kotlin.config.*
+import org.jetbrains.kotlin.ir.inline.diagnostics.IrInlinerErrors
 import org.jetbrains.kotlin.js.config.fakeOverrideValidator
 import org.jetbrains.kotlin.konan.config.*
 import org.jetbrains.kotlin.konan.file.File
@@ -36,6 +41,16 @@ object NativeConfigurationPhase : AbstractConfigurationPhase<K2NativeCompilerArg
     postActions = setOf(PerformanceNotifications.InitializationFinished, CheckCompilationErrors.CheckDiagnosticCollector),
     configurationUpdaters = listOf(NativeKlibConfigurationUpdater)
 ) {
+    override fun executePhase(input: ArgumentsPipelineArtifact<K2NativeCompilerArguments>): ConfigurationPipelineArtifact {
+        return super.executePhase(input).also {
+            it.configuration.diagnosticFactoriesStorage?.registerDiagnosticContainers(
+                PartialLinkageDiagnostics,
+                CommonBackendErrors,
+                SerializationErrors,
+                IrInlinerErrors,
+            )
+        }
+    }
     override fun createMetadataVersion(versionArray: IntArray): BinaryVersion {
         return MetadataVersion(*versionArray)
     }
