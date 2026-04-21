@@ -16,7 +16,6 @@ import org.jetbrains.kotlin.js.test.utils.jsIrIncrementalDataProvider
 import org.jetbrains.kotlin.test.backend.ir.IrBackendFacade
 import org.jetbrains.kotlin.test.backend.ir.IrBackendInput
 import org.jetbrains.kotlin.test.directives.KlibBasedCompilerTestDirectives.SKIP_GENERATING_KLIB
-import org.jetbrains.kotlin.test.frontend.classic.ModuleDescriptorProvider
 import org.jetbrains.kotlin.test.frontend.fir.Fir2IrCliBasedOutputArtifact
 import org.jetbrains.kotlin.test.model.ArtifactKinds
 import org.jetbrains.kotlin.test.model.BinaryArtifacts
@@ -51,10 +50,7 @@ class FirKlibSerializerCliJsFacade(
 class FirKlibSerializerCliWasmFacade(
     testServices: TestServices,
     firstTimeCompilation: Boolean = true,
-) : FirKlibSerializerCliWebFacade(testServices, firstTimeCompilation) {
-    override val additionalServices: List<ServiceRegistrationData>
-        get() = listOf(service(::ModuleDescriptorProvider))
-}
+) : FirKlibSerializerCliWebFacade(testServices, firstTimeCompilation)
 
 sealed class FirKlibSerializerCliWebFacade(
     testServices: TestServices,
