@@ -90,7 +90,7 @@ class WasmIrToBinary(
     private val resolvedAnnotationsByFunction = mutableListOf<FunctionResolvedAnnotations>()
 
     // Context for tracking annotations during function emission
-    private var currentFunctionCodeStart: Int? = null
+    private var currentFunctionCodeStart: Int = -1
     private var currentFunctionAnnotations: MutableList<ResolvedAnnotation>? = null
 
     override fun consumeDebugInformation(debugInformation: DebugInformation) {
@@ -358,9 +358,9 @@ class WasmIrToBinary(
 
         if (opcode == WASM_OP_PSEUDO_OPCODE) {
             // Handle annotation pseudo-instructions by recording them without emitting bytes
-            val codeStart = currentFunctionCodeStart ?: error("Annotation context not set up.")
+            require(currentFunctionCodeStart != -1) { "Annotation context not set up." }
             val annotations = currentFunctionAnnotations ?: mutableListOf<ResolvedAnnotation>().also { currentFunctionAnnotations = it }
-            val byteOffset = b.written - codeStart
+            val byteOffset = b.written - currentFunctionCodeStart
             when (instr.operator) {
                 WasmOp.PSEUDO_ANNOTATION_BRANCH_HINT -> {
                     val likely = (instr.firstImmediateOrNull()!! as WasmImmediate.ConstU8).value.toInt()
@@ -719,7 +719,7 @@ class WasmIrToBinary(
             // Clear annotation tracking context; save any collected annotations
             val annotations = currentFunctionAnnotations
             currentFunctionAnnotations = null
-            currentFunctionCodeStart = null
+            currentFunctionCodeStart = -1
 
             // Store resolved annotations for later section emission
             if (annotations != null) {
