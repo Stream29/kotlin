@@ -358,8 +358,8 @@ class WasmIrToBinary(
 
         if (opcode == WASM_OP_PSEUDO_OPCODE) {
             // Handle annotation pseudo-instructions by recording them without emitting bytes
-            val annotations = currentFunctionAnnotations?: error("Annotation context not set up.")
-            val codeStart = currentFunctionCodeStart?: error("Annotation context not set up.")
+            val codeStart = currentFunctionCodeStart ?: error("Annotation context not set up.")
+            val annotations = currentFunctionAnnotations ?: mutableListOf<ResolvedAnnotation>().also { currentFunctionAnnotations = it }
             val byteOffset = b.written - codeStart
             when (instr.operator) {
                 WasmOp.PSEUDO_ANNOTATION_BRANCH_HINT -> {
@@ -704,8 +704,6 @@ class WasmIrToBinary(
             // Code annotation offsets are relative to the first byte
             // of the locals.
             currentFunctionCodeStart = b.written
-            val annotations = mutableListOf<ResolvedAnnotation>()
-            currentFunctionAnnotations = annotations
 
             b.writeVarUInt32(function.locals.count { !it.isParameter })
             function.locals.forEach { local ->
@@ -718,12 +716,13 @@ class WasmIrToBinary(
             debugInformationGenerator?.startFunction(getCurrentSourceLocationMapping(function.startLocation), function.name)
             appendExpr(function.instructions, function.endLocation)
 
-            // Clear annotation tracking context
+            // Clear annotation tracking context; save any collected annotations
+            val annotations = currentFunctionAnnotations
             currentFunctionAnnotations = null
             currentFunctionCodeStart = null
 
             // Store resolved annotations for later section emission
-            if (annotations.isNotEmpty()) {
+            if (annotations != null) {
                 resolvedAnnotationsByFunction.add(FunctionResolvedAnnotations(functionIndex, annotations))
             }
 
