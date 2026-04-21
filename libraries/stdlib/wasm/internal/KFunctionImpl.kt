@@ -50,6 +50,8 @@ internal abstract class KFunctionImplNew<out R>(val flags: Int, val arity: Int, 
         result = 31 * result + arity
         result = 31 * result + id.hashCode()
         result = 31 * result + receiver.hashCode()
+        // name does not need to be hashed explicitly, since id is a
+        // hash of fqName which contains name.
         return result
     }
 }
