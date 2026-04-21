@@ -74,7 +74,7 @@ CHOSEN for fixation: TypeVariable(T) --- Readiness(
      <: Shape
      <: ToSmithyBuilder<TypeVariable(T)>
      = OperationShape
-     <: ToSmithyBuilder<OperationShape>
+     <: ToSmithyBuilder<OperationShape> (inferred during fixation)
     FIXED TO: OperationShape
 TypeVariable(B) --- Readiness(
     	 true ALLOWED
@@ -137,7 +137,7 @@ CHOSEN for fixation: TypeVariable(T) --- Readiness(
      <: Shape
      <: ToSmithyBuilder<TypeVariable(T)>
      = OperationShape
-     <: ToSmithyBuilder<OperationShape>
+     <: ToSmithyBuilder<OperationShape> (inferred during fixation)
     FIXED TO: OperationShape
 TypeVariable(B) --- Readiness(
     	 true ALLOWED
@@ -156,9 +156,9 @@ TypeVariable(B) --- Readiness(
     )
      <: AbstractShapeBuilder<TypeVariable(B), TypeVariable(T)>
      <: SmithyBuilder<TypeVariable(T)>
-     <: SmithyBuilder<OperationShape>
      = kotlin/Nothing
      <: AbstractShapeBuilder<kotlin/Nothing, TypeVariable(T)>
+     <: SmithyBuilder<OperationShape> (inferred during fixation)
      <: AbstractShapeBuilder<kotlin/Nothing, OperationShape> (inferred during fixation)
 ********************************
 CHOSEN for fixation: TypeVariable(B) --- Readiness(
@@ -176,8 +176,8 @@ CHOSEN for fixation: TypeVariable(B) --- Readiness(
     	 true HAS_PROPER_EQUALITY_CONSTRAINT
     	false HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
     )
-     <: SmithyBuilder<OperationShape>
      = kotlin/Nothing
+     <: SmithyBuilder<OperationShape>
      <: AbstractShapeBuilder<kotlin/Nothing, OperationShape>
     FIXED TO: kotlin/Nothing
 ********************************
@@ -199,7 +199,7 @@ CHOSEN for fixation: TypeVariable(T) --- Readiness(
      <: Shape
      <: ToSmithyBuilder<TypeVariable(T)>
      = OperationShape
-     <: ToSmithyBuilder<OperationShape>
+     <: ToSmithyBuilder<OperationShape> (inferred during fixation)
     FIXED TO: OperationShape
 TypeVariable(B) --- Readiness(
     	 true ALLOWED
@@ -218,9 +218,9 @@ TypeVariable(B) --- Readiness(
     )
      <: AbstractShapeBuilder<TypeVariable(B), TypeVariable(T)>
      <: SmithyBuilder<TypeVariable(T)>
-     <: SmithyBuilder<OperationShape>
      = AbstractShapeBuilder<*, OperationShape>
      <: AbstractShapeBuilder<AbstractShapeBuilder<*, OperationShape>, TypeVariable(T)>
+     <: SmithyBuilder<OperationShape> (inferred during fixation)
      <: AbstractShapeBuilder<AbstractShapeBuilder<*, OperationShape>, OperationShape> (inferred during fixation)
 ********************************
 CHOSEN for fixation: TypeVariable(B) --- Readiness(
@@ -238,8 +238,8 @@ CHOSEN for fixation: TypeVariable(B) --- Readiness(
     	 true HAS_PROPER_EQUALITY_CONSTRAINT
     	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
     )
-     <: SmithyBuilder<OperationShape>
      = AbstractShapeBuilder<*, OperationShape>
+     <: SmithyBuilder<OperationShape>
      <: AbstractShapeBuilder<AbstractShapeBuilder<*, OperationShape>, OperationShape>
     FIXED TO: AbstractShapeBuilder<*, OperationShape>
 ********************************

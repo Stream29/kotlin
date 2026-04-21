@@ -71,7 +71,7 @@ class ConstraintIncorporator(
     fun incorporate(
         typeVariable: TypeVariableMarker,
         constraint: Constraint,
-        dependencyProvider: TypeVariableDependencyInformationProvider,
+        dependencyProvider: TypeVariableDependencyInformationProvider?,
         isCausedByFixation: Boolean,
     ) {
         ProgressIndicatorAndCompilationCanceledStatus.checkCanceled()
@@ -165,7 +165,7 @@ class ConstraintIncorporator(
     private fun insideOtherConstraint(
         typeVariable: TypeVariableMarker,
         constraint: Constraint,
-        dependencyProvider: TypeVariableDependencyInformationProvider,
+        dependencyProvider: TypeVariableDependencyInformationProvider?,
         isCausedByFixation: Boolean,
     ) {
         if (typeVariable in constraint.derivedFrom) return
@@ -198,7 +198,7 @@ class ConstraintIncorporator(
         causeOfIncorporationVariable: TypeVariableMarker,
         // \alpha <: Number
         causeOfIncorporationConstraint: Constraint,
-        dependencyProvider: TypeVariableDependencyInformationProvider,
+        dependencyProvider: TypeVariableDependencyInformationProvider?,
         isCausedByFixation: Boolean,
         // \beta
         otherVariable: TypeVariableMarker,
@@ -206,6 +206,9 @@ class ConstraintIncorporator(
         otherConstraint: Constraint,
     ) {
         if (causeOfIncorporationVariable in otherConstraint.derivedFrom ||
+            // Only LV 2.5 enables analysis of upcoming equality fixation here,
+            // and makes dependencyProvider non-null
+            dependencyProvider != null &&
             // Soon the constraint will be used to fix the variable as EQUALITY constraints are the most prioritized (with a few exceptions),
             // so we can wait with the constraint incorporation to avoid constraint explosion, as described in KT-66469
             causeOfIncorporationConstraint.kind == ConstraintKind.EQUALITY &&

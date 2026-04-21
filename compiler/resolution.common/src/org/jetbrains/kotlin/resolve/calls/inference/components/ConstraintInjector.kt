@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.addToStdlib.popLast
+import org.jetbrains.kotlin.utils.addToStdlib.runIf
 import kotlin.math.max
 
 class ConstraintInjector(
@@ -177,13 +178,15 @@ class ConstraintInjector(
 
     context(c: Context, typeCheckerState: TypeCheckerStateForConstraintInjector)
     private fun processGivenConstraints(constraintsToProcess: Collection<Pair<TypeVariableMarker, Constraint>>) {
-        val dependencyProvider = TypeVariableDependencyInformationProvider(
-            c.notFixedTypeVariables,
-            postponedKtPrimitives = emptyList(),
-            topLevelType = null,
-            c,
-            languageVersionSettings,
-        )
+        val dependencyProvider = runIf(languageVersionSettings.supportsFeature(LanguageFeature.EnhancementsOfSecondIncorporationKind25)) {
+            TypeVariableDependencyInformationProvider(
+                c.notFixedTypeVariables,
+                postponedKtPrimitives = emptyList(),
+                topLevelType = null,
+                c,
+                languageVersionSettings,
+            )
+        }
         for ((typeVariable, constraint) in constraintsToProcess) {
             if (shouldWeSkipConstraint(typeVariable, constraint)) continue
 
