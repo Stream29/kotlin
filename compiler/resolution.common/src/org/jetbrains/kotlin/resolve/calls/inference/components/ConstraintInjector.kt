@@ -177,6 +177,13 @@ class ConstraintInjector(
 
     context(c: Context, typeCheckerState: TypeCheckerStateForConstraintInjector)
     private fun processGivenConstraints(constraintsToProcess: Collection<Pair<TypeVariableMarker, Constraint>>) {
+        val dependencyProvider = TypeVariableDependencyInformationProvider(
+            c.notFixedTypeVariables,
+            postponedKtPrimitives = emptyList(),
+            topLevelType = null,
+            c,
+            languageVersionSettings,
+        )
         for ((typeVariable, constraint) in constraintsToProcess) {
             if (shouldWeSkipConstraint(typeVariable, constraint)) continue
 
@@ -203,7 +210,7 @@ class ConstraintInjector(
                 constraintIncorporator.incorporate(
                     typeVariable,
                     constraintToIncorporate,
-
+                    dependencyProvider,
                     isCausedByFixation = constraint.position.initialConstraint.position is FixVariableConstraintPosition<*>
                 )
             }

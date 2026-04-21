@@ -68,14 +68,19 @@ class ConstraintIncorporator(
 
     // \alpha is typeVariable, \beta -- other type variable registered in ConstraintStorage
     context(c: Context)
-    fun incorporate(typeVariable: TypeVariableMarker, constraint: Constraint, isCausedByFixation: Boolean) {
+    fun incorporate(
+        typeVariable: TypeVariableMarker,
+        constraint: Constraint,
+        dependencyProvider: TypeVariableDependencyInformationProvider,
+        isCausedByFixation: Boolean,
+    ) {
         ProgressIndicatorAndCompilationCanceledStatus.checkCanceled()
 
         // we shouldn't incorporate recursive constraint -- It is too dangerous
         if (constraint.areThereRecursiveConstraints(typeVariable)) return
 
         directWithVariable(typeVariable, constraint)
-        insideOtherConstraint(typeVariable, constraint, isCausedByFixation)
+        insideOtherConstraint(typeVariable, constraint, dependencyProvider, isCausedByFixation)
     }
 
     context(c: Context)
@@ -160,6 +165,7 @@ class ConstraintIncorporator(
     private fun insideOtherConstraint(
         typeVariable: TypeVariableMarker,
         constraint: Constraint,
+        dependencyProvider: TypeVariableDependencyInformationProvider,
         isCausedByFixation: Boolean,
     ) {
         if (typeVariable in constraint.derivedFrom) return
@@ -173,6 +179,7 @@ class ConstraintIncorporator(
                     generateNewConstraintForSecondIncorporationKind(
                         typeVariable,
                         constraint,
+                        dependencyProvider,
                         isCausedByFixation,
                         storageForOtherVariable.typeVariable,
                         otherConstraint
@@ -191,6 +198,7 @@ class ConstraintIncorporator(
         causeOfIncorporationVariable: TypeVariableMarker,
         // \alpha <: Number
         causeOfIncorporationConstraint: Constraint,
+        dependencyProvider: TypeVariableDependencyInformationProvider,
         isCausedByFixation: Boolean,
         // \beta
         otherVariable: TypeVariableMarker,
@@ -204,7 +212,7 @@ class ConstraintIncorporator(
             // We don't want to block variable fixation at all
             !isCausedByFixation &&
             // Variable should be usable in variable fixation
-            causeOfIncorporationVariable.isConditionallyReadyForFixation()
+            causeOfIncorporationVariable.isConditionallyReadyForFixation(dependencyProvider)
         ) {
             return
         }
@@ -242,15 +250,8 @@ class ConstraintIncorporator(
     }
 
     context(c: Context)
-    private fun TypeVariableMarker.isConditionallyReadyForFixation(): Boolean {
+    private fun TypeVariableMarker.isConditionallyReadyForFixation(dependencyProvider: TypeVariableDependencyInformationProvider): Boolean {
         val readiness = with(VariableReadinessCalculator(TrivialConstraintTypeInferenceOracle.create(c), languageVersionSettings)) {
-            val dependencyProvider = TypeVariableDependencyInformationProvider(
-                c.notFixedTypeVariables,
-                postponedKtPrimitives = emptyList(),
-                topLevelType = null,
-                c,
-                languageVersionSettings,
-            )
             freshTypeConstructor().getReadiness(dependencyProvider)
         }
         return readiness[Q.ALLOWED] && readiness[Q.HAS_PROPER_CONSTRAINTS] && readiness[Q.HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY] &&
