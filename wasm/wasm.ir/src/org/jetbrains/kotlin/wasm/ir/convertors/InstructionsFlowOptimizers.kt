@@ -23,12 +23,6 @@ private fun WasmOp.isInCfgNode() = when (this) {
     else -> false
 }
 
-private fun WasmOp.isAnnotationPseudoOp() = when (this) {
-    WasmOp.PSEUDO_ANNOTATION_BRANCH_HINT,
-    WasmOp.PSEUDO_ANNOTATION_TRACE_INST,
-    WasmOp.PSEUDO_ANNOTATION_JS_CALLED -> true
-    else -> false
-}
 
 internal abstract class OptimizeFlow {
     abstract fun push(instruction: WasmInstr)
@@ -173,17 +167,15 @@ private class RemoveInstructionPriorDrop(output: OptimizeFlow) : OptimizeFlowBas
 
 private class MergeSetAndGetIntoTee(output: OptimizeFlow) : OptimizeFlowBase(output) {
     private var firstInstruction: WasmInstr? = null
-    private val pendingAnnotations = mutableListOf<WasmInstr>()
 
     override fun push(instruction: WasmInstr) {
         if (instruction.operator.opcode == WASM_OP_PSEUDO_OPCODE) {
-            if (instruction.operator.isAnnotationPseudoOp() && firstInstruction != null) {
-                // Buffer annotation to keep LOCAL_SET available for potential merge with LOCAL_GET.
-                pendingAnnotations.add(instruction)
-            } else {
-                flash()
-                output.push(instruction)
-            }
+            // If the pseudo-instruction is an annotation between
+            // LOCAL_SET and LOCAL_GET, it should prevent merging into
+            // LOCAL_TEE, so flush the buffered instruction and pass
+            // the annotation through immediately.
+            flash()
+            output.push(instruction)
             return
         }
 
@@ -209,9 +201,6 @@ private class MergeSetAndGetIntoTee(output: OptimizeFlow) : OptimizeFlowBase(out
                 } else {
                     wasmInstrWithoutLocation(WasmOp.LOCAL_TEE, firstImmediate)
                 }
-                // Emit annotations before LOCAL_TEE: they annotated LOCAL_GET, which LOCAL_TEE replaces.
-                pendingAnnotations.forEach { output.push(it) }
-                pendingAnnotations.clear()
                 output.push(tee)
                 firstInstruction = null
                 return
@@ -219,16 +208,12 @@ private class MergeSetAndGetIntoTee(output: OptimizeFlow) : OptimizeFlowBase(out
         }
 
         output.push(first)
-        pendingAnnotations.forEach { output.push(it) }
-        pendingAnnotations.clear()
         firstInstruction = instruction
     }
 
     override fun flash() {
         firstInstruction?.let { first ->
             output.push(first)
-            pendingAnnotations.forEach { output.push(it) }
-            pendingAnnotations.clear()
             firstInstruction = null
         }
     }
