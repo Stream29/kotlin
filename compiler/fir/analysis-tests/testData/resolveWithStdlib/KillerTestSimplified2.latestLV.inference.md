@@ -78,39 +78,69 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
     30. `TypeVariable(Uf) <: Tf`
 3. Combine `T1 <: TypeVariable(U1)` with `TypeVariable(U1) <: T1`
     1. `TypeVariable(U1) == T1`
-4. Combine `T2 <: TypeVariable(U2)` with `TypeVariable(U2) <: T2`
+4. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+5. Combine `T2 <: TypeVariable(U2)` with `TypeVariable(U2) <: T2`
     1. `TypeVariable(U2) == T2`
-5. Combine `T3 <: TypeVariable(U3)` with `TypeVariable(U3) <: T3`
+6. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<TypeVariable(U1), T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+7. Combine `T3 <: TypeVariable(U3)` with `TypeVariable(U3) <: T3`
     1. `TypeVariable(U3) == T3`
-6. Combine `T4 <: TypeVariable(U4)` with `TypeVariable(U4) <: T4`
+8. Combine `TypeVariable(U3) == T3` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+9. Combine `T4 <: TypeVariable(U4)` with `TypeVariable(U4) <: T4`
     1. `TypeVariable(U4) == T4`
-7. Combine `T5 <: TypeVariable(U5)` with `TypeVariable(U5) <: T5`
+10. Combine `TypeVariable(U4) == T4` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+11. Combine `T5 <: TypeVariable(U5)` with `TypeVariable(U5) <: T5`
     1. `TypeVariable(U5) == T5`
-8. Combine `T6 <: TypeVariable(U6)` with `TypeVariable(U6) <: T6`
+12. Combine `TypeVariable(U5) == T5` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+13. Combine `T6 <: TypeVariable(U6)` with `TypeVariable(U6) <: T6`
     1. `TypeVariable(U6) == T6`
-9. Combine `T7 <: TypeVariable(U7)` with `TypeVariable(U7) <: T7`
+14. Combine `TypeVariable(U6) == T6` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+15. Combine `T7 <: TypeVariable(U7)` with `TypeVariable(U7) <: T7`
     1. `TypeVariable(U7) == T7`
-10. Combine `T8 <: TypeVariable(U8)` with `TypeVariable(U8) <: T8`
+16. Combine `TypeVariable(U7) == T7` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+17. Combine `T8 <: TypeVariable(U8)` with `TypeVariable(U8) <: T8`
     1. `TypeVariable(U8) == T8`
-11. Combine `T9 <: TypeVariable(U9)` with `TypeVariable(U9) <: T9`
+18. Combine `TypeVariable(U8) == T8` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+19. Combine `T9 <: TypeVariable(U9)` with `TypeVariable(U9) <: T9`
     1. `TypeVariable(U9) == T9`
-12. Combine `Ta <: TypeVariable(Ua)` with `TypeVariable(Ua) <: Ta`
+20. Combine `TypeVariable(U9) == T9` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+21. Combine `Ta <: TypeVariable(Ua)` with `TypeVariable(Ua) <: Ta`
     1. `TypeVariable(Ua) == Ta`
-13. Combine `Tb <: TypeVariable(Ub)` with `TypeVariable(Ub) <: Tb`
+22. Combine `TypeVariable(Ua) == Ta` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+23. Combine `Tb <: TypeVariable(Ub)` with `TypeVariable(Ub) <: Tb`
     1. `TypeVariable(Ub) == Tb`
-14. Combine `Tc <: TypeVariable(Uc)` with `TypeVariable(Uc) <: Tc`
+24. Combine `TypeVariable(Ub) == Tb` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+25. Combine `Tc <: TypeVariable(Uc)` with `TypeVariable(Uc) <: Tc`
     1. `TypeVariable(Uc) == Tc`
-15. Combine `Td <: TypeVariable(Ud)` with `TypeVariable(Ud) <: Td`
+26. Combine `TypeVariable(Uc) == Tc` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+27. Combine `Td <: TypeVariable(Ud)` with `TypeVariable(Ud) <: Td`
     1. `TypeVariable(Ud) == Td`
-16. Combine `Te <: TypeVariable(Ue)` with `TypeVariable(Ue) <: Te`
+28. Combine `TypeVariable(Ud) == Td` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+29. Combine `Te <: TypeVariable(Ue)` with `TypeVariable(Ue) <: Te`
     1. `TypeVariable(Ue) == Te`
-17. Combine `Tf <: TypeVariable(Uf)` with `TypeVariable(Uf) <: Tf`
+30. Combine `TypeVariable(Ue) == Te` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+31. Combine `Tf <: TypeVariable(Uf)` with `TypeVariable(Uf) <: Tf`
     1. `TypeVariable(Uf) == Tf`
-18. `T1.(T2) -> T3 <: TypeVariable(U1).(TypeVariable(U2)) -> TypeVariable(U3)` _from SimpleConstraintSystemConstraintPosition_
-19. `T4.(T5) -> T6 <: TypeVariable(U4).(TypeVariable(U5)) -> TypeVariable(U6)` _from SimpleConstraintSystemConstraintPosition_
-20. `T7.(T8) -> T9 <: TypeVariable(U7).(TypeVariable(U8)) -> TypeVariable(U9)` _from SimpleConstraintSystemConstraintPosition_
-21. `Ta.(Tb) -> Tc <: TypeVariable(Ua).(TypeVariable(Ub)) -> TypeVariable(Uc)` _from SimpleConstraintSystemConstraintPosition_
-22. `Td.(Te) -> Tf <: TypeVariable(Ud).(TypeVariable(Ue)) -> TypeVariable(Uf)` _from SimpleConstraintSystemConstraintPosition_
+32. Combine `TypeVariable(Uf) == Tf` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+33. `T1.(T2) -> T3 <: TypeVariable(U1).(TypeVariable(U2)) -> TypeVariable(U3)` _from SimpleConstraintSystemConstraintPosition_
+34. `T4.(T5) -> T6 <: TypeVariable(U4).(TypeVariable(U5)) -> TypeVariable(U6)` _from SimpleConstraintSystemConstraintPosition_
+35. `T7.(T8) -> T9 <: TypeVariable(U7).(TypeVariable(U8)) -> TypeVariable(U9)` _from SimpleConstraintSystemConstraintPosition_
+36. `Ta.(Tb) -> Tc <: TypeVariable(Ua).(TypeVariable(Ub)) -> TypeVariable(Uc)` _from SimpleConstraintSystemConstraintPosition_
+37. `Td.(Te) -> Tf <: TypeVariable(Ud).(TypeVariable(Ue)) -> TypeVariable(Uf)` _from SimpleConstraintSystemConstraintPosition_
 
 ##### Resolution Stages > CheckLambdaAgainstTypeVariableContradiction:
 
@@ -361,50 +391,79 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
 2. `TypeVariable(U1) == T1` _from Fix variable U1_
 3. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
     1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-4. Combine `T0 <: TypeVariable(U0)` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+4. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+5. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+6. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+7. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+8. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+9. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+10. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+11. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+12. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+13. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+14. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+15. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+16. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+17. Combine `TypeVariable(U1) == T1` with `TypeVariable(U0) <: Generic<TypeVariable(U1), TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+    1. `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+18. Combine `T0 <: TypeVariable(U0)` with `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `T3 <: TypeVariable(U3)`
+    2. `TypeVariable(U3) <: T3`
+    3. `T4 <: TypeVariable(U4)`
+    4. `TypeVariable(U4) <: T4`
+    5. `T5 <: TypeVariable(U5)`
+    6. `TypeVariable(U5) <: T5`
+    7. `T6 <: TypeVariable(U6)`
+    8. `TypeVariable(U6) <: T6`
+    9. `T7 <: TypeVariable(U7)`
+    10. `TypeVariable(U7) <: T7`
+    11. `T8 <: TypeVariable(U8)`
+    12. `TypeVariable(U8) <: T8`
+    13. `T9 <: TypeVariable(U9)`
+    14. `TypeVariable(U9) <: T9`
+    15. `Ta <: TypeVariable(Ua)`
+    16. `TypeVariable(Ua) <: Ta`
+    17. `Tb <: TypeVariable(Ub)`
+    18. `TypeVariable(Ub) <: Tb`
+    19. `Tc <: TypeVariable(Uc)`
+    20. `TypeVariable(Uc) <: Tc`
+    21. `Td <: TypeVariable(Ud)`
+    22. `TypeVariable(Ud) <: Td`
+    23. `Te <: TypeVariable(Ue)`
+    24. `TypeVariable(Ue) <: Te`
+    25. `Tf <: TypeVariable(Uf)`
+    26. `TypeVariable(Uf) <: Tf`
+19. Combine `T0 <: TypeVariable(U0)` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
     1. `T2 <: TypeVariable(U2)`
     2. `TypeVariable(U2) <: T2`
-    3. `T3 <: TypeVariable(U3)`
-    4. `TypeVariable(U3) <: T3`
-    5. `T4 <: TypeVariable(U4)`
-    6. `TypeVariable(U4) <: T4`
-    7. `T5 <: TypeVariable(U5)`
-    8. `TypeVariable(U5) <: T5`
-    9. `T6 <: TypeVariable(U6)`
-    10. `TypeVariable(U6) <: T6`
-    11. `T7 <: TypeVariable(U7)`
-    12. `TypeVariable(U7) <: T7`
-    13. `T8 <: TypeVariable(U8)`
-    14. `TypeVariable(U8) <: T8`
-    15. `T9 <: TypeVariable(U9)`
-    16. `TypeVariable(U9) <: T9`
-    17. `Ta <: TypeVariable(Ua)`
-    18. `TypeVariable(Ua) <: Ta`
-    19. `Tb <: TypeVariable(Ub)`
-    20. `TypeVariable(Ub) <: Tb`
-    21. `Tc <: TypeVariable(Uc)`
-    22. `TypeVariable(Uc) <: Tc`
-    23. `Td <: TypeVariable(Ud)`
-    24. `TypeVariable(Ud) <: Td`
-    25. `Te <: TypeVariable(Ue)`
-    26. `TypeVariable(Ue) <: Te`
-    27. `Tf <: TypeVariable(Uf)`
-    28. `TypeVariable(Uf) <: Tf`
-5. Choose `TypeVariable(U2)` with `Readiness(
-   	 true ALLOWED
-   	 true HAS_PROPER_CONSTRAINTS
-   	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
-   	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
-   	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
-   	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
-   	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
-   	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
-   	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
-   	 true HAS_PROPER_NON_ILT_CONSTRAINT
-   	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
-   	 true HAS_PROPER_EQUALITY_CONSTRAINT
-   	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
-   )`
+20. Choose `TypeVariable(U2)` with `Readiness(
+    	 true ALLOWED
+    	 true HAS_PROPER_CONSTRAINTS
+    	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
+    	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
+    	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
+    	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
+    	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
+    	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
+    	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
+    	 true HAS_PROPER_NON_ILT_CONSTRAINT
+    	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
+    	 true HAS_PROPER_EQUALITY_CONSTRAINT
+    	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
+    )`
     1. `TypeVariable(U0)` is `Readiness(
        	 true ALLOWED
        	 true HAS_PROPER_CONSTRAINTS
@@ -615,24 +674,48 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
         	 true HAS_PROPER_EQUALITY_CONSTRAINT
         	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
         )`
-6. `TypeVariable(U2) == T2` _from Fix variable U2_
-7. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-    1. `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-8. Choose `TypeVariable(U3)` with `Readiness(
-   	 true ALLOWED
-   	 true HAS_PROPER_CONSTRAINTS
-   	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
-   	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
-   	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
-   	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
-   	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
-   	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
-   	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
-   	 true HAS_PROPER_NON_ILT_CONSTRAINT
-   	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
-   	 true HAS_PROPER_EQUALITY_CONSTRAINT
-   	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
-   )`
+21. `TypeVariable(U2) == T2` _from Fix variable U2_
+22. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+23. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+24. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+25. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+26. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+27. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+28. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+29. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+30. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+31. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+32. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+33. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+34. Combine `TypeVariable(U2) == T2` with `TypeVariable(U0) <: Generic<T1, TypeVariable(U2), TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+35. Choose `TypeVariable(U3)` with `Readiness(
+    	 true ALLOWED
+    	 true HAS_PROPER_CONSTRAINTS
+    	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
+    	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
+    	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
+    	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
+    	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
+    	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
+    	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
+    	 true HAS_PROPER_NON_ILT_CONSTRAINT
+    	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
+    	 true HAS_PROPER_EQUALITY_CONSTRAINT
+    	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
+    )`
     1. `TypeVariable(U0)` is `Readiness(
        	 true ALLOWED
        	 true HAS_PROPER_CONSTRAINTS
@@ -828,10 +911,32 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
         	 true HAS_PROPER_EQUALITY_CONSTRAINT
         	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
         )`
-9. `TypeVariable(U3) == T3` _from Fix variable U3_
-10. Combine `TypeVariable(U3) == T3` with `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-    1. `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-11. Choose `TypeVariable(U4)` with `Readiness(
+36. `TypeVariable(U3) == T3` _from Fix variable U3_
+37. Combine `TypeVariable(U3) == T3` with `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+38. Combine `TypeVariable(U3) == T3` with `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+39. Combine `TypeVariable(U3) == T3` with `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+40. Combine `TypeVariable(U3) == T3` with `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+41. Combine `TypeVariable(U3) == T3` with `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+42. Combine `TypeVariable(U3) == T3` with `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+43. Combine `TypeVariable(U3) == T3` with `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+44. Combine `TypeVariable(U3) == T3` with `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+45. Combine `TypeVariable(U3) == T3` with `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+46. Combine `TypeVariable(U3) == T3` with `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+47. Combine `TypeVariable(U3) == T3` with `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+48. Combine `TypeVariable(U3) == T3` with `TypeVariable(U0) <: Generic<T1, T2, TypeVariable(U3), TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+49. Choose `TypeVariable(U4)` with `Readiness(
     	 true ALLOWED
     	 true HAS_PROPER_CONSTRAINTS
     	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
@@ -1026,10 +1131,30 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
         	 true HAS_PROPER_EQUALITY_CONSTRAINT
         	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
         )`
-12. `TypeVariable(U4) == T4` _from Fix variable U4_
-13. Combine `TypeVariable(U4) == T4` with `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-14. Choose `TypeVariable(U5)` with `Readiness(
+50. `TypeVariable(U4) == T4` _from Fix variable U4_
+51. Combine `TypeVariable(U4) == T4` with `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+52. Combine `TypeVariable(U4) == T4` with `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+53. Combine `TypeVariable(U4) == T4` with `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+54. Combine `TypeVariable(U4) == T4` with `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+55. Combine `TypeVariable(U4) == T4` with `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+56. Combine `TypeVariable(U4) == T4` with `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+57. Combine `TypeVariable(U4) == T4` with `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+58. Combine `TypeVariable(U4) == T4` with `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+59. Combine `TypeVariable(U4) == T4` with `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+60. Combine `TypeVariable(U4) == T4` with `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+61. Combine `TypeVariable(U4) == T4` with `TypeVariable(U0) <: Generic<T1, T2, T3, TypeVariable(U4), TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+62. Choose `TypeVariable(U5)` with `Readiness(
     	 true ALLOWED
     	 true HAS_PROPER_CONSTRAINTS
     	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
@@ -1209,10 +1334,28 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
         	 true HAS_PROPER_EQUALITY_CONSTRAINT
         	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
         )`
-15. `TypeVariable(U5) == T5` _from Fix variable U5_
-16. Combine `TypeVariable(U5) == T5` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-17. Choose `TypeVariable(U6)` with `Readiness(
+63. `TypeVariable(U5) == T5` _from Fix variable U5_
+64. Combine `TypeVariable(U5) == T5` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+65. Combine `TypeVariable(U5) == T5` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+66. Combine `TypeVariable(U5) == T5` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+67. Combine `TypeVariable(U5) == T5` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+68. Combine `TypeVariable(U5) == T5` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+69. Combine `TypeVariable(U5) == T5` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+70. Combine `TypeVariable(U5) == T5` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+71. Combine `TypeVariable(U5) == T5` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+72. Combine `TypeVariable(U5) == T5` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+73. Combine `TypeVariable(U5) == T5` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, TypeVariable(U5), TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+74. Choose `TypeVariable(U6)` with `Readiness(
     	 true ALLOWED
     	 true HAS_PROPER_CONSTRAINTS
     	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
@@ -1377,10 +1520,26 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
         	 true HAS_PROPER_EQUALITY_CONSTRAINT
         	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
         )`
-18. `TypeVariable(U6) == T6` _from Fix variable U6_
-19. Combine `TypeVariable(U6) == T6` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-20. Choose `TypeVariable(U7)` with `Readiness(
+75. `TypeVariable(U6) == T6` _from Fix variable U6_
+76. Combine `TypeVariable(U6) == T6` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+77. Combine `TypeVariable(U6) == T6` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+78. Combine `TypeVariable(U6) == T6` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+79. Combine `TypeVariable(U6) == T6` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+80. Combine `TypeVariable(U6) == T6` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+81. Combine `TypeVariable(U6) == T6` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+82. Combine `TypeVariable(U6) == T6` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+83. Combine `TypeVariable(U6) == T6` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+84. Combine `TypeVariable(U6) == T6` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, TypeVariable(U6), TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+85. Choose `TypeVariable(U7)` with `Readiness(
     	 true ALLOWED
     	 true HAS_PROPER_CONSTRAINTS
     	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
@@ -1530,10 +1689,24 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
        	 true HAS_PROPER_EQUALITY_CONSTRAINT
        	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
        )`
-21. `TypeVariable(U7) == T7` _from Fix variable U7_
-22. Combine `TypeVariable(U7) == T7` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-23. Choose `TypeVariable(U8)` with `Readiness(
+86. `TypeVariable(U7) == T7` _from Fix variable U7_
+87. Combine `TypeVariable(U7) == T7` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+88. Combine `TypeVariable(U7) == T7` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+89. Combine `TypeVariable(U7) == T7` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+90. Combine `TypeVariable(U7) == T7` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+91. Combine `TypeVariable(U7) == T7` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+92. Combine `TypeVariable(U7) == T7` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+93. Combine `TypeVariable(U7) == T7` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+94. Combine `TypeVariable(U7) == T7` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, TypeVariable(U7), TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+95. Choose `TypeVariable(U8)` with `Readiness(
     	 true ALLOWED
     	 true HAS_PROPER_CONSTRAINTS
     	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
@@ -1668,24 +1841,36 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
        	 true HAS_PROPER_EQUALITY_CONSTRAINT
        	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
        )`
-24. `TypeVariable(U8) == T8` _from Fix variable U8_
-25. Combine `TypeVariable(U8) == T8` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-26. Choose `TypeVariable(U9)` with `Readiness(
-    	 true ALLOWED
-    	 true HAS_PROPER_CONSTRAINTS
-    	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
-    	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
-    	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
-    	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
-    	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
-    	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
-    	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
-    	 true HAS_PROPER_NON_ILT_CONSTRAINT
-    	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
-    	 true HAS_PROPER_EQUALITY_CONSTRAINT
-    	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
-    )`
+96. `TypeVariable(U8) == T8` _from Fix variable U8_
+97. Combine `TypeVariable(U8) == T8` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+98. Combine `TypeVariable(U8) == T8` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+99. Combine `TypeVariable(U8) == T8` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+100. Combine `TypeVariable(U8) == T8` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+101. Combine `TypeVariable(U8) == T8` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+102. Combine `TypeVariable(U8) == T8` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+103. Combine `TypeVariable(U8) == T8` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, TypeVariable(U8), TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+104. Choose `TypeVariable(U9)` with `Readiness(
+     	 true ALLOWED
+     	 true HAS_PROPER_CONSTRAINTS
+     	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
+     	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
+     	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
+     	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
+     	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
+     	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
+     	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
+     	 true HAS_PROPER_NON_ILT_CONSTRAINT
+     	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
+     	 true HAS_PROPER_EQUALITY_CONSTRAINT
+     	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
+     )`
     1. `TypeVariable(U0)` is `Readiness(
        	 true ALLOWED
        	 true HAS_PROPER_CONSTRAINTS
@@ -1791,24 +1976,34 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
        	 true HAS_PROPER_EQUALITY_CONSTRAINT
        	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
        )`
-27. `TypeVariable(U9) == T9` _from Fix variable U9_
-28. Combine `TypeVariable(U9) == T9` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-29. Choose `TypeVariable(Ua)` with `Readiness(
-    	 true ALLOWED
-    	 true HAS_PROPER_CONSTRAINTS
-    	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
-    	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
-    	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
-    	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
-    	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
-    	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
-    	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
-    	 true HAS_PROPER_NON_ILT_CONSTRAINT
-    	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
-    	 true HAS_PROPER_EQUALITY_CONSTRAINT
-    	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
-    )`
+105. `TypeVariable(U9) == T9` _from Fix variable U9_
+106. Combine `TypeVariable(U9) == T9` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+107. Combine `TypeVariable(U9) == T9` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+108. Combine `TypeVariable(U9) == T9` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+109. Combine `TypeVariable(U9) == T9` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+110. Combine `TypeVariable(U9) == T9` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+111. Combine `TypeVariable(U9) == T9` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, TypeVariable(U9), TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+112. Choose `TypeVariable(Ua)` with `Readiness(
+     	 true ALLOWED
+     	 true HAS_PROPER_CONSTRAINTS
+     	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
+     	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
+     	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
+     	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
+     	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
+     	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
+     	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
+     	 true HAS_PROPER_NON_ILT_CONSTRAINT
+     	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
+     	 true HAS_PROPER_EQUALITY_CONSTRAINT
+     	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
+     )`
     1. `TypeVariable(U0)` is `Readiness(
        	 true ALLOWED
        	 true HAS_PROPER_CONSTRAINTS
@@ -1899,24 +2094,32 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
        	 true HAS_PROPER_EQUALITY_CONSTRAINT
        	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
        )`
-30. `TypeVariable(Ua) == Ta` _from Fix variable Ua_
-31. Combine `TypeVariable(Ua) == Ta` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-32. Choose `TypeVariable(Ub)` with `Readiness(
-    	 true ALLOWED
-    	 true HAS_PROPER_CONSTRAINTS
-    	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
-    	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
-    	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
-    	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
-    	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
-    	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
-    	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
-    	 true HAS_PROPER_NON_ILT_CONSTRAINT
-    	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
-    	 true HAS_PROPER_EQUALITY_CONSTRAINT
-    	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
-    )`
+113. `TypeVariable(Ua) == Ta` _from Fix variable Ua_
+114. Combine `TypeVariable(Ua) == Ta` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, TypeVariable(Ua), Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+115. Combine `TypeVariable(Ua) == Ta` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, TypeVariable(Ua), TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+116. Combine `TypeVariable(Ua) == Ta` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+117. Combine `TypeVariable(Ua) == Ta` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+118. Combine `TypeVariable(Ua) == Ta` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, TypeVariable(Ua), TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+119. Choose `TypeVariable(Ub)` with `Readiness(
+     	 true ALLOWED
+     	 true HAS_PROPER_CONSTRAINTS
+     	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
+     	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
+     	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
+     	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
+     	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
+     	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
+     	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
+     	 true HAS_PROPER_NON_ILT_CONSTRAINT
+     	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
+     	 true HAS_PROPER_EQUALITY_CONSTRAINT
+     	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
+     )`
     1. `TypeVariable(U0)` is `Readiness(
        	 true ALLOWED
        	 true HAS_PROPER_CONSTRAINTS
@@ -1992,24 +2195,30 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
        	 true HAS_PROPER_EQUALITY_CONSTRAINT
        	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
        )`
-33. `TypeVariable(Ub) == Tb` _from Fix variable Ub_
-34. Combine `TypeVariable(Ub) == Tb` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-35. Choose `TypeVariable(Uc)` with `Readiness(
-    	 true ALLOWED
-    	 true HAS_PROPER_CONSTRAINTS
-    	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
-    	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
-    	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
-    	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
-    	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
-    	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
-    	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
-    	 true HAS_PROPER_NON_ILT_CONSTRAINT
-    	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
-    	 true HAS_PROPER_EQUALITY_CONSTRAINT
-    	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
-    )`
+120. `TypeVariable(Ub) == Tb` _from Fix variable Ub_
+121. Combine `TypeVariable(Ub) == Tb` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, TypeVariable(Ub), Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
+122. Combine `TypeVariable(Ub) == Tb` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, TypeVariable(Ub), TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+123. Combine `TypeVariable(Ub) == Tb` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+124. Combine `TypeVariable(Ub) == Tb` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, TypeVariable(Ub), TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+125. Choose `TypeVariable(Uc)` with `Readiness(
+     	 true ALLOWED
+     	 true HAS_PROPER_CONSTRAINTS
+     	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
+     	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
+     	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
+     	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
+     	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
+     	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
+     	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
+     	 true HAS_PROPER_NON_ILT_CONSTRAINT
+     	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
+     	 true HAS_PROPER_EQUALITY_CONSTRAINT
+     	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
+     )`
     1. `TypeVariable(U0)` is `Readiness(
        	 true ALLOWED
        	 true HAS_PROPER_CONSTRAINTS
@@ -2070,24 +2279,28 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
        	 true HAS_PROPER_EQUALITY_CONSTRAINT
        	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
        )`
-36. `TypeVariable(Uc) == Tc` _from Fix variable Uc_
-37. Combine `TypeVariable(Uc) == Tc` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-38. Choose `TypeVariable(Ud)` with `Readiness(
-    	 true ALLOWED
-    	 true HAS_PROPER_CONSTRAINTS
-    	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
-    	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
-    	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
-    	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
-    	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
-    	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
-    	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
-    	 true HAS_PROPER_NON_ILT_CONSTRAINT
-    	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
-    	 true HAS_PROPER_EQUALITY_CONSTRAINT
-    	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
-    )`
+126. `TypeVariable(Uc) == Tc` _from Fix variable Uc_
+127. Combine `TypeVariable(Uc) == Tc` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, TypeVariable(Uc), Td, TypeVariable(Ue), TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, Td, TypeVariable(Ue), TypeVariable(Uf)>`
+128. Combine `TypeVariable(Uc) == Tc` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, TypeVariable(Uc), TypeVariable(Ud), Te, TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, TypeVariable(Ud), Te, TypeVariable(Uf)>`
+129. Combine `TypeVariable(Uc) == Tc` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, TypeVariable(Uc), TypeVariable(Ud), TypeVariable(Ue), Tf>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, TypeVariable(Ud), TypeVariable(Ue), Tf>`
+130. Choose `TypeVariable(Ud)` with `Readiness(
+     	 true ALLOWED
+     	 true HAS_PROPER_CONSTRAINTS
+     	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
+     	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
+     	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
+     	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
+     	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
+     	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
+     	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
+     	 true HAS_PROPER_NON_ILT_CONSTRAINT
+     	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
+     	 true HAS_PROPER_EQUALITY_CONSTRAINT
+     	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
+     )`
     1. `TypeVariable(U0)` is `Readiness(
        	 true ALLOWED
        	 true HAS_PROPER_CONSTRAINTS
@@ -2133,24 +2346,26 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
        	 true HAS_PROPER_EQUALITY_CONSTRAINT
        	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
        )`
-39. `TypeVariable(Ud) == Td` _from Fix variable Ud_
-40. Combine `TypeVariable(Ud) == Td` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, TypeVariable(Ud), TypeVariable(Ue), TypeVariable(Uf)>`
-    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, Td, TypeVariable(Ue), TypeVariable(Uf)>`
-41. Choose `TypeVariable(Ue)` with `Readiness(
-    	 true ALLOWED
-    	 true HAS_PROPER_CONSTRAINTS
-    	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
-    	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
-    	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
-    	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
-    	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
-    	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
-    	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
-    	 true HAS_PROPER_NON_ILT_CONSTRAINT
-    	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
-    	 true HAS_PROPER_EQUALITY_CONSTRAINT
-    	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
-    )`
+131. `TypeVariable(Ud) == Td` _from Fix variable Ud_
+132. Combine `TypeVariable(Ud) == Td` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, TypeVariable(Ud), Te, TypeVariable(Uf)>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, Td, Te, TypeVariable(Uf)>`
+133. Combine `TypeVariable(Ud) == Td` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, TypeVariable(Ud), TypeVariable(Ue), Tf>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, Td, TypeVariable(Ue), Tf>`
+134. Choose `TypeVariable(Ue)` with `Readiness(
+     	 true ALLOWED
+     	 true HAS_PROPER_CONSTRAINTS
+     	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
+     	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
+     	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
+     	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
+     	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
+     	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
+     	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
+     	 true HAS_PROPER_NON_ILT_CONSTRAINT
+     	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
+     	 true HAS_PROPER_EQUALITY_CONSTRAINT
+     	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
+     )`
     1. `TypeVariable(U0)` is `Readiness(
        	 true ALLOWED
        	 true HAS_PROPER_CONSTRAINTS
@@ -2181,24 +2396,24 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
        	 true HAS_PROPER_EQUALITY_CONSTRAINT
        	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
        )`
-42. `TypeVariable(Ue) == Te` _from Fix variable Ue_
-43. Combine `TypeVariable(Ue) == Te` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, Td, TypeVariable(Ue), TypeVariable(Uf)>`
-    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, Td, Te, TypeVariable(Uf)>`
-44. Choose `TypeVariable(Uf)` with `Readiness(
-    	 true ALLOWED
-    	 true HAS_PROPER_CONSTRAINTS
-    	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
-    	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
-    	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
-    	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
-    	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
-    	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
-    	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
-    	 true HAS_PROPER_NON_ILT_CONSTRAINT
-    	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
-    	 true HAS_PROPER_EQUALITY_CONSTRAINT
-    	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
-    )`
+135. `TypeVariable(Ue) == Te` _from Fix variable Ue_
+136. Combine `TypeVariable(Ue) == Te` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, Td, TypeVariable(Ue), Tf>`
+    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, Td, Te, Tf>`
+137. Choose `TypeVariable(Uf)` with `Readiness(
+     	 true ALLOWED
+     	 true HAS_PROPER_CONSTRAINTS
+     	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
+     	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
+     	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
+     	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
+     	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
+     	false HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
+     	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
+     	 true HAS_PROPER_NON_ILT_CONSTRAINT
+     	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
+     	 true HAS_PROPER_EQUALITY_CONSTRAINT
+     	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
+     )`
     1. `TypeVariable(U0)` is `Readiness(
        	 true ALLOWED
        	 true HAS_PROPER_CONSTRAINTS
@@ -2214,25 +2429,23 @@ bar#(R|<local>/generic|, R|<local>/first|, R|<local>/second|, R|<local>/third|, 
        	false HAS_PROPER_EQUALITY_CONSTRAINT
        	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
        )`
-45. `TypeVariable(Uf) == Tf` _from Fix variable Uf_
-46. Combine `TypeVariable(Uf) == Tf` with `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, Td, Te, TypeVariable(Uf)>`
-    1. `TypeVariable(U0) <: Generic<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ta, Tb, Tc, Td, Te, Tf>`
-47. Choose `TypeVariable(U0)` with `Readiness(
-    	 true ALLOWED
-    	 true HAS_PROPER_CONSTRAINTS
-    	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
-    	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
-    	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
-    	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
-    	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
-    	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
-    	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
-    	 true HAS_PROPER_NON_ILT_CONSTRAINT
-    	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
-    	false HAS_PROPER_EQUALITY_CONSTRAINT
-    	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
-    )`
-48. `TypeVariable(U0) == T0` _from Fix variable U0_
+138. `TypeVariable(Uf) == Tf` _from Fix variable Uf_
+139. Choose `TypeVariable(U0)` with `Readiness(
+     	 true ALLOWED
+     	 true HAS_PROPER_CONSTRAINTS
+     	 true HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY
+     	false HAS_CAPTURED_UPPER_BOUND_WITH_SELF_TYPES
+     	 true HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT
+     	 true HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES
+     	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS
+     	 true HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND
+     	false HAS_PROPER_FLEXIBLE_LOWER_CONSTRAINT
+     	 true HAS_PROPER_NON_ILT_CONSTRAINT
+     	 true HAS_NO_EXPLICIT_LOWER_NOTHING_CONSTRAINT
+     	false HAS_PROPER_EQUALITY_CONSTRAINT
+     	 true HAS_PROPER_NON_NOTHING_NON_UPPER_CONSTRAINT
+     )`
+140. `TypeVariable(U0) == T0` _from Fix variable U0_
 
 ### Call 2
 

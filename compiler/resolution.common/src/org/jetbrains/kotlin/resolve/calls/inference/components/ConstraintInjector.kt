@@ -39,13 +39,13 @@ class ConstraintInjector(
     private val useMaxTypeDepthFromInitialConstraints: Boolean =
         !languageVersionSettings.supportsFeature(LanguageFeature.DisableMaxTypeDepthFromInitialConstraints)
 
-    interface Context : TypeSystemInferenceExtensionContext, ConstraintSystemMarker {
-        val allTypeVariables: Map<TypeConstructorMarker, TypeVariableMarker>
+    interface Context : TypeSystemInferenceExtensionContext, ConstraintSystemMarker, VariableFixationFinder.Context {
+        override val allTypeVariables: Map<TypeConstructorMarker, TypeVariableMarker>
 
         var maxTypeDepthFromInitialConstraints: Int
-        val notFixedTypeVariables: MutableMap<TypeConstructorMarker, MutableVariableWithConstraints>
-        val fixedTypeVariables: MutableMap<TypeConstructorMarker, KotlinTypeMarker>
-        val constraintsFromAllForkPoints: MutableList<Pair<IncorporationConstraintPosition, ForkPointData>>
+        override val notFixedTypeVariables: MutableMap<TypeConstructorMarker, MutableVariableWithConstraints>
+        override val fixedTypeVariables: MutableMap<TypeConstructorMarker, KotlinTypeMarker>
+        override val constraintsFromAllForkPoints: MutableList<Pair<IncorporationConstraintPosition, ForkPointData>>
 
         /**
          * @see org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintStorage.typeVariableDependencies
@@ -576,6 +576,20 @@ class ConstraintInjector(
             get() = c.notFixedTypeVariables.values
         override val notFixedTypeVariables: Map<TypeConstructorMarker, VariableWithConstraints>
             get() = c.notFixedTypeVariables
+        override val fixedTypeVariables: Map<TypeConstructorMarker, KotlinTypeMarker>
+            get() = c.fixedTypeVariables
+        override val postponedTypeVariables: List<TypeVariableMarker>
+            get() = c.postponedTypeVariables
+        override val constraintsFromAllForkPoints: MutableList<Pair<IncorporationConstraintPosition, ForkPointData>>
+            get() = c.constraintsFromAllForkPoints
+        override val allTypeVariables: Map<TypeConstructorMarker, TypeVariableMarker>
+            get() = c.allTypeVariables
+        override val outerSystemVariablesPrefixSize: Int
+            get() = c.outerSystemVariablesPrefixSize
+        override val typeVariablesThatAreCountedAsProperTypes: Set<TypeConstructorMarker>?
+            get() = c.typeVariablesThatAreCountedAsProperTypes
+
+        override fun isReified(variable: TypeVariableMarker): Boolean = c.isReified(variable)
 
         override val approximatorCaches: TypeApproximatorCachesPerConfiguration
             get() = c.approximatorCaches

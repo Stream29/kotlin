@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.builtins.functions.AllowedToUsedOnlyInK1
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStatus
+import org.jetbrains.kotlin.resolve.calls.inference.components.VariableReadinessCalculator.TypeVariableFixationReadinessQuality as Q
 import org.jetbrains.kotlin.resolve.calls.inference.model.*
 import org.jetbrains.kotlin.types.AbstractTypeApproximator
 import org.jetbrains.kotlin.types.TypeApproximatorCachesPerConfiguration
@@ -33,9 +34,9 @@ class ConstraintIncorporator(
     @OptIn(AllowedToUsedOnlyInK1::class)
     val inferenceLogger = inferenceLoggerParameter.takeIf { it !is InferenceLogger.Dummy }
 
-    interface Context : TypeSystemInferenceExtensionContext {
+    interface Context : TypeSystemInferenceExtensionContext, VariableFixationFinder.Context {
         val allTypeVariablesWithConstraints: Collection<VariableWithConstraints>
-        val notFixedTypeVariables: Map<TypeConstructorMarker, VariableWithConstraints>
+        override val notFixedTypeVariables: Map<TypeConstructorMarker, VariableWithConstraints>
 
         fun getVariablesWithConstraintsContainingGivenTypeVariable(
             variableConstructorMarker: TypeConstructorMarker,
@@ -202,10 +203,8 @@ class ConstraintIncorporator(
             causeOfIncorporationConstraint.kind == ConstraintKind.EQUALITY &&
             // We don't want to block variable fixation at all
             !isCausedByFixation &&
-            // To be used in variable fixation, the constraint must have a proper type
-            causeOfIncorporationConstraint.type.isProperTypeForFixation(c.notFixedTypeVariables.keys) { t ->
-                !t.contains { c.notFixedTypeVariables.containsKey(it.typeConstructor()) }
-            }
+            // Variable should be usable in variable fixation
+            causeOfIncorporationVariable.isConditionallyReadyForFixation()
         ) {
             return
         }
@@ -240,6 +239,24 @@ class ConstraintIncorporator(
                 isSubtype = true
             )
         }
+    }
+
+    context(c: Context)
+    private fun TypeVariableMarker.isConditionallyReadyForFixation(): Boolean {
+        val readiness = with(VariableReadinessCalculator(TrivialConstraintTypeInferenceOracle.create(c), languageVersionSettings)) {
+            val dependencyProvider = TypeVariableDependencyInformationProvider(
+                c.notFixedTypeVariables,
+                postponedKtPrimitives = emptyList(),
+                topLevelType = null,
+                c,
+                languageVersionSettings,
+            )
+            freshTypeConstructor().getReadiness(dependencyProvider)
+        }
+        return readiness[Q.ALLOWED] && readiness[Q.HAS_PROPER_CONSTRAINTS] && readiness[Q.HAS_NO_OUTER_TYPE_VARIABLE_DEPENDENCY] &&
+                readiness[Q.HAS_PROPER_NON_SELF_TYPE_BASED_CONSTRAINT] && readiness[Q.HAS_NO_DEPENDENCIES_TO_OTHER_VARIABLES] &&
+                readiness[Q.HAS_PROPER_NON_TRIVIAL_CONSTRAINTS] &&
+                readiness[Q.HAS_PROPER_NON_TRIVIAL_CONSTRAINTS_OTHER_THAN_INCORPORATED_FROM_DECLARED_UPPER_BOUND]
     }
 
     /**
