@@ -200,7 +200,12 @@ class ConstraintInjector(
             }
 
             if (constraintToIncorporate != null) {
-                constraintIncorporator.incorporate(typeVariable, constraintToIncorporate, constraint)
+                constraintIncorporator.incorporate(
+                    typeVariable,
+                    constraintToIncorporate,
+
+                    isCausedByFixation = constraint.position.initialConstraint.position is FixVariableConstraintPosition<*>
+                )
             }
         }
     }

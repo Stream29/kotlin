@@ -67,14 +67,14 @@ class ConstraintIncorporator(
 
     // \alpha is typeVariable, \beta -- other type variable registered in ConstraintStorage
     context(c: Context)
-    fun incorporate(typeVariable: TypeVariableMarker, constraint: Constraint, originalConstraint: Constraint) {
+    fun incorporate(typeVariable: TypeVariableMarker, constraint: Constraint, isCausedByFixation: Boolean) {
         ProgressIndicatorAndCompilationCanceledStatus.checkCanceled()
 
         // we shouldn't incorporate recursive constraint -- It is too dangerous
         if (constraint.areThereRecursiveConstraints(typeVariable)) return
 
         directWithVariable(typeVariable, constraint)
-        insideOtherConstraint(typeVariable, constraint, originalConstraint)
+        insideOtherConstraint(typeVariable, constraint, isCausedByFixation)
     }
 
     context(c: Context)
@@ -159,7 +159,7 @@ class ConstraintIncorporator(
     private fun insideOtherConstraint(
         typeVariable: TypeVariableMarker,
         constraint: Constraint,
-        originalConstraint: Constraint,
+        isCausedByFixation: Boolean,
     ) {
         if (typeVariable in constraint.derivedFrom) return
         val freshTypeConstructor = typeVariable.freshTypeConstructor()
@@ -172,7 +172,7 @@ class ConstraintIncorporator(
                     generateNewConstraintForSecondIncorporationKind(
                         typeVariable,
                         constraint,
-                        originalConstraint,
+                        isCausedByFixation,
                         storageForOtherVariable.typeVariable,
                         otherConstraint
                     )
@@ -190,7 +190,7 @@ class ConstraintIncorporator(
         causeOfIncorporationVariable: TypeVariableMarker,
         // \alpha <: Number
         causeOfIncorporationConstraint: Constraint,
-        originalConstraint: Constraint,
+        isCausedByFixation: Boolean,
         // \beta
         otherVariable: TypeVariableMarker,
         // \beta <: Inv<\alpha>
@@ -201,7 +201,7 @@ class ConstraintIncorporator(
             // so we can wait with the constraint incorporation to avoid constraint explosion, as described in KT-66469
             causeOfIncorporationConstraint.kind == ConstraintKind.EQUALITY &&
             // We don't want to block variable fixation at all
-            originalConstraint.position.initialConstraint.position !is FixVariableConstraintPosition<*> &&
+            !isCausedByFixation &&
             // To be used in variable fixation, the constraint must have a proper type
             causeOfIncorporationConstraint.type.isProperTypeForFixation(c.notFixedTypeVariables.keys) { t ->
                 !t.contains { c.notFixedTypeVariables.containsKey(it.typeConstructor()) }
