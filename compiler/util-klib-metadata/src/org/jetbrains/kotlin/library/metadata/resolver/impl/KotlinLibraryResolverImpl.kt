@@ -209,6 +209,9 @@ class KotlinLibraryResolverResultImpl(
     override fun filterRoots(predicate: (KotlinResolvedLibrary) -> Boolean) =
         KotlinLibraryResolverResultImpl(roots.filter(predicate))
 
+    /**
+     * Returns the list of libraries in reverse topological order.
+     */
     override fun getFullList(): List<KotlinLibrary> = all.map { it.library }
 
     override fun forEach(action: (KotlinLibrary) -> Unit) {
