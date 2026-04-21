@@ -59,7 +59,3 @@ internal val implementedAsIntrinsic: Nothing
 @Target(AnnotationTarget.CONSTRUCTOR)
 @Retention(AnnotationRetention.BINARY)
 internal annotation class WasmPrimitiveConstructor
-
-public fun likely(cond: Boolean): Boolean = cond
-
-public fun unlikely(cond: Boolean): Boolean = cond

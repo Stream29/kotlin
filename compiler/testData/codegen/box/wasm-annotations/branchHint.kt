@@ -1,5 +1,8 @@
 // TARGET_BACKEND: WASM
 // RUN_THIRD_PARTY_OPTIMIZER
+// DISABLE_IR_VISIBILITY_CHECKS: ANY
+
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
 import kotlin.random.Random
 import kotlin.wasm.internal.*
