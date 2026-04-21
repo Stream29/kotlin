@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.gradle.testbase.*
 class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
 
     @GradleAndroidTest
-    fun `test - explicit API - warning builds with implicit declarations`(
+    fun `test - warning - warns with implicit declarations`(
         gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
     ) {
         project(
@@ -60,12 +60,14 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
             build(":compileKotlinMetadata", ":compileAndroidMain") {
                 assertTasksExecuted(":compileAndroidMain")
                 assertCompilerArgument(":compileAndroidMain", "-Xexplicit-api=warning", LogLevel.INFO)
+                assertOutputContains("Visibility must be specified in explicit API mode")
+                assertOutputContains("Return type must be specified in explicit API mode")
             }
         }
     }
 
     @GradleAndroidTest
-    fun `test - explicit API - strict fails with implicit declarations`(
+    fun `test - strict - fails with implicit declarations`(
         gradleVersion: GradleVersion,
         androidVersion: String,
         jdkVersion: JdkVersions.ProvidedJdk,
@@ -108,7 +110,7 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
                     """.trimIndent()
                 )
             }
-            buildAndFail(":compileKotlinMetadata", ":compileAndroidMain") {
+            buildAndFail(":compileCommonMainKotlinMetadata", ":compileAndroidMain") {
                 assertCompilerArgument(":compileAndroidMain", "-Xexplicit-api=strict", LogLevel.INFO)
                 assertOutputContains("Visibility must be specified in explicit API mode")
                 assertOutputContains("Return type must be specified in explicit API mode")
@@ -117,7 +119,7 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
     }
 
     @GradleAndroidTest
-    fun `test - explicit API disabled - implicit declarations build`(
+    fun `test - disabled - builds with implicit declarations`(
         gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
     ) {
         project(
@@ -140,15 +142,6 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
                 }
             }
             buildScriptInjection {
-                val commonMain = kotlinMultiplatform.sourceSets.getByName("commonMain")
-                commonMain.compileSource(
-                    """
-                    object CommonMain {
-                        val greeting = "Hello"
-                        fun greet(name: String) = "${'$'}greeting, ${'$'}name"
-                    }
-                    """.trimIndent()
-                )
                 val androidMain = kotlinMultiplatform.sourceSets.getByName("androidMain")
                 androidMain.compileSource(
                     """
@@ -169,7 +162,7 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
     }
 
     @GradleAndroidTest
-    fun `test - explicit API - strict - androidMain missing explicit types fails`(
+    fun `test - strict - fails with androidMain missing explicit types`(
         gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
     ) {
         project(
@@ -223,7 +216,7 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
     }
 
     @GradleAndroidTest
-    fun `test - explicit API - strict - commonMain missing explicit types fails`(
+    fun `test - strict - fails with commonMain missing explicit types`(
         gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
     ) {
         project(
@@ -265,7 +258,7 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
                     """.trimIndent()
                 )
             }
-            buildAndFail(":compileKotlinMetadata", ":compileAndroidMain") {
+            buildAndFail(":compileCommonMainKotlinMetadata", ":compileAndroidMain") {
                 assertCompilerArgument(":compileAndroidMain", "-Xexplicit-api=strict", LogLevel.INFO)
                 assertOutputContains("Return type must be specified in explicit API mode")
             }
@@ -273,7 +266,7 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
     }
 
     @GradleAndroidTest
-    fun `test - explicit API - positive warning builds`(
+    fun `test - warning - builds without warnings - positive case`(
         gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
     ) {
         project(
@@ -317,12 +310,14 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
             build(":compileKotlinMetadata", ":compileAndroidMain") {
                 assertTasksExecuted(":compileAndroidMain")
                 assertCompilerArgument(":compileAndroidMain", "-Xexplicit-api=warning", LogLevel.INFO)
+                assertOutputDoesNotContain("Visibility must be specified in explicit API mode")
+                assertOutputDoesNotContain("Return type must be specified in explicit API mode")
             }
         }
     }
 
     @GradleAndroidTest
-    fun `test - explicit API - positive strict builds`(
+    fun `test - strict - builds - positive case`(
         gradleVersion: GradleVersion, androidVersion: String, jdkVersion: JdkVersions.ProvidedJdk,
     ) {
         project(
@@ -366,6 +361,8 @@ class ExplicitApiExternalAndroidTargetIT : KGPBaseTest() {
             build(":compileKotlinMetadata", ":compileAndroidMain") {
                 assertTasksExecuted(":compileAndroidMain")
                 assertCompilerArgument(":compileAndroidMain", "-Xexplicit-api=strict", LogLevel.INFO)
+                assertOutputDoesNotContain("Visibility must be specified in explicit API mode")
+                assertOutputDoesNotContain("Return type must be specified in explicit API mode")
             }
         }
     }
