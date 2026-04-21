@@ -2,6 +2,9 @@
 
 GRAAL_HOME=$JAVA_HOME
 UPDATE_REACHABILITY_METADATA=false
+KOTLINC_BINARY_NAME=kotlinc-native
+KOTLINC_DIST_DIR=dist
+KOTLINC_BINARY_DIST_DIR=$KOTLINC_DIST_DIR/$KOTLINC_BINARY_NAME
 
 for arg in "$@"; do
   case $arg in
@@ -31,10 +34,10 @@ echo '--- Building kotlin compiler embeddable ---'
 ./gradlew -q :kotlin-compiler-embeddable:embeddable
 
 EMBEDDABLE_JAR=$(find prepare/compiler-embeddable -name 'kotlin-compiler-embeddable-*.jar')
-STDLIB_JAR=$(find dist/ -name 'kotlin-stdlib.jar')
-REFLECT_JAR=$(find dist/ -name 'kotlin-reflect.jar')
-COROUTINES_JAR=$(find dist/ -name 'kotlinx-coroutines-core-jvm.jar')
-ANNOTATIONS_JAR=$(find dist/ -name 'annotations-*.jar')
+STDLIB_JAR=$(find dist/kotlinc/ -name 'kotlin-stdlib.jar')
+REFLECT_JAR=$(find dist/kotlinc/ -name 'kotlin-reflect.jar')
+COROUTINES_JAR=$(find dist/kotlinc/ -name 'kotlinx-coroutines-core-jvm.jar')
+ANNOTATIONS_JAR=$(find dist/kotlinc/ -name 'annotations-*.jar')
 
 CLASSPATH=$EMBEDDABLE_JAR:$STDLIB_JAR:$REFLECT_JAR:$COROUTINES_JAR:$ANNOTATIONS_JAR
 echo "Class path: $CLASSPATH"
@@ -52,9 +55,9 @@ if [ "$UPDATE_REACHABILITY_METADATA" = true ]; then
     --add-opens java.base/java.nio=ALL-UNNAMED \
     --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
     --add-opens java.desktop/javax.swing=ALL-UNNAMED \
-    -cp $CLASSPATH \
+    -cp "$CLASSPATH" \
     -Dkotlin.home=dist/kotlinc \
-    -Djava.home=$JAVA_HOME \
+    -Djava.home="$JAVA_HOME" \
     -agentlib:native-image-agent=config-merge-dir=resources/META-INF/native-image/org/jetbrains/kotlin/kotlin-compiler-embeddable \
     org.jetbrains.kotlin.cli.jvm.K2JVMCompiler \
     -kotlin-home=dist/kotlinc \
@@ -63,6 +66,15 @@ if [ "$UPDATE_REACHABILITY_METADATA" = true ]; then
   echo '--- Rebuilding kotlin compiler embeddable with reachability metadata ---'
   ./gradlew -q :kotlin-compiler-embeddable:embeddable
 fi
+
+echo '--- Prepare native image dist ---'
+mkdir -p $KOTLINC_BINARY_DIST_DIR/
+mkdir -p $KOTLINC_BINARY_DIST_DIR/bin
+mkdir -p $KOTLINC_BINARY_DIST_DIR/lib
+mkdir -p $KOTLINC_BINARY_DIST_DIR/resources
+
+cp -r dist/kotlinc/lib/* $KOTLINC_BINARY_DIST_DIR/lib
+cp -r compiler/cli/cli-common/build/resources/main/* $KOTLINC_BINARY_DIST_DIR/resources/
 
 echo '--- Building native image of kotlin compiler embeddable ---'
 $NATIVE_IMAGE_BIN \
@@ -74,6 +86,10 @@ $NATIVE_IMAGE_BIN \
   -H:+AddAllCharsets \
   -H:+UnlockExperimentalVMOptions \
   -H:+AllowJRTFileSystem \
-  -cp $CLASSPATH \
-  -o kotlinc-native \
+  -cp "$CLASSPATH" \
+  -o $KOTLINC_BINARY_DIST_DIR/bin/$KOTLINC_BINARY_NAME \
   org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
+
+echo '--- Creating wrappers for the kotlinc native binary ---'
+cp native-image/kotlinc-native.sh $KOTLINC_BINARY_DIST_DIR/bin/
+chmod a+x $KOTLINC_BINARY_DIST_DIR/bin/kotlinc-native.sh

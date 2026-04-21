@@ -18,10 +18,10 @@ By default, assumes that `JAVA_HOME` is set to GraalVM installation. Tested on G
 The binary uses reachability metadata from [resources/META-INF/](../resources/META-INF/native-image/org/jetbrains/kotlin/kotlin-compiler-embeddable/reachability-metadata.json).
 There are also several samples of reachability metadata collected on different test setups in [native-image/reachability](../native-image/reachability).
 
-The build script will produce a `kotlinc-native` binary. The binary works just the same as a regular `kotlinc`, however,
-it always requires `-Djava.home` property to be set when running. Example command:
+The build script will produce a `kotlinc-native` distribution in `dist/kotlinc-native` directory. The distribution includes the kotlinc-native binary,
+kotlin stdlib and kotlin-reflect libraries, resources necessary to run the binary and a wrapper script to run the binary with the correct arguments. Example:
 ```
-./kotlinc-native -Djava.home=$JAVA_HOME A.kt
+./dist/kotlinc-native/bin/kotlinc-native.sh A.kt
 ```
 
 # Reachability

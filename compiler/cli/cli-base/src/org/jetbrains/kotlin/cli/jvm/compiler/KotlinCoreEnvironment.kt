@@ -92,10 +92,9 @@ import org.jetbrains.kotlin.resolve.lazy.declarations.CliDeclarationProviderFact
 import org.jetbrains.kotlin.resolve.lazy.declarations.DeclarationProviderFactoryService
 import org.jetbrains.kotlin.serialization.DescriptorSerializerPlugin
 import org.jetbrains.kotlin.utils.PathUtil
+import org.jetbrains.kotlin.utils.isGraalNativeimage
 import java.io.File
-import java.io.InputStream
 import java.nio.file.FileSystems
-import java.nio.file.Files
 import java.util.zip.ZipFile
 
 class KotlinCoreEnvironment private constructor(
@@ -181,8 +180,9 @@ class KotlinCoreEnvironment private constructor(
         fun registerExtensionsFromPlugins(configuration: CompilerConfiguration) {
             if (!extensionRegistered) {
                 registerPluginExtensionPoints(project)
-                // TODO Graal
-//                registerExtensionsFromPlugins(project, configuration)
+                if (!isGraalNativeimage) {
+                    registerExtensionsFromPlugins(project, configuration)
+                }
                 extensionRegistered = true
             }
         }
@@ -667,7 +667,7 @@ class KotlinCoreEnvironment private constructor(
         ): KotlinCoreApplicationEnvironment {
             val applicationEnvironment = KotlinCoreApplicationEnvironment.create(parentDisposable, environmentMode)
 
-//            registerApplicationExtensionPointsAndExtensionsFrom(configuration, "extensions/compiler.xml")
+            registerApplicationExtensionPointsAndExtensionsFrom(configuration, "extensions/compiler.xml")
 
             registerApplicationServicesForCLI(applicationEnvironment)
             registerApplicationServices(applicationEnvironment)
@@ -688,10 +688,10 @@ class KotlinCoreEnvironment private constructor(
 
             val pluginRoot: File =
                 configuration.get(CLIConfigurationKeys.INTELLIJ_PLUGIN_ROOT)?.let(::File)
-                // TODO Graal
                     ?: PathUtil.getResourcePathForClass(this::class.java).takeIf { it.hasConfigFile(configFilePath) }
                     // hack for load extensions when compiler run directly from project directory (e.g. in tests)
                     ?: File("compiler/cli/cli-common/resources").takeIf { it.hasConfigFile(configFilePath) }
+                    ?: configuration.get(CLIConfigurationKeys.PATH_TO_KOTLIN_COMPILER_JAR)?.takeIf { it.hasConfigFile(configFilePath) }
                     ?: throw IllegalStateException(
                         "Unable to find extension point configuration $configFilePath " +
                                 "(cp:\n  ${(Thread.currentThread().contextClassLoader as? UrlClassLoader)?.urls?.joinToString("\n  ") { it.file }})"

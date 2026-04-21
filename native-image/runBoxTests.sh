@@ -1,9 +1,9 @@
 #!/bin/bash
 
-NATIVE_IMAGE_BIN="./kotlinc-native"
+NATIVE_IMAGE_BIN="./dist/kotlinc-native/bin/kotlinc-native.sh"
 DEFAULT_KOTLINC="dist/kotlinc/bin/kotlinc"
 TESTS_DIR="compiler/testData/codegen/boxJvm"
-NATIVE_IMAGE_ARGS="-Djava.home=$JAVA_HOME -Dkotlin.home=dist/kotlinc"
+NATIVE_IMAGE_ARGS=""
 STOP_ON_FAILURE=false
 
 for arg in "$@"; do

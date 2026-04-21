@@ -372,6 +372,12 @@
           "parameterTypes": [
             "java.lang.String[]"
           ]
+        },
+        {
+          "name": "setIntellijPluginRoot",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
         }
       ]
     },
