@@ -360,49 +360,19 @@
     },
     {
       "type": "org.jetbrains.kotlin.cli.common.arguments.CommonCompilerArguments",
-      "methods": [
-        {
-          "name": "setKotlinHome",
-          "parameterTypes": [
-            "java.lang.String"
-          ]
-        },
-        {
-          "name": "setManuallyConfiguredFeatures",
-          "parameterTypes": [
-            "java.lang.String[]"
-          ]
-        },
-        {
-          "name": "setIntellijPluginRoot",
-          "parameterTypes": [
-            "java.lang.String"
-          ]
-        }
-      ]
+      "allDeclaredMethods": true
     },
     {
-      "type": "org.jetbrains.kotlin.cli.common.arguments.CommonToolArguments"
+      "type": "org.jetbrains.kotlin.cli.common.arguments.CommonToolArguments",
+      "allDeclaredMethods": true
     },
     {
-      "type": "org.jetbrains.kotlin.cli.common.arguments.Freezable"
+      "type": "org.jetbrains.kotlin.cli.common.arguments.Freezable",
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments",
-      "methods": [
-        {
-          "name": "setClasspath",
-          "parameterTypes": [
-            "java.lang.String"
-          ]
-        },
-        {
-          "name": "setDestination",
-          "parameterTypes": [
-            "java.lang.String"
-          ]
-        }
-      ]
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jetbrains.kotlin.codegen.serialization.JvmSerializationBindings",
