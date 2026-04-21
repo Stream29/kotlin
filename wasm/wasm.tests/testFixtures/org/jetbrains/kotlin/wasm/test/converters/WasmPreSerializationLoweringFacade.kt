@@ -8,14 +8,7 @@ package org.jetbrains.kotlin.wasm.test.converters
 import org.jetbrains.kotlin.cli.pipeline.web.WebFir2IrPipelineArtifact
 import org.jetbrains.kotlin.cli.pipeline.web.WebKlibInliningPipelinePhase
 import org.jetbrains.kotlin.cli.pipeline.withNewDiagnosticCollector
-import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.diagnostics.impl.DiagnosticsCollectorImpl
-import org.jetbrains.kotlin.ir.IrDiagnosticReporter
-import org.jetbrains.kotlin.ir.KtDiagnosticReporterWithImplicitIrBasedContext
-import org.jetbrains.kotlin.ir.backend.js.wasm.WasmKlibCheckers
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.test.backend.ir.IrBackendInput
 import org.jetbrains.kotlin.test.frontend.fir.Fir2IrCliBasedOutputArtifact
 import org.jetbrains.kotlin.test.model.BackendKinds
@@ -45,12 +38,6 @@ class WasmPreSerializationLoweringFacade(
 
         val input = cliArtifact.withNewDiagnosticCollector(diagnosticReporter)
 
-        val irDiagnosticReporter = KtDiagnosticReporterWithImplicitIrBasedContext(
-            diagnosticReporter,
-            input.configuration.languageVersionSettings
-        )
-        runKlibCheckers(irDiagnosticReporter, input.configuration, inputArtifact.irModuleFragment)
-
         if (diagnosticReporter.hasErrors) {
             // Should errors be found by checkers, there's a chance that JsCodeOutlineLowering will throw an exception on unparseable code.
             // In test pipeline, it's unwanted, so let's avoid crashes. Already found errors would already be enough for diagnostic tests.
@@ -64,16 +51,4 @@ class WasmPreSerializationLoweringFacade(
         return Fir2IrCliBasedOutputArtifact(output)
     }
 
-    private fun runKlibCheckers(
-        irDiagnosticReporter: IrDiagnosticReporter,
-        configuration: CompilerConfiguration,
-        irModuleFragment: IrModuleFragment,
-    ) {
-        irModuleFragment.acceptVoid(
-            WasmKlibCheckers.makeChecker(
-                irDiagnosticReporter,
-                configuration,
-            )
-        )
-    }
 }

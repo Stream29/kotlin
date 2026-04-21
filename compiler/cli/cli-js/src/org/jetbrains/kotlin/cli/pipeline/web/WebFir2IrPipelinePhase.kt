@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.ir.backend.js.checkers.JsKlibCheckers
 import org.jetbrains.kotlin.ir.backend.js.getSerializedData
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsManglerIr
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.collectJsExportNames
+import org.jetbrains.kotlin.ir.backend.js.wasm.WasmKlibCheckers
 import org.jetbrains.kotlin.ir.types.IrTypeSystemContextImpl
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.js.config.incrementalDataProvider
@@ -48,8 +49,8 @@ object WebFir2IrPipelinePhase : PipelinePhase<WebFrontendPipelineArtifact, WebFi
         val (firResult, configuration, moduleStructure, hasErrors) = input
         val diagnosticsReporter = configuration.diagnosticsCollector
         val fir2IrActualizedResult = transformFirToIr(moduleStructure, firResult.outputs, diagnosticsReporter)
-        if (!configuration.wasmCompilation)
-            runJsKlibCallCheckers(diagnosticsReporter, configuration, firResult.outputs, fir2IrActualizedResult)
+
+        runWebKlibCallCheckers(diagnosticsReporter, configuration, firResult.outputs, fir2IrActualizedResult)
 
         return WebFir2IrPipelineArtifact(
             fir2IrActualizedResult,
@@ -106,7 +107,7 @@ object WebFir2IrPipelinePhase : PipelinePhase<WebFrontendPipelineArtifact, WebFi
 }
 
 
-private fun runJsKlibCallCheckers(
+private fun runWebKlibCallCheckers(
     diagnosticReporter: BaseDiagnosticsCollector,
     configuration: CompilerConfiguration,
     firOutputs: List<SingleModuleFrontendOutput>,
@@ -124,7 +125,8 @@ private fun runJsKlibCallCheckers(
     val cleanFilesIrData = cleanFiles.map { it.irData ?: error("Metadata-only KLIBs are not supported in Kotlin/JS") }
 
     val irModuleFragment = fir2IrActualizedResult.irModuleFragment
-    irModuleFragment.acceptVoid(
+
+    val checker = if (!configuration.wasmCompilation) {
         JsKlibCheckers.makeChecker(
             irDiagnosticReporter,
             configuration,
@@ -133,5 +135,12 @@ private fun runJsKlibCallCheckers(
             cleanFiles = cleanFilesIrData,
             exportedNames = irModuleFragment.collectJsExportNames(),
         )
-    )
+    } else {
+        WasmKlibCheckers.makeChecker(
+            irDiagnosticReporter,
+            configuration,
+        )
+    }
+
+    irModuleFragment.acceptVoid(checker)
 }
