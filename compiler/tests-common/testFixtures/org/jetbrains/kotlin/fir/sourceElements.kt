@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.fir
 
+import com.intellij.openapi.util.text.StringUtil
+import org.jetbrains.kotlin.KtPsiSourceElement
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirFile
@@ -18,7 +20,7 @@ import kotlin.collections.forEach
  * @param lazyErrorHeadline A headline for the error message if the check fails. The parameters are the two FIR declarations that have
  *  conflicting source elements.
  */
-inline fun checkDistinctSourceElements(files: List<FirFile>, crossinline lazyErrorHeadline: (FirDeclaration, FirDeclaration) -> String) {
+fun checkDistinctSourceElements(files: List<FirFile>, lazyErrorHeadline: (FirDeclaration, FirDeclaration) -> String) {
     val declarationBySourceElement = mutableMapOf<KtSourceElement, FirDeclaration>()
 
     val visitor = object : FirVisitorVoid() {
@@ -34,20 +36,59 @@ inline fun checkDistinctSourceElements(files: List<FirFile>, crossinline lazyErr
             val sourceElement = declaration.symbol.source ?: return
             val previousDeclaration = declarationBySourceElement.put(sourceElement, declaration)
 
-            // We have to compare `previousDeclaration` and `declaration` with reference equality, because regular equality defers to the
-            // source element whose uniqueness we want to check in the first place.
+            // We have to compare `previousDeclaration` and `declaration` with reference equality, because regular equality might defer to
+            // the source element whose uniqueness we want to check in the first place.
             //
             // Source element uniqueness doesn't prevent the *exact* same FIR declaration instance from appearing multiple times. It's about
             // different FIR declaration instances sharing equal source elements accidentally.
             if (previousDeclaration != null && previousDeclaration !== declaration) {
-                error(
-                    "${lazyErrorHeadline(previousDeclaration, declaration)}:\n" +
-                            "  First declaration: ${previousDeclaration::class.simpleName} at ${previousDeclaration.source}\n" +
-                            "  Second declaration: ${declaration::class.simpleName} at ${declaration.source}"
-                )
+                throwDuplicateSourceElementsError(lazyErrorHeadline, previousDeclaration, declaration)
             }
         }
     }
 
     files.forEach { it.accept(visitor) }
 }
+
+private fun throwDuplicateSourceElementsError(
+    lazyErrorHeadline: (FirDeclaration, FirDeclaration) -> String,
+    previousDeclaration: FirDeclaration,
+    declaration: FirDeclaration,
+): Nothing {
+    val message = buildString {
+        append(lazyErrorHeadline(previousDeclaration, declaration))
+        appendLine(":")
+
+        append("  First declaration:  ")
+        append(previousDeclaration::class.simpleName)
+        append(" with ")
+        append(previousDeclaration.source.toLocationDescription())
+        appendLine()
+
+        append("  Second declaration: ")
+        append(declaration::class.simpleName)
+        append(" with ")
+        append(declaration.source.toLocationDescription())
+        appendLine()
+    }
+
+    error(message)
+}
+
+private fun KtSourceElement?.toLocationDescription(): String =
+    when (this) {
+        null -> "<unknown location: no source element>"
+
+        is KtPsiSourceElement -> {
+            val pos = StringUtil.offsetToLineColumn(psi.containingFile.text, startOffset)
+            val lineColumn = "${pos.line + 1}:${pos.column + 1}"
+
+            buildString {
+                append(this@toLocationDescription)
+                append(" on line ")
+                append(lineColumn)
+            }
+        }
+
+        else -> toString()
+    }

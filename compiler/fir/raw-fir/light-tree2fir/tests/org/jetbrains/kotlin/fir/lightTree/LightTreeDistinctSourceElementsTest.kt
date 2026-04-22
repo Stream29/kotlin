@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.test.util.walkRepositoryKotlinFilesWithoutTestData
 import org.junit.runner.RunWith
 import java.io.File
 
-@TestDataPath("\$PROJECT_ROOT")
+@TestDataPath($$"$PROJECT_ROOT")
 @RunWith(JUnit3RunnerWithInners::class)
 class LightTreeDistinctSourceElementsTest : AbstractRawFirBuilderTestCase() {
     /**
