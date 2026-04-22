@@ -537,7 +537,7 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
      */
     class LambdaContextParameter(private val index: Int) : KtFakeSourceElementKind() {
         override fun equals(other: Any?): Boolean = this === other || other is LambdaContextParameter && index == other.index
-        override fun hashCode(): Int = Objects.hash(javaClass, index.hashCode())
+        override fun hashCode(): Int = Objects.hash(this::class, index.hashCode())
         override fun toString(): String = "${LambdaContextParameter::class.simpleName}($index)"
     }
 
