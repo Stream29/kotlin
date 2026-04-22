@@ -404,7 +404,11 @@ internal fun assertStableResult(
 
     val symbols = sortedSymbols(symbolResolutionAttempt!!.symbols)
     val symbolsFromCall = sortedSymbols(callResolutionAttempt.calls.flatMap(KaSingleOrMultiCall::symbols))
-    assertions.assertEquals(expected = symbolsFromCall, actual = symbols)
+    if (callResolutionAttempt !is KaCallResolutionError || callResolutionAttempt.candidateCalls.isNotEmpty()) {
+        // Empty call resolution errors are expected to have fewer symbols than the symbol resolution attempt in some
+        // corner cases, such as when symbols aren't callables (e.g., type parameters)
+        assertions.assertEquals(expected = symbolsFromCall, actual = symbols)
+    }
 }
 
 /**

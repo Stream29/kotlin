@@ -59,14 +59,17 @@ abstract class KaBaseResolver<T : KaSession> : KaBaseSessionComponent<T>(), KaRe
      */
     private fun KtResolvableCall.tryResolveSymbolsForResolvableCall(): KaSymbolResolutionAttempt? {
         return when (val callAttempt = tryResolveCall()) {
-            is KaSingleCallResolutionAttempt -> callAttempt.toSingleSymbolResolutionAttempt()
+            is KaCallResolutionSuccess -> callAttempt.toSingleSymbolResolutionAttempt()
             is KaMultiCallResolutionAttempt -> callAttempt.toSymbolResolutionAttempt()
 
-            null -> when (this) {
+            // Some candidates are found -> was resolved properly via the call resolution
+            is KaCallResolutionError if callAttempt.candidateCalls.isNotEmpty() -> callAttempt.toSingleSymbolResolutionAttempt()
+            is KaCallResolutionError, null -> when (this) {
                 // Name reference expressions are special since they might represent not only calls
-                // but also types
+                // but also types.
+                // Also, empty call resolution errors are substituted as symbols resolution could be more complete
                 is KtNameReferenceExpression -> tryResolveSymbolsForElement()
-                else -> null
+                else -> callAttempt?.toSingleSymbolResolutionAttempt()
             }
         }
     }
