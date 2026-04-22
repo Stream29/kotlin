@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.fir.builder
 
 import com.intellij.testFramework.TestDataPath
-import org.jetbrains.kotlin.fir.checkDistinctSourceElements
+import org.jetbrains.kotlin.test.frontend.fir.checkDistinctSourceElements
 import org.jetbrains.kotlin.test.JUnit3RunnerWithInners
 import org.jetbrains.kotlin.test.util.walkRepositoryKotlinFilesWithoutTestData
 import org.junit.runner.RunWith

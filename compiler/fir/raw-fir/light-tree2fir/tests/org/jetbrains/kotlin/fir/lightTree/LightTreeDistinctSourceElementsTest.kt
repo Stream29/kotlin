@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.KtIoFileSourceFile
 import org.jetbrains.kotlin.ObsoleteTestInfrastructure
 import org.jetbrains.kotlin.fir.builder.AbstractRawFirBuilderTestCase
 import org.jetbrains.kotlin.fir.builder.StubFirScopeProvider
-import org.jetbrains.kotlin.fir.checkDistinctSourceElements
+import org.jetbrains.kotlin.test.frontend.fir.checkDistinctSourceElements
 import org.jetbrains.kotlin.fir.session.FirSessionFactoryHelper
 import org.jetbrains.kotlin.readSourceFileWithMapping
 import org.jetbrains.kotlin.test.JUnit3RunnerWithInners
