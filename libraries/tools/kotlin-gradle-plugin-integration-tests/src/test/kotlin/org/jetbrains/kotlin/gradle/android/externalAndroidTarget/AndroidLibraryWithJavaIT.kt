@@ -190,11 +190,13 @@ class AndroidLibraryWithJavaIT : KGPBaseTest() {
                         namespace = "org.jetbrains.sample.shared"
                         withJava()
                     }
+                    iosArm64()
 
                     val sharedMain = sourceSets.create("sharedMain").apply {
                         dependsOn(sourceSets.getByName("commonMain"))
                     }
                     sourceSets.getByName("androidMain").dependsOn(sharedMain)
+                    sourceSets.getByName("iosArm64Main").dependsOn(sharedMain)
                 }
             }
 
@@ -250,7 +252,7 @@ class AndroidLibraryWithJavaIT : KGPBaseTest() {
     }
 
     @GradleAndroidTest
-    fun `test - withJava enabled - androidMain actual declaration can delegate to Java class`(
+    fun `test - withJava enabled - androidMain actual typealias can point to Java class`(
         gradleVersion: GradleVersion,
         androidVersion: String,
         jdkVersion: JdkVersions.ProvidedJdk,
@@ -293,19 +295,6 @@ class AndroidLibraryWithJavaIT : KGPBaseTest() {
                 )
             }
 
-            kotlinSourcesDir("androidMain").resolve("sample/PlatformGreeter.kt").apply {
-                parent.toFile().mkdirs()
-                toFile().writeText(
-                    """
-                package sample
-
-                actual class PlatformGreeter actual constructor() {
-                    actual fun ping(): String = JavaPlatformGreeter().ping()
-                }
-                """.trimIndent()
-                )
-            }
-
             javaSourcesDir("androidMain").resolve("sample/JavaPlatformGreeter.java").apply {
                 parent.toFile().mkdirs()
                 toFile().writeText(
@@ -321,10 +310,20 @@ class AndroidLibraryWithJavaIT : KGPBaseTest() {
                 )
             }
 
+            kotlinSourcesDir("androidMain").resolve("sample/PlatformGreeter.kt").apply {
+                parent.toFile().mkdirs()
+                toFile().writeText(
+                    """
+                package sample
+
+                actual typealias PlatformGreeter = JavaPlatformGreeter
+                """.trimIndent()
+                )
+            }
+
             build("assemble") {
                 assertTasksExecuted(":compileAndroidMainJavaWithJavac")
                 assertFileInProjectExists("build/outputs/aar/empty.aar")
-                assertAarContainsClass("build/outputs/aar/empty.aar", "sample/PlatformGreeter.class")
                 assertAarContainsClass("build/outputs/aar/empty.aar", "sample/KotlinCaller.class")
                 assertAarContainsClass("build/outputs/aar/empty.aar", "sample/JavaPlatformGreeter.class")
             }
@@ -353,6 +352,7 @@ class AndroidLibraryWithJavaIT : KGPBaseTest() {
                         withJava()
                         withHostTest {}
                     }
+                    iosArm64()
                 }
             }
 
