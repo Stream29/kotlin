@@ -818,13 +818,13 @@ private fun toCompilerConverterFunBuilder(
     parentClass: TypeName?,
 ): FunSpec.Builder = FunSpec.builder("toCompilerArguments").apply {
     val compilerArgumentsClass = level.getCompilerArgumentsClassName()
-    addParameter(
-        ParameterSpec.builder("arguments", compilerArgumentsClass).apply {
-            if (level.isLeaf()) {
-                defaultValue("%T()", compilerArgumentsClass)
-            }
-        }.build()
-    )
+    if (!level.isLeaf()) {
+        addParameter(
+            ParameterSpec.builder("arguments", compilerArgumentsClass).build()
+        )
+    } else {
+        addStatement("val arguments = %T()", compilerArgumentsClass)
+    }
     annotation<Suppress> {
         addMember("%S", "DEPRECATION")
     }
