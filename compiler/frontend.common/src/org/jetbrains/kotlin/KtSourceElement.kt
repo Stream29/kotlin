@@ -767,36 +767,37 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
          * A parameter generated from a base class constructor value parameter.
          */
         class BaseClassConstructorParameter(val index: Int) : ScriptParameter() {
-            override fun equals(other: Any?): Boolean = this === other ||
-                    other is BaseClassConstructorParameter && index == other.index
+            override fun equals(other: Any?): Boolean =
+                this === other || other is BaseClassConstructorParameter && index == other.index
 
-            override fun hashCode(): Int = Objects.hash(javaClass, index)
+            override fun hashCode(): Int = Objects.hash(this::class, index)
 
-            override fun toString(): String = "${BaseClassConstructorParameter::class.simpleName}($index)"
+            override fun toString(): String =
+                "${ScriptParameter::class.simpleName}.${BaseClassConstructorParameter::class.simpleName}($index)"
         }
 
         /**
          * An implicit receiver generated from the script configuration.
          */
         class ImplicitReceiver(val index: Int) : ScriptParameter() {
-            override fun equals(other: Any?): Boolean = this === other ||
-                    other is ImplicitReceiver && index == other.index
+            override fun equals(other: Any?): Boolean =
+                this === other || other is ImplicitReceiver && index == other.index
 
-            override fun hashCode(): Int = Objects.hash(javaClass, index)
+            override fun hashCode(): Int = Objects.hash(this::class, index)
 
-            override fun toString(): String = "${ImplicitReceiver::class.simpleName}($index)"
+            override fun toString(): String = "${ScriptParameter::class.simpleName}.${ImplicitReceiver::class.simpleName}($index)"
         }
 
         /**
          * A parameter generated from a script's provided property.
          */
         class ProvidedProperty(val index: Int) : ScriptParameter() {
-            override fun equals(other: Any?): Boolean = this === other ||
-                    other is ProvidedProperty && index == other.index
+            override fun equals(other: Any?): Boolean =
+                this === other || other is ProvidedProperty && index == other.index
 
-            override fun hashCode(): Int = Objects.hash(javaClass, index)
+            override fun hashCode(): Int = Objects.hash(this::class, index)
 
-            override fun toString(): String = "${ProvidedProperty::class.simpleName}($index)"
+            override fun toString(): String = "${ScriptParameter::class.simpleName}.${ProvidedProperty::class.simpleName}($index)"
         }
 
         /**
