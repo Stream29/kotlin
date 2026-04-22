@@ -92,7 +92,7 @@ abstract class CommonRecompileModuleJsBackendFacade(
 
         val incrementalArtifact = try {
             incrementalRunner.processModule(incrementalModule, incrementalArtifactsProvider)
-            incrementalRunner.reportFailures()
+            incrementalRunner.failuresInterceptor.reportFailures()
             incrementalArtifactsProvider.getArtifact(incrementalModule, ArtifactKinds.Js)
         } finally {
             disposeRootInWriteAction(incrementalConfiguration.rootDisposable)
