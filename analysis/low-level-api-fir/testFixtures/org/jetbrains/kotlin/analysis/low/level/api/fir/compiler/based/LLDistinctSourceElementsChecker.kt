@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.analysis.low.level.api.fir.LLResolutionFacadeService
 import org.jetbrains.kotlin.analysis.low.level.api.fir.api.getOrBuildFirFile
 import org.jetbrains.kotlin.analysis.test.framework.projectStructure.ktTestModuleStructure
 import org.jetbrains.kotlin.fir.checkDistinctSourceElements
-import org.jetbrains.kotlin.test.WrappedException
 import org.jetbrains.kotlin.test.model.AfterAnalysisChecker
 import org.jetbrains.kotlin.test.services.TestServices
 
@@ -20,7 +19,7 @@ import org.jetbrains.kotlin.test.services.TestServices
  * FIR files are checked in the state they were resolved to, or built fresh and checked as raw FIR if they haven't been resolved yet.
  */
 class LLDistinctSourceElementsChecker(testServices: TestServices) : AfterAnalysisChecker(testServices) {
-    override fun check(failedAssertions: List<WrappedException>) {
+    override fun check(thereWereFailures: Boolean) {
         // We ignore failed assertions. With symbol IDs, duplicate source elements can easily lead to resolution problems, so they have a
         // higher priority than the resolution test failure itself.
 
