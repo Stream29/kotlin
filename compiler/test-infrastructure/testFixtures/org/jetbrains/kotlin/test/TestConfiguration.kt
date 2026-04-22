@@ -9,6 +9,7 @@ import com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.test.directives.model.DirectivesContainer
 import org.jetbrains.kotlin.test.directives.model.RegisteredDirectives
 import org.jetbrains.kotlin.test.model.AfterAnalysisChecker
+import org.jetbrains.kotlin.test.model.GroupingTestIsolator
 import org.jetbrains.kotlin.test.model.ResultingArtifact
 import org.jetbrains.kotlin.test.model.TestFailureSuppressor
 import org.jetbrains.kotlin.test.model.TestModule
@@ -38,6 +39,7 @@ interface TestConfiguration<Step : TestStep<*, *>> {
 
 interface NonGroupingPhaseTestConfiguration : TestConfiguration<TestStep.NonGroupingStep<*, *>> {
     var startingArtifactFactory: (TestModule) -> ResultingArtifact<*>
+    val groupingTestIsolators: List<GroupingTestIsolator>
 }
 
 interface GroupingPhaseTestConfiguration : TestConfiguration<TestStep.GroupingPhaseStep<*, *>> {

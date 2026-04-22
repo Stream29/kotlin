@@ -207,6 +207,11 @@ class NonGroupingPhaseTestConfigurationBuilder :
     OnePhaseTestConfigurationBuilderBase<NonGroupingPhaseTestConfigurationBuilder, NonGroupingPhaseTestConfiguration>() {
     lateinit var testInfo: KotlinTestInfo
     lateinit var startingArtifactFactory: (TestModule) -> ResultingArtifact<*>
+    private val groupingTestIsolators: MutableList<Constructor<GroupingTestIsolator>> = mutableListOf()
+
+    fun useGroupingTestIsolators(vararg isolators: Constructor<GroupingTestIsolator>) {
+        groupingTestIsolators += isolators
+    }
 
     fun <I : ResultingArtifact<I>, O : ResultingArtifact<O>> facadeStep(
         facade: Constructor<AbstractTestFacade<I, O>>,
@@ -300,6 +305,7 @@ class NonGroupingPhaseTestConfigurationBuilder :
             failureSuppressors,
             compilerConfigurationProvider,
             runtimeClasspathProviders,
+            groupingTestIsolators,
             metaInfoHandlerEnabled,
             directives,
             defaultRegisteredDirectivesBuilder.build(),

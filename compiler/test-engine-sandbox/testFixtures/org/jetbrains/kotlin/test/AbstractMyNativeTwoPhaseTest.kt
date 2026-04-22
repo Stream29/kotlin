@@ -5,11 +5,16 @@
 
 package org.jetbrains.kotlin.test
 
+import org.jetbrains.kotlin.builtins.StandardNames.KOTLIN_INTERNAL_FQ_NAME
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.konan.test.KlibSerializerNativeCliFacade
 import org.jetbrains.kotlin.konan.test.blackbox.support.NativeTestSupport.computeBlackBoxTestInstances
 import org.jetbrains.kotlin.konan.test.blackbox.support.NativeTestSupport.createTestRunSettings
 import org.jetbrains.kotlin.konan.test.blackbox.support.NativeTestSupport.getOrCreateTestRunProvider
+import org.jetbrains.kotlin.konan.test.blackbox.support.TestDirectives.FILECHECK_STAGE
+import org.jetbrains.kotlin.konan.test.blackbox.support.TestKind
+import org.jetbrains.kotlin.konan.test.blackbox.support.testKind
+import org.jetbrains.kotlin.konan.test.blackbox.testRunSettings
 import org.jetbrains.kotlin.konan.test.configuration.commonConfigurationForNativeCodegenTest
 import org.jetbrains.kotlin.konan.test.configuration.setupStepsForNativeFirstStageUpToSerialization
 import org.jetbrains.kotlin.konan.test.handlers.NativeBoxRunnerGroupingPhase
@@ -19,6 +24,7 @@ import org.jetbrains.kotlin.konan.test.services.CInteropTestSkipper
 import org.jetbrains.kotlin.konan.test.services.DisabledNativeTestSkipper
 import org.jetbrains.kotlin.konan.test.services.FileCheckTestSkipper
 import org.jetbrains.kotlin.konan.test.services.sourceProviders.NativeLauncherAdditionalSourceProvider
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.test.backend.handlers.NoFirCompilationErrorsHandler
 import org.jetbrains.kotlin.test.backend.handlers.NoIrCompilationErrorsHandler
 import org.jetbrains.kotlin.test.builders.*
@@ -28,8 +34,11 @@ import org.jetbrains.kotlin.test.directives.LanguageSettingsDirectives.OPT_IN
 import org.jetbrains.kotlin.test.frontend.fir.FirMetaInfoDiffSuppressor
 import org.jetbrains.kotlin.test.frontend.fir.handlers.FirDiagnosticsHandler
 import org.jetbrains.kotlin.test.model.ArtifactKinds
+import org.jetbrains.kotlin.test.model.GroupingTestIsolator
 import org.jetbrains.kotlin.test.services.BatchingPackageInserter
 import org.jetbrains.kotlin.test.services.CompilationStage
+import org.jetbrains.kotlin.test.services.TestModuleStructure
+import org.jetbrains.kotlin.test.services.TestServices
 import org.jetbrains.kotlin.test.services.configuration.CommonEnvironmentConfigurator
 import org.jetbrains.kotlin.test.services.configuration.NativeFirstStageEnvironmentConfigurator
 import org.jetbrains.kotlin.test.services.configuration.NativeSecondStageEnvironmentConfigurator
@@ -86,6 +95,8 @@ abstract class AbstractMyNativeTwoPhaseTest : AbstractTwoStageKotlinCompilerTest
                 ::NativeFirstStageEnvironmentConfigurator,
             )
 
+            useGroupingTestIsolators(::NativeGroupingTestIsolator)
+
             // Because of package escaping various dumps for grouping mode would be different from
             // the regular one, so we don't want all the frontend handlers to be set up, only some specific ones.
             setupStepsForNativeFirstStageUpToSerialization(
@@ -133,3 +144,20 @@ abstract class AbstractMyNativeTwoPhaseTest : AbstractTwoStageKotlinCompilerTest
         }
     }
 }
+
+class NativeGroupingTestIsolator(testServices: TestServices) : GroupingTestIsolator(testServices) {
+    override fun shouldIsolateTestInGroupingConfiguration(moduleStructure: TestModuleStructure): Boolean {
+        // KT-84713: Migrate here full grouping logic from TestRunProvider.withTestExecutable(): respect ignores, difference of compiler args, etc.
+        return (testServices.testRunSettings.testKind(moduleStructure.modules.firstOrNull()?.directives) != TestKind.REGULAR
+                || moduleStructure.allDirectives[FILECHECK_STAGE].isNotEmpty()
+                || containsPackage(moduleStructure, KOTLIN_INTERNAL_FQ_NAME))
+    }
+}
+
+private fun containsPackage(moduleStructure: TestModuleStructure, packageName: FqName): Boolean =
+    moduleStructure.modules.any {
+        it.files.any {
+            val contains = it.originalContent.contains(Regex("package\\s$packageName"))
+            contains
+        }
+    }

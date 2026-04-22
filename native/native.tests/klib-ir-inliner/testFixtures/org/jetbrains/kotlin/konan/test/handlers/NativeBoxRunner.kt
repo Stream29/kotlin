@@ -8,7 +8,6 @@ package org.jetbrains.kotlin.konan.test.handlers
 import org.jetbrains.kotlin.konan.test.blackbox.support.*
 import org.jetbrains.kotlin.konan.test.blackbox.support.compilation.TestCompilationArtifact
 import org.jetbrains.kotlin.konan.test.blackbox.support.compilation.TestCompilationResult
-import org.jetbrains.kotlin.konan.test.blackbox.support.parseTestKind
 import org.jetbrains.kotlin.konan.test.blackbox.support.runner.TestExecutable
 import org.jetbrains.kotlin.konan.test.blackbox.support.runner.TestRun
 import org.jetbrains.kotlin.konan.test.blackbox.support.runner.TestRunCheck
@@ -90,7 +89,7 @@ private fun createTestRun(
     addTeamCityLogger: Boolean,
     addTestFilter: Boolean,
 ): TestRun {
-    val testKind = parseTestKind(testServices.moduleStructure.modules.firstOrNull()?.directives) ?: testServices.testRunSettings.get<TestKind>()
+    val testKind = testServices.testRunSettings.testKind(testServices.moduleStructure.modules.firstOrNull()?.directives)
     val checks = TestRunChecks(
         executionTimeoutCheck = TestRunCheck.ExecutionTimeout.ShouldNotExceed(testServices.testRunSettings.get<Timeouts>().executionTimeout),
         testFiltering = TestRunCheck.TestFiltering(

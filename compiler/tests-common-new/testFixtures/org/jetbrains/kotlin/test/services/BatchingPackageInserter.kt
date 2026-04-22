@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.psi.psiUtil.nextLeaf
 import org.jetbrains.kotlin.psi.psiUtil.prevLeaf
 import org.jetbrains.kotlin.resolve.ImportPath
 import org.jetbrains.kotlin.test.TestInfrastructureInternals
+import org.jetbrains.kotlin.test.impl.shouldIsolateTestInGroupingConfiguration
 import org.jetbrains.kotlin.test.model.TestFile
 import org.jetbrains.kotlin.test.model.TestModule
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.decapitalizeSmart
@@ -85,6 +86,9 @@ class BatchingPackageInserter(testServices: TestServices) : ReversibleSourceFile
 
     @TestInfrastructureInternals
     override fun processModule(module: TestModule, filesContent: MutableMap<TestFile, String>) {
+        if (testServices.shouldIsolateTestInGroupingConfiguration())
+            return // Without grouping, packages are not altered, since no clashes can happen.
+
         // At this point we can't get `project` from `compilerConfigurationProvider`, as it will cause infinite recursion.
         val psiFactory = createPsiFactory()
         val additionalBasePackage = FqName(computePackage(testServices.testInfo))
