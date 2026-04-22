@@ -397,8 +397,6 @@ KtLabelReferenceExpression(686,691): '@anon'
     attempt: KaSymbolResolutionSuccess
     symbols:
       extension receiver with type one.MyClass
-    resolveToSymbols:
-      (in <local>: MyClass.InnerOuter.InnerNested.<no name>.f) fun one.MyClass.(s: kotlin.String): kotlin.Unit
 
 KtCallExpression(692,697): 'foo()'
   KtInvokeFunctionReference:
@@ -583,8 +581,6 @@ KtLabelReferenceExpression(952,959): '@myWith'
     attempt: KaSymbolResolutionSuccess
     symbols:
       extension receiver with type one.MyClass.InnerOuter.InnerNested
-    resolveToSymbols:
-      (in <local>: MyClass.InnerOuter.InnerNested.<no name>) fun one.MyClass.InnerOuter.InnerNested.(t: one.MyClass.InnerOuter.InnerNested): kotlin.Unit
 
 KtCallExpression(960,965): 'foo()'
   KtInvokeFunctionReference:
@@ -737,8 +733,6 @@ KtLabelReferenceExpression(1164,1170): '@label'
     attempt: KaSymbolResolutionSuccess
     symbols:
       extension receiver with type one.MyClass.InnerOuter.InnerNested
-    resolveToSymbols:
-      (in <local>: MyClass.InnerOuter.InnerNested.<no name>) fun one.MyClass.InnerOuter.InnerNested.(it: one.MyClass.InnerOuter.InnerNested): kotlin.Unit
 
 KtCallExpression(1171,1176): 'foo()'
   KtInvokeFunctionReference:
