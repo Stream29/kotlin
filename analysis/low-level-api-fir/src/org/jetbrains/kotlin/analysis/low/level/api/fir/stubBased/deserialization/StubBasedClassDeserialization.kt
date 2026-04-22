@@ -348,7 +348,7 @@ private fun FirRegularClassBuilder.addCloneForEnumIfNeeded(
     val anyLookupId = StandardClassIds.Any.toLookupTag()
     val cloneCallableId = StandardClassIds.Callables.clone
 
-    val sourceElement = classSourceElement.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration.EnumCloneFunction)
+    val sourceElement = classSourceElement.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration.CloneFunction)
 
     declarations += buildNamedFunction {
         moduleData = this@addCloneForEnumIfNeeded.moduleData

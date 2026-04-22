@@ -58,15 +58,19 @@ private val allowedFakeElementKinds: Set<KtFakeSourceElementKind> =
         KtFakeSourceElementKind.ImplicitJavaAnnotationConstructor,
         KtFakeSourceElementKind.SamConstructor,
         KtFakeSourceElementKind.JavaRecordComponentFunction,
-    ) + KtFakeSourceElementKind.ALL_ENUM_GENERATED_DECLARATIONS
+    )
 
 @OptIn(SuspiciousFakeSourceCheck::class)
 internal fun FirElement.getAllowedPsi() = when (val source = source) {
     null -> null
     is KtRealPsiSourceElement -> source.psi
-    is KtFakePsiSourceElement -> if (source.kind in allowedFakeElementKinds) psi else null
+    is KtFakePsiSourceElement -> if (isAllowedFakeElementKind(source.kind)) psi else null
     else -> null
 }
+
+private fun isAllowedFakeElementKind(kind: KtFakeSourceElementKind): Boolean =
+    kind is KtFakeSourceElementKind.EnumGeneratedDeclaration
+            || kind in allowedFakeElementKinds
 
 internal fun FirElement.findPsi(): PsiElement? =
     getAllowedPsi()

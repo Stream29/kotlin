@@ -204,68 +204,66 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
     /**
      * For enum classes, FIR generates the `valueOf()` and `values()` functions, which are covered by the various fake source element kinds
      * defined in this class.
-     *
-     * The fake element kinds must be kept in sync with [ALL_ENUM_GENERATED_DECLARATIONS].
      */
     sealed class EnumGeneratedDeclaration : KtFakeSourceElementKind() {
         /**
          * The source kind of an enum class's `values()` function. Its real source is the corresponding enum class.
          */
-        object EnumValuesFunction : EnumGeneratedDeclaration()
-
-        /**
-         * The source kind of a return type reference of the generated [EnumValuesFunction]. Its real source is the corresponding enum
-         * class.
-         */
-        object EnumValuesFunctionReturnType : EnumGeneratedDeclaration()
+        object ValuesFunction : EnumGeneratedDeclaration() {
+            /**
+             * The source kind of a return type reference of the generated [ValuesFunction]. Its real source is the corresponding enum
+             * class.
+             */
+            object ReturnType : EnumGeneratedDeclaration()
+        }
 
         /**
          * The source kind of an enum class's `valueOf()` function. Its real source is the corresponding enum class.
          */
-        object EnumValueOfFunction : EnumGeneratedDeclaration()
+        object ValueOfFunction : EnumGeneratedDeclaration() {
+            /**
+             * The source kind of the return type reference of the generated [ValueOfFunction]. Its real source is the corresponding
+             * enum class.
+             */
+            object ReturnType : EnumGeneratedDeclaration()
 
-        /**
-         * The source kind of the return type reference of the generated [EnumValueOfFunction]. Its real source is the corresponding enum
-         * class.
-         */
-        object EnumValueOfFunctionReturnType : EnumGeneratedDeclaration()
+            /**
+             * The source kind of the parameter of the generated [ValueOfFunction]. Its real source is the corresponding enum class.
+             */
+            object Parameter : EnumGeneratedDeclaration()
 
-        /**
-         * The source kind of the parameter of the generated [EnumValueOfFunction]. Its real source is the corresponding enum class.
-         */
-        object EnumValueOfFunctionParameter : EnumGeneratedDeclaration()
-
-        /**
-         * The source kind of the parameter type reference of the generated [EnumValueOfFunction]. Its real source is the corresponding enum
-         * class.
-         */
-        object EnumValueOfFunctionParameterType : EnumGeneratedDeclaration()
+            /**
+             * The source kind of the parameter type reference of the generated [ValueOfFunction]. Its real source is the corresponding enum
+             * class.
+             */
+            object ParameterType : EnumGeneratedDeclaration()
+        }
 
         /**
          * The source kind of an enum class's `entries` property. Its real source is the corresponding enum class.
          */
-        object EnumEntriesProperty : EnumGeneratedDeclaration()
+        object EntriesProperty : EnumGeneratedDeclaration() {
+            /**
+             * The source kind of the return type of the [EntriesProperty]. Its real source is the corresponding enum class.
+             */
+            object ReturnType : EnumGeneratedDeclaration()
 
-        /**
-         * The source kind of the return type of the [EnumEntriesProperty]. Its real source is the corresponding enum class.
-         */
-        object EnumEntriesPropertyReturnType : EnumGeneratedDeclaration()
-
-        /**
-         * The source kind of the getter of the [EnumEntriesProperty]. Its real source is the corresponding enum class.
-         */
-        object EnumEntriesPropertyGetter : EnumGeneratedDeclaration()
-
-        /**
-         * The source kind of the return type of the [EnumEntriesPropertyGetter]. Its real source is the corresponding enum class.
-         */
-        object EnumEntriesPropertyGetterReturnType : EnumGeneratedDeclaration()
+            /**
+             * The source kind of the getter of the [EntriesProperty]. Its real source is the corresponding enum class.
+             */
+            object Getter : EnumGeneratedDeclaration() {
+                /**
+                 * The source kind of the return type of the [Getter]. Its real source is the corresponding enum class.
+                 */
+                object ReturnType : EnumGeneratedDeclaration()
+            }
+        }
 
         /**
          * The source kind of the enum class's `clone()` function, which may be injected on non-JVM platforms. Its real source is the
          * corresponding enum class.
          */
-        object EnumCloneFunction : EnumGeneratedDeclaration()
+        object CloneFunction : EnumGeneratedDeclaration()
     }
 
     /**
@@ -684,24 +682,6 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
      */
     object ContextSensitiveAlternative : KtFakeSourceElementKind()
     object ReferenceForContextSensitiveAlternative : KtFakeSourceElementKind()
-
-    // Moving these properties to the companion objects of their respective classes such as `EnumGeneratedDeclaration` is not an option
-    // because then the sealed class can be used as an object (e.g. as a `when` subject), which can lead to programming errors.
-    companion object {
-        val ALL_ENUM_GENERATED_DECLARATIONS: Set<EnumGeneratedDeclaration> = setOf(
-            EnumGeneratedDeclaration.EnumValuesFunction,
-            EnumGeneratedDeclaration.EnumValuesFunctionReturnType,
-            EnumGeneratedDeclaration.EnumValueOfFunction,
-            EnumGeneratedDeclaration.EnumValueOfFunctionReturnType,
-            EnumGeneratedDeclaration.EnumValueOfFunctionParameter,
-            EnumGeneratedDeclaration.EnumValueOfFunctionParameterType,
-            EnumGeneratedDeclaration.EnumEntriesProperty,
-            EnumGeneratedDeclaration.EnumEntriesPropertyReturnType,
-            EnumGeneratedDeclaration.EnumEntriesPropertyGetter,
-            EnumGeneratedDeclaration.EnumEntriesPropertyGetterReturnType,
-            EnumGeneratedDeclaration.EnumCloneFunction,
-        )
-    }
 }
 
 sealed class AbstractKtSourceElement {
