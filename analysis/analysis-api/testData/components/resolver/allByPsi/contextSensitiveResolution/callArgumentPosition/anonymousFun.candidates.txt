@@ -441,23 +441,7 @@ KtNameReferenceExpression(579,594): 'InheritorObject'
   NO_CANDIDATES
 
 KtNameReferenceExpression(597,612): 'InheritorObject'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.InheritorObject
-        symbol = <constructor>(): MyClass.InheritorObject
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtProperty(621,642): 'val prop: String = ""'
   NO_CANDIDATES
@@ -817,23 +801,7 @@ KtBlockExpression(752,767): 'InheritorObject'
   NO_CANDIDATES
 
 KtNameReferenceExpression(752,767): 'InheritorObject'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.InheritorObject
-        symbol = <constructor>(): MyClass.InheritorObject
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNamedFunction(777,805): 'fun func(): MyClass = TODO()'
   NO_CANDIDATES
@@ -1142,23 +1110,7 @@ KtValueArgument(990,1005): 'InheritorObject'
   NO_CANDIDATES
 
 KtNameReferenceExpression(990,1005): 'InheritorObject'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.InheritorObject
-        symbol = <constructor>(): MyClass.InheritorObject
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtCallExpression(1011,1041): 'anonymousConsumer(propMyClass)'
   KaApplicableCallCandidate:

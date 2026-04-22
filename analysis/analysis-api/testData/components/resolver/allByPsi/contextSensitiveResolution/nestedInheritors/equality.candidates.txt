@@ -217,23 +217,7 @@ KtOperationReferenceExpression(313,315): '=='
     isInBestCandidates = true
 
 KtNameReferenceExpression(316,329): 'BasicSettings'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = Settings.BasicSettings
-        symbol = <constructor>(): Settings.BasicSettings
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtContainerNodeForControlStructureBody(331,344): 'work("Basic")'
   NO_CANDIDATES
@@ -417,23 +401,7 @@ KtOperationReferenceExpression(368,370): '=='
     isInBestCandidates = true
 
 KtNameReferenceExpression(371,387): 'SpecificSettings'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = Settings.SpecificSettings
-        symbol = <constructor>(): Settings.SpecificSettings
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtContainerNodeForControlStructureBody(389,405): 'work("Specific")'
   NO_CANDIDATES
@@ -617,45 +585,13 @@ KtOperationReferenceExpression(428,430): '=='
     isInBestCandidates = true
 
 KtDotQualifiedExpression(431,456): 'Settings.SpecificSettings'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = Settings.SpecificSettings
-        symbol = <constructor>(): Settings.SpecificSettings
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(431,439): 'Settings'
   NO_CANDIDATES
 
 KtNameReferenceExpression(440,456): 'SpecificSettings'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = Settings.SpecificSettings
-        symbol = <constructor>(): Settings.SpecificSettings
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtContainerNodeForControlStructureBody(458,474): 'work("Specific")'
   NO_CANDIDATES
@@ -1005,23 +941,7 @@ KtOperationReferenceExpression(716,718): '=='
     isInBestCandidates = true
 
 KtNameReferenceExpression(719,736): 'OpenBasicSettings'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = OpenSettings.OpenBasicSettings
-        symbol = <constructor>(): OpenSettings.OpenBasicSettings
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtContainerNodeForControlStructureBody(738,751): 'work("Basic")'
   NO_CANDIDATES
@@ -1389,61 +1309,13 @@ KtOperationReferenceExpression(839,841): '=='
     isInBestCandidates = true
 
 KtDotQualifiedExpression(842,875): 'OpenSettings.OpenSpecificSettings'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = OpenSettings.OpenSpecificSettings
-        symbol = <constructor>(): OpenSettings.OpenSpecificSettings
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(842,854): 'OpenSettings'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = OpenSettings
-        symbol = <constructor>(): OpenSettings
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(855,875): 'OpenSpecificSettings'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = OpenSettings.OpenSpecificSettings
-        symbol = <constructor>(): OpenSettings.OpenSpecificSettings
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtContainerNodeForControlStructureBody(877,893): 'work("Specific")'
   NO_CANDIDATES

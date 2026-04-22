@@ -77,23 +77,7 @@ KtDotQualifiedExpression(191,208): 'MyEnum.EnumValue1'
     isInBestCandidates = true
 
 KtNameReferenceExpression(191,197): 'MyEnum'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyEnum
-        symbol = <constructor>(): MyEnum
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(198,208): 'EnumValue1'
   KaApplicableCallCandidate:

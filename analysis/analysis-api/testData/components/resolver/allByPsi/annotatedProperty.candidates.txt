@@ -205,23 +205,7 @@ KtDotQualifiedExpression(44,69): 'AnnotationTarget.PROPERTY'
     isInBestCandidates = true
 
 KtNameReferenceExpression(44,60): 'AnnotationTarget'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = kotlin.annotation.AnnotationTarget
-        symbol = <constructor>(): kotlin.annotation.AnnotationTarget
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(61,69): 'PROPERTY'
   KaApplicableCallCandidate:
@@ -269,23 +253,7 @@ KtDotQualifiedExpression(75,106): 'AnnotationTarget.TYPE_PARAMETER'
     isInBestCandidates = true
 
 KtNameReferenceExpression(75,91): 'AnnotationTarget'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = kotlin.annotation.AnnotationTarget
-        symbol = <constructor>(): kotlin.annotation.AnnotationTarget
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(92,106): 'TYPE_PARAMETER'
   KaApplicableCallCandidate:
@@ -333,23 +301,7 @@ KtDotQualifiedExpression(112,137): 'AnnotationTarget.FUNCTION'
     isInBestCandidates = true
 
 KtNameReferenceExpression(112,128): 'AnnotationTarget'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = kotlin.annotation.AnnotationTarget
-        symbol = <constructor>(): kotlin.annotation.AnnotationTarget
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(129,137): 'FUNCTION'
   KaApplicableCallCandidate:
@@ -397,23 +349,7 @@ KtDotQualifiedExpression(143,175): 'AnnotationTarget.VALUE_PARAMETER'
     isInBestCandidates = true
 
 KtNameReferenceExpression(143,159): 'AnnotationTarget'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = kotlin.annotation.AnnotationTarget
-        symbol = <constructor>(): kotlin.annotation.AnnotationTarget
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(160,175): 'VALUE_PARAMETER'
   KaApplicableCallCandidate:
@@ -461,23 +397,7 @@ KtDotQualifiedExpression(181,213): 'AnnotationTarget.PROPERTY_GETTER'
     isInBestCandidates = true
 
 KtNameReferenceExpression(181,197): 'AnnotationTarget'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = kotlin.annotation.AnnotationTarget
-        symbol = <constructor>(): kotlin.annotation.AnnotationTarget
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(198,213): 'PROPERTY_GETTER'
   KaApplicableCallCandidate:
@@ -525,23 +445,7 @@ KtDotQualifiedExpression(219,251): 'AnnotationTarget.PROPERTY_SETTER'
     isInBestCandidates = true
 
 KtNameReferenceExpression(219,235): 'AnnotationTarget'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = kotlin.annotation.AnnotationTarget
-        symbol = <constructor>(): kotlin.annotation.AnnotationTarget
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(236,251): 'PROPERTY_SETTER'
   KaApplicableCallCandidate:
@@ -589,23 +493,7 @@ KtDotQualifiedExpression(257,278): 'AnnotationTarget.TYPE'
     isInBestCandidates = true
 
 KtNameReferenceExpression(257,273): 'AnnotationTarget'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = kotlin.annotation.AnnotationTarget
-        symbol = <constructor>(): kotlin.annotation.AnnotationTarget
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(274,278): 'TYPE'
   KaApplicableCallCandidate:

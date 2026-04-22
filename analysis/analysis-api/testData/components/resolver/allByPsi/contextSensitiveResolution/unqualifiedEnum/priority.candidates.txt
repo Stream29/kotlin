@@ -74,23 +74,7 @@ KtDotQualifiedExpression(134,146): 'Second.THREE'
     isInBestCandidates = true
 
 KtNameReferenceExpression(134,140): 'Second'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = second.Second
-        symbol = <constructor>(): second.Second
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(141,146): 'THREE'
   KaApplicableCallCandidate:

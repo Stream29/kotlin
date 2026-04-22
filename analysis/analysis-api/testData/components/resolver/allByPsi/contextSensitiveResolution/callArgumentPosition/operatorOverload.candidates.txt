@@ -469,20 +469,4 @@ KtOperationReferenceExpression(384,385): '-'
     isInBestCandidates = true
 
 KtNameReferenceExpression(386,401): 'InheritorObject'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.InheritorObject
-        symbol = <constructor>(): MyClass.InheritorObject
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES

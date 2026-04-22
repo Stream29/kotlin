@@ -1,4 +1,2 @@
 KtCallExpression(33,45): 'List<String>'
-  KaCallResolutionError:
-    candidateCalls = []
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
+  null

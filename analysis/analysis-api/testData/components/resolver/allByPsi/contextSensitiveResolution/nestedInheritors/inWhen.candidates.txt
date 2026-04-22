@@ -255,23 +255,7 @@ KtWhenEntry(294,317): 'else -> NestedInheritor'
   NO_CANDIDATES
 
 KtNameReferenceExpression(302,317): 'NestedInheritor'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.NestedInheritor
-        symbol = <constructor>(): MyClass.NestedInheritor
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNamedFunction(337,512): 'fun sealed2(b: Boolean, subClass: MyClass.NestedInheritor) {'
   NO_CANDIDATES
@@ -441,23 +425,7 @@ KtWhenEntry(471,494): 'else -> NestedInheritor'
   NO_CANDIDATES
 
 KtNameReferenceExpression(479,494): 'NestedInheritor'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.NestedInheritor
-        symbol = <constructor>(): MyClass.NestedInheritor
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNamedFunction(514,737): 'fun sealed3(b1: Boolean, b2: Boolean, subClass: MyClass.NestedInheritor) {'
   NO_CANDIDATES
@@ -662,23 +630,7 @@ KtNameReferenceExpression(663,665): 'b2'
     isInBestCandidates = true
 
 KtNameReferenceExpression(669,684): 'NestedInheritor'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.NestedInheritor
-        symbol = <constructor>(): MyClass.NestedInheritor
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtWhenEntry(697,719): 'else -> OtherInheritor'
   NO_CANDIDATES
@@ -1185,23 +1137,7 @@ KtWhenEntry(1114,1123): 'else -> C'
   NO_CANDIDATES
 
 KtNameReferenceExpression(1122,1123): 'C'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = OtherClass.C
-        symbol = <constructor>(): OtherClass.C
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtClass(1143,1219): 'open class OpenClass {'
   NO_CANDIDATES
@@ -1451,23 +1387,7 @@ KtWhenEntry(1382,1416): 'else -> NestedInheritorOfOpenClass'
   NO_CANDIDATES
 
 KtNameReferenceExpression(1390,1416): 'NestedInheritorOfOpenClass'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = OpenClass.NestedInheritorOfOpenClass
-        symbol = <constructor>(): OpenClass.NestedInheritorOfOpenClass
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNamedFunction(1436,1635): 'fun open2(b: Boolean, subClass: OpenClass.NestedInheritorOfOpenClass) {'
   NO_CANDIDATES

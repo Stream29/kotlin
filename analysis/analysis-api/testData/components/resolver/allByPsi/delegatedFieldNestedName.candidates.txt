@@ -121,23 +121,7 @@ KtDotQualifiedExpression(39,60): 'AnnotationTarget.TYPE'
     isInBestCandidates = true
 
 KtNameReferenceExpression(39,55): 'AnnotationTarget'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = kotlin.annotation.AnnotationTarget
-        symbol = <constructor>(): kotlin.annotation.AnnotationTarget
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(56,60): 'TYPE'
   KaApplicableCallCandidate:
@@ -1931,23 +1915,7 @@ KtNameReferenceExpression(286,289): 'Int'
   NO_CANDIDATES
 
 KtNameReferenceExpression(295,304): 'Companion'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = second.MyClass.Companion
-        symbol = <constructor>(): second.MyClass.Companion
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtDelegatedSuperTypeEntry(310,374): '@Anno(4 + outer) Second<@Anno(5 + outer) String> by NestedObject'
   NO_CANDIDATES
@@ -3079,23 +3047,7 @@ KtNameReferenceExpression(351,357): 'String'
   NO_CANDIDATES
 
 KtNameReferenceExpression(362,374): 'NestedObject'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = second.MyClass.NestedObject
-        symbol = <constructor>(): second.MyClass.NestedObject
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtClassBody(375,610): '{'
   NO_CANDIDATES

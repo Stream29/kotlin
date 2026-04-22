@@ -776,23 +776,7 @@ KtDotQualifiedExpression(325,334): 'MyEnum1.X'
     isInBestCandidates = true
 
 KtNameReferenceExpression(325,332): 'MyEnum1'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyEnum1
-        symbol = <constructor>(): MyEnum1
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(333,334): 'X'
   KaApplicableCallCandidate:
@@ -1057,23 +1041,7 @@ KtDotQualifiedExpression(347,356): 'MyEnum1.X'
     isInBestCandidates = true
 
 KtNameReferenceExpression(347,354): 'MyEnum1'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyEnum1
-        symbol = <constructor>(): MyEnum1
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(355,356): 'X'
   KaApplicableCallCandidate:
@@ -2143,23 +2111,7 @@ KtDotQualifiedExpression(493,502): 'MyEnum3.X'
     isInBestCandidates = true
 
 KtNameReferenceExpression(493,500): 'MyEnum3'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyEnum3
-        symbol = <constructor>(): MyEnum3
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(501,502): 'X'
   KaApplicableCallCandidate:

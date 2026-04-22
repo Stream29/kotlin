@@ -223,23 +223,7 @@ KtDotQualifiedExpression(232,243): 'MyClass.bar'
     isInBestCandidates = true
 
 KtNameReferenceExpression(232,239): 'MyClass'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass
-        symbol = <constructor>(): MyClass
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(240,243): 'bar'
   KaInapplicableCallCandidate:
@@ -550,23 +534,7 @@ KtDotQualifiedExpression(408,420): 'MyClass2.bar'
     isInBestCandidates = true
 
 KtNameReferenceExpression(408,416): 'MyClass2'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass2
-        symbol = <constructor>(): MyClass2
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(417,420): 'bar'
   KaApplicableCallCandidate:

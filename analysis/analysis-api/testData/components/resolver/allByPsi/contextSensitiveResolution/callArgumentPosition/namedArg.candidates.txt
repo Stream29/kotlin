@@ -440,23 +440,7 @@ KtNameReferenceExpression(592,607): 'InheritorObject'
   NO_CANDIDATES
 
 KtNameReferenceExpression(610,625): 'InheritorObject'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.InheritorObject
-        symbol = <constructor>(): MyClass.InheritorObject
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtProperty(634,655): 'val prop: String = ""'
   NO_CANDIDATES
@@ -904,23 +888,7 @@ KtBlockExpression(761,776): 'InheritorObject'
   NO_CANDIDATES
 
 KtNameReferenceExpression(761,776): 'InheritorObject'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.InheritorObject
-        symbol = <constructor>(): MyClass.InheritorObject
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNamedFunction(787,845): 'fun namedArgumentsHolder(enumArg: MyEnum, arg: MyClass) {}'
   NO_CANDIDATES
@@ -1094,23 +1062,7 @@ KtNameReferenceExpression(944,947): 'arg'
   NO_CANDIDATES
 
 KtNameReferenceExpression(950,965): 'InheritorObject'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.InheritorObject
-        symbol = <constructor>(): MyClass.InheritorObject
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtValueArgument(975,995): 'enumArg = EnumValue1'
   NO_CANDIDATES

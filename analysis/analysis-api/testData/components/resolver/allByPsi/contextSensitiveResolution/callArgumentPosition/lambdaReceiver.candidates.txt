@@ -429,23 +429,7 @@ KtNameReferenceExpression(539,554): 'InheritorObject'
   NO_CANDIDATES
 
 KtNameReferenceExpression(557,572): 'InheritorObject'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.InheritorObject
-        symbol = <constructor>(): MyClass.InheritorObject
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtProperty(582,603): 'val prop: String = ""'
   NO_CANDIDATES
@@ -911,23 +895,7 @@ KtBlockExpression(754,769): 'InheritorObject'
   NO_CANDIDATES
 
 KtNameReferenceExpression(754,769): 'InheritorObject'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.InheritorObject
-        symbol = <constructor>(): MyClass.InheritorObject
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNamedFunction(779,814): 'fun <T>receiveLambda(l: () -> T) {}'
   NO_CANDIDATES
@@ -1074,23 +1042,7 @@ KtBlockExpression(872,887): 'InheritorObject'
   NO_CANDIDATES
 
 KtNameReferenceExpression(872,887): 'InheritorObject'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.InheritorObject
-        symbol = <constructor>(): MyClass.InheritorObject
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtCallExpression(894,932): 'receiveLambda<MyClass> { propMyClass }'
   KaApplicableCallCandidate:
@@ -2164,23 +2116,7 @@ KtBlockExpression(1264,1276): 'NestedObject'
   NO_CANDIDATES
 
 KtNameReferenceExpression(1264,1276): 'NestedObject'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.NestedObject
-        symbol = <constructor>(): MyClass.NestedObject
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtCallExpression(1283,1316): 'receiveLambda<MyClass> { func() }'
   KaInapplicableCallCandidate:

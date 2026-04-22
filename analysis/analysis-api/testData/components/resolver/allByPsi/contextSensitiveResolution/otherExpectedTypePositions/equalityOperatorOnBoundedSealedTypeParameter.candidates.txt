@@ -307,61 +307,13 @@ KtProperty(257,275): 'val L = MySealed.X'
   NO_CANDIDATES
 
 KtDotQualifiedExpression(265,275): 'MySealed.X'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.X
-        symbol = <constructor>(): MySealed.X
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(265,273): 'MySealed'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed
-        symbol = <constructor>(): MySealed
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(274,275): 'X'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.X
-        symbol = <constructor>(): MySealed.X
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtIfExpression(281,295): 'if (a == X) {}'
   NO_CANDIDATES
@@ -462,23 +414,7 @@ KtOperationReferenceExpression(287,289): '=='
     isInBestCandidates = true
 
 KtNameReferenceExpression(290,291): 'X'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.X
-        symbol = <constructor>(): MySealed.X
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtContainerNodeForControlStructureBody(293,295): '{}'
   NO_CANDIDATES
@@ -585,23 +521,7 @@ KtOperationReferenceExpression(306,308): '=='
     isInBestCandidates = true
 
 KtNameReferenceExpression(309,310): 'Y'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.Y
-        symbol = <constructor>(): MySealed.Y
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtContainerNodeForControlStructureBody(312,314): '{}'
   NO_CANDIDATES
@@ -708,23 +628,7 @@ KtOperationReferenceExpression(325,327): '!='
     isInBestCandidates = true
 
 KtNameReferenceExpression(328,329): 'X'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.X
-        symbol = <constructor>(): MySealed.X
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtContainerNodeForControlStructureBody(331,333): '{}'
   NO_CANDIDATES
@@ -831,23 +735,7 @@ KtOperationReferenceExpression(344,346): '!='
     isInBestCandidates = true
 
 KtNameReferenceExpression(347,348): 'Y'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.Y
-        symbol = <constructor>(): MySealed.Y
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtContainerNodeForControlStructureBody(350,352): '{}'
   NO_CANDIDATES
@@ -886,23 +774,7 @@ KtOperationReferenceExpression(363,366): '==='
   NO_CANDIDATES
 
 KtNameReferenceExpression(367,368): 'X'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.X
-        symbol = <constructor>(): MySealed.X
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtContainerNodeForControlStructureBody(370,372): '{}'
   NO_CANDIDATES
@@ -941,23 +813,7 @@ KtOperationReferenceExpression(383,386): '==='
   NO_CANDIDATES
 
 KtNameReferenceExpression(387,388): 'Y'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.Y
-        symbol = <constructor>(): MySealed.Y
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtContainerNodeForControlStructureBody(390,392): '{}'
   NO_CANDIDATES
@@ -996,23 +852,7 @@ KtOperationReferenceExpression(403,406): '!=='
   NO_CANDIDATES
 
 KtNameReferenceExpression(407,408): 'X'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.X
-        symbol = <constructor>(): MySealed.X
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtContainerNodeForControlStructureBody(410,412): '{}'
   NO_CANDIDATES
@@ -1051,23 +891,7 @@ KtOperationReferenceExpression(423,426): '!=='
   NO_CANDIDATES
 
 KtNameReferenceExpression(427,428): 'Y'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.Y
-        symbol = <constructor>(): MySealed.Y
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtContainerNodeForControlStructureBody(430,432): '{}'
   NO_CANDIDATES
@@ -2081,23 +1905,7 @@ KtOperationReferenceExpression(973,975): '=='
     isInBestCandidates = true
 
 KtNameReferenceExpression(976,977): 'X'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.X
-        symbol = <constructor>(): MySealed.X
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtBlockExpression(981,983): '{}'
   NO_CANDIDATES
@@ -2201,23 +2009,7 @@ KtOperationReferenceExpression(994,996): '!='
     isInBestCandidates = true
 
 KtNameReferenceExpression(997,998): 'Y'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.Y
-        symbol = <constructor>(): MySealed.Y
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtBlockExpression(1002,1004): '{}'
   NO_CANDIDATES
@@ -2256,23 +2048,7 @@ KtOperationReferenceExpression(1033,1036): '==='
   NO_CANDIDATES
 
 KtNameReferenceExpression(1037,1038): 'X'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.X
-        symbol = <constructor>(): MySealed.X
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtBlockExpression(1042,1044): '{}'
   NO_CANDIDATES
@@ -2469,23 +2245,7 @@ KtOperationReferenceExpression(1103,1106): '!=='
   NO_CANDIDATES
 
 KtNameReferenceExpression(1107,1108): 'Y'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.Y
-        symbol = <constructor>(): MySealed.Y
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtBlockExpression(1112,1114): '{}'
   NO_CANDIDATES
@@ -2518,23 +2278,7 @@ KtWhenConditionWithExpression(1144,1145): 'X'
   NO_CANDIDATES
 
 KtNameReferenceExpression(1144,1145): 'X'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.X
-        symbol = <constructor>(): MySealed.X
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtBlockExpression(1149,1151): '{}'
   NO_CANDIDATES
@@ -2546,23 +2290,7 @@ KtWhenConditionWithExpression(1160,1161): 'Y'
   NO_CANDIDATES
 
 KtNameReferenceExpression(1160,1161): 'Y'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.Y
-        symbol = <constructor>(): MySealed.Y
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtWhenConditionWithExpression(1163,1164): 'L'
   NO_CANDIDATES
@@ -2637,23 +2365,7 @@ KtWhenConditionWithExpression(1234,1235): 'X'
   NO_CANDIDATES
 
 KtNameReferenceExpression(1234,1235): 'X'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.X
-        symbol = <constructor>(): MySealed.X
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtBlockExpression(1239,1241): '{}'
   NO_CANDIDATES
@@ -2665,23 +2377,7 @@ KtWhenConditionWithExpression(1250,1251): 'Y'
   NO_CANDIDATES
 
 KtNameReferenceExpression(1250,1251): 'Y'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.Y
-        symbol = <constructor>(): MySealed.Y
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtWhenConditionWithExpression(1253,1254): 'L'
   NO_CANDIDATES

@@ -619,23 +619,7 @@ KtValueArgument(377,392): 'InheritorObject'
   NO_CANDIDATES
 
 KtNameReferenceExpression(377,392): 'InheritorObject'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MySealed.InheritorObject
-        symbol = <constructor>(): MySealed.InheritorObject
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtLambdaArgument(393,414): '{'
   NO_CANDIDATES

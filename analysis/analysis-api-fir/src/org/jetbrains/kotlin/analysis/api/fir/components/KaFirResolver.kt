@@ -65,10 +65,8 @@ import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.substitution.substitutorByMap
 import org.jetbrains.kotlin.fir.resolve.toArrayOfFactoryName
 import org.jetbrains.kotlin.fir.resolve.transformers.unwrapAtoms
-import org.jetbrains.kotlin.fir.scopes.getDeclaredConstructors
 import org.jetbrains.kotlin.fir.scopes.impl.declaredMemberScope
 import org.jetbrains.kotlin.fir.scopes.impl.toConeType
-import org.jetbrains.kotlin.fir.scopes.unsubstitutedScope
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.*
@@ -592,18 +590,6 @@ internal class KaFirResolver(
             )
         }
 
-        if (this is FirResolvedQualifier) {
-            val callExpression = (psi as? KtExpression)?.getPossiblyQualifiedCallExpression()
-            if (callExpression != null) {
-                val constructors = findQualifierConstructors()
-                val calls = toKaCalls(constructors)
-                return KaBaseCallResolutionError(
-                    backedDiagnostic = inapplicableCandidateDiagnostic(),
-                    backingCandidateCalls = calls,
-                )
-            }
-        }
-
         if (this is FirImplicitInvokeCall) {
 
             // If we have a PSI expression like `Foo.Bar.Baz()` and try to resolve `Bar` part,
@@ -703,10 +689,6 @@ internal class KaFirResolver(
 
             else -> null
         }
-    }
-
-    private fun inapplicableCandidateDiagnostic(): KaDiagnostic {
-        return KaNonBoundToPsiErrorDiagnostic(factoryName = FirErrors.OTHER_ERROR.name, "Inapplicable candidate", token)
     }
 
     /**
@@ -1789,10 +1771,6 @@ internal class KaFirResolver(
         return toFirTypeArgumentsMapping(typeArguments, symbol)
     }
 
-    private fun FirResolvedQualifier.toFirTypeArgumentsMapping(symbol: FirCallableSymbol<*>): Map<FirTypeParameterSymbol, ConeKotlinType> {
-        return toFirTypeArgumentsMapping(typeArguments, symbol)
-    }
-
     private fun FirDelegatedConstructorCall.toFirTypeArgumentsMapping(symbol: FirCallableSymbol<*>): Map<FirTypeParameterSymbol, ConeKotlinType> {
         val typeParameters = symbol.typeParameterSymbols.ifEmpty { return emptyMap() }
         val typeArguments = constructedTypeRef.coneType.typeArguments
@@ -1878,30 +1856,9 @@ internal class KaFirResolver(
                 resolveFragmentOfCall = resolveFragmentOfCall,
             )
 
-            is FirResolvedQualifier -> toKaCallCandidates()
             is FirDelegatedConstructorCall -> collectCallCandidatesForDelegatedConstructorCall(psi, resolveFragmentOfCall)
             else -> toKaResolutionAttempt(psi, resolveCalleeExpressionOfFunctionCall, resolveFragmentOfCall).toKaCallCandidates()
         }
-    }
-
-    private fun FirResolvedQualifier.toKaCallCandidates(): List<KaCallCandidate> {
-        return toKaCalls(findQualifierConstructors()).map {
-            KaBaseInapplicableCallCandidate(
-                backingCandidate = it,
-                backingIsInBestCandidates = false,
-                backingDiagnostic = inapplicableCandidateDiagnostic()
-            )
-        }
-    }
-
-    private fun FirResolvedQualifier.findQualifierConstructors(): List<FirConstructorSymbol> {
-        val classSymbol = this.symbol?.fullyExpandedClass(analysisSession.firSession) ?: return emptyList()
-        return classSymbol.unsubstitutedScope(
-            analysisSession.firSession,
-            analysisSession.getScopeSessionFor(analysisSession.firSession),
-            withForcedTypeCalculator = true,
-            memberRequiredPhase = null,
-        ).getDeclaredConstructors()
     }
 
     private fun Map<FirTypeParameterSymbol, ConeKotlinType>.asKaTypeParametersMapping(): Map<KaTypeParameterSymbol, KaType> {
@@ -1909,25 +1866,6 @@ internal class KaFirResolver(
             firSymbolBuilder.classifierBuilder.buildTypeParameterSymbol(key) to value.asKaType()
         }.toMap()
     }
-
-    private fun FirResolvedQualifier.toKaCalls(constructors: List<FirConstructorSymbol>): List<KaFunctionCall<*>> =
-        constructors.map { constructor ->
-            val signature = constructor.toKaSignature()
-            val partiallyAppliedSymbol = KaBasePartiallyAppliedSymbol(
-                backingSignature = signature as KaFunctionSignature<*>,
-                dispatchReceiver = null,
-                extensionReceiver = null,
-                contextArguments = emptyList(),
-            )
-
-            val firTypeArgumentsMapping = toFirTypeArgumentsMapping(constructor)
-            val typeArgumentsMapping = firTypeArgumentsMapping.asKaTypeParametersMapping()
-            KaBaseSimpleFunctionCall(
-                backingPartiallyAppliedSymbol = partiallyAppliedSymbol,
-                backingArgumentMapping = emptyMap(),
-                backingTypeArgumentsMapping = typeArgumentsMapping,
-            )
-        }
 
     private fun FirQualifiedAccessExpression.collectCallCandidates(
         psi: KtElement,

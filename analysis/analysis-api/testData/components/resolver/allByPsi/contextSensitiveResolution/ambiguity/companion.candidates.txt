@@ -374,23 +374,7 @@ KtDotQualifiedExpression(331,339): 'MyEnum.A'
     isInBestCandidates = true
 
 KtNameReferenceExpression(331,337): 'MyEnum'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = foo.MyEnum
-        symbol = <constructor>(): foo.MyEnum
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(338,339): 'A'
   KaApplicableCallCandidate:
@@ -560,23 +544,7 @@ KtDotQualifiedExpression(412,423): 'Companion.A'
     isInBestCandidates = true
 
 KtNameReferenceExpression(412,421): 'Companion'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = foo.Test.Companion
-        symbol = <constructor>(): foo.Test.Companion
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(422,423): 'A'
   KaApplicableCallCandidate:
@@ -782,23 +750,7 @@ KtDotQualifiedExpression(571,579): 'MyEnum.A'
     isInBestCandidates = true
 
 KtNameReferenceExpression(571,577): 'MyEnum'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = foo.MyEnum
-        symbol = <constructor>(): foo.MyEnum
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(578,579): 'A'
   KaApplicableCallCandidate:
@@ -930,23 +882,7 @@ KtDotQualifiedExpression(667,678): 'Companion.A'
     isInBestCandidates = true
 
 KtNameReferenceExpression(667,676): 'Companion'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = foo.Test.Companion
-        symbol = <constructor>(): foo.Test.Companion
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(677,678): 'A'
   KaApplicableCallCandidate:

@@ -2733,23 +2733,7 @@ KtDotQualifiedExpression(2598,2615): 'JClass.staticProp'
     isInBestCandidates = true
 
 KtNameReferenceExpression(2598,2604): 'JClass'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = JClass
-        symbol = <constructor>(): JClass
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(2605,2615): 'staticProp'
   KaApplicableCallCandidate:

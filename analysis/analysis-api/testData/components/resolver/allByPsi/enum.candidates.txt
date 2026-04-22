@@ -520,31 +520,7 @@ KtDotQualifiedExpression(325,350): 'EnumWithConstructor.Entry'
     isInBestCandidates = true
 
 KtNameReferenceExpression(325,344): 'EnumWithConstructor'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = EnumWithConstructor
-        symbol = <constructor>(i: kotlin.Int): EnumWithConstructor
-        valueParameters = [
-          KaVariableSignature:
-            name = i
-            receiverType = null
-            returnType = kotlin.Int
-            symbol = i: kotlin.Int
-            contextParameters = []
-            callableId = null
-        ]
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(345,350): 'Entry'
   KaApplicableCallCandidate:
@@ -610,31 +586,7 @@ KtDotQualifiedExpression(355,380): 'EnumWithConstructor.Entry'
     isInBestCandidates = true
 
 KtNameReferenceExpression(355,374): 'EnumWithConstructor'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = EnumWithConstructor
-        symbol = <constructor>(i: kotlin.Int): EnumWithConstructor
-        valueParameters = [
-          KaVariableSignature:
-            name = i
-            receiverType = null
-            returnType = kotlin.Int
-            symbol = i: kotlin.Int
-            contextParameters = []
-            callableId = null
-        ]
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(375,380): 'Entry'
   KaApplicableCallCandidate:
@@ -700,31 +652,7 @@ KtDotQualifiedExpression(390,423): 'EnumWithConstructor.EntryWithBody'
     isInBestCandidates = true
 
 KtNameReferenceExpression(390,409): 'EnumWithConstructor'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = EnumWithConstructor
-        symbol = <constructor>(i: kotlin.Int): EnumWithConstructor
-        valueParameters = [
-          KaVariableSignature:
-            name = i
-            receiverType = null
-            returnType = kotlin.Int
-            symbol = i: kotlin.Int
-            contextParameters = []
-            callableId = null
-        ]
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(410,423): 'EntryWithBody'
   KaApplicableCallCandidate:
@@ -790,31 +718,7 @@ KtDotQualifiedExpression(428,461): 'EnumWithConstructor.EntryWithBody'
     isInBestCandidates = true
 
 KtNameReferenceExpression(428,447): 'EnumWithConstructor'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = EnumWithConstructor
-        symbol = <constructor>(i: kotlin.Int): EnumWithConstructor
-        valueParameters = [
-          KaVariableSignature:
-            name = i
-            receiverType = null
-            returnType = kotlin.Int
-            symbol = i: kotlin.Int
-            contextParameters = []
-            callableId = null
-        ]
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(448,461): 'EntryWithBody'
   KaApplicableCallCandidate:
@@ -880,23 +784,7 @@ KtDotQualifiedExpression(469,499): 'EnumWithoutConstructor.entries'
     isInBestCandidates = true
 
 KtNameReferenceExpression(469,491): 'EnumWithoutConstructor'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = EnumWithoutConstructor
-        symbol = <constructor>(): EnumWithoutConstructor
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(492,499): 'entries'
   KaApplicableCallCandidate:
@@ -941,23 +829,7 @@ KtDotQualifiedExpression(504,532): 'EnumWithoutConstructor.Entry'
     isInBestCandidates = true
 
 KtNameReferenceExpression(504,526): 'EnumWithoutConstructor'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = EnumWithoutConstructor
-        symbol = <constructor>(): EnumWithoutConstructor
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(527,532): 'Entry'
   KaApplicableCallCandidate:
@@ -1002,23 +874,7 @@ KtDotQualifiedExpression(537,573): 'EnumWithoutConstructor.EntryWithBody'
     isInBestCandidates = true
 
 KtNameReferenceExpression(537,559): 'EnumWithoutConstructor'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = EnumWithoutConstructor
-        symbol = <constructor>(): EnumWithoutConstructor
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(560,573): 'EntryWithBody'
   KaApplicableCallCandidate:

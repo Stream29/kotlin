@@ -1087,23 +1087,7 @@ KtValueArgument(491,494): 'Bar'
   NO_CANDIDATES
 
 KtNameReferenceExpression(491,494): 'Bar'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.Bar
-        symbol = <constructor>(): MyClass.Bar
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtCallExpression(500,522): 'expectMyClass(id(Bar))'
   KaApplicableCallCandidate:
@@ -1258,23 +1242,7 @@ KtValueArgument(517,520): 'Bar'
   NO_CANDIDATES
 
 KtNameReferenceExpression(517,520): 'Bar'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.Bar
-        symbol = <constructor>(): MyClass.Bar
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtCallExpression(528,558): 'expectMyClass(ForTypeMismatch)'
   KaInapplicableCallCandidate:
@@ -1353,23 +1321,7 @@ KtValueArgument(542,557): 'ForTypeMismatch'
   NO_CANDIDATES
 
 KtNameReferenceExpression(542,557): 'ForTypeMismatch'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.ForTypeMismatch
-        symbol = <constructor>(): MyClass.ForTypeMismatch
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtCallExpression(563,597): 'expectMyClass(id(ForTypeMismatch))'
   KaInapplicableCallCandidate:
@@ -1526,23 +1478,7 @@ KtValueArgument(580,595): 'ForTypeMismatch'
   NO_CANDIDATES
 
 KtNameReferenceExpression(580,595): 'ForTypeMismatch'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = MyClass.ForTypeMismatch
-        symbol = <constructor>(): MyClass.ForTypeMismatch
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtDotQualifiedExpression(603,638): 'JavaClass.expectJavaClass(INSTANCE)'
   KaApplicableCallCandidate:
@@ -1582,23 +1518,7 @@ KtDotQualifiedExpression(603,638): 'JavaClass.expectJavaClass(INSTANCE)'
     isInBestCandidates = true
 
 KtNameReferenceExpression(603,612): 'JavaClass'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = JavaClass
-        symbol = <constructor>(): JavaClass
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtCallExpression(613,638): 'expectJavaClass(INSTANCE)'
   KaApplicableCallCandidate:

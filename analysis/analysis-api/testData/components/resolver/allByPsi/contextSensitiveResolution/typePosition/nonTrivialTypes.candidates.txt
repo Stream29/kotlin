@@ -323,23 +323,7 @@ KtDotQualifiedExpression(403,418): 'JavaClass.foo()'
     isInBestCandidates = true
 
 KtNameReferenceExpression(403,412): 'JavaClass'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = JavaClass
-        symbol = <constructor>(): JavaClass
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtCallExpression(413,418): 'foo()'
   KaApplicableCallCandidate:

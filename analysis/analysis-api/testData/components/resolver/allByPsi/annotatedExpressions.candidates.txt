@@ -127,23 +127,7 @@ KtDotQualifiedExpression(46,73): 'AnnotationTarget.EXPRESSION'
     isInBestCandidates = true
 
 KtNameReferenceExpression(46,62): 'AnnotationTarget'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = kotlin.annotation.AnnotationTarget
-        symbol = <constructor>(): kotlin.annotation.AnnotationTarget
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(63,73): 'EXPRESSION'
   KaApplicableCallCandidate:
@@ -271,23 +255,7 @@ KtDotQualifiedExpression(86,112): 'AnnotationRetention.SOURCE'
     isInBestCandidates = true
 
 KtNameReferenceExpression(86,105): 'AnnotationRetention'
-  KaInapplicableCallCandidate:
-    candidate = KaSimpleFunctionCall:
-      contextArgumentMapping = {}
-      contextArguments = []
-      dispatchReceiver = null
-      extensionReceiver = null
-      signature = KaFunctionSignature:
-        receiverType = null
-        returnType = kotlin.annotation.AnnotationRetention
-        symbol = <constructor>(): kotlin.annotation.AnnotationRetention
-        valueParameters = []
-        contextParameters = []
-        callableId = null
-      typeArgumentsMapping = {}
-      valueArgumentMapping = {}
-    diagnostic = ERROR<OTHER_ERROR: Inapplicable candidate>
-    isInBestCandidates = false
+  NO_CANDIDATES
 
 KtNameReferenceExpression(106,112): 'SOURCE'
   KaApplicableCallCandidate:
