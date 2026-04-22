@@ -61,7 +61,7 @@ internal object LLContainingClassCalculator {
         val source = symbol.source as? KtPsiSourceElement ?: return null
         return when (source.kind) {
             ImplicitConstructor,
-            EnumGeneratedDeclaration,
+            is EnumGeneratedDeclaration,
             ReplEvalFunction,
                 -> computeContainingClass(symbol, source.psi)
 
