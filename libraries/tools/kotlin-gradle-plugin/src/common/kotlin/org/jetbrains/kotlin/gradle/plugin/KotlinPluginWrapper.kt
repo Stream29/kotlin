@@ -85,15 +85,15 @@ abstract class DefaultKotlinBasePlugin : KotlinBasePlugin {
     override val pluginVersion: String = getKotlinPluginVersion(logger)
 
     override fun apply(project: Project) {
-
         project.checkCompilerEmbeddableInClasspath()
         project.registerDefaultVariantImplementations()
+
+        project.runGradleCompatibilityCheck()
+        project.runAgpCompatibilityCheckIfAgpIsApplied()
 
         //BuildMetricsPlugin access variants so it should be applied after it initialization
         project.pluginManager.apply(BuildMetricsPlugin::class.java)
 
-        project.runGradleCompatibilityCheck()
-        project.runAgpCompatibilityCheckIfAgpIsApplied()
         BuildFinishedListenerService.registerIfAbsent(project)
         BuildSessionService.registerIfAbsent(project)
 
