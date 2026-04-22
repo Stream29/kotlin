@@ -40,14 +40,17 @@ object KtRealSourceElementKind : KtSourceElementKind() {
  *
  * ### Distinct fake source elements
  *
- * **Constraint:** To support the unambiguous source-based equality of FIR symbols, each FIR declaration in a file should have a distinct
- * `(realSource, fakeElementKind)` pair as a source element.
+ * **Constraint:** To support the unambiguous source-based equality of FIR symbols, each FIR declaration with a fake source should have a
+ * distinct `(realSource, fakeElementKind)` pair as its source element.
  *
  * This constraint can be checked per file because fake source elements from different files can never be equal, as real source elements
  * are distinct between files.
  *
  * When the constraint is violated, we can have two different FIR declarations with the same source element. Source-based equality would
  * then break, because these FIR declarations would be unexpectedly equal.
+ *
+ * This constraint does not (yet) apply to non-declaration FIR elements, so, for example, it is currently legal for multiple FIR expressions
+ * to share the same fake source element.
  */
 sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeReporting: Boolean = false) : KtSourceElementKind() {
     /**
