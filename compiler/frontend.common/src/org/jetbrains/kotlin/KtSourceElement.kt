@@ -55,6 +55,17 @@ object KtRealSourceElementKind : KtSourceElementKind() {
  */
 sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeReporting: Boolean = false) : KtSourceElementKind() {
     /**
+     * The full name of the fake source element kind. It includes its own simple name and the names of the complete nested hierarchy of
+     * outer fake source element kinds, excluding [KtFakeSourceElementKind].
+     *
+     * For example, [EnumGeneratedDeclaration.ValuesFunction.ReturnType] has the full name
+     * `EnumGeneratedDeclaration.ValuesFunction.ReturnType`.
+     */
+    private val fullName: String = javaClass.name.substringAfter('$').replace('$', '.')
+
+    override fun toString(): String = fullName
+
+    /**
      * for some fir expression implicit return typeRef is generated
      * some of them are: break, continue, return, throw, string concat,
      * destruction parameters, function literals, explicitly boolean expressions
@@ -457,8 +468,7 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
 
         override fun hashCode(): Int = Objects.hash(this::class, generatedElementKind)
 
-        override fun toString(): String =
-            "${DesugaredIncrementOrDecrement::class.simpleName}.${this::class.simpleName}($generatedElementKind)"
+        override fun toString(): String = "${super.toString()}($generatedElementKind)"
     }
 
     /**
@@ -619,7 +629,7 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
     class LambdaContextParameter(private val index: Int) : KtFakeSourceElementKind() {
         override fun equals(other: Any?): Boolean = this === other || other is LambdaContextParameter && index == other.index
         override fun hashCode(): Int = Objects.hash(this::class, index.hashCode())
-        override fun toString(): String = "${LambdaContextParameter::class.simpleName}($index)"
+        override fun toString(): String = "${super.toString()}($index)"
     }
 
     /**
@@ -772,8 +782,7 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
 
             override fun hashCode(): Int = Objects.hash(this::class, index)
 
-            override fun toString(): String =
-                "${ScriptParameter::class.simpleName}.${BaseClassConstructorParameter::class.simpleName}($index)"
+            override fun toString(): String = "${super.toString()}($index)"
         }
 
         /**
@@ -785,7 +794,7 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
 
             override fun hashCode(): Int = Objects.hash(this::class, index)
 
-            override fun toString(): String = "${ScriptParameter::class.simpleName}.${ImplicitReceiver::class.simpleName}($index)"
+            override fun toString(): String = "${super.toString()}($index)"
         }
 
         /**
@@ -797,7 +806,7 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
 
             override fun hashCode(): Int = Objects.hash(this::class, index)
 
-            override fun toString(): String = "${ScriptParameter::class.simpleName}.${ProvidedProperty::class.simpleName}($index)"
+            override fun toString(): String = "${super.toString()}($index)"
         }
 
         /**
