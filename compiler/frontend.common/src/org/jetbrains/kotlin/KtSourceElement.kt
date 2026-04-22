@@ -104,7 +104,7 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
      */
     sealed class DefaultAccessor : KtFakeSourceElementKind(shouldSkipErrorTypeReporting = true) {
         /**
-         * A default backing field. Its real source is the property.
+         * A default backing field. Its real source is the property or return type reference (for the backing field's return type).
          *
          * The backing field is a default "accessor" for historical reasons: The same `DefaultAccessor` fake element kind was applied not
          * only to default getters and setters, but also to default backing fields.
