@@ -345,4 +345,4 @@ class AvailableSinceTest : BaseCompilationTest() {
     }
 }
 
-private fun KotlinReleaseVersion.toKotlinToolingVersion() = KotlinToolingVersion(this.toString())
+private fun KotlinReleaseVersion.toKotlinToolingVersion() = KotlinToolingVersion(this.major, this.minor, this.patch, "snapshot")

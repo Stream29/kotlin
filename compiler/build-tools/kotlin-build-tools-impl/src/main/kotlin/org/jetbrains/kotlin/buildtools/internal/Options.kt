@@ -85,6 +85,7 @@ internal fun initializeOptions(klazz: KClass<*>, options: Options) {
 }
 
 @TestOnly
+@Suppress("unused")
 internal fun overrideVersionForOptionsCheck(version: String) {
     versionForOptionsCheck = version
 }
@@ -94,11 +95,15 @@ private var versionForOptionsCheck: String = KotlinCompilerVersion.VERSION
 internal fun checkOptionIsAvailableForVersion(key: BaseOption<*>) {
     val getAvailableSinceVersionMethod = key::class.java.methods.find { it.name == "getAvailableSinceVersion" } ?: return
     val availableSinceVersion = getAvailableSinceVersionMethod.invoke(key) as KotlinReleaseVersion
-    if (availableSinceVersion.toKotlinToolingVersion() > KotlinToolingVersion(versionForOptionsCheck)) {
+    if (availableSinceVersion.toKotlinToolingVersion() > KotlinToolingVersion(versionForOptionsCheck).clearClassifier()) {
         throw IllegalStateException("${key.id} is available only since $availableSinceVersion")
     }
 }
 
 internal fun KotlinReleaseVersion.toKotlinToolingVersion(): KotlinToolingVersion {
+    return KotlinToolingVersion(major, minor, patch, null)
+}
+
+private fun KotlinToolingVersion.clearClassifier(): KotlinToolingVersion {
     return KotlinToolingVersion(major, minor, patch, null)
 }
