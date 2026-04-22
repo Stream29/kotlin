@@ -5,9 +5,12 @@
 
 package org.jetbrains.kotlin.buildtools.tests.compilation.model
 
-import org.jetbrains.kotlin.buildtools.api.*
 import org.jetbrains.kotlin.buildtools.api.BaseIncrementalCompilationConfiguration.Companion.FORCE_RECOMPILATION
 import org.jetbrains.kotlin.buildtools.api.BaseIncrementalCompilationConfiguration.Companion.MODULE_BUILD_DIR
+import org.jetbrains.kotlin.buildtools.api.CompilationResult
+import org.jetbrains.kotlin.buildtools.api.ExecutionPolicy
+import org.jetbrains.kotlin.buildtools.api.KotlinToolchains
+import org.jetbrains.kotlin.buildtools.api.SourcesChanges
 import org.jetbrains.kotlin.buildtools.api.arguments.CommonJsAndWasmArguments.Companion.IR_OUTPUT_NAME
 import org.jetbrains.kotlin.buildtools.api.arguments.CommonJsAndWasmArguments.Companion.LIBRARIES
 import org.jetbrains.kotlin.buildtools.api.arguments.CommonJsAndWasmArguments.Companion.NOPACK
@@ -22,6 +25,7 @@ import org.jetbrains.kotlin.buildtools.api.js.operations.JsKlibCompilationOperat
 import org.jetbrains.kotlin.buildtools.api.js.operations.JsLinkingOperation
 import org.jetbrains.kotlin.buildtools.api.js.operations.historyBasedIcConfiguration
 import java.nio.file.Path
+import kotlin.io.path.name
 import kotlin.io.path.pathString
 import kotlin.io.path.walk
 
@@ -43,12 +47,43 @@ class JsModule(
     dependencies,
     defaultStrategyConfig,
     moduleCompilationConfigAction,
-) {
+), LinkableModule<JsLinkingOperation, JsLinkingOperation.Builder> {
 
     val otherModules = mutableListOf<JsModule>()
+    var lastCompileProducedPackedKlib = false
 
     private val dependencyFiles: List<Path>
         get() = dependencies.map { it.location }.plus(stdlibKlibLocation)
+
+    override fun link(
+        strategyConfig: ExecutionPolicy,
+        forceOutput: LogLevel?,
+        compilationConfigAction: (JsLinkingOperation.Builder) -> Unit,
+        compilationAction: (JsLinkingOperation) -> Unit,
+        assertions: context(Module<*, *, *>) CompilationOutcome.() -> Unit,
+    ): CompilationResult {
+        val kotlinLogger = TestKotlinLogger()
+        val compilationOperation = kotlinToolchain.js.jsLinkingOperation(
+            // handle both cases of NOPACK set to true and false
+            if (lastCompileProducedPackedKlib) {
+                outputDirectory.resolve("$moduleName.klib")
+            } else {
+                outputDirectory
+            },
+            outputDirectory,
+        ) {
+            compilationConfigAction(this)
+            compilerArguments[LIBRARIES] = dependencyFiles
+            compilerArguments[IR_OUTPUT_NAME] = moduleName
+        }
+        val result = compilationOperation.let {
+            compilationAction(it)
+            buildSession.executeOperation(it, strategyConfig, kotlinLogger)
+        }
+
+        processOutcome(kotlinLogger, result, assertions, forceOutput)
+        return result
+    }
 
     override fun compileImpl(
         strategyConfig: ExecutionPolicy,
@@ -64,11 +99,13 @@ class JsModule(
                 .toList(),
             outputDirectory,
         ) {
+            compilerArguments[NOPACK] = true
             moduleCompilationConfigAction(this)
             compilationConfigAction(this)
             compilerArguments[LIBRARIES] = dependencyFiles
             compilerArguments[IR_OUTPUT_NAME] = moduleName
-            compilerArguments[NOPACK] = true
+
+            lastCompileProducedPackedKlib = compilerArguments[NOPACK]
         }
 
         return compilationOperation.let {
@@ -85,7 +122,7 @@ class JsModule(
         compilationConfigAction: (JsKlibCompilationOperation.Builder) -> Unit,
         compilationAction: (JsKlibCompilationOperation) -> Unit,
         icOptionsConfigAction: (JsHistoryBasedIncrementalCompilationConfiguration.Builder) -> Unit,
-        assertions: context(Module<JsKlibCompilationOperation, JsKlibCompilationOperation.Builder, JsHistoryBasedIncrementalCompilationConfiguration.Builder>) CompilationOutcome.() -> Unit,
+        assertions: context(Module<*, *, *>) CompilationOutcome.() -> Unit,
     ): CompilationResult {
         return compile(strategyConfig, forceOutput, { compilationOperation ->
             val modulesInfo = (otherModules + this).map {
@@ -97,7 +134,6 @@ class JsModule(
                 )
             }
 
-            println("MODULES FOR $moduleName")
             modulesInfo.forEach {
                 println(it)
             }
@@ -117,90 +153,6 @@ class JsModule(
             compilationOperation[INCREMENTAL_COMPILATION] = icConfig
             compilationConfigAction(compilationOperation)
         }, compilationAction, assertions)
-    }
-
-    override fun prepareExecutionProcessBuilder(
-        mainClassFqn: String,
-    ): ProcessBuilder {
-        // JS modules produce KLib files and cannot be executed directly like JVM classes.
-        throw UnsupportedOperationException("Execution of compiled JS modules is not supported directly")
-    }
-
-    fun linkedJsModule(moduleLinkingConfigAction: (JsLinkingOperation.Builder) -> Unit = {}): LinkedJsModule {
-        return LinkedJsModule(
-            kotlinToolchain,
-            buildSession,
-            project,
-            moduleName,
-            moduleDirectory,
-            this,
-            dependencies,
-            defaultStrategyConfig,
-            stdlibKlibLocation,
-            moduleLinkingConfigAction
-        )
-    }
-}
-
-@OptIn(ExperimentalCompilerArgument::class)
-class LinkedJsModule(
-    private val kotlinToolchain: KotlinToolchains,
-    val buildSession: KotlinToolchains.BuildSession,
-    project: JsProject,
-    moduleName: String,
-    moduleDirectory: Path,
-    val klib: Dependency,
-    dependencies: List<Dependency>,
-    defaultStrategyConfig: ExecutionPolicy,
-    private val stdlibKlibLocation: List<Path>,
-    moduleCompilationConfigAction: (JsLinkingOperation.Builder) -> Unit = {},
-) : AbstractModule<JsLinkingOperation, JsLinkingOperation.Builder, BaseIncrementalCompilationConfiguration.Builder>(
-    project,
-    moduleName,
-    moduleDirectory,
-    dependencies,
-    defaultStrategyConfig,
-    moduleCompilationConfigAction,
-) {
-
-    private val dependencyFiles: List<Path>
-        get() = dependencies.map { it.location }.plus(stdlibKlibLocation)
-
-    override fun compileImpl(
-        strategyConfig: ExecutionPolicy,
-        compilationConfigAction: (JsLinkingOperation.Builder) -> Unit,
-        compilationAction: (JsLinkingOperation) -> Unit,
-        kotlinLogger: TestKotlinLogger,
-    ): CompilationResult {
-
-        val compilationOperation = kotlinToolchain.js.jsLinkingOperation(
-            klib.location,
-            outputDirectory,
-        ) {
-            moduleCompilationConfigAction(this)
-            compilationConfigAction(this)
-            compilerArguments[LIBRARIES] = dependencyFiles
-            compilerArguments[IR_OUTPUT_NAME] = moduleName
-        }
-
-        return compilationOperation.let {
-            compilationAction(it)
-            buildSession.executeOperation(it, strategyConfig, kotlinLogger)
-        }
-    }
-
-    override fun compileIncrementally(
-        sourcesChanges: SourcesChanges,
-        strategyConfig: ExecutionPolicy,
-        forceOutput: LogLevel?,
-        forceNonIncrementalCompilation: Boolean,
-        compilationConfigAction: (JsLinkingOperation.Builder) -> Unit,
-        compilationAction: (JsLinkingOperation) -> Unit,
-        icOptionsConfigAction: (BaseIncrementalCompilationConfiguration.Builder) -> Unit,
-        assertions: context(Module<JsLinkingOperation, JsLinkingOperation.Builder, BaseIncrementalCompilationConfiguration.Builder>) CompilationOutcome.() -> Unit,
-    ): CompilationResult {
-        // linking doesn't have any special config for incremental compilation, just use the regular one
-        return compile(strategyConfig, forceOutput, compilationConfigAction, compilationAction, assertions)
     }
 
     override fun prepareExecutionProcessBuilder(
