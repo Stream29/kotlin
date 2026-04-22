@@ -255,18 +255,6 @@ val actualCommonCompilerArguments by compilerArgumentsLevel(CompilerArgumentsLev
     }
 
     compilerArgument {
-        name = "Xintellij-plugin-root"
-        description =
-            "Path to 'kotlin-compiler.jar' or the directory where the IntelliJ IDEA configuration files can be found.".asReleaseDependent()
-        valueDescription = "<path>".asReleaseDependent()
-        valueType = StringType.defaultNull
-
-        lifecycle(
-            introducedVersion = KotlinReleaseVersion.v1_1_3,
-        )
-    }
-
-    compilerArgument {
         name = "Xnew-inference"
         description = "Enable the new experimental generic type inference algorithm.".asReleaseDependent()
         valueType = BooleanType.defaultFalse

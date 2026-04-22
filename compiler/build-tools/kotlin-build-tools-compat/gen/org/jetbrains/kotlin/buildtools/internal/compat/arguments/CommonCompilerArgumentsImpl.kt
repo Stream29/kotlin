@@ -204,7 +204,7 @@ internal abstract class CommonCompilerArgumentsImpl(
     if (X_FRAGMENTS in this) { arguments.fragments = get(X_FRAGMENTS) ?: emptyArray()}
     if (X_IGNORE_CONST_OPTIMIZATION_ERRORS in this) { arguments.ignoreConstOptimizationErrors = get(X_IGNORE_CONST_OPTIMIZATION_ERRORS)}
     if (X_INLINE_CLASSES in this) { arguments.inlineClasses = get(X_INLINE_CLASSES)}
-    if (X_INTELLIJ_PLUGIN_ROOT in this) { arguments.intellijPluginRoot = get(X_INTELLIJ_PLUGIN_ROOT)}
+    try { if (X_INTELLIJ_PLUGIN_ROOT in this) { arguments.setUsingReflection("intellijPluginRoot", get(X_INTELLIJ_PLUGIN_ROOT))} } catch (e: NoSuchMethodError) { throw IllegalStateException("""Compiler parameter not recognized: X_INTELLIJ_PLUGIN_ROOT. Current compiler version is: $KC_VERSION, but the argument was removed in 2.4.20""").initCause(e) }
     if (X_LIST_PHASES in this) { arguments.listPhases = get(X_LIST_PHASES)}
     try { if (X_METADATA_KLIB in this) { arguments.metadataKlib = get(X_METADATA_KLIB)} } catch (e: NoSuchMethodError) { throw IllegalStateException("""Compiler parameter not recognized: X_METADATA_KLIB. Current compiler version is: $KC_VERSION, but the argument was introduced in 2.0.0""").initCause(e) }
     if (X_METADATA_VERSION in this) { arguments.metadataVersion = get(X_METADATA_VERSION)}
@@ -296,7 +296,7 @@ internal abstract class CommonCompilerArgumentsImpl(
     try { this[X_FRAGMENTS] = arguments.fragments } catch (_: NoSuchMethodError) {  }
     try { this[X_IGNORE_CONST_OPTIMIZATION_ERRORS] = arguments.ignoreConstOptimizationErrors } catch (_: NoSuchMethodError) {  }
     try { this[X_INLINE_CLASSES] = arguments.inlineClasses } catch (_: NoSuchMethodError) {  }
-    try { this[X_INTELLIJ_PLUGIN_ROOT] = arguments.intellijPluginRoot } catch (_: NoSuchMethodError) {  }
+    try { this[X_INTELLIJ_PLUGIN_ROOT] = arguments.getUsingReflection("intellijPluginRoot") } catch (_: NoSuchMethodError) {  }
     try { this[X_LIST_PHASES] = arguments.listPhases } catch (_: NoSuchMethodError) {  }
     try { this[X_METADATA_KLIB] = arguments.metadataKlib } catch (_: NoSuchMethodError) {  }
     try { this[X_METADATA_VERSION] = arguments.metadataVersion } catch (_: NoSuchMethodError) {  }

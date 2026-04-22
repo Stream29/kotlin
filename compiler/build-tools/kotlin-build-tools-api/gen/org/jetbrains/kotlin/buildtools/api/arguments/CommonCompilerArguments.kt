@@ -12,6 +12,7 @@ import kotlin.collections.List
 import kotlin.jvm.JvmField
 import org.jetbrains.kotlin.buildtools.api.DeprecatedCompilerArgument
 import org.jetbrains.kotlin.buildtools.api.KotlinReleaseVersion
+import org.jetbrains.kotlin.buildtools.api.RemovedCompilerArgument
 import org.jetbrains.kotlin.buildtools.api.arguments.enums.AnnotationDefaultTargetMode
 import org.jetbrains.kotlin.buildtools.api.arguments.enums.ExplicitApiMode
 import org.jetbrains.kotlin.buildtools.api.arguments.enums.HeaderMode
@@ -416,6 +417,19 @@ public interface CommonCompilerArguments : CommonToolArguments {
     @ExperimentalCompilerArgument
     public val X_INLINE_CLASSES: CommonCompilerArgument<Boolean> =
         CommonCompilerArgument("X_INLINE_CLASSES", KotlinReleaseVersion(1, 3, 50))
+
+    /**
+     * Path to 'kotlin-compiler.jar' or the directory where the IntelliJ IDEA configuration files can be found.
+     *
+     * WARNING: this option is EXPERIMENTAL and it may be changed in the future without notice or may be removed entirely.
+     *
+     * Removed in Kotlin version 2.4.20.
+     */
+    @JvmField
+    @ExperimentalCompilerArgument
+    @RemovedCompilerArgument
+    public val X_INTELLIJ_PLUGIN_ROOT: CommonCompilerArgument<String?> =
+        CommonCompilerArgument("X_INTELLIJ_PLUGIN_ROOT", KotlinReleaseVersion(1, 1, 3))
 
     /**
      * List backend phases.

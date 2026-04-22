@@ -583,17 +583,6 @@ with bodies.""",
         }
 
     @Argument(
-        value = "-Xintellij-plugin-root",
-        valueDescription = "<path>",
-        description = "Path to 'kotlin-compiler.jar' or the directory where the IntelliJ IDEA configuration files can be found.",
-    )
-    var intellijPluginRoot: String? = null
-        set(value) {
-            checkFrozen()
-            field = if (value.isNullOrEmpty()) null else value
-        }
-
-    @Argument(
         value = "-Xlist-phases",
         description = "List backend phases.",
     )
