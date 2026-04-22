@@ -53,8 +53,6 @@ KtNameReferenceExpression(142,149): 'Another'
     attempt: KaSymbolResolutionSuccess
     symbols:
       (in ROOT) open class Another
-    resolveToSymbols:
-      (in Another) constructor()
 
 KtNameReferenceExpression(185,188): 'Any'
   KtSimpleNameReference:

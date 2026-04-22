@@ -29,8 +29,6 @@ KtNameReferenceExpression(118,125): 'MyClass'
     attempt: KaSymbolResolutionSuccess
     symbols:
       (in pack) open class MyClass
-    resolveToSymbols:
-      (in pack.MyClass) constructor()
 
 KtNameReferenceExpression(187,188): 'T'
   KtSimpleNameReference:
@@ -55,8 +53,6 @@ KtNameReferenceExpression(258,271): 'ClassWithType'
     attempt: KaSymbolResolutionSuccess
     symbols:
       (in pack) open class ClassWithType<T>
-    resolveToSymbols:
-      (in pack.ClassWithType) constructor <T>()
 
 KtNameReferenceExpression(272,279): 'MyClass'
   KtSimpleNameReference:
