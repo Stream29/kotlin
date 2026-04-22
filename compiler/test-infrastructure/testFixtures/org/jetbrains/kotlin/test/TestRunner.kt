@@ -110,23 +110,24 @@ sealed class TestRunner<Step : TestStep<*, *>, Configuration : TestConfiguration
         /**
          * @return true if there were any failures from any steps, even if they were suppressed by [AfterAnalysisChecker]s
          */
-        fun reportFailures(): Boolean {
-            val hadFailures = allFailedExceptions.isNotEmpty()
-            val filteredFailedAssertions = if (hadFailures) {
-                filterFailedExceptions(allFailedExceptions)
-            } else {
-                for (suppressor in testConfiguration.failureSuppressors) {
-                    withAssertionCatching(WrappedException::FromFailingTestSuppressor) {
-                        suppressor.checkIfTestShouldBeUnmuted()
+        fun reportFailures(checkForUnmuting: Boolean): Boolean {
+            val filteredFailedAssertions = when {
+                hasFailures -> filterFailedExceptions(allFailedExceptions)
+                checkForUnmuting -> {
+                    for (suppressor in testConfiguration.failureSuppressors) {
+                        withAssertionCatching(WrappedException::FromFailingTestSuppressor) {
+                            suppressor.checkIfTestShouldBeUnmuted()
+                        }
                     }
+                    allFailedExceptions.map { it.cause }
                 }
-                allFailedExceptions.map { it.cause }
+                else -> emptyList()
             }
             filteredFailedAssertions.firstIsInstanceOrNull<WrappedException.FromFacade>()?.let {
                 throw it
             }
             testConfiguration.testServices.assertions.failAll(filteredFailedAssertions)
-            return hadFailures
+            return hasFailures
         }
 
         /*
@@ -207,7 +208,7 @@ class NonGroupingTestRunner(
     fun runTestPipeline() {
         runTestPreprocessing()
         runSteps()
-        failuresInterceptor.reportFailures()
+        failuresInterceptor.reportFailures(checkForUnmuting = true)
     }
 
     override fun runTestPreprocessing() {

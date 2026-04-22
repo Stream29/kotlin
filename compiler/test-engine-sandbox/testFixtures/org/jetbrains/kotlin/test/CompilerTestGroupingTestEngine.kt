@@ -171,7 +171,7 @@ class CompilerTestGroupingTestEngine : TestEngine {
                 val testRunner = testInstance.nonGroupingRunner
                 testRunner.runTestPreprocessing()
                 testRunner.runSteps()
-                hadIgnoredFailuresOnNonGroupingPhase = testRunner.failuresInterceptor.reportFailures()
+                hadIgnoredFailuresOnNonGroupingPhase = testRunner.failuresInterceptor.reportFailures(checkForUnmuting = false)
             }
             finishIfFailed()
         }
@@ -231,7 +231,7 @@ class CompilerTestGroupingTestEngine : TestEngine {
                 )
             }
             testRunner.run(nonGroupingPhaseOutputs)
-            testRunner.failuresInterceptor.reportFailures()
+            testRunner.failuresInterceptor.reportFailures(checkForUnmuting = true)
         }
         executionListener.executionFinished(testDescriptor, throwableCollector.toTestExecutionResult())
         batch.forEach {
