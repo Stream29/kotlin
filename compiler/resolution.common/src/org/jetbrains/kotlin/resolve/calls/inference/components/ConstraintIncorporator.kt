@@ -205,7 +205,9 @@ class ConstraintIncorporator(
             // To be used in variable fixation, the constraint must have a proper type
             causeOfIncorporationConstraint.type.isProperTypeForFixation(c.notFixedTypeVariables.keys) { t ->
                 !t.contains { c.notFixedTypeVariables.containsKey(it.typeConstructor()) }
-            }
+            } &&
+            // Also, we shouldn't have dependencies on other type variable, otherwise immediate fixation may be not possible
+            !causeOfIncorporationConstraint.type.contains { it.isTypeVariableType() }
         ) {
             return
         }
