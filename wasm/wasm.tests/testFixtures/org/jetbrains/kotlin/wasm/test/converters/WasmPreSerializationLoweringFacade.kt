@@ -26,8 +26,6 @@ class WasmPreSerializationLoweringFacade(
     override fun transform(module: TestModule, inputArtifact: IrBackendInput): IrBackendInput {
         require(module.languageVersionSettings.languageVersion.usesK2)
 
-        val diagnosticReporter = DiagnosticsCollectorImpl()
-
         require(inputArtifact is Fir2IrCliBasedOutputArtifact<*>) {
             "WasmPreSerializationLoweringFacade expects Fir2IrCliBasedOutputArtifact as input, but got ${inputArtifact::class.simpleName}"
         }
@@ -36,13 +34,9 @@ class WasmPreSerializationLoweringFacade(
             "WasmPreSerializationLoweringFacade expects WebFir2IrPipelineArtifact as cliArtifact, but got ${cliArtifact::class.simpleName}"
         }
 
-        val input = cliArtifact.withNewDiagnosticCollector(diagnosticReporter)
+        val diagnosticReporter = DiagnosticsCollectorImpl()
 
-        if (diagnosticReporter.hasErrors) {
-            // Should errors be found by checkers, there's a chance that JsCodeOutlineLowering will throw an exception on unparseable code.
-            // In test pipeline, it's unwanted, so let's avoid crashes. Already found errors would already be enough for diagnostic tests.
-            return Fir2IrCliBasedOutputArtifact(input)
-        }
+        val input = cliArtifact.withNewDiagnosticCollector(diagnosticReporter)
 
         val output = WebKlibInliningPipelinePhase.executePhase(input)
 

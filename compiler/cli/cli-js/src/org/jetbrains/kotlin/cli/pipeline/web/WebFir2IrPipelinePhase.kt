@@ -115,18 +115,23 @@ private fun runWebKlibCallCheckers(
 ) {
     val irDiagnosticReporter = KtDiagnosticReporterWithImplicitIrBasedContext(diagnosticReporter, configuration.languageVersionSettings)
 
-    val fir2KlibMetadataSerializer = Fir2KlibMetadataSerializer(
-        configuration,
-        firOutputs,
-        fir2IrActualizedResult,
-        produceHeaderKlib = false,
-    )
-    val cleanFiles = configuration.incrementalDataProvider?.getSerializedData(fir2KlibMetadataSerializer.sourceFiles).orEmpty()
-    val cleanFilesIrData = cleanFiles.map { it.irData ?: error("Metadata-only KLIBs are not supported in Kotlin/JS") }
-
     val irModuleFragment = fir2IrActualizedResult.irModuleFragment
 
-    val checker = if (!configuration.wasmCompilation) {
+    val checker = if (configuration.wasmCompilation) {
+        WasmKlibCheckers.makeChecker(
+            irDiagnosticReporter,
+            configuration,
+        )
+    } else { // JS-specific
+        val fir2KlibMetadataSerializer = Fir2KlibMetadataSerializer(
+            configuration,
+            firOutputs,
+            fir2IrActualizedResult,
+            produceHeaderKlib = false,
+        )
+        val cleanFiles = configuration.incrementalDataProvider?.getSerializedData(fir2KlibMetadataSerializer.sourceFiles).orEmpty()
+        val cleanFilesIrData = cleanFiles.map { it.irData ?: error("Metadata-only KLIBs are not supported in Kotlin/JS") }
+
         JsKlibCheckers.makeChecker(
             irDiagnosticReporter,
             configuration,
@@ -134,11 +139,6 @@ private fun runWebKlibCallCheckers(
             doModuleLevelChecks = true,
             cleanFiles = cleanFilesIrData,
             exportedNames = irModuleFragment.collectJsExportNames(),
-        )
-    } else {
-        WasmKlibCheckers.makeChecker(
-            irDiagnosticReporter,
-            configuration,
         )
     }
 
