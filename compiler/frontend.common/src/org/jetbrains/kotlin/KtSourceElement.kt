@@ -101,8 +101,6 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
 
     /**
      * For properties without accessors, FIR generates default getters and setters, as well as default backing fields.
-     *
-     * The fake element kinds must be kept in sync with [ALL_DEFAULT_ACCESSORS].
      */
     sealed class DefaultAccessor : KtFakeSourceElementKind(shouldSkipErrorTypeReporting = true) {
         /**
@@ -111,22 +109,22 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
          * The backing field is a default "accessor" for historical reasons: The same `DefaultAccessor` fake element kind was applied not
          * only to default getters and setters, but also to default backing fields.
          */
-        object DefaultBackingField : DefaultAccessor()
+        object BackingField : DefaultAccessor()
 
         /**
          * A default getter. Its real source is the property.
          */
-        object DefaultGetter : DefaultAccessor()
+        object Getter : DefaultAccessor()
 
         /**
          * A default setter. Its real source is the property.
          */
-        object DefaultSetter : DefaultAccessor()
-
-        /**
-         * The value parameter of a default setter. Its real source is the property.
-         */
-        object DefaultSetterValueParameter : DefaultAccessor()
+        object Setter : DefaultAccessor() {
+            /**
+             * The value parameter of a default [Setter]. Its real source is the property.
+             */
+            object ValueParameter : DefaultAccessor()
+        }
     }
 
     /**
@@ -741,17 +739,6 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
      */
     object ContextSensitiveAlternative : KtFakeSourceElementKind()
     object ReferenceForContextSensitiveAlternative : KtFakeSourceElementKind()
-
-    // Moving these properties to the companion objects of their respective classes such as `EnumGeneratedDeclaration` is not an option
-    // because then the sealed class can be used as an object (e.g. as a `when` subject), which can lead to programming errors.
-    companion object {
-        val ALL_DEFAULT_ACCESSORS: Set<DefaultAccessor> = setOf(
-            DefaultAccessor.DefaultBackingField,
-            DefaultAccessor.DefaultGetter,
-            DefaultAccessor.DefaultSetter,
-            DefaultAccessor.DefaultSetterValueParameter,
-        )
-    }
 }
 
 sealed class AbstractKtSourceElement {

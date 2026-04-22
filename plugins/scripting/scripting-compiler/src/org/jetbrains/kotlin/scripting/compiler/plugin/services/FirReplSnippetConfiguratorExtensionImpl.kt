@@ -205,16 +205,16 @@ class FirReplSnippetConfiguratorExtensionImpl(
             backingField = FirDefaultPropertyBackingField(
                 moduleData = moduleData,
                 origin = origin,
-                source = lastScriptBlock.source?.fakeElement(KtFakeSourceElementKind.DefaultAccessor.DefaultBackingField),
+                source = lastScriptBlock.source?.fakeElement(KtFakeSourceElementKind.DefaultAccessor.BackingField),
                 annotations = annotations,
-                returnTypeRef = returnTypeRef.copyWithNewSourceKind(KtFakeSourceElementKind.DefaultAccessor.DefaultBackingField),
+                returnTypeRef = returnTypeRef.copyWithNewSourceKind(KtFakeSourceElementKind.DefaultAccessor.BackingField),
                 isVar = isVar,
                 propertySymbol = symbol,
                 status = status,
             )
 
             getter = FirDefaultPropertyGetter(
-                source = lastScriptBlock.source?.fakeElement(KtFakeSourceElementKind.DefaultAccessor.DefaultGetter),
+                source = lastScriptBlock.source?.fakeElement(KtFakeSourceElementKind.DefaultAccessor.Getter),
                 moduleData = moduleData,
                 origin = origin,
                 propertyTypeRef = returnTypeRef.copyWithNewSourceKind(KtFakeSourceElementKind.ImplicitTypeRef),

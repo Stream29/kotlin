@@ -175,7 +175,7 @@ class FirDefaultPropertySetter(
         buildDefaultSetterValueParameter builder@{
             this@builder.resolvePhase = resolvePhase
             this@builder.source =
-                (parameterSource ?: source)?.fakeElement(KtFakeSourceElementKind.DefaultAccessor.DefaultSetterValueParameter)
+                (parameterSource ?: source)?.fakeElement(KtFakeSourceElementKind.DefaultAccessor.Setter.ValueParameter)
             this@builder.containingDeclarationSymbol = propertyAccessorSymbol
             this@builder.moduleData = moduleData
             this@builder.origin = origin
