@@ -225,14 +225,24 @@ class CompilerTestGroupingTestEngine : TestEngine {
             val nonGroupingPhaseOutputs = batch.map { methodInfo ->
                 NonGroupingPhaseOutput(
                     testServices = methodInfo.testInstance.nonGroupingRunner.testServices,
-                    catchingExecutor = { block ->
-                        methodInfo.context.throwableCollector.execute(block)
+                    catchingExecutor = { wrapper, block ->
+                        methodInfo.testInstance.nonGroupingRunner.failuresInterceptor.withAssertionCatching(wrapper, block)
                     }
                 )
             }
             testRunner.run(nonGroupingPhaseOutputs)
             testRunner.failuresInterceptor.reportFailures(checkForUnmuting = true)
         }
+        for (methodInfo in batch) {
+            methodInfo.context.throwableCollector.execute {
+                methodInfo.testInstance.nonGroupingRunner.failuresInterceptor.reportFailures(
+                    // we need to check for unmuting only if there were no exceptions from the
+                    // grouped facades
+                    checkForUnmuting = throwableCollector.isEmpty
+                )
+            }
+        }
+
         executionListener.executionFinished(testDescriptor, throwableCollector.toTestExecutionResult())
         batch.forEach {
             it.finalizeNonGroupingPhase()
