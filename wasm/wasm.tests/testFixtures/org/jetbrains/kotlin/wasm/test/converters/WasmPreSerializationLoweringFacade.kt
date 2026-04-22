@@ -47,7 +47,6 @@ class WasmPreSerializationLoweringFacade(
         val output = WebKlibInliningPipelinePhase.executePhase(input)
 
         // The returned artifact will be stored in dependencyProvider instead of `inputArtifact`, with same kind=BackendKinds.IrBackend
-        // Later, third artifact of class `JsIrDeserializedFromKlibBackendInput` might replace it again during some test pipelines.
         return Fir2IrCliBasedOutputArtifact(output)
     }
 
