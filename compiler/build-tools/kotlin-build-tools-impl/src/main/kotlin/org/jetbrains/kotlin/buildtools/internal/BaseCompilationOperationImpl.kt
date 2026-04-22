@@ -25,7 +25,6 @@ import org.jetbrains.kotlin.buildtools.internal.arguments.CommonToolArgumentsImp
 import org.jetbrains.kotlin.buildtools.internal.arguments.absolutePathStringOrThrow
 import org.jetbrains.kotlin.buildtools.internal.arguments.reportRestrictedViolations
 import org.jetbrains.kotlin.buildtools.internal.jvm.operations.JvmCompilationOperationImpl
-import org.jetbrains.kotlin.buildtools.internal.jvm.operations.JvmCompilationOperationImpl.Option
 import org.jetbrains.kotlin.buildtools.internal.trackers.CompilerImportTracker
 import org.jetbrains.kotlin.buildtools.internal.trackers.ImportTrackerAdapter
 import org.jetbrains.kotlin.buildtools.internal.trackers.LookupTrackerAdapter
@@ -62,6 +61,7 @@ internal abstract class BaseCompilationOperationImpl<BtaCompilerArgs : CommonCom
 
     @UseFromImplModuleRestricted
     override fun <V> set(key: BaseCompilationOperation.Option<V>, value: V) {
+        checkOptionIsAvailableForVersion(key)
         options[key] = value
     }
 
