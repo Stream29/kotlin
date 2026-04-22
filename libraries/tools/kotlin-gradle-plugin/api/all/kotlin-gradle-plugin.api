@@ -423,6 +423,13 @@ public final class org/jetbrains/kotlin/gradle/plugin/BuildEventsListenerRegistr
 	public final fun getInstance (Lorg/gradle/api/Project;)Lorg/jetbrains/kotlin/gradle/plugin/BuildEventsListenerRegistryHolder;
 }
 
+public abstract class org/jetbrains/kotlin/gradle/plugin/BuildMetricsPlugin : org/gradle/api/Plugin {
+	public fun <init> (Lorg/gradle/internal/operations/BuildOperationListenerManager;)V
+	public synthetic fun apply (Ljava/lang/Object;)V
+	public fun apply (Lorg/gradle/api/Project;)V
+	public final fun getBuildOperationListenerManager ()Lorg/gradle/internal/operations/BuildOperationListenerManager;
+}
+
 public abstract class org/jetbrains/kotlin/gradle/plugin/DefaultKotlinBasePlugin : org/jetbrains/kotlin/gradle/plugin/KotlinBasePlugin {
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V
@@ -2127,11 +2134,24 @@ public final class org/jetbrains/kotlin/gradle/plugin/statistics/plugins/Observa
 	public static fun values ()[Lorg/jetbrains/kotlin/gradle/plugin/statistics/plugins/ObservablePlugins;
 }
 
+public final class org/jetbrains/kotlin/gradle/report/BuildMetricsBuildOperationListener : java/lang/AutoCloseable, org/gradle/internal/operations/BuildOperationListener {
+	public static final field Companion Lorg/jetbrains/kotlin/gradle/report/BuildMetricsBuildOperationListener$Companion;
+	public fun <init> (Lorg/gradle/api/provider/Provider;)V
+	public fun close ()V
+	public fun finished (Lorg/gradle/internal/operations/BuildOperationDescriptor;Lorg/gradle/internal/operations/OperationFinishEvent;)V
+	public fun progress (Lorg/gradle/internal/operations/OperationIdentifier;Lorg/gradle/internal/operations/OperationProgressEvent;)V
+	public fun started (Lorg/gradle/internal/operations/BuildOperationDescriptor;Lorg/gradle/internal/operations/OperationStartEvent;)V
+}
+
+public final class org/jetbrains/kotlin/gradle/report/BuildMetricsBuildOperationListener$Companion {
+}
+
 public abstract class org/jetbrains/kotlin/gradle/report/BuildMetricsService : java/lang/AutoCloseable, org/gradle/api/services/BuildService, org/gradle/tooling/events/OperationCompletionListener {
 	public static final field Companion Lorg/jetbrains/kotlin/gradle/report/BuildMetricsService$Companion;
 	public fun <init> ()V
+	public fun addConfigurationRecord (Ljava/lang/String;Ljava/lang/Class;JJLorg/jetbrains/kotlin/build/report/metrics/BuildMetrics;Ljava/lang/String;Ljava/util/List;)V
+	public static synthetic fun addConfigurationRecord$default (Lorg/jetbrains/kotlin/gradle/report/BuildMetricsService;Ljava/lang/String;Ljava/lang/Class;JJLorg/jetbrains/kotlin/build/report/metrics/BuildMetrics;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)V
 	public fun addTask (Ljava/lang/String;Ljava/lang/Class;Lorg/jetbrains/kotlin/build/report/metrics/BuildMetricsReporter;)V
-	public fun addTransformMetrics (Ljava/lang/String;Ljava/lang/Class;ZJJLorg/jetbrains/kotlin/build/report/metrics/BuildMetrics;Ljava/lang/String;)V
 	public fun close ()V
 	public fun onFinish (Lorg/gradle/tooling/events/FinishEvent;)V
 }
