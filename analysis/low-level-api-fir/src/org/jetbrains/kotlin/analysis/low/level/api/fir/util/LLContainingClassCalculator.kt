@@ -70,7 +70,7 @@ internal object LLContainingClassCalculator {
             PropertyFromParameter,
                 -> computeContainingClass(symbol, (source.psi as? KtDeclaration)?.containingClassOrScript)
 
-            DataClassGeneratedMembers -> {
+            is DataClassGeneratedMembers -> {
                 val containingClass = when (val psi = source.psi) {
                     is KtClassOrObject -> psi
                     is KtParameter -> psi.containingClassOrObject // component() functions point to 'KtParameter's
