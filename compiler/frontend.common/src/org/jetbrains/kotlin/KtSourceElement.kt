@@ -392,6 +392,38 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
             SecondGetReference,
         }
 
+        class PrefixInc private constructor(
+            generatedElementKind: GeneratedElementKind,
+        ) : DesugaredIncrementOrDecrement(generatedElementKind) {
+            constructor() : this(GeneratedElementKind.DesugaredExpression)
+
+            override fun withGeneratedElementKind(elementKind: GeneratedElementKind) = PrefixInc(elementKind)
+        }
+
+        class PrefixDec private constructor(
+            generatedElementKind: GeneratedElementKind,
+        ) : DesugaredIncrementOrDecrement(generatedElementKind) {
+            constructor() : this(GeneratedElementKind.DesugaredExpression)
+
+            override fun withGeneratedElementKind(elementKind: GeneratedElementKind) = PrefixDec(elementKind)
+        }
+
+        class PostfixInc private constructor(
+            generatedElementKind: GeneratedElementKind,
+        ) : DesugaredIncrementOrDecrement(generatedElementKind) {
+            constructor() : this(GeneratedElementKind.DesugaredExpression)
+
+            override fun withGeneratedElementKind(elementKind: GeneratedElementKind) = PostfixInc(elementKind)
+        }
+
+        class PostfixDec private constructor(
+            generatedElementKind: GeneratedElementKind,
+        ) : DesugaredIncrementOrDecrement(generatedElementKind) {
+            constructor() : this(GeneratedElementKind.DesugaredExpression)
+
+            override fun withGeneratedElementKind(elementKind: GeneratedElementKind) = PostfixDec(elementKind)
+        }
+
         /**
          * @see GeneratedElementKind.SecondGetReference
          */
@@ -420,36 +452,13 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
 
         override fun equals(other: Any?): Boolean = this === other ||
                 other is DesugaredIncrementOrDecrement &&
-                javaClass == other.javaClass &&
+                this::class == other::class &&
                 generatedElementKind == other.generatedElementKind
 
-        override fun hashCode(): Int = Objects.hash(javaClass, generatedElementKind)
+        override fun hashCode(): Int = Objects.hash(this::class, generatedElementKind)
 
-        override fun toString(): String = "${this::class.simpleName}($generatedElementKind)"
-    }
-
-    class DesugaredPrefixInc(
-        generatedElementKind: GeneratedElementKind = GeneratedElementKind.DesugaredExpression,
-    ) : DesugaredIncrementOrDecrement(generatedElementKind) {
-        override fun withGeneratedElementKind(elementKind: GeneratedElementKind) = DesugaredPrefixInc(elementKind)
-    }
-
-    class DesugaredPrefixDec(
-        generatedElementKind: GeneratedElementKind = GeneratedElementKind.DesugaredExpression,
-    ) : DesugaredIncrementOrDecrement(generatedElementKind) {
-        override fun withGeneratedElementKind(elementKind: GeneratedElementKind) = DesugaredPrefixDec(elementKind)
-    }
-
-    class DesugaredPostfixInc(
-        generatedElementKind: GeneratedElementKind = GeneratedElementKind.DesugaredExpression,
-    ) : DesugaredIncrementOrDecrement(generatedElementKind) {
-        override fun withGeneratedElementKind(elementKind: GeneratedElementKind) = DesugaredPostfixInc(elementKind)
-    }
-
-    class DesugaredPostfixDec(
-        generatedElementKind: GeneratedElementKind = GeneratedElementKind.DesugaredExpression,
-    ) : DesugaredIncrementOrDecrement(generatedElementKind) {
-        override fun withGeneratedElementKind(elementKind: GeneratedElementKind) = DesugaredPostfixDec(elementKind)
+        override fun toString(): String =
+            "${DesugaredIncrementOrDecrement::class.simpleName}.${this::class.simpleName}($generatedElementKind)"
     }
 
     /**
@@ -1250,14 +1259,14 @@ inline fun LighterASTNode.toKtLightSourceElement(
 
 fun sourceKindForIncOrDec(operation: Name, isPrefix: Boolean) = when (operation) {
     OperatorNameConventions.INC -> if (isPrefix) {
-        KtFakeSourceElementKind.DesugaredPrefixInc()
+        KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PrefixInc()
     } else {
-        KtFakeSourceElementKind.DesugaredPostfixInc()
+        KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PostfixInc()
     }
     OperatorNameConventions.DEC -> if (isPrefix) {
-        KtFakeSourceElementKind.DesugaredPrefixDec()
+        KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PrefixDec()
     } else {
-        KtFakeSourceElementKind.DesugaredPostfixDec()
+        KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PostfixDec()
     }
     else -> error("Unexpected operator: ${operation.identifier}")
 }

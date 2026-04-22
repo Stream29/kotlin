@@ -379,10 +379,10 @@ class CallAndReferenceGenerator(
                     else -> error("Unexpected name: ${render()}")
                 }
 
-                kind is KtFakeSourceElementKind.DesugaredPrefixInc -> IrDynamicOperator.PREFIX_INCREMENT
-                kind is KtFakeSourceElementKind.DesugaredPrefixDec -> IrDynamicOperator.PREFIX_DECREMENT
-                kind is KtFakeSourceElementKind.DesugaredPostfixInc -> IrDynamicOperator.POSTFIX_INCREMENT
-                kind is KtFakeSourceElementKind.DesugaredPostfixDec -> IrDynamicOperator.POSTFIX_DECREMENT
+                kind is KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PrefixInc -> IrDynamicOperator.PREFIX_INCREMENT
+                kind is KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PrefixDec -> IrDynamicOperator.PREFIX_DECREMENT
+                kind is KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PostfixInc -> IrDynamicOperator.POSTFIX_INCREMENT
+                kind is KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PostfixDec -> IrDynamicOperator.POSTFIX_DECREMENT
 
                 kind is KtFakeSourceElementKind.DesugaredAugmentedAssign -> when (calleeReference.resolved?.name) {
                     OperatorNameConventions.SET -> IrDynamicOperator.EQ

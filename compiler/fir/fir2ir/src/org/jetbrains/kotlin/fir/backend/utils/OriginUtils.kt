@@ -170,8 +170,14 @@ fun FirVariableAssignment.getIrAssignmentOrigin(): IrStatementOrigin {
     val kind = rValue.source?.kind
 
     return when (kind) {
-        is KtFakeSourceElementKind.DesugaredPrefixInc, is KtFakeSourceElementKind.DesugaredPostfixInc -> IrStatementOrigin.PLUSEQ
-        is KtFakeSourceElementKind.DesugaredPrefixDec, is KtFakeSourceElementKind.DesugaredPostfixDec -> IrStatementOrigin.MINUSEQ
+        is KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PrefixInc,
+        is KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PostfixInc
+            -> IrStatementOrigin.PLUSEQ
+
+        is KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PrefixDec,
+        is KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PostfixDec
+            -> IrStatementOrigin.MINUSEQ
+
         else -> IrStatementOrigin.EQ
     }
 }
@@ -203,9 +209,9 @@ val augmentedAssignSourceKindToIrStatementOrigin: Map<KtFakeSourceElementKind.De
 
 fun KtSourceElementKind.incOrDecSourceKindToIrStatementOrigin(): IrStatementOrigin? =
     when (this) {
-        is KtFakeSourceElementKind.DesugaredPrefixInc -> IrStatementOrigin.PREFIX_INCR
-        is KtFakeSourceElementKind.DesugaredPostfixInc -> IrStatementOrigin.POSTFIX_INCR
-        is KtFakeSourceElementKind.DesugaredPrefixDec -> IrStatementOrigin.PREFIX_DECR
-        is KtFakeSourceElementKind.DesugaredPostfixDec -> IrStatementOrigin.POSTFIX_DECR
+        is KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PrefixInc -> IrStatementOrigin.PREFIX_INCR
+        is KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PostfixInc -> IrStatementOrigin.POSTFIX_INCR
+        is KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PrefixDec -> IrStatementOrigin.PREFIX_DECR
+        is KtFakeSourceElementKind.DesugaredIncrementOrDecrement.PostfixDec -> IrStatementOrigin.POSTFIX_DECR
         else -> null
     }
