@@ -7,10 +7,13 @@ package org.jetbrains.kotlin.buildtools.tests.compilation.scenario
 
 import org.jetbrains.kotlin.buildtools.api.BaseCompilationOperation
 import org.jetbrains.kotlin.buildtools.api.BaseIncrementalCompilationConfiguration
+import org.jetbrains.kotlin.buildtools.api.KotlinToolchains
 import org.jetbrains.kotlin.buildtools.api.jvm.ClassSnapshotGranularity
 import org.jetbrains.kotlin.buildtools.tests.compilation.model.SnapshotConfig
 
-interface Scenario<out B : BaseCompilationOperation.Builder, out IC : BaseIncrementalCompilationConfiguration.Builder> {
+interface Scenario<B : BaseCompilationOperation.Builder, IC : BaseIncrementalCompilationConfiguration.Builder> {
+    val kotlinToolchains: KotlinToolchains
+
     /**
      * Creates a module for a scenario.
      *

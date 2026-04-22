@@ -33,7 +33,7 @@ class NonIncrementalCompilationSmokeTest : BaseCompilationTest() {
     @DefaultStrategyAgnosticCompilationTest
     @TestMetadata("jvm-module-1")
     fun multiModule(strategyConfig: CompilerExecutionStrategyConfiguration) {
-        project(strategyConfig) {
+        jvmProject(strategyConfig) {
             val module1 = module("jvm-module-1")
             val module2 = module("jvm-module-2", listOf(module1))
 
@@ -50,7 +50,7 @@ class NonIncrementalCompilationSmokeTest : BaseCompilationTest() {
     @DefaultStrategyAgnosticCompilationTest
     @TestMetadata("kotlin-java-mixed")
     fun mixedJavaKotlin(strategyConfig: CompilerExecutionStrategyConfiguration) {
-        project(strategyConfig) {
+        jvmProject(strategyConfig) {
             val module1 = module("kotlin-java-mixed")
 
             module1.compile {
@@ -67,7 +67,7 @@ class NonIncrementalCompilationSmokeTest : BaseCompilationTest() {
     @DefaultStrategyAgnosticCompilationTest
     @TestMetadata("jvm-module-1")
     fun removedArgument(strategyConfig: CompilerExecutionStrategyConfiguration) {
-        project(strategyConfig) {
+        jvmProject(strategyConfig) {
             val module1 = module("jvm-module-1") {
                 it.compilerArguments[JvmCompilerArguments.X_USE_K2_KAPT] = true
             }
@@ -105,7 +105,7 @@ class NonIncrementalCompilationSmokeTest : BaseCompilationTest() {
     @DefaultStrategyAgnosticCompilationTest
     @TestMetadata("jvm-module-1")
     fun addedArgument(strategyConfig: CompilerExecutionStrategyConfiguration) {
-        project(strategyConfig) {
+        jvmProject(strategyConfig) {
             val module1 = module("jvm-module-1") {
                 it.compilerArguments[JvmCompilerArguments.X_ANNOTATIONS_IN_METADATA] = true
             }
@@ -123,37 +123,14 @@ class NonIncrementalCompilationSmokeTest : BaseCompilationTest() {
     @OptIn(ExperimentalCompilerArgument::class)
     @BtaV2StrategyAgnosticCompilationTest
     fun basicJsCompilation(strategyConfig: CompilerExecutionStrategyConfiguration) {
-        assumeTrue(strategyConfig.first.getCompilerVersion().startsWith("2.4"))
-        val toolchain = strategyConfig.first
-        val sources = listOf(
-            workingDirectory.resolve("a.kt")
-                .also { it.writeText("@OptIn(kotlin.js.ExperimentalJsExport::class) @JsExport fun main() {println(\"aaa\")}") })
-        val destination = workingDirectory.resolve("klib").also { it.createDirectories() }
-        val compilationOperation = toolchain.js.jsKlibCompilationOperation(
-            sources,
-            destination
-        ) {
-            compilerArguments[CommonJsAndWasmArguments.LIBRARIES] = listOf(currentKotlinJsStdlibKlibLocation)
-            compilerArguments[CommonJsAndWasmArguments.IR_OUTPUT_NAME] = "some_module"
-        }
-        toolchain.createBuildSession().use {
-            val result = it.executeOperation(compilationOperation, strategyConfig.second, TestKotlinLogger())
-            assertEquals(CompilationResult.COMPILATION_SUCCESS, result)
-        }
-
-        val linkingDestination = workingDirectory.resolve("out").also { it.createDirectories() }
-        val linkingOperation =
-            toolchain.js.jsLinkingOperation(destination, linkingDestination) {
-                compilerArguments[CommonJsAndWasmArguments.LIBRARIES] = listOf(currentKotlinJsStdlibKlibLocation)
-                compilerArguments[CommonJsAndWasmArguments.IR_OUTPUT_NAME] = "some_module"
+        jsProject(strategyConfig) {
+            val libModule = module("js-ic-basic-lib")
+            val appModule = module("js-ic-basic-app", listOf(libModule))
+            libModule.compile()
+            appModule.compile()
+            appModule.link {
+                assertOutputs("js-ic-basic-app.js")
             }
-        toolchain.createBuildSession().use {
-            val result = it.executeOperation(linkingOperation, strategyConfig.second, TestKotlinLogger())
-            assertEquals(CompilationResult.COMPILATION_SUCCESS, result)
         }
-        assertTrue(
-            linkingDestination.resolve("some_module.js").readText().contains("println('aaa')"),
-            "JS file should contain \"println('aaa')\" string"
-        )
     }
 }

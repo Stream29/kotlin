@@ -15,7 +15,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.*
 
-internal abstract class BaseScenarioModule<B : BaseCompilationOperation.Builder, out IC : BaseIncrementalCompilationConfiguration.Builder> private constructor(
+internal abstract class BaseScenarioModule<B : BaseCompilationOperation.Builder, IC : BaseIncrementalCompilationConfiguration.Builder> private constructor(
     internal val module: Module<*, B, IC>,
     internal val outputs: MutableSet<FileKey>,
     private val strategyConfig: ExecutionPolicy,
@@ -104,7 +104,7 @@ internal abstract class BaseScenarioModule<B : BaseCompilationOperation.Builder,
     }
 }
 
-internal class ExternallyTrackedScenarioModuleImpl<B : BaseCompilationOperation.Builder, out IC : BaseIncrementalCompilationConfiguration.Builder>(
+internal class ExternallyTrackedScenarioModuleImpl<B : BaseCompilationOperation.Builder, IC : BaseIncrementalCompilationConfiguration.Builder>(
     module: Module<*, B, IC>,
     outputs: MutableSet<FileKey>,
     strategyConfig: ExecutionPolicy,
@@ -182,7 +182,7 @@ internal class ExternallyTrackedScenarioModuleImpl<B : BaseCompilationOperation.
     }
 }
 
-internal class AutoTrackedScenarioModuleImpl<B : BaseCompilationOperation.Builder, out IC : BaseIncrementalCompilationConfiguration.Builder>(
+internal class AutoTrackedScenarioModuleImpl<B : BaseCompilationOperation.Builder, IC : BaseIncrementalCompilationConfiguration.Builder>(
     module: Module<*, B, IC>,
     outputs: MutableSet<FileKey>,
     strategyConfig: ExecutionPolicy,
@@ -194,6 +194,7 @@ internal class AutoTrackedScenarioModuleImpl<B : BaseCompilationOperation.Builde
 private class JvmScenarioDsl(
     private val project: JvmProject,
     private val strategyConfig: ExecutionPolicy,
+    override val kotlinToolchains: KotlinToolchains,
 ) : Scenario<JvmCompilationOperation.Builder, JvmSnapshotBasedIncrementalCompilationConfiguration.Builder> {
     @Synchronized
     override fun module(
@@ -259,7 +260,7 @@ fun BaseCompilationTest.jvmScenario(
     strategyConfig: ExecutionPolicy,
     action: Scenario<JvmCompilationOperation.Builder, JvmSnapshotBasedIncrementalCompilationConfiguration.Builder>.() -> Unit,
 ) {
-    action(JvmScenarioDsl(JvmProject(kotlinToolchains, strategyConfig, workingDirectory), strategyConfig))
+    action(JvmScenarioDsl(JvmProject(kotlinToolchains, strategyConfig, workingDirectory), strategyConfig, kotlinToolchains))
 }
 
 fun BaseCompilationTest.jvmScenario(

@@ -14,10 +14,12 @@ import org.jetbrains.kotlin.buildtools.tests.compilation.BaseCompilationTest
 import org.jetbrains.kotlin.buildtools.tests.compilation.model.JsModule
 import org.jetbrains.kotlin.buildtools.tests.compilation.model.JsProject
 import org.jetbrains.kotlin.buildtools.tests.compilation.model.SnapshotConfig
+import org.jetbrains.kotlin.buildtools.tests.compilation.model.assumeJsIsSupported
 
-private class JsScenarioDsl(
+class JsScenarioDsl(
     private val project: JsProject,
     private val strategyConfig: ExecutionPolicy,
+    override val kotlinToolchains: KotlinToolchains,
 ) : Scenario<JsKlibCompilationOperation.Builder, JsHistoryBasedIncrementalCompilationConfiguration.Builder> {
     @Synchronized
     override fun module(
@@ -137,7 +139,8 @@ fun BaseCompilationTest.jsScenario(
     strategyConfig: ExecutionPolicy,
     action: Scenario<JsKlibCompilationOperation.Builder, JsHistoryBasedIncrementalCompilationConfiguration.Builder>.() -> Unit,
 ) {
-    action(JsScenarioDsl(JsProject(kotlinToolchains, strategyConfig, workingDirectory), strategyConfig))
+    kotlinToolchains.assumeJsIsSupported()
+    action(JsScenarioDsl(JsProject(kotlinToolchains, strategyConfig, workingDirectory), strategyConfig, kotlinToolchains))
 }
 
 fun BaseCompilationTest.jsScenario(

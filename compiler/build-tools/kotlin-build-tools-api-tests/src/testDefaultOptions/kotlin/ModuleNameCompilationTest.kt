@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.buildtools.tests.compilation.model.BtaV2StrategyAgno
 import org.jetbrains.kotlin.buildtools.tests.compilation.model.CompilationOutcome
 import org.jetbrains.kotlin.buildtools.tests.compilation.model.EXPLICIT_NULL_MODULE_NAME_MARKER
 import org.jetbrains.kotlin.buildtools.tests.compilation.model.LogLevel
-import org.jetbrains.kotlin.buildtools.tests.compilation.model.project
+import org.jetbrains.kotlin.buildtools.tests.compilation.model.jvmProject
 import org.jetbrains.kotlin.buildtools.tests.compilation.scenario.jvmScenario
 import org.jetbrains.kotlin.test.TestMetadata
 import org.junit.jupiter.api.DisplayName
@@ -29,7 +29,7 @@ class ModuleNameCompilationTest : BaseCompilationTest() {
     @BtaV2StrategyAgnosticCompilationTest
     @TestMetadata("jvm-module-1")
     fun nonIncremental(strategyConfig: CompilerExecutionStrategyConfiguration) {
-        project(strategyConfig) {
+        jvmProject(strategyConfig) {
             val module1 = module("jvm-module-1", moduleCompilationConfigAction = {
                 it.compilerArguments[MODULE_NAME] = EXPLICIT_NULL_MODULE_NAME_MARKER
             })
