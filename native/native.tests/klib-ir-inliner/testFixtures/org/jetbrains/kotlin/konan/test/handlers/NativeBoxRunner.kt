@@ -204,14 +204,17 @@ class PrettyResultsHandler(
 ) : ResultHandler(runResult, checks, testRun, loggedParameters) {
     companion object {
         @Suppress("RegExpRepeatedSpace")
-        val failedRegex = """\[  FAILED  ] (.*)\.__launcher__Kt.runTest""".toRegex()
+        val failedRegexWithoutTCLogger = """\[  FAILED  ] (.*)\.__launcher__Kt.runTest""".toRegex()
+        val failedRegexWithTCLogger = """-\s+(.*)\.__launcher__Kt.runTest""".toRegex()
     }
 
     override fun processNonExpectedFailure(failedResults: List<TestRunCheck.Result.Failed>) {
         val output = getLoggedRun().toString()
-        val failedTests = failedRegex.findAll(output)
-            .map { it.groupValues }.distinct()
-            .map { it[1] }.toList()
+        val failedTests = if (testRun.runParameters.contains(TestRunParameter.WithTCTestLogger)) {
+            failedResults.flatMap { findFailedTestsWithTCLogger(it.reason) }
+        } else {
+            findFailedTestsWithoutTCLogger(output)
+        }
         val phaseInputs = testServices.groupingPhaseInputs
 
         if (phaseInputs.size == 1) {
@@ -236,5 +239,21 @@ class PrettyResultsHandler(
                 super.processNonExpectedFailure(failedResults)
             }
         }
+
+        if (failedResults.isNotEmpty() && failedTests.isEmpty()) {
+            error("There should be at least one failed test in the batch mode, but there were none")
+        }
+    }
+
+    private fun findFailedTestsWithoutTCLogger(output: String): List<String> {
+        return failedRegexWithoutTCLogger.findAll(output)
+            .map { it.groupValues }.distinct()
+            .map { it[1] }.toList()
+    }
+
+    private fun findFailedTestsWithTCLogger(output: String): List<String> {
+        return failedRegexWithTCLogger.findAll(output)
+            .map { it.groupValues }.distinct()
+            .map { it[1] }.toList()
     }
 }
