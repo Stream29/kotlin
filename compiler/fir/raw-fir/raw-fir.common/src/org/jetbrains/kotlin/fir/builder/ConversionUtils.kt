@@ -428,7 +428,7 @@ fun <T> FirPropertyBuilder.generateAccessorsByDelegate(
 
     delegate = lazyDelegateExpression ?: run {
         val delegateCallSource = delegateBuilder.source
-            ?.fakeElement(KtFakeSourceElementKind.DelegatedPropertyAccessor.DelegatedPropertyDelegateExpression)
+            ?.fakeElement(KtFakeSourceElementKind.DelegatedPropertyAccessor.DelegateExpression)
 
         delegateBuilder.provideDelegateCall = buildFunctionCall {
             explicitReceiver = delegateBuilder.expression
@@ -453,12 +453,12 @@ fun <T> FirPropertyBuilder.generateAccessorsByDelegate(
         val getterStatus = getter?.status
 
         val getterElement = getter?.source?.takeIf { it.kind == KtRealSourceElementKind }
-            ?: explicitDeclarationSource.fakeElement(KtFakeSourceElementKind.DelegatedPropertyAccessor.DelegatedPropertyGetter)
+            ?: explicitDeclarationSource.fakeElement(KtFakeSourceElementKind.DelegatedPropertyAccessor.Getter)
 
         // We take the delegate source instead of the getter source as we want to report issues with the getter's body on the delegate call
         // expression, not the whole property, since the delegate call "generates" the getter's body. For example, reporting
         // `CANNOT_INFER_PARAMETER_TYPE` on `A()` in `val p by A()`.
-        val bodyFakeSource = delegateSource?.fakeElement(KtFakeSourceElementKind.DelegatedPropertyAccessor.DelegatedPropertyGetter)
+        val bodyFakeSource = delegateSource?.fakeElement(KtFakeSourceElementKind.DelegatedPropertyAccessor.Getter)
 
         getter = buildPropertyAccessor {
             this.source = getterElement
@@ -503,12 +503,12 @@ fun <T> FirPropertyBuilder.generateAccessorsByDelegate(
         val setterStatus = setter?.status
 
         val setterElement = setter?.source?.takeIf { it.kind is KtRealSourceElementKind }
-            ?: explicitDeclarationSource.fakeElement(KtFakeSourceElementKind.DelegatedPropertyAccessor.DelegatedPropertySetter)
+            ?: explicitDeclarationSource.fakeElement(KtFakeSourceElementKind.DelegatedPropertyAccessor.Setter)
 
         // We take the delegate source instead of the setter source as we want to report issues with the setter's body on the delegate call
         // expression, not the whole property, since the delegate call "generates" the setter's body. For example, reporting
         // `CANNOT_INFER_PARAMETER_TYPE` on `A()` in `val p by A()`.
-        val bodyFakeSource = delegateSource?.fakeElement(KtFakeSourceElementKind.DelegatedPropertyAccessor.DelegatedPropertySetter)
+        val bodyFakeSource = delegateSource?.fakeElement(KtFakeSourceElementKind.DelegatedPropertyAccessor.Setter)
 
         setter = buildPropertyAccessor {
             this.source = setterElement
@@ -522,7 +522,7 @@ fun <T> FirPropertyBuilder.generateAccessorsByDelegate(
             symbol = FirPropertyAccessorSymbol()
 
             val parameterSource =
-                setterElement.fakeElement(KtFakeSourceElementKind.DelegatedPropertyAccessor.DelegatedPropertySetterValueParameter)
+                setterElement.fakeElement(KtFakeSourceElementKind.DelegatedPropertyAccessor.Setter.ValueParameter)
 
             val parameter = buildValueParameter {
                 source = parameterSource

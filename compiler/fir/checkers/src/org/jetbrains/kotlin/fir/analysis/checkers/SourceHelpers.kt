@@ -35,7 +35,7 @@ internal fun KtSourceElement.delegatedPropertySourceOrThis(): KtSourceElement {
     if (kind is KtFakeSourceElementKind.DelegatedPropertyAccessor) {
         val property = context.containingDeclarations.lastIsInstanceOrNull<FirPropertySymbol>()
         property?.delegate?.source
-            ?.fakeElement(KtFakeSourceElementKind.DelegatedPropertyAccessor.DelegatedPropertyDelegateExpression)
+            ?.fakeElement(KtFakeSourceElementKind.DelegatedPropertyAccessor.DelegateExpression)
             ?.let { return it }
     }
 
