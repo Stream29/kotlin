@@ -83,6 +83,7 @@ abstract class AbstractWasmDiagnosticTestBase(
                 ::FirResolvedTypesVerifier,
                 ::FirScopeDumpHandler,
                 ::NoFirCompilationErrorsHandler,
+                ::FirDistinctSourceElementsHandler,
             )
         }
 

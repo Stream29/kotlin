@@ -17,6 +17,9 @@ import org.jetbrains.kotlin.test.services.TestServices
  * [checkDistinctSourceElements] for more information.
  *
  * FIR files are checked in the state they were resolved to, or built fresh and checked as raw FIR if they haven't been resolved yet.
+ *
+ * See [FirDistinctSourceElementsHandler][org.jetbrains.kotlin.test.frontend.fir.handlers.FirDistinctSourceElementsHandler] for the
+ * corresponding compiler checker.
  */
 class LLDistinctSourceElementsChecker(testServices: TestServices) : AfterAnalysisChecker(testServices) {
     override fun check(thereWereFailures: Boolean) {

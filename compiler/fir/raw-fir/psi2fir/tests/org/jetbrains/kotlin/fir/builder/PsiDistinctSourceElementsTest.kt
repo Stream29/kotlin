@@ -42,6 +42,9 @@ class PsiDistinctSourceElementsTest : AbstractRawFirBuilderTestCase() {
     /**
      * Walks diagnostic test data files, strips diagnostic markup, and checks that the source elements of FIR declarations are distinct via
      * [checkDistinctSourceElements].
+     *
+     * This test covers FIR files in their raw state. See `FirDistinctSourceElementsHandler` for the handler that checks already transformed
+     * FIR files during compiler frontend tests.
      */
     fun testDiagnosticsTestData() {
         COMPILER_DIAGNOSTICS_TEST_DATA_DIRECTORY.walkRepositoryKotlinFilesWithTestData { file ->
