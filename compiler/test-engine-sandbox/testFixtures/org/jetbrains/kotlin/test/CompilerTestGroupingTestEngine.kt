@@ -200,7 +200,9 @@ class CompilerTestGroupingTestEngine : TestEngine {
 
     private fun groupTestsInBatches(infos: List<TestMethodInfo>): List<List<TestMethodInfo>> {
         val (standalones, regulars) = infos.partition { info ->
-            info.testInstance.groupingPhaseRunner.testConfiguration.groupingTestIsolators.any { it.shouldIsolateTestInGroupingConfiguration() }
+            info.testInstance.groupingPhaseRunner.testConfiguration.groupingTestIsolators.any {
+                it.shouldIsolateTestInGroupingConfiguration(info.testInstance.nonGroupingRunner.testConfiguration)
+            }
         }
 
         return standalones.map { listOf(it) }.applyIf(regulars.isNotEmpty()) { plusElement(regulars) }

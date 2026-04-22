@@ -5,8 +5,9 @@
 
 package org.jetbrains.kotlin.test.model
 
+import org.jetbrains.kotlin.test.NonGroupingPhaseTestConfiguration
 import org.jetbrains.kotlin.test.services.TestServices
 
 abstract class GroupingTestIsolator(val testServices: TestServices) {
-    abstract fun shouldIsolateTestInGroupingConfiguration(): Boolean
+    abstract fun shouldIsolateTestInGroupingConfiguration(testConfiguration: NonGroupingPhaseTestConfiguration): Boolean
 }

@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.test.frontend.fir.FirMetaInfoDiffSuppressor
 import org.jetbrains.kotlin.test.frontend.fir.handlers.FirDiagnosticsHandler
 import org.jetbrains.kotlin.test.model.ArtifactKinds
 import org.jetbrains.kotlin.test.model.GroupingTestIsolator
+import org.jetbrains.kotlin.test.model.SimpleTestFailureSuppressor
 import org.jetbrains.kotlin.test.services.BatchingPackageInserter
 import org.jetbrains.kotlin.test.services.CompilationStage
 import org.jetbrains.kotlin.test.services.TestServices
@@ -130,7 +131,7 @@ abstract class AbstractMyNativeTwoPhaseTest : AbstractTwoStageKotlinCompilerTest
         groupingPhase {
             useConfigurators(::NativeSecondStageEnvironmentConfigurator)
 
-            useGroupingTestIsolators(::MyIsolator)
+            useGroupingTestIsolators(::MyIsolator, ::MutedTestsIsolator)
 
             facadeStep(NativeCompilerSecondStageFacade::Grouping.bind(currentCustomNativeCompilerSettings))
             handlersStep(ArtifactKinds.Native, CompilationStage.SECOND) {
@@ -144,8 +145,15 @@ abstract class AbstractMyNativeTwoPhaseTest : AbstractTwoStageKotlinCompilerTest
 }
 
 class MyIsolator(testServices: TestServices) : GroupingTestIsolator(testServices) {
-    override fun shouldIsolateTestInGroupingConfiguration(): Boolean {
+    override fun shouldIsolateTestInGroupingConfiguration(testConfiguration: NonGroupingPhaseTestConfiguration): Boolean {
         // KT-84713: Migrate here full grouping logic from TestRunProvider.withTestExecutable(): respect difference of compiler args, etc.
         return testServices.testKind() != TestKind.REGULAR
+    }
+}
+
+class MutedTestsIsolator(testServices: TestServices) : GroupingTestIsolator(testServices) {
+    override fun shouldIsolateTestInGroupingConfiguration(testConfiguration: NonGroupingPhaseTestConfiguration): Boolean {
+        @OptIn(TestInfrastructureInternals::class)
+        return testConfiguration.failureSuppressors.filterIsInstance<SimpleTestFailureSuppressor>().any { it.testIsMuted() }
     }
 }
