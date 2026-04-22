@@ -49,7 +49,7 @@ class KonanIrLinker(
     }
 
     private val forwardDeclarationDeserializer = forwardModuleDescriptor?.let {
-        KonanForwardDeclarationModuleDeserializer(it, this, stubGenerator)
+        KonanForwardDeclarationModuleDeserializerK2(it, this)
     }
 
     override val fakeOverrideBuilder = IrLinkerFakeOverrideProvider(
