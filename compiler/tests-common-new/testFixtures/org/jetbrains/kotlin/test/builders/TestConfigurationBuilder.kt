@@ -346,6 +346,11 @@ class GroupingPhaseTestConfigurationBuilder :
     OnePhaseTestConfigurationBuilderBase<GroupingPhaseTestConfigurationBuilder, GroupingPhaseTestConfiguration>() {
     lateinit var testInfo: KotlinTestInfo
     val mergerWorkers: MutableList<Constructor<GroupingPhaseInputsMerger.Worker>> = mutableListOf()
+    private val groupingTestIsolators: MutableList<Constructor<GroupingTestIsolator>> = mutableListOf()
+
+    fun useGroupingTestIsolators(vararg isolators: Constructor<GroupingTestIsolator>) {
+        groupingTestIsolators += isolators
+    }
 
     fun <I : ResultingArtifact<I>, O : ResultingArtifact<O>> facadeStep(
         facade: Constructor<AbstractGroupingPhaseTestFacade<I, O>>,
@@ -439,6 +444,7 @@ class GroupingPhaseTestConfigurationBuilder :
             failureSuppressors,
             compilerConfigurationProvider,
             runtimeClasspathProviders,
+            groupingTestIsolators,
             metaInfoHandlerEnabled,
             directives,
             defaultRegisteredDirectivesBuilder.build(),

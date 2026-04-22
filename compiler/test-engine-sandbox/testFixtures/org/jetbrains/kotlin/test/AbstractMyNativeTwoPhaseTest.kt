@@ -25,11 +25,15 @@ import org.jetbrains.kotlin.test.builders.*
 import org.jetbrains.kotlin.test.directives.DiagnosticsDirectives.DIAGNOSTICS
 import org.jetbrains.kotlin.test.directives.LanguageSettingsDirectives.LANGUAGE
 import org.jetbrains.kotlin.test.directives.LanguageSettingsDirectives.OPT_IN
+import org.jetbrains.kotlin.test.directives.TestKind
+import org.jetbrains.kotlin.test.directives.testKind
 import org.jetbrains.kotlin.test.frontend.fir.FirMetaInfoDiffSuppressor
 import org.jetbrains.kotlin.test.frontend.fir.handlers.FirDiagnosticsHandler
 import org.jetbrains.kotlin.test.model.ArtifactKinds
+import org.jetbrains.kotlin.test.model.GroupingTestIsolator
 import org.jetbrains.kotlin.test.services.BatchingPackageInserter
 import org.jetbrains.kotlin.test.services.CompilationStage
+import org.jetbrains.kotlin.test.services.TestServices
 import org.jetbrains.kotlin.test.services.configuration.CommonEnvironmentConfigurator
 import org.jetbrains.kotlin.test.services.configuration.NativeFirstStageEnvironmentConfigurator
 import org.jetbrains.kotlin.test.services.configuration.NativeSecondStageEnvironmentConfigurator
@@ -126,6 +130,8 @@ abstract class AbstractMyNativeTwoPhaseTest : AbstractTwoStageKotlinCompilerTest
         groupingPhase {
             useConfigurators(::NativeSecondStageEnvironmentConfigurator)
 
+            useGroupingTestIsolators(::MyIsolator)
+
             facadeStep(NativeCompilerSecondStageFacade::Grouping.bind(currentCustomNativeCompilerSettings))
             handlersStep(ArtifactKinds.Native, CompilationStage.SECOND) {
                 useHandlers(
@@ -134,5 +140,12 @@ abstract class AbstractMyNativeTwoPhaseTest : AbstractTwoStageKotlinCompilerTest
                 )
             }
         }
+    }
+}
+
+class MyIsolator(testServices: TestServices) : GroupingTestIsolator(testServices) {
+    override fun shouldIsolateTestInGroupingConfiguration(): Boolean {
+        // KT-84713: Migrate here full grouping logic from TestRunProvider.withTestExecutable(): respect difference of compiler args, etc.
+        return testServices.testKind() != TestKind.REGULAR
     }
 }

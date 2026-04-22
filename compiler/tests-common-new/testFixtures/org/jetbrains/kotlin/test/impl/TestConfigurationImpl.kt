@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.test.directives.model.ComposedDirectivesContainer
 import org.jetbrains.kotlin.test.directives.model.DirectivesContainer
 import org.jetbrains.kotlin.test.directives.model.RegisteredDirectives
 import org.jetbrains.kotlin.test.model.AfterAnalysisChecker
+import org.jetbrains.kotlin.test.model.GroupingTestIsolator
 import org.jetbrains.kotlin.test.model.ResultingArtifact
 import org.jetbrains.kotlin.test.model.ServicesAndDirectivesContainer
 import org.jetbrains.kotlin.test.model.TestFailureSuppressor
@@ -204,6 +205,7 @@ class GroupingPhaseTestConfigurationImpl(
     failureSuppressors: List<Constructor<TestFailureSuppressor>>,
     compilerConfigurationProvider: ((TestServices, Disposable, List<AbstractEnvironmentConfigurator>) -> CompilerConfigurationProvider)?,
     runtimeClasspathProviders: List<Constructor<RuntimeClasspathProvider>>,
+    groupingTestIsolators: List<Constructor<GroupingTestIsolator>>,
     metaInfoHandlerEnabled: Boolean,
     directives: List<DirectivesContainer>,
     defaultRegisteredDirectives: RegisteredDirectives,
@@ -216,6 +218,7 @@ class GroupingPhaseTestConfigurationImpl(
     defaultRegisteredDirectives, additionalServices,
 ), GroupingPhaseTestConfiguration {
     override val mergerWorkers: List<GroupingPhaseInputsMerger.Worker> = mergerWorkers.map { it.invoke(testServices) }
+    override val groupingTestIsolators: List<GroupingTestIsolator> = groupingTestIsolators.map { it.invoke(testServices) }
 }
 
 

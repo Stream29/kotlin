@@ -10,6 +10,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import org.jetbrains.kotlin.test.directives.TestKind
+import org.jetbrains.kotlin.utils.addToStdlib.applyIf
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
 import org.jetbrains.kotlin.utils.addToStdlib.shouldNotBeCalled
 import org.junit.jupiter.engine.config.CachingJupiterConfiguration
@@ -198,9 +199,11 @@ class CompilerTestGroupingTestEngine : TestEngine {
     }
 
     private fun groupTestsInBatches(infos: List<TestMethodInfo>): List<List<TestMethodInfo>> {
-        // KT-84713: Migrate here full grouping logic from TestRunProvider.withTestExecutable(): respect difference of compiler args, etc.
-        val (regulars, standalones) = infos.partition { it.testInstance.testKind == TestKind.REGULAR }
-        return standalones.map { listOf(it) }.plusElement(regulars)
+        val (standalones, regulars) = infos.partition { info ->
+            info.testInstance.groupingPhaseRunner.testConfiguration.groupingTestIsolators.any { it.shouldIsolateTestInGroupingConfiguration() }
+        }
+
+        return standalones.map { listOf(it) }.applyIf(regulars.isNotEmpty()) { plusElement(regulars) }
     }
 
     private fun runGroupingPhaseOnBatch(
