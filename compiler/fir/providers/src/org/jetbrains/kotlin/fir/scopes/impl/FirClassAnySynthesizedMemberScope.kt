@@ -141,7 +141,7 @@ class FirClassAnySynthesizedMemberScope(
         buildNamedFunction {
             generateSyntheticFunction(
                 OperatorNameConventions.EQUALS,
-                KtFakeSourceElementKind.DataClassGeneratedMembers.DataClassEqualsFunction,
+                KtFakeSourceElementKind.DataClassGeneratedMembers.EqualsFunction,
                 isOperator = true,
             )
 
@@ -149,7 +149,7 @@ class FirClassAnySynthesizedMemberScope(
             this.valueParameters.add(
                 buildValueParameter {
                     val valueParameterSourceElement = klass.source
-                        ?.fakeElement(KtFakeSourceElementKind.DataClassGeneratedMembers.DataClassEqualsFunctionParameter)
+                        ?.fakeElement(KtFakeSourceElementKind.DataClassGeneratedMembers.EqualsFunction.Parameter)
 
                     source = valueParameterSourceElement
                     this.name = Name.identifier("other")
@@ -169,7 +169,7 @@ class FirClassAnySynthesizedMemberScope(
         buildNamedFunction {
             generateSyntheticFunction(
                 OperatorNameConventions.HASH_CODE,
-                KtFakeSourceElementKind.DataClassGeneratedMembers.DataClassHashCodeFunction,
+                KtFakeSourceElementKind.DataClassGeneratedMembers.HashCodeFunction,
             )
             returnTypeRef = FirImplicitIntTypeRef(source)
         }
@@ -178,7 +178,7 @@ class FirClassAnySynthesizedMemberScope(
         buildNamedFunction {
             generateSyntheticFunction(
                 OperatorNameConventions.TO_STRING,
-                KtFakeSourceElementKind.DataClassGeneratedMembers.DataClassToStringFunction,
+                KtFakeSourceElementKind.DataClassGeneratedMembers.ToStringFunction,
             )
             returnTypeRef = FirImplicitStringTypeRef(source)
         }

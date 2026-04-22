@@ -1167,7 +1167,7 @@ abstract class AbstractRawFirBuilder<T : Any>(val baseSession: FirSession, val c
                 val name = Name.identifier("component$componentIndex")
                 componentIndex++
                 val componentSource =
-                    sourceNode.toFirSourceElement(KtFakeSourceElementKind.DataClassGeneratedMembers.DataClassComponentFunction)
+                    sourceNode.toFirSourceElement(KtFakeSourceElementKind.DataClassGeneratedMembers.ComponentFunction)
 
                 val componentFunction = buildNamedFunction {
                     source = componentSource
@@ -1175,9 +1175,9 @@ abstract class AbstractRawFirBuilder<T : Any>(val baseSession: FirSession, val c
                     origin = FirDeclarationOrigin.Synthetic.DataClassMember
 
                     // The return type reference has a different real source than the component function, so we can reuse
-                    // `DataClassComponentFunction`.
+                    // `ComponentFunction`.
                     returnTypeRef = firProperty.returnTypeRef
-                        .copyWithNewSourceKind(KtFakeSourceElementKind.DataClassGeneratedMembers.DataClassComponentFunction)
+                        .copyWithNewSourceKind(KtFakeSourceElementKind.DataClassGeneratedMembers.ComponentFunction)
 
                     this.name = name
                     status = FirDeclarationStatusImpl(firProperty.visibility, Modality.FINAL).apply {
@@ -1485,11 +1485,11 @@ fun <TBase, TSource : TBase, TParameter : TBase> FirRegularClassBuilder.createDa
     val declarationOrigin = if (isFromLibrary) FirDeclarationOrigin.Library else FirDeclarationOrigin.Synthetic.DataClassMember
 
     return buildNamedFunction {
-        val copySourceElement = toFirSource(sourceElement, KtFakeSourceElementKind.DataClassGeneratedMembers.DataClassCopyFunction)
+        val copySourceElement = toFirSource(sourceElement, KtFakeSourceElementKind.DataClassGeneratedMembers.CopyFunction)
 
-        // The return type reference has a different real source than the copy function, so we can reuse `DataClassCopyFunction`.
+        // The return type reference has a different real source than the copy function, so we can reuse `CopyFunction`.
         val classTypeRef = firConstructor.returnTypeRef
-            .copyWithNewSourceKind(KtFakeSourceElementKind.DataClassGeneratedMembers.DataClassCopyFunction)
+            .copyWithNewSourceKind(KtFakeSourceElementKind.DataClassGeneratedMembers.CopyFunction)
 
         this.source = copySourceElement
         moduleData = this@createDataClassCopyFunction.moduleData
@@ -1510,11 +1510,11 @@ fun <TBase, TSource : TBase, TParameter : TBase> FirRegularClassBuilder.createDa
 
         for ((ktParameter, firProperty) in zippedParameters) {
             val propertyName = firProperty.name
-            val parameterSource = toFirSource(ktParameter, KtFakeSourceElementKind.DataClassGeneratedMembers.DataClassCopyFunctionParameter)
+            val parameterSource = toFirSource(ktParameter, KtFakeSourceElementKind.DataClassGeneratedMembers.CopyFunction.Parameter)
 
-            // The return type reference has a different real source than the parameter, so we can reuse `DataClassCopyFunctionParameter`.
+            // The return type reference has a different real source than the parameter, so we can reuse `CopyFunction.Parameter`.
             val propertyReturnTypeRef = firProperty.returnTypeRef
-                .copyWithNewSourceKind(KtFakeSourceElementKind.DataClassGeneratedMembers.DataClassCopyFunctionParameter)
+                .copyWithNewSourceKind(KtFakeSourceElementKind.DataClassGeneratedMembers.CopyFunction.Parameter)
 
             valueParameters += buildValueParameter {
                 resolvePhase = this@createDataClassCopyFunction.resolvePhase

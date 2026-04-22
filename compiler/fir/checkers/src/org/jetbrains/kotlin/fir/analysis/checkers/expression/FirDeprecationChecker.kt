@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.fir.analysis.checkers.expression
 
 import org.jetbrains.kotlin.KtFakeSourceElementKind
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.KtSourceElementKind
 import org.jetbrains.kotlin.config.KotlinCompilerVersion
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
@@ -38,14 +39,10 @@ import org.jetbrains.kotlin.metadata.deserialization.VersionRequirement
 import org.jetbrains.kotlin.resolve.deprecation.DeprecationLevelValue
 
 object FirDeprecationChecker : FirBasicExpressionChecker(MppCheckerKind.Common) {
-
-    private val filteredSourceKinds: Set<KtFakeSourceElementKind> = setOf(
-        KtFakeSourceElementKind.PropertyFromParameter,
-    ) + KtFakeSourceElementKind.ALL_DATA_CLASS_GENERATED_MEMBERS
-
     context(context: CheckerContext, reporter: DiagnosticReporter)
     override fun check(expression: FirStatement) {
-        if (expression.source?.kind in filteredSourceKinds) return
+        val sourceKind = expression.source?.kind
+        if (isExcludedSourceKind(sourceKind)) return
         if (expression is FirAnnotation) return // checked by FirDeprecatedTypeChecker
         if (expression.isLhsOfAssignment()) return
 
@@ -72,6 +69,10 @@ object FirDeprecationChecker : FirBasicExpressionChecker(MppCheckerKind.Common) 
 
         reportCallToDeprecatedOverrideOfHidden(expression, source, referencedSymbol)
     }
+
+    private fun isExcludedSourceKind(kind: KtSourceElementKind?): Boolean =
+        kind is KtFakeSourceElementKind.DataClassGeneratedMembers
+                || kind == KtFakeSourceElementKind.PropertyFromParameter
 
     context(context: CheckerContext, reporter: DiagnosticReporter)
     private fun reportCallToDeprecatedOverrideOfHidden(
