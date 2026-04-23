@@ -32,7 +32,6 @@ tasks.withType<Test>().configureEach {
         val javaVersion = provider { tasks.named<Test>(taskName).map { it.javaLauncher.get().metadata.languageVersion.asInt() }.get() }
         val defineJDKEnvVariables: List<Int> = listOf(8, 11, 17, 21)
         inputs.property("javaVersion", javaVersion)
-
         val nativeHome = project.providers.gradleProperty("kotlin.internal.native.test.nativeHome").orElse(
             project.providers.gradleProperty("kn.nativeHome")
         )
@@ -260,7 +259,18 @@ tasks.withType<Test>().configureEach {
                         .replace("{{all_permissions_for_gradle_ro_dep_cache}}", allPermissionsForGradleRoDepCache ?: "")
                         .replace(
                             "{{build_dir}}",
-                            """permission java.io.FilePermission "${buildDir.get().asFile.absolutePath}/-", "read,write,execute,delete";"""
+                            buildString {
+                                val buildDirPath = buildDir.get().asFile.absolutePath
+                                append("""permission java.io.FilePermission "$buildDirPath/-", "read,write,execute,delete";""")
+                                // Gradle's FileSystemProbing uppercases a filename and calls File.exists() to detect
+                                // filesystem case-sensitivity. SecurityManager.checkRead fires on the uppercased path
+                                // regardless of OS or whether the file exists, so grant read for that variant too.
+                                val buildDirUpper = buildDirPath.uppercase()
+                                if (buildDirUpper != buildDirPath) {
+                                    append("\n    ")
+                                    append("""permission java.io.FilePermission "$buildDirUpper/-", "read";""")
+                                }
+                            }
                         )
                         .replace("{{java_library_paths}}", javaLibraryPaths.joinToString("\n    "))
                         .replace(
