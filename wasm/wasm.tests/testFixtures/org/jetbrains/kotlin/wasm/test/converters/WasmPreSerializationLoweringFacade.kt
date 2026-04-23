@@ -34,11 +34,7 @@ class WasmPreSerializationLoweringFacade(
             "WasmPreSerializationLoweringFacade expects WebFir2IrPipelineArtifact as cliArtifact, but got ${cliArtifact::class.simpleName}"
         }
 
-        val diagnosticReporter = DiagnosticsCollectorImpl()
-
-        val input = cliArtifact.withNewDiagnosticCollector(diagnosticReporter)
-
-        val output = WebKlibInliningPipelinePhase.executePhase(input)
+        val output = WebKlibInliningPipelinePhase.executePhase(cliArtifact)
 
         // The returned artifact will be stored in dependencyProvider instead of `inputArtifact`, with same kind=BackendKinds.IrBackend
         return Fir2IrCliBasedOutputArtifact(output)
