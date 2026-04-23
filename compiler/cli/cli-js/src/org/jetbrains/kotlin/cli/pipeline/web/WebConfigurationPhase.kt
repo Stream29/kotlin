@@ -7,18 +7,17 @@ package org.jetbrains.kotlin.cli.pipeline.web
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.text.StringUtil
-import org.jetbrains.kotlin.backend.common.CommonBackendErrors
-import org.jetbrains.kotlin.backend.common.diagnostics.SerializationErrors
-import org.jetbrains.kotlin.backend.common.linkage.partial.PartialLinkageDiagnostics
 import org.jetbrains.kotlin.backend.common.linkage.partial.setupPartialLinkageConfig
 import org.jetbrains.kotlin.cli.CliDiagnostics.WEB_ARGUMENT_ERROR
 import org.jetbrains.kotlin.cli.CliDiagnostics.WEB_ARGUMENT_WARNING
 import org.jetbrains.kotlin.cli.common.*
 import org.jetbrains.kotlin.cli.common.arguments.*
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
-import org.jetbrains.kotlin.cli.diagnosticFactoriesStorage
 import org.jetbrains.kotlin.cli.js.*
-import org.jetbrains.kotlin.cli.pipeline.*
+import org.jetbrains.kotlin.cli.pipeline.AbstractConfigurationPhase
+import org.jetbrains.kotlin.cli.pipeline.ArgumentsPipelineArtifact
+import org.jetbrains.kotlin.cli.pipeline.CheckCompilationErrors
+import org.jetbrains.kotlin.cli.pipeline.ConfigurationUpdater
 import org.jetbrains.kotlin.cli.pipeline.web.js.JsConfigurationUpdater
 import org.jetbrains.kotlin.cli.pipeline.web.wasm.WasmConfigurationUpdater
 import org.jetbrains.kotlin.cli.report
@@ -29,9 +28,6 @@ import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.incremental.js.IncrementalDataProvider
 import org.jetbrains.kotlin.incremental.js.IncrementalNextRoundChecker
 import org.jetbrains.kotlin.incremental.js.IncrementalResultsConsumer
-import org.jetbrains.kotlin.ir.backend.js.checkers.JsKlibErrors
-import org.jetbrains.kotlin.ir.backend.js.wasm.WasmKlibErrors
-import org.jetbrains.kotlin.ir.inline.diagnostics.IrInlinerErrors
 import org.jetbrains.kotlin.js.config.*
 import org.jetbrains.kotlin.metadata.deserialization.BinaryVersion
 import org.jetbrains.kotlin.metadata.deserialization.MetadataVersion
@@ -45,18 +41,6 @@ object JsConfigurationPhase : AbstractConfigurationPhase<K2JSCompilerArguments>(
     postActions = setOf(CheckCompilationErrors.CheckDiagnosticCollector),
     configurationUpdaters = listOf(CommonJsConfigurationUpdater, JsConfigurationUpdater)
 ) {
-    override fun executePhase(input: ArgumentsPipelineArtifact<K2JSCompilerArguments>): ConfigurationPipelineArtifact {
-        return super.executePhase(input).also {
-            it.configuration.diagnosticFactoriesStorage?.registerDiagnosticContainers(
-                PartialLinkageDiagnostics,
-                CommonBackendErrors,
-                SerializationErrors,
-                IrInlinerErrors,
-                JsKlibErrors,
-            )
-        }
-    }
-
     override fun createMetadataVersion(versionArray: IntArray): BinaryVersion {
         return MetadataVersion(*versionArray)
     }
@@ -67,18 +51,6 @@ object WasmConfigurationPhase : AbstractConfigurationPhase<KotlinWasmCompilerArg
     postActions = setOf(CheckCompilationErrors.CheckDiagnosticCollector),
     configurationUpdaters = listOf(CommonWasmConfigurationUpdater, WasmConfigurationUpdater)
 ) {
-    override fun executePhase(input: ArgumentsPipelineArtifact<KotlinWasmCompilerArguments>): ConfigurationPipelineArtifact {
-        return super.executePhase(input).also {
-            it.configuration.diagnosticFactoriesStorage?.registerDiagnosticContainers(
-                PartialLinkageDiagnostics,
-                CommonBackendErrors,
-                SerializationErrors,
-                IrInlinerErrors,
-                WasmKlibErrors,
-            )
-        }
-    }
-
     override fun createMetadataVersion(versionArray: IntArray): BinaryVersion {
         return MetadataVersion(*versionArray)
     }

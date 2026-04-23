@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlin.native.pipeline
 
-import org.jetbrains.kotlin.backend.common.CommonBackendErrors
-import org.jetbrains.kotlin.backend.common.diagnostics.SerializationErrors
 import org.jetbrains.kotlin.backend.common.linkage.partial.PartialLinkageDiagnostics
 import org.jetbrains.kotlin.backend.common.linkage.partial.setupPartialLinkageConfig
 import org.jetbrains.kotlin.cli.CliDiagnostics.KONAN_ARGUMENT_ERROR
@@ -41,16 +39,6 @@ object NativeConfigurationPhase : AbstractConfigurationPhase<K2NativeCompilerArg
     postActions = setOf(PerformanceNotifications.InitializationFinished, CheckCompilationErrors.CheckDiagnosticCollector),
     configurationUpdaters = listOf(NativeKlibConfigurationUpdater)
 ) {
-    override fun executePhase(input: ArgumentsPipelineArtifact<K2NativeCompilerArguments>): ConfigurationPipelineArtifact {
-        return super.executePhase(input).also {
-            it.configuration.diagnosticFactoriesStorage?.registerDiagnosticContainers(
-                PartialLinkageDiagnostics,
-                CommonBackendErrors,
-                SerializationErrors,
-                IrInlinerErrors,
-            )
-        }
-    }
     override fun createMetadataVersion(versionArray: IntArray): BinaryVersion {
         return MetadataVersion(*versionArray)
     }
@@ -64,6 +52,11 @@ object NativeKlibConfigurationUpdater : ConfigurationUpdater<K2NativeCompilerArg
         input: ArgumentsPipelineArtifact<K2NativeCompilerArguments>,
         configuration: CompilerConfiguration,
     ) {
+        configuration.diagnosticFactoriesStorage?.registerDiagnosticContainers(
+            PartialLinkageDiagnostics,
+            IrInlinerErrors,
+        )
+
         val arguments = input.arguments
         val rootDisposable = input.rootDisposable
         configuration.setupCommonKlibArguments(arguments, canBeMetadataKlibCompilation = true, rootDisposable)

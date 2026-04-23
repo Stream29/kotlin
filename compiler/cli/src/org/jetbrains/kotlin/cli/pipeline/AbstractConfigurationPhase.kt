@@ -46,7 +46,7 @@ abstract class AbstractConfigurationPhase<A : CommonCompilerArguments>(
     postActions: Set<Action<ConfigurationPipelineArtifact, PipelineContext>> = emptySet(),
     val configurationUpdaters: List<ConfigurationUpdater<A>>
 ) : PipelinePhase<ArgumentsPipelineArtifact<A>, ConfigurationPipelineArtifact>(name, preActions, postActions) {
-    override fun executePhase(input: ArgumentsPipelineArtifact<A>): ConfigurationPipelineArtifact {
+    override fun executePhase(input: ArgumentsPipelineArtifact<A>): ConfigurationPipelineArtifact? {
         val configuration = input.configuration
         configuration.setupCommonConfiguration(input)
 

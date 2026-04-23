@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.cli.pipeline.jvm
 
-import org.jetbrains.kotlin.backend.common.CommonBackendErrors
 import org.jetbrains.kotlin.backend.jvm.JvmBackendErrors
 import org.jetbrains.kotlin.backend.jvm.jvmPhases
 import org.jetbrains.kotlin.cli.common.*
@@ -33,14 +32,10 @@ object JvmConfigurationPipelinePhase : AbstractConfigurationPhase<K2JVMCompilerA
     postActions = setOf(CheckCompilationErrors.CheckDiagnosticCollector),
     configurationUpdaters = listOf(JvmConfigurationUpdater)
 ) {
-    override fun executePhase(input: ArgumentsPipelineArtifact<K2JVMCompilerArguments>): ConfigurationPipelineArtifact =
+    override fun executePhase(input: ArgumentsPipelineArtifact<K2JVMCompilerArguments>): ConfigurationPipelineArtifact? =
         super.executePhase(input).also {
-            val configuration = it.configuration
-            configuration.diagnosticFactoriesStorage?.registerDiagnosticContainers(
-                JvmBackendErrors,
-                CommonBackendErrors,
-            )
-            val dumpModelDir = configuration[CommonConfigurationKeys.DUMP_MODEL]
+            val configuration = it?.configuration
+            val dumpModelDir = configuration?.get(CommonConfigurationKeys.DUMP_MODEL)
             if (dumpModelDir != null) {
                 JvmFrontendPipelinePhase.dumpModel(dumpModelDir, configuration.moduleChunk!!.modules, configuration, input.arguments)
             }
@@ -67,6 +62,8 @@ object JvmConfigurationUpdater : ConfigurationUpdater<K2JVMCompilerArguments>() 
         input: ArgumentsPipelineArtifact<K2JVMCompilerArguments>,
         configuration: CompilerConfiguration,
     ) {
+        configuration.diagnosticFactoriesStorage?.registerDiagnosticContainers(JvmBackendErrors)
+
         val (arguments, services, _, _, _) = input
         configuration.reportLog("Configuring the compilation environment")
 

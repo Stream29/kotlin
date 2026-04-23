@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlin.cli.jklib.pipeline
 
-import org.jetbrains.kotlin.backend.common.CommonBackendErrors
-import org.jetbrains.kotlin.backend.common.diagnostics.SerializationErrors
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.linkage.partial.PartialLinkageDiagnostics
 import org.jetbrains.kotlin.backend.common.serialization.IrSerializationSettings
@@ -69,17 +67,6 @@ object JKlibConfigurationPhase : AbstractConfigurationPhase<K2JKlibCompilerArgum
     postActions = setOf(CheckCompilationErrors.CheckDiagnosticCollector),
     configurationUpdaters = listOf(JKlibConfigurationUpdater)
 ) {
-    override fun executePhase(input: ArgumentsPipelineArtifact<K2JKlibCompilerArguments>): ConfigurationPipelineArtifact {
-        return super.executePhase(input).also {
-            it.configuration.diagnosticFactoriesStorage?.registerDiagnosticContainers(
-                PartialLinkageDiagnostics,
-                CommonBackendErrors,
-                SerializationErrors,
-                JvmBackendErrors,
-            )
-        }
-    }
-
     override fun createMetadataVersion(versionArray: IntArray): BinaryVersion {
         return MetadataVersion(*versionArray)
     }
@@ -90,6 +77,11 @@ object JKlibConfigurationUpdater : ConfigurationUpdater<K2JKlibCompilerArguments
         input: ArgumentsPipelineArtifact<K2JKlibCompilerArguments>,
         configuration: CompilerConfiguration,
     ) {
+        configuration.diagnosticFactoriesStorage?.registerDiagnosticContainers(
+            PartialLinkageDiagnostics,
+            JvmBackendErrors,
+        )
+
         val arguments = input.arguments
 
         val commonSources = arguments.commonSources.toSet()
