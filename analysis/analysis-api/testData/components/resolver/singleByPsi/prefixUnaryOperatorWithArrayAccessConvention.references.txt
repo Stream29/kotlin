@@ -6,6 +6,8 @@ KtOperationReferenceExpression(128,130): '++'
     symbols:
       0: (in MyMap) operator fun set(k: K, v: V)
       1: (in kotlin.Int) operator fun inc(): kotlin.Int
+    resolveToSymbols:
+      (in MyMap) operator fun set(k: K, v: V)
 
   KtSimpleNameReference:
     isImplicitReferenceToCompanion: false
@@ -14,3 +16,5 @@ KtOperationReferenceExpression(128,130): '++'
     symbols:
       0: (in MyMap) operator fun set(k: K, v: V)
       1: (in kotlin.Int) operator fun inc(): kotlin.Int
+    resolveToSymbols:
+      (in MyMap) operator fun set(k: K, v: V)

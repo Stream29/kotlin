@@ -190,6 +190,8 @@ KtOperationReferenceExpression(461,463): '=='
     attempt: KaSymbolResolutionSuccess
     symbols:
       (in kotlin.Any) open operator fun equals(other: kotlin.Any?): kotlin.Boolean
+    resolveToSymbols:
+      Nothing (Unresolved reference)
 
 KtNameReferenceExpression(464,465): 'a'
   KtSimpleNameReference:
