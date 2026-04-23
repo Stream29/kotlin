@@ -1,4 +1,5 @@
 // RUN_PIPELINE_TILL: FRONTEND
+// LATEST_LV_DIFFERENCE
 fun test() {
     // ISSUE: KT-71662
     val resultA = pcla { otvOwner ->
@@ -16,7 +17,7 @@ fun test() {
         otvOwner.provide().unbox().function()
 
         // expected: Interloper </: Box<ScopeOwner>
-        otvOwner.constrain(<!ARGUMENT_TYPE_MISMATCH("Interloper; Box<uninferred PNT (of fun <PNT> createDerivativeTypeVariable)>")!>Interloper<!>)
+        otvOwner.constrain(<!ARGUMENT_TYPE_MISMATCH("Interloper; Box<ScopeOwner>")!>Interloper<!>)
     }
     // expected: Box<ScopeOwner>
     <!DEBUG_INFO_EXPRESSION_TYPE("Box<ScopeOwner>")!>resultA<!>

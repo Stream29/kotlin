@@ -1,4 +1,5 @@
 // RUN_PIPELINE_TILL: BACKEND
+// LANGUAGE: +EnhancementsOfSecondIncorporationKind25
 // ISSUE: KT-83068
 
 sealed class PhysicalQuantity {
