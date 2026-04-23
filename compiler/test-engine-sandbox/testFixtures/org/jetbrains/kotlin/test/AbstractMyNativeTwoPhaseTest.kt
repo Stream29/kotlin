@@ -24,7 +24,6 @@ import org.jetbrains.kotlin.konan.test.services.CInteropTestSkipper
 import org.jetbrains.kotlin.konan.test.services.DisabledNativeTestSkipper
 import org.jetbrains.kotlin.konan.test.services.FileCheckTestSkipper
 import org.jetbrains.kotlin.konan.test.services.sourceProviders.NativeLauncherAdditionalSourceProvider
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.test.backend.handlers.NoFirCompilationErrorsHandler
 import org.jetbrains.kotlin.test.backend.handlers.NoIrCompilationErrorsHandler
 import org.jetbrains.kotlin.test.builders.*
@@ -148,16 +147,15 @@ abstract class AbstractMyNativeTwoPhaseTest : AbstractTwoStageKotlinCompilerTest
 class NativeGroupingTestIsolator(testServices: TestServices) : GroupingTestIsolator(testServices) {
     override fun shouldIsolateTestInGroupingConfiguration(moduleStructure: TestModuleStructure): Boolean {
         // KT-84713: Migrate here full grouping logic from TestRunProvider.withTestExecutable(): respect ignores, difference of compiler args, etc.
-        return (testServices.testRunSettings.testKind(moduleStructure.modules.firstOrNull()?.directives) != TestKind.REGULAR
+        return testServices.testRunSettings.testKind(moduleStructure.modules.firstOrNull()?.directives) != TestKind.REGULAR
                 || moduleStructure.allDirectives[FILECHECK_STAGE].isNotEmpty()
-                || containsPackage(moduleStructure, KOTLIN_INTERNAL_FQ_NAME))
+                || moduleStructure.sourceContains(packageKotlinInternalRegex)
+    }
+
+    private val packageKotlinInternalRegex = Regex("package\\s$KOTLIN_INTERNAL_FQ_NAME")
+    private val sourceContainsCache = HashMap<Pair<TestModuleStructure, Regex>, Boolean>()
+
+    private fun TestModuleStructure.sourceContains(regex: Regex): Boolean {
+        return sourceContainsCache.getOrPut(this to regex) { modules.any { it.files.any { it.originalContent.contains(regex) } } }
     }
 }
-
-private fun containsPackage(moduleStructure: TestModuleStructure, packageName: FqName): Boolean =
-    moduleStructure.modules.any {
-        it.files.any {
-            val contains = it.originalContent.contains(Regex("package\\s$packageName"))
-            contains
-        }
-    }
