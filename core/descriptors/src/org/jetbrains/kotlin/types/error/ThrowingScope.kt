@@ -36,6 +36,6 @@ class ThrowingScope(kind: ErrorScopeKind, vararg formatParams: String) : ErrorSc
     override fun definitelyDoesNotContainName(name: Name): Boolean = false
     override fun toString(): String = "ThrowingScope{$debugMessage}"
     override fun printScopeStructure(p: Printer) {
-        p.println(javaClass.simpleName, ": ", debugMessage)
+        p.println(this::class.simpleName, ": ", debugMessage)
     }
 }

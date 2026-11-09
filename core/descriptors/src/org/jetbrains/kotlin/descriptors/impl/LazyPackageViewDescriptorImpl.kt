@@ -66,5 +66,5 @@ open class LazyPackageViewDescriptorImpl(
         return result
     }
 
-    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R = visitor.visitPackageViewDescriptor(this, data)
+    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R? = visitor.visitPackageViewDescriptor(this, data)
 }

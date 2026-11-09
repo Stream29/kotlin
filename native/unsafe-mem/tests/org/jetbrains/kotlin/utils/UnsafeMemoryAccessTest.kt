@@ -5,11 +5,8 @@
 
 package org.jetbrains.kotlin.utils
 
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import java.nio.ByteOrder
+import kotlin.test.*
+import kotlin.test.assertFailsWith as assertThrows
 
 abstract class UnsafeMemoryAccessTest {
     protected abstract val memory: UnsafeMemoryAccess
@@ -68,7 +65,7 @@ abstract class UnsafeMemoryAccessTest {
     }
 
     private fun toBytes(bits: Long, size: Int): ByteArray {
-        assertEquals(ByteOrder.LITTLE_ENDIAN, ByteOrder.nativeOrder())
+        assertNativeLittleEndian()
         return ByteArray(size) { i -> (bits shr (i * 8)).toByte() }
     }
 
@@ -100,7 +97,6 @@ abstract class UnsafeMemoryAccessTest {
         }
     }
 
-    @Nested
     inner class BasicAllocation {
         @Test
         fun testAllocateAndFreeMemory() {
@@ -125,7 +121,7 @@ abstract class UnsafeMemoryAccessTest {
             val exception = assertThrows<Throwable> { memory.allocateMemory(Long.MAX_VALUE) }
             assertTrue(
                 exception is OutOfMemoryError || exception is IllegalArgumentException,
-                "Expected OutOfMemoryError or IllegalArgumentException, but got ${exception::class.java.name}"
+                "Expected OutOfMemoryError or IllegalArgumentException, but got ${exception::class.simpleName}"
             )
         }
 
@@ -148,7 +144,6 @@ abstract class UnsafeMemoryAccessTest {
         }
     }
 
-    @Nested
     inner class PutGetRoundTrips {
         @Test
         fun testPutAndGetByte() = testPutAndGet(
@@ -215,7 +210,6 @@ abstract class UnsafeMemoryAccessTest {
         )
     }
 
-    @Nested
     inner class UnalignedAccess {
         @Test
         fun testUnalignedShortAccess() = testUnaligned(
@@ -263,7 +257,6 @@ abstract class UnsafeMemoryAccessTest {
         )
     }
 
-    @Nested
     inner class ZeroMemoryOperations {
         @Test
         fun testZeroMemory() {
@@ -321,7 +314,6 @@ abstract class UnsafeMemoryAccessTest {
 
     }
 
-    @Nested
     inner class ByteArrayOperations {
         @Test
         fun testCopyFromAndToByteArray() {
@@ -416,7 +408,6 @@ abstract class UnsafeMemoryAccessTest {
         }
     }
 
-    @Nested
     inner class CharArrayOperations {
         @Test
         fun testCopyFromCharArray() = checkCopyFromCharArray(charArrayOf('H', 'e', 'l', 'l', 'o'), offset = 0)
@@ -455,7 +446,6 @@ abstract class UnsafeMemoryAccessTest {
 
     }
 
-    @Nested
     inner class MultipleValuesAtDifferentOffsets {
         @Test
         fun testMultipleValuesAtDifferentOffsets() {
@@ -485,7 +475,6 @@ abstract class UnsafeMemoryAccessTest {
         }
     }
 
-    @Nested
     inner class ByteLayout {
         @Test
         fun testShortByteLayout() = testByteLayout(
@@ -518,7 +507,6 @@ abstract class UnsafeMemoryAccessTest {
         ) { it.toRawBits() }
     }
 
-    @Nested
     inner class ZeroLengthOperations {
         @Test
         fun testZeroMemoryZeroLength() {

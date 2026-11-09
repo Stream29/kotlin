@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlin.builtins.jvm
 
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.functions.BuiltInFictitiousFunctionClassFactory
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor

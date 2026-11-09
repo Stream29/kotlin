@@ -16,11 +16,10 @@ import org.jetbrains.kotlin.library.loader.KlibLoaderResult.ProblemCase.Incompat
 import org.jetbrains.kotlin.library.loader.KlibLoaderResult.ProblemCase.InvalidLibraryFormat
 import org.jetbrains.kotlin.library.loader.KlibLoaderResult.ProblemCase.LibraryNotFound
 import org.jetbrains.kotlin.library.loader.KlibLoaderResult.ProblematicLibrary
-import java.io.File
-import java.nio.file.InvalidPathException
-import java.nio.file.Path
-import java.nio.file.Paths
-import kotlin.io.path.exists
+import nativekotlin.host.files.NativeFile as File
+import org.jetbrains.kotlin.library.InvalidKlibPathException as InvalidPathException
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.KlibPaths as Paths
 
 /**
  * The [KlibLoader] component helps to load [KotlinLibrary]s based on the supplied

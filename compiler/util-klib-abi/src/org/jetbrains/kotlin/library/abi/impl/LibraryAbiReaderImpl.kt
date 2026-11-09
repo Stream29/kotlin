@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.library.abi.impl
 
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import org.jetbrains.kotlin.backend.common.serialization.*
 import org.jetbrains.kotlin.backend.common.serialization.encodings.*
 import org.jetbrains.kotlin.backend.common.serialization.encodings.BinarySymbolData.SymbolKind.CLASS_SYMBOL
@@ -37,7 +36,7 @@ import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.utils.*
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
-import java.io.File
+import org.jetbrains.kotlin.konan.file.File
 import org.jetbrains.kotlin.backend.common.serialization.IrFlags as ProtoFlags
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrClass as ProtoClass
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrAnnotation as ProtoAnnotation
@@ -115,8 +114,8 @@ private class LibraryDeserializer(
     private val interner = IrInterningService()
 
     private val annotationInterner = object {
-        private val uniqueAnnotations = ObjectOpenHashSet<AbiAnnotationImpl>()
-        fun intern(annotation: AbiAnnotationImpl): AbiAnnotationImpl = uniqueAnnotations.addOrGet(annotation)
+        private val uniqueAnnotations = HashMap<AbiAnnotationImpl, AbiAnnotationImpl>()
+        fun intern(annotation: AbiAnnotationImpl): AbiAnnotationImpl = uniqueAnnotations.getOrPut(annotation) { annotation }
     }
 
     private val needV1Signatures = AbiSignatureVersions.Supported.V1 in supportedSignatureVersions
@@ -508,7 +507,7 @@ private class LibraryDeserializer(
                 val annotationClassName = when {
                     idSignature is CommonSignature -> idSignature
                     idSignature is CompositeSignature && idSignature.container is FileSignature -> idSignature.inner as CommonSignature
-                    else -> error("Unexpected annotation signature encountered: ${idSignature::class.java}, ${idSignature.render()}")
+                    else -> error("Unexpected annotation signature encountered: ${idSignature::class}, ${idSignature.render()}")
                 }.extractQualifiedName { rawRelativeName ->
                     check(rawRelativeName.endsWith(INIT_SUFFIX)) {
                         "Annotation constructor name does not have '$INIT_SUFFIX' suffix: $rawRelativeName"
@@ -767,7 +766,7 @@ private class LibraryDeserializer(
                     )
                 }
 
-                else -> error("Unexpected combination of symbol kind ($symbolKind) and a signature: ${idSignature::class.java}, ${idSignature.render()}")
+                else -> error("Unexpected combination of symbol kind ($symbolKind) and a signature: ${idSignature::class}, ${idSignature.render()}")
             }
         }
 

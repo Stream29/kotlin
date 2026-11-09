@@ -7,10 +7,12 @@ package org.jetbrains.kotlin.load.java.lazy.types
 
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.TypeParameterUpperBoundEraser
-import org.jetbrains.kotlin.types.TypeUtils.makeStarProjection
+import org.jetbrains.kotlin.types.TypeUtils.Companion.makeStarProjection
+import org.jetbrains.kotlin.builtins.*
 
 @K1Deprecation
 class RawProjectionComputer : ErasureProjectionComputer() {

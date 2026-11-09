@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.descriptors.impl
 
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.Name
@@ -38,11 +40,9 @@ open class ValueParameterDescriptorImpl(
 ) : VariableDescriptorImpl(containingDeclaration, annotations, name, outType, source), ValueParameterDescriptor {
 
     companion object {
-        @JvmStatic
         fun getDestructuringVariablesOrNull(valueParameterDescriptor: ValueParameterDescriptor) =
                 (valueParameterDescriptor as? ValueParameterDescriptorImpl.WithDestructuringDeclaration)?.destructuringVariables
 
-        @JvmStatic
         fun createWithDestructuringDeclarations(containingDeclaration: CallableDescriptor,
                                                 original: ValueParameterDescriptor?,
                                                 index: Int,
@@ -106,7 +106,7 @@ open class ValueParameterDescriptorImpl(
         throw UnsupportedOperationException() // TODO
     }
 
-    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R {
+    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R? {
         return visitor.visitValueParameterDescriptor(this, data)
     }
 

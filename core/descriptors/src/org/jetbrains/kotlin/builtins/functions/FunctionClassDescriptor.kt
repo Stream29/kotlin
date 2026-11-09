@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.builtins.functions
 
+import org.jetbrains.kotlin.descriptors.impl.*
+
 import org.jetbrains.kotlin.builtins.StandardNames.BUILT_INS_PACKAGE_FQ_NAME
 import org.jetbrains.kotlin.builtins.StandardNames.COROUTINES_PACKAGE_FQ_NAME
 import org.jetbrains.kotlin.builtins.StandardNames.KOTLIN_REFLECT_FQ_NAME
@@ -60,7 +62,6 @@ class FunctionClassDescriptor(
         parameters = result.toList()
     }
 
-    @get:JvmName("hasBigArity")
     val hasBigArity: Boolean
         get() = arity >= BuiltInFunctionArity.BIG_ARITY
 

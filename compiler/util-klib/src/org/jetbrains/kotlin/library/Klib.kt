@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.library
 
 import org.jetbrains.kotlin.library.components.KlibIrComponent
 import org.jetbrains.kotlin.library.components.KlibMetadataComponent
-import java.nio.file.Path
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 /**
  * [Klib] represents an instance of Kotlin library (Klib) that can be read by the compiler or any other tools.

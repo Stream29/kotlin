@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.load.java.lazy
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProviderOptimized

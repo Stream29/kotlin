@@ -51,7 +51,9 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.utils.Printer
 import org.jetbrains.kotlin.utils.addIfNotNull
-import java.util.*
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.descriptors.impl.*
 
 @K1Deprecation
 abstract class LazyJavaScope(
@@ -399,7 +401,7 @@ abstract class LazyJavaScope(
     override fun toString() = "Lazy scope for $ownerDescriptor"
 
     override fun printScopeStructure(p: Printer) {
-        p.println(this::class.java.simpleName, " {")
+        p.println(this::class.simpleName, " {")
         p.pushIndent()
 
         p.println("containingDeclaration: $ownerDescriptor")

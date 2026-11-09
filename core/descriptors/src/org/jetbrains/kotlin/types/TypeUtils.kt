@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.types.typeUtil
 
+import org.jetbrains.kotlin.builtins.*
+
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.UnsignedTypes
 import org.jetbrains.kotlin.descriptors.*
@@ -212,7 +214,6 @@ private fun KotlinType.extractTypeParametersFromUpperBounds(
     }
 }
 
-@JvmOverloads
 fun hasTypeParameterRecursiveBounds(
     typeParameter: TypeParameterDescriptor,
     selfConstructor: TypeConstructor? = null,
@@ -359,7 +360,7 @@ fun FlexibleType.unCapture(): FlexibleType {
 private fun NewCapturedType.unCaptureTopLevelType(): UnwrappedType {
     if (lowerType != null) return lowerType
 
-    val supertypes = constructor.supertypes
+    val supertypes = constructor.getSupertypes()
     if (supertypes.isNotEmpty()) return intersectTypes(supertypes)
 
     return constructor.projection.type.unwrap()

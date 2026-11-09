@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.types
 
+import org.jetbrains.kotlin.builtins.*
+
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 import org.jetbrains.kotlin.types.checker.NewTypeVariableConstructor

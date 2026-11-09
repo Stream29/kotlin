@@ -30,7 +30,10 @@ import org.jetbrains.kotlin.load.java.descriptors.getParentJavaStaticClassScope
 import org.jetbrains.kotlin.load.java.lazy.LazyJavaResolverContext
 import org.jetbrains.kotlin.load.java.structure.JavaClass
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.resolve.DescriptorFactory.*
+import org.jetbrains.kotlin.resolve.DescriptorFactory.Companion.createEnumValueOfMethod
+import org.jetbrains.kotlin.resolve.DescriptorFactory.Companion.createEnumValuesMethod
+import org.jetbrains.kotlin.resolve.DescriptorFactory.Companion.createEnumEntriesProperty
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.utils.DFS

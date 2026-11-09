@@ -16,6 +16,10 @@
 
 package org.jetbrains.kotlin.load.java.lazy.descriptors
 
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.jvm.JavaToKotlinClassMapper
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor

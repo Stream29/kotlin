@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.resolve
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 
 abstract class OverridingStrategy {

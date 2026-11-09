@@ -9,52 +9,42 @@ import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.platform.toTargetPlatform
 
-sealed class NativePlatform : org.jetbrains.kotlin.platform.NativePlatform("Native") {
-    override val oldFashionedDescription: String
-        get() = toString() + " "
-}
-
-object NativePlatformUnspecifiedTarget : NativePlatform() {
-    override val targetName: String
-        get() = "general"
-}
-
 data class NativePlatformWithTarget(val target: KonanTarget) : NativePlatform() {
     override fun toString() = super.toString() // override the method generated for data class
 
     override val targetName: String
         get() = target.visibleName
+
+    override val oldFashionedDescription: String
+        get() = "Kotlin/Native "
 }
 
-object NativePlatforms {
-    private val predefinedNativeTargetToSimpleNativePlatform: Map<KonanTarget, NativePlatformWithTarget> =
-        KonanTarget.predefinedTargets.values.associateWith { NativePlatformWithTarget(it) }
+private val predefinedNativeTargetToSimpleNativePlatform: Map<KonanTarget, NativePlatformWithTarget> =
+    KonanTarget.predefinedTargets.values.associateWith { NativePlatformWithTarget(it) }
 
-    private val predefinedNativeTargetToNativePlatform: Map<KonanTarget, TargetPlatform> =
-        predefinedNativeTargetToSimpleNativePlatform.mapValues { [_, simplePlatform] -> simplePlatform.toTargetPlatform() }
+private val predefinedNativeTargetToNativePlatform: Map<KonanTarget, TargetPlatform> =
+    predefinedNativeTargetToSimpleNativePlatform.mapValues { [_, simplePlatform] -> simplePlatform.toTargetPlatform() }
 
-    val unspecifiedNativePlatform: TargetPlatform
-        get() = CompatNativePlatform
+private val allNativePlatformsList: List<TargetPlatform> =
+    listOf(NativePlatforms.unspecifiedNativePlatform) + predefinedNativeTargetToNativePlatform.values
 
-    val allNativePlatforms: List<TargetPlatform> = listOf(unspecifiedNativePlatform) + predefinedNativeTargetToNativePlatform.values
+val NativePlatforms.allNativePlatforms: List<TargetPlatform>
+    get() = allNativePlatformsList
 
-    fun nativePlatformBySingleTarget(target: KonanTarget): TargetPlatform =
-        predefinedNativeTargetToNativePlatform[target] ?: unspecifiedNativePlatform
+fun NativePlatforms.nativePlatformBySingleTarget(target: KonanTarget): TargetPlatform =
+    predefinedNativeTargetToNativePlatform[target] ?: unspecifiedNativePlatform
 
-    fun nativePlatformByTargets(targets: Collection<KonanTarget>): TargetPlatform {
-        val simplePlatforms = targets.mapNotNullTo(HashSet()) { predefinedNativeTargetToSimpleNativePlatform[it] }
-        return when (simplePlatforms.size) {
-            0 -> unspecifiedNativePlatform
-            1 -> nativePlatformBySingleTarget(simplePlatforms.first().target)
-            else -> TargetPlatform(simplePlatforms)
-        }
+fun NativePlatforms.nativePlatformByTargets(targets: Collection<KonanTarget>): TargetPlatform {
+    val simplePlatforms = targets.mapNotNullTo(HashSet()) { predefinedNativeTargetToSimpleNativePlatform[it] }
+    return when (simplePlatforms.size) {
+        0 -> unspecifiedNativePlatform
+        1 -> nativePlatformBySingleTarget(simplePlatforms.first().target)
+        else -> TargetPlatform(simplePlatforms)
     }
-
-    fun nativePlatformByTargetNames(targets: Collection<String>): TargetPlatform =
-        nativePlatformByTargets(targets.mapNotNull { KonanTarget.predefinedTargets[it] })
-
-    private object CompatNativePlatform : TargetPlatform(setOf(NativePlatformUnspecifiedTarget))
 }
+
+fun NativePlatforms.nativePlatformByTargetNames(targets: Collection<String>): TargetPlatform =
+    nativePlatformByTargets(targets.mapNotNull { KonanTarget.predefinedTargets[it] })
 
 fun TargetPlatform?.isNative(): Boolean = this != null && this.size > 0 && all { it is NativePlatform }
 

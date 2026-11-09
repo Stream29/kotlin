@@ -47,7 +47,7 @@ abstract class AbstractTypeAliasDescriptor(
         this.declaredTypeParametersImpl = declaredTypeParameters
     }
 
-    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
+    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R? =
         visitor.visitTypeAliasDescriptor(this, data)
 
     override fun isInner(): Boolean =
@@ -107,18 +107,18 @@ abstract class AbstractTypeAliasDescriptor(
             getTypeConstructorTypeParameters()
 
         override fun getSupertypes(): Collection<KotlinType> =
-            declarationDescriptor.underlyingType.constructor.supertypes
+            getDeclarationDescriptor().underlyingType.constructor.supertypes
 
         override fun isFinal(): Boolean =
-            declarationDescriptor.underlyingType.constructor.isFinal
+            getDeclarationDescriptor().underlyingType.constructor.isFinal
 
         override fun isDenotable(): Boolean =
             true
 
         override fun getBuiltIns(): KotlinBuiltIns =
-            declarationDescriptor.builtIns
+            getDeclarationDescriptor().builtIns
 
-        override fun toString(): String = "[typealias ${declarationDescriptor.name.asString()}]"
+        override fun toString(): String = "[typealias ${getDeclarationDescriptor().name.asString()}]"
 
         // There must be @TypeRefinement, but there is a bug with anonymous objects and experimental annotations
         // See KT-31728

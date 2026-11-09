@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.builtins
 
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.name.ClassId
@@ -59,7 +62,6 @@ object UnsignedTypes {
     fun getUnsignedClassIdByArrayClassId(arrayClassId: ClassId): ClassId? = arrayClassIdToUnsignedClassId[arrayClassId]
     fun getUnsignedArrayClassIdByUnsignedClassId(arrayClassId: ClassId): ClassId? = unsignedClassIdToArrayClassId[arrayClassId]
 
-    @JvmStatic
     fun isUnsignedType(type: KotlinType): Boolean {
         if (TypeUtils.noExpectedType(type)) return false
 
@@ -83,7 +85,6 @@ object UnsignedTypes {
                 descriptor.name in UnsignedTypes.unsignedTypeNames
     }
 
-    @JvmStatic
     fun isUnsignedArrayType(type: KotlinType): Boolean {
         if (TypeUtils.noExpectedType(type)) return false
 
@@ -91,7 +92,6 @@ object UnsignedTypes {
         return isUnsignedArrayClass(descriptor)
     }
 
-    @JvmStatic
     fun toUnsignedArrayType(type: KotlinType): UnsignedArrayType? =
         when {
             KotlinBuiltIns.isUByteArray(type) -> UnsignedArrayType.UBYTEARRAY
@@ -101,7 +101,6 @@ object UnsignedTypes {
             else -> null
         }
 
-    @JvmStatic
     fun toUnsignedArrayType(descriptor: DeclarationDescriptor): UnsignedArrayType? =
         if (!isUnsignedArrayClass(descriptor)) null
         else when (descriptor.name.asString()) {

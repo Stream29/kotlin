@@ -62,7 +62,7 @@ abstract class AbstractScopeAdapter : MemberScope {
     }
 
     override fun printScopeStructure(p: Printer) {
-        p.println(this::class.java.simpleName, " {")
+        p.println(this::class.simpleName, " {")
         p.pushIndent()
 
         p.print("worker =")

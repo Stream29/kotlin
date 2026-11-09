@@ -13,10 +13,10 @@ import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.utils.Printer
 
 open class ErrorScope(val kind: ErrorScopeKind, vararg formatParams: String) : MemberScope {
-    protected val debugMessage = kind.debugMessage.format(*formatParams)
+    protected val debugMessage = formatErrorMessage(kind.debugMessage, *formatParams)
 
     override fun getContributedClassifier(name: Name, location: LookupLocation): ClassifierDescriptor =
-        ErrorClassDescriptor(Name.special(ErrorEntity.ERROR_CLASS.debugText.format(name)))
+        ErrorClassDescriptor(Name.special(formatErrorMessage(ErrorEntity.ERROR_CLASS.debugText, name)))
 
     override fun getContributedClassifierIncludeDeprecated(
         name: Name, location: LookupLocation
@@ -41,6 +41,6 @@ open class ErrorScope(val kind: ErrorScopeKind, vararg formatParams: String) : M
     override fun toString(): String = "ErrorScope{$debugMessage}"
 
     override fun printScopeStructure(p: Printer) {
-        p.println(javaClass.simpleName, ": ", debugMessage)
+        p.println(this::class.simpleName, ": ", debugMessage)
     }
 }

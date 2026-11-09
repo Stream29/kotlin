@@ -9,8 +9,7 @@ import org.jetbrains.kotlin.library.KlibComponentLayout
 import org.jetbrains.kotlin.library.KlibConstants.KLIB_DEFAULT_COMPONENT_NAME
 import org.jetbrains.kotlin.library.KlibConstants.KLIB_RESOURCES_FOLDER_NAME
 import org.jetbrains.kotlin.library.writer.KlibComponentWriter
-import java.nio.file.Path
-import kotlin.io.path.createDirectories
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 /**
  * This is the workaround to create an empty 'resources' directory that is expected inside a KLIB.

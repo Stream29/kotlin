@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.serialization.deserialization
 
+import org.jetbrains.kotlin.descriptors.impl.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
@@ -76,8 +78,8 @@ class MemberDeserializer(private val c: DeserializationContext) {
         // by taking hasAnnotations/visibility/modality from property flags, and using false for the rest
         val defaultAccessorFlags = Flags.getAccessorFlags(
             Flags.HAS_ANNOTATIONS.get(flags),
-            Flags.VISIBILITY.get(flags),
-            Flags.MODALITY.get(flags),
+            requireNotNull(Flags.VISIBILITY.get(flags)) { "Unknown property visibility in flags: $flags" },
+            requireNotNull(Flags.MODALITY.get(flags)) { "Unknown property modality in flags: $flags" },
             false, false, false
         )
 

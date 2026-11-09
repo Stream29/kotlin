@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.types
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 
 // Composition works as it's expected: Composition(outer, inner)(type) = outer(inner(type))

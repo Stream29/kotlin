@@ -6,22 +6,18 @@
 package org.jetbrains.kotlin.library
 
 import org.jetbrains.kotlin.io.ZipFileSystemAccessor
-import java.io.IOException
-import java.nio.file.FileVisitResult
-import java.nio.file.Files
-import java.nio.file.Files.createTempDirectory
-import java.nio.file.Files.createTempFile
-import java.nio.file.Path
-import java.nio.file.SimpleFileVisitor
-import java.nio.file.attribute.BasicFileAttributes
-import java.util.zip.ZipException
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.copyTo
-import kotlin.io.path.copyToRecursively
-import kotlin.io.path.exists
-import kotlin.io.path.isDirectory
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.name
+import org.jetbrains.kotlin.io.klibPath
+import org.jetbrains.kotlin.io.withZipFileSystem
+import org.jetbrains.kotlin.konan.file.deleteOnExit
+import org.jetbrains.kotlin.library.KlibIoException as IOException
+import org.jetbrains.kotlin.library.KlibFileVisitResult as FileVisitResult
+import org.jetbrains.kotlin.library.KlibFiles as Files
+import org.jetbrains.kotlin.library.KlibFiles.createTempDirectory
+import org.jetbrains.kotlin.library.KlibFiles.createTempFile
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.KlibSimpleFileVisitor as SimpleFileVisitor
+import org.jetbrains.kotlin.library.KlibBasicFileAttributes as BasicFileAttributes
+import org.jetbrains.kotlin.library.KlibZipException as ZipException
 
 /**
  * A class that allows reading from a specific [KlibComponent] using the corresponding [KlibComponentLayout].
@@ -72,7 +68,7 @@ sealed class KlibLayoutReader<KCL : KlibComponentLayout> {
     ) : KlibLayoutReader<KCL>() {
         override fun <T> readInPlace(readAction: (KCL) -> T): T =
             zipFileSystemAccessor.withZipFileSystem(klibArchive) { zipFileSystem ->
-                readAction(layoutBuilder(zipFileSystem.getPath("/")))
+                readAction(layoutBuilder(zipFileSystem.klibPath("/")))
             }
 
         override fun readExtractingToTemp(readAction: (KCL) -> Path): Path = readInPlace { layout ->
@@ -81,7 +77,6 @@ sealed class KlibLayoutReader<KCL : KlibComponentLayout> {
                 fileOrDirectory.isDirectory() -> {
                     val tempDir = createTempDirectory(fileOrDirectory.name)
                     tempDir.deleteOnExitRecursively()
-                    @OptIn(ExperimentalPathApi::class)
                     fileOrDirectory.copyToRecursively(tempDir, followLinks = false, overwrite = true)
                     tempDir
                 }

@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.load.java
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.name.FqName

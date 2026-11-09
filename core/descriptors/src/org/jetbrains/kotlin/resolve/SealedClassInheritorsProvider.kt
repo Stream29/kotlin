@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.resolve
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor

@@ -1,0 +1,4 @@
+headers = host.h
+headerFilter = host.h
+package = nativekotlin.c1i.posix
+compilerOpts = -D_GNU_SOURCE

@@ -16,13 +16,17 @@
 
 package org.jetbrains.kotlin.resolve.scopes
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.resolve.DescriptorFactory.*
+import org.jetbrains.kotlin.resolve.DescriptorFactory.Companion.createEnumEntriesProperty
+import org.jetbrains.kotlin.resolve.DescriptorFactory.Companion.createEnumValueOfMethod
+import org.jetbrains.kotlin.resolve.DescriptorFactory.Companion.createEnumValuesMethod
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.utils.Printer

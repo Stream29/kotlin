@@ -21,8 +21,8 @@ import org.jetbrains.kotlin.library.KotlinLibraryVersioning
 import org.jetbrains.kotlin.library.builtInsPlatform
 import org.jetbrains.kotlin.library.loader.KlibManifestTransformer
 import org.jetbrains.kotlin.library.readKonanLibraryVersioning
-import java.nio.file.Path
-import java.util.Properties
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.konan.properties.Properties
 
 internal class KlibImpl(
     override val path: Path,

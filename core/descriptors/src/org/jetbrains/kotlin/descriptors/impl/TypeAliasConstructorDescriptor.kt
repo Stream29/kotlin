@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.descriptors.impl
 
+import org.jetbrains.kotlin.resolve.scopes.receivers.*
+
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor.Kind
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
@@ -84,7 +86,9 @@ class TypeAliasConstructorDescriptorImpl private constructor(
             typeAliasConstructor.initialize(
                 null,
                 underlyingConstructorDescriptor.dispatchReceiverParameter?.substitute(substitutorForUnderlyingClass),
-                underlyingConstructorDescriptor.contextReceiverParameters.map { it.substitute(substitutorForUnderlyingClass) },
+                underlyingConstructorDescriptor.contextReceiverParameters.map {
+                    it.substitute(substitutorForUnderlyingClass) ?: return@createNullableLazyValue null
+                },
                 typeAliasDescriptor.declaredTypeParameters,
                 valueParameters,
                 returnType,
@@ -207,13 +211,13 @@ class TypeAliasConstructorDescriptorImpl private constructor(
             val classDescriptor = typeAliasDescriptor.classDescriptor
             val contextReceiverParameters = classDescriptor?.let {
                 constructor.contextReceiverParameters.mapIndexed { index, contextReceiver ->
-                    DescriptorFactory.createContextReceiverParameterForClass(
+                    checkNotNull(DescriptorFactory.createContextReceiverParameterForClass(
                         classDescriptor,
                         substitutorForUnderlyingClass.safeSubstitute(contextReceiver.type, Variance.INVARIANT),
                         (contextReceiver.value as ImplicitContextReceiver).customLabelName,
                         Annotations.EMPTY,
                         index
-                    )
+                    )) { "A non-null substituted context receiver type must produce a receiver descriptor" }
                 }
             } ?: emptyList()
 
@@ -232,6 +236,4 @@ class TypeAliasConstructorDescriptorImpl private constructor(
         }
     }
 }
-
-
 

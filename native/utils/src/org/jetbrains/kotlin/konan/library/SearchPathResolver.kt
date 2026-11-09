@@ -1,16 +1,15 @@
 package org.jetbrains.kotlin.konan.library
 
 import org.jetbrains.kotlin.io.ZipFileSystemAccessor
-import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.target.Distribution
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.library.*
+import org.jetbrains.kotlin.library.KlibPaths as Paths
 import org.jetbrains.kotlin.library.loader.KlibLoader
 import org.jetbrains.kotlin.library.loader.KlibPlatformChecker
 import org.jetbrains.kotlin.util.DummyLogger
 import org.jetbrains.kotlin.util.Logger
-import java.nio.file.Paths
-import kotlin.io.path.absolutePathString
 
 interface SearchPathResolverWithTarget<L : KotlinLibrary> : SearchPathResolver<L> {
     val target: KonanTarget

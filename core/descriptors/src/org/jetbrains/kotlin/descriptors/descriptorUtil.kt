@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlin.descriptors
 
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.resolve.scopes.receivers.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.builtins.StandardNames.CONTINUATION_INTERFACE_FQ_NAME
 import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation

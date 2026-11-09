@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.load.java.typeEnhancement.NullabilityQualifier
 import org.jetbrains.kotlin.load.java.typeEnhancement.NullabilityQualifierWithMigrationStatus
 import org.jetbrains.kotlin.load.java.typeEnhancement.WithMigrationStatus
 import org.jetbrains.kotlin.name.FqName
-import java.util.concurrent.ConcurrentHashMap
+import org.jetbrains.kotlin.storage.ConcurrentHashMap
 
 private typealias TypeQualifierWithApplicability<TAnnotation> = Pair<TAnnotation, Set<AnnotationQualifierApplicabilityType>>
 
@@ -41,11 +41,10 @@ abstract class AbstractAnnotationTypeQualifierResolver<TAnnotation : Any>(
             return annotation
         if (!annotation.hasAnnotation(JAVAX_TYPE_QUALIFIER_NICKNAME_ANNOTATION_FQ_NAME))
             return null
-        return resolvedNicknames.getOrPut(annotation.key) {
-            // This won't store nulls (ConcurrentHashMap does not permit that), but presumably unless the code
-            // is broken a nickname should be resolvable.
-            annotation.metaAnnotations.firstNotNullOfOrNull(::resolveTypeQualifierAnnotation) ?: return null
-        }
+        val key = annotation.key
+        resolvedNicknames[key]?.let { return it }
+        val resolved = annotation.metaAnnotations.firstNotNullOfOrNull(::resolveTypeQualifierAnnotation) ?: return null
+        return resolvedNicknames.putIfAbsent(key, resolved) ?: resolved
     }
 
     private fun resolveQualifierBuiltInDefaultAnnotation(annotation: TAnnotation, isForWarningOnly: Boolean): JavaDefaultQualifiers? {

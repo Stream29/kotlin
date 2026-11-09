@@ -10,14 +10,16 @@ import kotlin.concurrent.atomics.AtomicLongArray
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 class ThreadSafeDisposableHelper<T>(private val _create: () -> T, private val _dispose: (T) -> Unit) {
-    var holder: T? = null
-        private set
+    private var currentHolder: T? = null
+    var holder: T?
+        get() = lock.withLock { currentHolder }
+        private set(value) { lock.withLock { currentHolder = value } }
 
     private var counter = 0
-    private val lock = Any()
+    private val lock = NativeMemoryLock()
 
     fun create() {
-        synchronized(lock) {
+        lock.withLock {
             if (counter++ == 0) {
                 check(holder == null)
                 holder = _create()
@@ -26,7 +28,7 @@ class ThreadSafeDisposableHelper<T>(private val _create: () -> T, private val _d
     }
 
     fun dispose() {
-        synchronized(lock) {
+        lock.withLock {
             if (--counter == 0) {
                 _dispose(holder!!)
                 holder = null
@@ -82,7 +84,6 @@ class NativeMemoryAllocator {
     private fun alignUp(x: Long, align: Int) = (x + align - 1) and (align - 1).toLong().inv()
     private fun alignUp(x: Int, align: Int) = (x + align - 1) and (align - 1).inv()
 
-    @JvmInline
     private value class ChunkRef(val value: Int) {
         val offset get() = (value and ((1 shl RawChunkOffsetBits) - 1)) shl ChunkSizeAlignmentBits
 
@@ -101,7 +102,6 @@ class NativeMemoryAllocator {
     }
 
     // Timestamps here solve the ABA problem.
-    @JvmInline
     private value class ChunkRefWithTimestamp(val value: Long) {
         val chunkRef get() = ChunkRef(value.toInt())
 
@@ -151,11 +151,11 @@ class NativeMemoryAllocator {
         }
     }
 
-    private val rawChunks = LongArray(MaxRawChunksCount)
+    private val rawChunks = AtomicLongArray(MaxRawChunksCount)
 
-    private fun ChunkRef.dereference() = rawChunks[index] + offset
+    private fun ChunkRef.dereference() = rawChunks.loadAt(index) + offset
 
-    private val rawChunksLock = Any()
+    private val rawChunksLock = NativeMemoryLock()
 
     private val rawOffset = AtomicLong(0L)
 
@@ -169,13 +169,13 @@ class NativeMemoryAllocator {
             val dataStartOffset = newOffset - size
             val rawChunkIndex = (dataStartOffset ushr RawChunkSizeBits).toInt()
             val rawChunkOffset = (dataStartOffset and (RawChunkSize - 1)).toInt()
-            var rawChunk = rawChunks[rawChunkIndex]
+            var rawChunk = rawChunks.loadAt(rawChunkIndex)
             if (rawChunk == 0L) {
-                synchronized(rawChunksLock) {
-                    rawChunk = rawChunks[rawChunkIndex]
+                rawChunksLock.withLock {
+                    rawChunk = rawChunks.loadAt(rawChunkIndex)
                     if (rawChunk == 0L) {
                         rawChunk = unsafeMemoryAccess.allocateMemory(RawChunkSize)
-                        rawChunks[rawChunkIndex] = rawChunk
+                        rawChunks.storeAt(rawChunkIndex, rawChunk)
                     }
                 }
             }
@@ -226,11 +226,11 @@ class NativeMemoryAllocator {
             mediumChunks.storeAt(i, 0L)
             bigChunks.storeAt(i, 0L)
         }
-        for (index in rawChunks.indices) {
-            val rawChunk = rawChunks[index]
+        for (index in 0 until rawChunks.size) {
+            val rawChunk = rawChunks.loadAt(index)
             if (rawChunk != 0L)
                 unsafeMemoryAccess.freeMemory(rawChunk)
-            rawChunks[index] = 0L
+            rawChunks.storeAt(index, 0L)
         }
         rawOffset.store(0L)
     }

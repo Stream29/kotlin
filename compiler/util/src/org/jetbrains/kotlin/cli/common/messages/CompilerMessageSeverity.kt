@@ -4,7 +4,7 @@
  */
 package org.jetbrains.kotlin.cli.common.messages
 
-import java.util.*
+import org.jetbrains.kotlin.config.ConfigurationEnumSet
 
 enum class CompilerMessageSeverity {
     EXCEPTION,
@@ -53,6 +53,6 @@ enum class CompilerMessageSeverity {
 
     companion object {
         @JvmField
-        val VERBOSE: EnumSet<CompilerMessageSeverity> = EnumSet.of(LOGGING)
+        val VERBOSE: MutableSet<CompilerMessageSeverity> = ConfigurationEnumSet(entries, setOf(LOGGING))
     }
 }

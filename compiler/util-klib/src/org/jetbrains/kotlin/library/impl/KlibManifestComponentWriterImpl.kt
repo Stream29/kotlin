@@ -18,10 +18,10 @@ import org.jetbrains.kotlin.library.KotlinLibraryVersioning
 import org.jetbrains.kotlin.library.writeKonanLibraryVersioning
 import org.jetbrains.kotlin.library.writer.KlibManifestWriterSpec
 import org.jetbrains.kotlin.library.writer.KlibComponentWriter
-import java.nio.file.Path
-import java.util.Properties
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.konan.properties.Properties
 import kotlin.collections.plusAssign
-import kotlin.io.path.createDirectories
+import org.jetbrains.kotlin.library.createDirectories
 
 /**
  * An implementation of [KlibComponentWriter] that writes manifest properties to the constructed Klib library.

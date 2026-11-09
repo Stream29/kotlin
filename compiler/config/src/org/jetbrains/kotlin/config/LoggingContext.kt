@@ -5,6 +5,11 @@
 
 package org.jetbrains.kotlin.config
 
+import kotlinx.cinterop.ExperimentalForeignApi
+import platform.posix.fputs
+import platform.posix.fputc
+import platform.posix.stderr
+
 interface LoggingContext {
 
     /**
@@ -15,9 +20,15 @@ interface LoggingContext {
     /**
      * If [inVerbosePhase] is `true`, prints [message] to the standard error stream.
      */
+    @OptIn(ExperimentalForeignApi::class)
     fun log(message: () -> String) {
         if (inVerbosePhase) {
-            System.err.println(message())
+            val text = message()
+            for (part in text.split('\u0000').withIndex()) {
+                if (part.index != 0) fputc(0, stderr)
+                fputs(part.value, stderr)
+            }
+            fputc(10, stderr)
         }
     }
 }

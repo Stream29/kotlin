@@ -5,11 +5,14 @@
 
 package org.jetbrains.kotlin.js
 
+import nativekotlin.host.text.jdkJavaIdentifierPart
+import nativekotlin.host.text.jdkJavaIdentifierStart
+
 fun validateQualifier(qualifier: String): Boolean {
     val parts = qualifier.split('.')
     if (parts.isEmpty()) return false
 
     return parts.all { part ->
-        part.isNotEmpty() && part[0].isJavaIdentifierStart() && part.drop(1).all(Char::isJavaIdentifierPart)
+        part.isNotEmpty() && jdkJavaIdentifierStart(part[0].code) && part.drop(1).all { jdkJavaIdentifierPart(it.code) }
     }
 }

@@ -16,6 +16,9 @@
 
 package org.jetbrains.kotlin.types.typesApproximation
 
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.renderer.ClassifierNamePolicy
@@ -26,7 +29,6 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.typeUtil.builtIns
-import java.util.*
 
 data class ApproximationBounds<out T>(
     val lower: T,

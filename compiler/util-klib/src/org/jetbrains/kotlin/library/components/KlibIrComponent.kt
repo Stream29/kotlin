@@ -21,8 +21,7 @@ import org.jetbrains.kotlin.library.components.KlibIrConstants.KLIB_IR_STRINGS_F
 import org.jetbrains.kotlin.library.components.KlibIrConstants.KLIB_IR_FILES_FILE_NAME
 import org.jetbrains.kotlin.library.components.KlibIrConstants.KLIB_IR_FILE_ENTRIES_FILE_NAME
 import org.jetbrains.kotlin.library.impl.KlibIrComponentImpl
-import java.nio.file.Path
-import kotlin.io.path.exists
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 /**
  * This component that provides read access to Klib IR. It can be used for two purposes:

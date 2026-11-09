@@ -25,7 +25,7 @@ import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.utils.sure
 
-class ModuleDescriptorImpl @JvmOverloads constructor(
+class ModuleDescriptorImpl(
     moduleName: Name,
     private val storageManager: StorageManager,
     override val builtIns: KotlinBuiltIns,
@@ -163,7 +163,7 @@ class ModuleDescriptorImpl @JvmOverloads constructor(
             append(super.toString())
             if (!isValid) append(" !isValid")
             append(" packageFragmentProvider: ")
-            append(packageFragmentProviderForModuleContent?.javaClass?.simpleName)
+            append(packageFragmentProviderForModuleContent?.let { it::class.simpleName })
         }
     }
 }

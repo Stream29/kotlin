@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.load.java
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.resolve.descriptorUtil.firstOverridden
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe

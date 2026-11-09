@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.resolve.scopes
 
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.Substitutable
 import org.jetbrains.kotlin.incremental.components.LookupLocation
@@ -27,7 +29,6 @@ import org.jetbrains.kotlin.types.checker.SimpleClassicTypeSystemContext.safeSub
 import org.jetbrains.kotlin.utils.Printer
 import org.jetbrains.kotlin.utils.newLinkedHashSetWithExpectedSize
 import org.jetbrains.kotlin.utils.sure
-import java.util.*
 
 class SubstitutingScope(private val workerScope: MemberScope, givenSubstitutor: TypeSubstitutor) : MemberScope {
     val substitutor by lazy { givenSubstitutor.substitution.buildSubstitutor() }
@@ -93,7 +94,7 @@ class SubstitutingScope(private val workerScope: MemberScope, givenSubstitutor: 
     override fun definitelyDoesNotContainName(name: Name) = workerScope.definitelyDoesNotContainName(name)
 
     override fun printScopeStructure(p: Printer) {
-        p.println(this::class.java.simpleName, " {")
+        p.println(this::class.simpleName, " {")
         p.pushIndent()
 
         p.println("substitutor = ")

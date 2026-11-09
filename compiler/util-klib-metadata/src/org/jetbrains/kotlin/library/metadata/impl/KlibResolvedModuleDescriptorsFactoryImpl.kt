@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.util.profile
 import org.jetbrains.kotlin.utils.Printer
+import org.jetbrains.kotlin.konan.file.File
 import org.jetbrains.kotlin.konan.file.File as KlibFile
 
 // TODO: eliminate Native specifics.
@@ -217,7 +218,7 @@ class ForwardDeclarationsPackageFragmentDescriptor(
           error("Class $name is not found")
 
         private fun findCinteropClassOrNull(name: Name): ClassDescriptor? {
-            return builtIns.builtInsModule.getPackage(NativeStandardInteropNames.cInteropPackage)
+            return builtIns.getBuiltInsModule().getPackage(NativeStandardInteropNames.cInteropPackage)
                 .memberScope
                 .getContributedClassifier(name, NoLookupLocation.FROM_BACKEND) as ClassDescriptor?
         }
@@ -251,7 +252,7 @@ class ForwardDeclarationsPackageFragmentDescriptor(
         override fun getContributedClassifier(name: Name, location: LookupLocation): ClassifierDescriptor = declarations(name)
 
         override fun printScopeStructure(p: Printer) {
-            p.println(this::class.java.simpleName, "{}")
+            p.println(this::class.simpleName, "{}")
         }
     }
 

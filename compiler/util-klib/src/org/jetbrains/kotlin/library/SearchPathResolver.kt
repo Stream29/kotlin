@@ -1,6 +1,6 @@
 package org.jetbrains.kotlin.library
 
-import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.library.isImplicitlyLoadedFromKotlinNativeDistribution
 import org.jetbrains.kotlin.library.KlibConstants.KLIB_FILE_EXTENSION
 import org.jetbrains.kotlin.library.KlibConstants.KLIB_FILE_EXTENSION_WITH_DOT
@@ -9,10 +9,8 @@ import org.jetbrains.kotlin.library.SearchPathResolver.SearchRoot
 import org.jetbrains.kotlin.util.Logger
 import org.jetbrains.kotlin.util.WithLogger
 import org.jetbrains.kotlin.util.removeSuffixIfPresent
-import java.nio.file.InvalidPathException
-import java.nio.file.Paths
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.name
+import org.jetbrains.kotlin.library.InvalidKlibPathException as InvalidPathException
+import org.jetbrains.kotlin.library.KlibPaths as Paths
 
 const val KOTLIN_NATIVE_STDLIB_NAME: String = "stdlib"
 const val KOTLIN_JS_STDLIB_NAME: String = "kotlin"

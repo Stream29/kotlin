@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.resolve.constants
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -141,7 +143,6 @@ class IntegerValueTypeConstant(
     val convertedFromSigned: Boolean = false
 ) : CompileTimeConstant<Number> {
     companion object {
-        @JvmStatic
         fun IntegerValueTypeConstant.convertToUnsignedConstant(module: ModuleDescriptor): IntegerValueTypeConstant {
             val newParameters = CompileTimeConstant.Parameters(
                 parameters.canBeUsedInAnnotation,

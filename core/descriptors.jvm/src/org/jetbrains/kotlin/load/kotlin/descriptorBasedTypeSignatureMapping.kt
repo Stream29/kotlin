@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.utils.DO_NOTHING_3
 
 @K1Deprecation
 interface TypeMappingConfiguration<out T : Any> {
-    fun commonSupertype(types: Collection<@JvmSuppressWildcards KotlinType>): KotlinType
+    fun commonSupertype(types: Collection<KotlinType>): KotlinType
     fun getPredefinedTypeForClass(classDescriptor: ClassDescriptor): T?
     fun getPredefinedInternalNameForClass(classDescriptor: ClassDescriptor): String?
     fun getPredefinedFullInternalNameForClass(classDescriptor: ClassDescriptor): String? = null

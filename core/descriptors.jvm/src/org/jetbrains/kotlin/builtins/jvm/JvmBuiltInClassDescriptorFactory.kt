@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.builtins.jvm
 
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.descriptors.impl.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.BuiltInsPackageFragment
 import org.jetbrains.kotlin.builtins.StandardNames

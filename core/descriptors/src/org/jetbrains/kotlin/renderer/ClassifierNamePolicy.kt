@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.render
 import org.jetbrains.kotlin.resolve.DescriptorUtils
-import java.util.*
 
 interface ClassifierNamePolicy {
     object SHORT : ClassifierNamePolicy {

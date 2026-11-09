@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.types
 
+import org.jetbrains.kotlin.descriptors.impl.*
+
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
@@ -96,8 +98,6 @@ class DefinitelyNotNullType private constructor(
     DefinitelyNotNullTypeMarker {
 
     companion object {
-        // Having `@JvmOverloads` just to make sure we don't break ABI compatibility
-        @JvmOverloads
         fun makeDefinitelyNotNull(
             type: UnwrappedType,
             useCorrectedNullabilityForTypeParameters: Boolean = false,

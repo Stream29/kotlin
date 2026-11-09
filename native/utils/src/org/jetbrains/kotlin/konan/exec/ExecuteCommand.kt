@@ -17,11 +17,9 @@
 package org.jetbrains.kotlin.konan.exec
 
 import org.jetbrains.kotlin.konan.KonanExternalToolFailure
-import java.io.BufferedReader
-import java.io.File
-import java.io.InputStreamReader
-import java.lang.ProcessBuilder.Redirect
-import java.nio.file.Files
+import org.jetbrains.kotlin.konan.host.NativeFile as File
+import org.jetbrains.kotlin.konan.host.NativeFiles as Files
+import org.jetbrains.kotlin.konan.host.runNativeProcess
 
 
 open class Command(
@@ -29,7 +27,7 @@ open class Command(
     val redirectInputFile: File? = null,
     /**
      * Working directory for the spawned process. When `null`, the current process working directory is inherited.
-     * See [ProcessBuilder.directory].
+     * Applied before exec in the native child process.
      */
     val workingDirectory: File? = null,
 ) {
@@ -64,23 +62,14 @@ open class Command(
 
     open fun runProcess(): Int {
         stdError = emptyList()
-        val builder = ProcessBuilder(command)
-
-        workingDirectory?.let { builder.directory(it) }
-        builder.redirectOutput(Redirect.INHERIT)
-        if (redirectInputFile == null) {
-            builder.redirectInput(Redirect.INHERIT)
-        } else {
-            builder.redirectInput(redirectInputFile)
+        val errors = Files.createTempFile(null, null).toFile()
+        try {
+            val exitCode = runNativeProcess(command, workingDirectory, redirectInputFile, null, errors, false)
+            stdError = errors.readLines()
+            return exitCode
+        } finally {
+            errors.delete()
         }
-
-        val process = builder.start()
-
-        val reader = BufferedReader(InputStreamReader(process.errorStream))
-        stdError = reader.readLines()
-
-        val exitCode = process.waitFor()
-        return exitCode
     }
 
     open fun execute() {
@@ -102,23 +91,11 @@ open class Command(
         outputFile.deleteOnExit()
 
         try {
-            val builder = ProcessBuilder(command)
-
-            workingDirectory?.let { builder.directory(it) }
-            if (redirectInputFile == null) {
-                builder.redirectInput(Redirect.INHERIT)
-            } else {
-                builder.redirectInput(redirectInputFile)
-            }
-            builder.redirectError(Redirect.INHERIT)
-            builder.redirectOutput(Redirect.to(outputFile))
-                    .redirectErrorStream(withErrors)
             // Note: getting process output could be done without redirecting to temporary file,
             // however this would require managing a thread to read `process.inputStream` because
             // it may have limited capacity.
 
-            val process = builder.start()
-            val code = process.waitFor()
+            val code = runNativeProcess(command, workingDirectory, redirectInputFile, outputFile, null, withErrors)
             if (handleError) handleExitCode(code, outputFile.readLines())
 
             return Result(code, outputFile.readLines())

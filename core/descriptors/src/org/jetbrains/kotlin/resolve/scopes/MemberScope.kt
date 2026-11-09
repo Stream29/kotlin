@@ -23,13 +23,12 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.scopes.MemberScope.Companion.ALL_NAME_FILTER
 import org.jetbrains.kotlin.utils.Printer
 import org.jetbrains.kotlin.utils.addToStdlib.flatMapToNullable
-import java.lang.reflect.Modifier
 
 interface MemberScope : ResolutionScope {
 
-    override fun getContributedVariables(name: Name, location: LookupLocation): Collection<@JvmWildcard PropertyDescriptor>
+    override fun getContributedVariables(name: Name, location: LookupLocation): Collection<PropertyDescriptor>
 
-    override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<@JvmWildcard SimpleFunctionDescriptor>
+    override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<SimpleFunctionDescriptor>
 
     /**
      * These methods may return a superset of an actual names' set
@@ -148,7 +147,7 @@ class DescriptorKindFilter(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other !is DescriptorKindFilter) return false
 
         other as DescriptorKindFilter
 
@@ -180,39 +179,45 @@ class DescriptorKindFilter(
         val VALUES_MASK: Int = SINGLETON_CLASSIFIERS_MASK or FUNCTIONS_MASK or VARIABLES_MASK
         val CALLABLES_MASK: Int = FUNCTIONS_MASK or VARIABLES_MASK
 
-        @JvmField val ALL: DescriptorKindFilter = DescriptorKindFilter(ALL_KINDS_MASK)
-        @JvmField val CALLABLES: DescriptorKindFilter = DescriptorKindFilter(CALLABLES_MASK)
-        @JvmField val NON_SINGLETON_CLASSIFIERS: DescriptorKindFilter = DescriptorKindFilter(NON_SINGLETON_CLASSIFIERS_MASK)
-        @JvmField val SINGLETON_CLASSIFIERS: DescriptorKindFilter = DescriptorKindFilter(SINGLETON_CLASSIFIERS_MASK)
-        @JvmField val TYPE_ALIASES: DescriptorKindFilter = DescriptorKindFilter(TYPE_ALIASES_MASK)
-        @JvmField val CLASSIFIERS: DescriptorKindFilter = DescriptorKindFilter(CLASSIFIERS_MASK)
-        @JvmField val PACKAGES: DescriptorKindFilter = DescriptorKindFilter(PACKAGES_MASK)
-        @JvmField val FUNCTIONS: DescriptorKindFilter = DescriptorKindFilter(FUNCTIONS_MASK)
-        @JvmField val VARIABLES: DescriptorKindFilter = DescriptorKindFilter(VARIABLES_MASK)
-        @JvmField val VALUES: DescriptorKindFilter = DescriptorKindFilter(VALUES_MASK)
+        val ALL: DescriptorKindFilter = DescriptorKindFilter(ALL_KINDS_MASK)
+        val CALLABLES: DescriptorKindFilter = DescriptorKindFilter(CALLABLES_MASK)
+        val NON_SINGLETON_CLASSIFIERS: DescriptorKindFilter = DescriptorKindFilter(NON_SINGLETON_CLASSIFIERS_MASK)
+        val SINGLETON_CLASSIFIERS: DescriptorKindFilter = DescriptorKindFilter(SINGLETON_CLASSIFIERS_MASK)
+        val TYPE_ALIASES: DescriptorKindFilter = DescriptorKindFilter(TYPE_ALIASES_MASK)
+        val CLASSIFIERS: DescriptorKindFilter = DescriptorKindFilter(CLASSIFIERS_MASK)
+        val PACKAGES: DescriptorKindFilter = DescriptorKindFilter(PACKAGES_MASK)
+        val FUNCTIONS: DescriptorKindFilter = DescriptorKindFilter(FUNCTIONS_MASK)
+        val VARIABLES: DescriptorKindFilter = DescriptorKindFilter(VARIABLES_MASK)
+        val VALUES: DescriptorKindFilter = DescriptorKindFilter(VALUES_MASK)
 
         private class MaskToName(val mask: Int, val name: String)
 
         // Only used in toString
         private val DEBUG_PREDEFINED_FILTERS_MASK_NAMES by lazy {
-            staticFields<DescriptorKindFilter>()
-                .mapNotNull { field ->
-                    val filter = field.get(null) as? DescriptorKindFilter
-                    if (filter != null) MaskToName(filter.kindMask, field.name) else null
-                }
+            listOf(
+                MaskToName(ALL_KINDS_MASK, "ALL"),
+                MaskToName(CALLABLES_MASK, "CALLABLES"),
+                MaskToName(NON_SINGLETON_CLASSIFIERS_MASK, "NON_SINGLETON_CLASSIFIERS"),
+                MaskToName(SINGLETON_CLASSIFIERS_MASK, "SINGLETON_CLASSIFIERS"),
+                MaskToName(TYPE_ALIASES_MASK, "TYPE_ALIASES"),
+                MaskToName(CLASSIFIERS_MASK, "CLASSIFIERS"),
+                MaskToName(PACKAGES_MASK, "PACKAGES"),
+                MaskToName(FUNCTIONS_MASK, "FUNCTIONS"),
+                MaskToName(VARIABLES_MASK, "VARIABLES"),
+                MaskToName(VALUES_MASK, "VALUES"),
+            )
         }
 
         private val DEBUG_MASK_BIT_NAMES by lazy {
-            staticFields<DescriptorKindFilter>()
-                .filter { it.type == Integer.TYPE }
-                .mapNotNull { field ->
-                    val mask = field.get(null) as Int
-                    val isOneBitMask = mask == (mask and (-mask))
-                    if (isOneBitMask) MaskToName(mask, field.name) else null
-                }
+            listOf(
+                MaskToName(NON_SINGLETON_CLASSIFIERS_MASK, "NON_SINGLETON_CLASSIFIERS"),
+                MaskToName(SINGLETON_CLASSIFIERS_MASK, "SINGLETON_CLASSIFIERS"),
+                MaskToName(TYPE_ALIASES_MASK, "TYPE_ALIASES"),
+                MaskToName(PACKAGES_MASK, "PACKAGES"),
+                MaskToName(FUNCTIONS_MASK, "FUNCTIONS"),
+                MaskToName(VARIABLES_MASK, "VARIABLES"),
+            )
         }
-
-        private inline fun <reified T : Any> staticFields() = T::class.java.fields.filter { Modifier.isStatic(it.modifiers) }
     }
 }
 
@@ -225,7 +230,7 @@ abstract class DescriptorKindExclude {
      */
     abstract val fullyExcludedDescriptorKinds: Int
 
-    override fun toString() = this::class.java.simpleName
+    override fun toString() = this::class.simpleName.orEmpty()
 
     object Extensions : DescriptorKindExclude() {
         override fun excludes(descriptor: DeclarationDescriptor)
@@ -262,4 +267,3 @@ abstract class DescriptorKindExclude {
         override val fullyExcludedDescriptorKinds: Int get() = 0
     }
 }
-

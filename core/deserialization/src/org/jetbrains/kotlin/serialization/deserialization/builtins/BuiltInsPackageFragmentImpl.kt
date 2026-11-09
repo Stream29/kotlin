@@ -14,8 +14,8 @@ import org.jetbrains.kotlin.metadata.builtins.readBuiltinsPackageFragment
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragmentImpl
+import org.jetbrains.kotlin.serialization.deserialization.InputStream
 import org.jetbrains.kotlin.storage.StorageManager
-import java.io.InputStream
 
 @K1Deprecation
 class BuiltInsPackageFragmentImpl private constructor(
@@ -36,7 +36,7 @@ class BuiltInsPackageFragmentImpl private constructor(
             inputStream: InputStream,
             isFallback: Boolean
         ): BuiltInsPackageFragmentImpl {
-            val [proto, version] = inputStream.readBuiltinsPackageFragment()
+            val [proto, version] = inputStream.use { it.readBytes().readBuiltinsPackageFragment() }
 
             if (proto == null) {
                 // TODO: report a proper diagnostic

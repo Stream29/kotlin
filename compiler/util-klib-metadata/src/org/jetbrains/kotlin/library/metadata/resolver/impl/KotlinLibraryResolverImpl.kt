@@ -24,7 +24,6 @@ import org.jetbrains.kotlin.library.metadata.resolver.KotlinLibraryResolver
 import org.jetbrains.kotlin.library.metadata.resolver.KotlinResolvedLibrary
 import org.jetbrains.kotlin.util.WithLogger
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
-import kotlin.io.path.absolutePathString
 
 @Deprecated(
     "Preserved for binary compatibility with existing versions of the kotlinx-benchmarks Gradle plugin. See KT-82882." +
@@ -32,7 +31,6 @@ import kotlin.io.path.absolutePathString
     replaceWith = ReplaceWith("KlibLoader.load()", imports = ["org.jetbrains.kotlin.library.loader.KlibLoader"]),
     level = DeprecationLevel.ERROR
 )
-@JvmName("libraryResolver")
 fun <L : KotlinLibrary> SearchPathResolver<L>.libraryResolverLegacy(resolveManifestDependenciesLenient: Boolean = false): KotlinLibraryResolverImpl<L> =
     KotlinLibraryResolverImpl(
         this,
@@ -40,7 +38,6 @@ fun <L : KotlinLibrary> SearchPathResolver<L>.libraryResolverLegacy(resolveManif
         legacyExternalToolResolveMode = true
     )
 
-@JvmName("libraryResolverNew")
 fun <L : KotlinLibrary> SearchPathResolver<L>.libraryResolver(resolveManifestDependenciesLenient: Boolean = false): KotlinLibraryResolverImpl<L> =
     KotlinLibraryResolverImpl(
         this,

@@ -11,30 +11,22 @@ object WebCommonStandardClassIds {
     val BASE_JS_PACKAGE = BASE_KOTLIN_PACKAGE.child(Name.identifier("js"))
 
     object Annotations {
-        @JvmField
         val JsQualifier = "JsQualifier".jsId()
 
-        @JvmField
         val JsModule = "JsModule".jsId()
 
-        @JvmField
         val JsName = "JsName".jsId()
 
-        @JvmField
         val JsExport = "JsExport".jsId()
 
-        @JvmField
         val JsNative = "native".jsId()
 
-        @JvmField
         val JsNativeInvoke = "nativeInvoke".jsId()
     }
 
     object Callables {
-        @JvmField
         val JsDefinedExternally = "definedExternally".callableId(BASE_JS_PACKAGE)
 
-        @JvmField
         val Js = "js".callableId(BASE_JS_PACKAGE)
     }
 }

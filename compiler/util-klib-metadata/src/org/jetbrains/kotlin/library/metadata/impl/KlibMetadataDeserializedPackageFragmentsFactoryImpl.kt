@@ -37,7 +37,7 @@ open class KlibMetadataDeserializedPackageFragmentsFactoryImpl : KlibMetadataDes
                 library, header, configuration, packageFqName, incompatibility = library.getIncompatibility(configuration.metadataVersion)
             )
             val parts = metadata.getPackageFragmentNames(packageFqName.asString())
-            val isBuiltInModule = moduleDescriptor.builtIns.builtInsModule === moduleDescriptor
+            val isBuiltInModule = moduleDescriptor.builtIns.getBuiltInsModule() === moduleDescriptor
             parts.map { partName ->
                 if (isBuiltInModule)
                     BuiltInKlibMetadataDeserializedPackageFragment(

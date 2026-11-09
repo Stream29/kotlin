@@ -19,7 +19,7 @@ package org.jetbrains.kotlin.resolve.scopes
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.storage.StorageManager
 
-class LazyScopeAdapter @JvmOverloads constructor(
+class LazyScopeAdapter(
     storageManager: StorageManager = LockBasedStorageManager.NO_LOCKS,
     getScope: () -> MemberScope
 ) : AbstractScopeAdapter() {

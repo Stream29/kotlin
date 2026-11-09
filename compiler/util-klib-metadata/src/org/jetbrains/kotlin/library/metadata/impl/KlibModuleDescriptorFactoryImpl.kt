@@ -48,7 +48,7 @@ internal class KlibModuleDescriptorFactoryImpl(val createBuiltIns: (StorageManag
         val builtIns = createBuiltIns(storageManager)
 
         val moduleDescriptor = createDescriptor(name, storageManager, builtIns, origin, customCapabilities)
-        builtIns.builtInsModule = moduleDescriptor
+        builtIns.setBuiltInsModule(moduleDescriptor)
 
         return moduleDescriptor
     }

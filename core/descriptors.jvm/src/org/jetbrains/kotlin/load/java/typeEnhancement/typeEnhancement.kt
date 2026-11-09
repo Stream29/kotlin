@@ -16,6 +16,9 @@
 
 package org.jetbrains.kotlin.load.java.typeEnhancement
 
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.builtins.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.jvm.JavaToKotlinClassMapper
 import org.jetbrains.kotlin.descriptors.ClassDescriptor

@@ -16,6 +16,9 @@
 
 package org.jetbrains.kotlin.resolve.constants
 
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -24,7 +27,6 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 import org.jetbrains.kotlin.types.TypeRefinement
-import java.util.*
 
 class IntegerValueTypeConstructor(
     private val value: Long,
@@ -99,4 +101,3 @@ class IntegerValueTypeConstructor(
 
     override fun toString() = "IntegerValueType($value)"
 }
-

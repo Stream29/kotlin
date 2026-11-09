@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.serialization.deserialization
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.ClassDescriptor

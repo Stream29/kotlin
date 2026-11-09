@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.resolve.scopes
 
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.name.Name
@@ -26,7 +28,6 @@ import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.utils.filterIsInstanceAnd
 import org.jetbrains.kotlin.utils.Printer
 import org.jetbrains.kotlin.utils.compact
-import java.util.*
 
 /**
  * A scope that may contain some declared functions + fake-overridden functions/properties from supertypes.

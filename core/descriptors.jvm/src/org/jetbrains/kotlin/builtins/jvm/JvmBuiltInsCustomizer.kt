@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlin.builtins.jvm
 
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.descriptors.impl.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.jvm.JvmBuiltInsSignatures.DEPRECATED_LIST_METHODS

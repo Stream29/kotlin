@@ -5,8 +5,7 @@
 
 package org.jetbrains.kotlin.library
 
-import java.nio.file.Path
-import kotlin.io.path.isRegularFile
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 /**
  * The format of a Klib library.

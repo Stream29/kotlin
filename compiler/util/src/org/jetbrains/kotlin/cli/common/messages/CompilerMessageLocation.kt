@@ -5,9 +5,7 @@
 
 package org.jetbrains.kotlin.cli.common.messages
 
-import java.io.Serializable
-
-interface CompilerMessageSourceLocation : Serializable {
+interface CompilerMessageSourceLocation {
     val path: String
     val line: Int
     val column: Int

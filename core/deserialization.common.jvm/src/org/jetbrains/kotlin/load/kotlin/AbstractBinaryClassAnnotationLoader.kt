@@ -175,7 +175,7 @@ abstract class AbstractBinaryClassAnnotationLoader<A : Any, S : AbstractBinaryCl
                 container.isInner -> 1
                 else -> 0
             }
-            else -> throw UnsupportedOperationException("Unsupported message: ${message::class.java}")
+            else -> throw UnsupportedOperationException("Unsupported message: ${message::class}")
         }
     }
 

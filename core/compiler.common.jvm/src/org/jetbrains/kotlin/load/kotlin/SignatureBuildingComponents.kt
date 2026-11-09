@@ -8,7 +8,6 @@ package org.jetbrains.kotlin.load.kotlin
 import org.jetbrains.kotlin.builtins.jvm.JavaToKotlinClassMap
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.resolve.jvm.JvmClassName
-import java.util.*
 
 inline fun <T> signatures(block: SignatureBuildingComponents.() -> T) = with(SignatureBuildingComponents, block)
 

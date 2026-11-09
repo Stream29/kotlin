@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.capitalizeAsciiOnly
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.capitalizeFirstWord
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.decapitalizeSmartForCompiler
-import java.util.ArrayList
 
 fun propertyNameByGetMethodName(methodName: Name): Name? =
     propertyNameFromAccessorMethodName(methodName, "get") ?: propertyNameFromAccessorMethodName(methodName, "is", removePrefix = false)

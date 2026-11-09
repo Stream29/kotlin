@@ -7,11 +7,6 @@
 
 package org.jetbrains.kotlin.konan.config
 
-/*
- * This file was generated automatically
- * DO NOT MODIFY IT MANUALLY
- */
-
 import org.jetbrains.kotlin.backend.konan.AllocationMode
 import org.jetbrains.kotlin.backend.konan.LlvmVariant
 import org.jetbrains.kotlin.backend.konan.TestRunnerKind
@@ -20,269 +15,284 @@ import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
-object NativeConfigurationKeys {
-    // Bundle ID to be set in Info.plist of a produced framework.
-    @JvmField
-    val BUNDLE_ID = CompilerConfigurationKey.create<String>("BUNDLE_ID")
-
-    // Check dependencies and download the missing ones.
-    @JvmField
-    val CHECK_DEPENDENCIES = CompilerConfigurationKey.create<Boolean>("CHECK_DEPENDENCIES")
-
-    @JvmField
-    val DEBUG = CompilerConfigurationKey.create<Boolean>("DEBUG")
-
-    @JvmField
-    val FAKE_OVERRIDE_VALIDATOR = CompilerConfigurationKey.create<Boolean>("FAKE_OVERRIDE_VALIDATOR")
-
-    @JvmField
-    val EMIT_LAZY_OBJC_HEADER_FILE = CompilerConfigurationKey.create<String>("EMIT_LAZY_OBJC_HEADER_FILE")
-
-    @JvmField
-    val ENABLE_ASSERTIONS = CompilerConfigurationKey.create<Boolean>("ENABLE_ASSERTIONS")
-
-    // Fully qualified main() name.
-    @JvmField
-    val KONAN_ENTRY_POINT = CompilerConfigurationKey.create<String>("KONAN_ENTRY_POINT")
-
-    // Libraries included into produced framework API.
-    @JvmField
-    val EXPORTED_LIBRARIES = CompilerConfigurationKey.create<List<String>>("EXPORTED_LIBRARIES")
-
-    // Prefix used when exporting Kotlin names to other languages.
-    @JvmField
-    val FULL_EXPORTED_NAME_PREFIX = CompilerConfigurationKey.create<String>("FULL_EXPORTED_NAME_PREFIX")
-
-    @JvmField
-    val KONAN_LIBRARY_TO_ADD_TO_CACHE = CompilerConfigurationKey.create<String>("KONAN_LIBRARY_TO_ADD_TO_CACHE")
-
-    @JvmField
-    val CACHE_DIRECTORIES = CompilerConfigurationKey.create<List<String>>("CACHE_DIRECTORIES")
-
-    // Paths to the root directories from which dependencies are to be cached automatically.
-    @JvmField
-    val AUTO_CACHEABLE_FROM = CompilerConfigurationKey.create<List<String>>("AUTO_CACHEABLE_FROM")
-
-    // Path to the directory where to put caches for auto-cacheable dependencies.
-    @JvmField
-    val AUTO_CACHE_DIR = CompilerConfigurationKey.create<String>("AUTO_CACHE_DIR")
-
-    // Path to the directory where to put incremental build caches.
-    @JvmField
-    val INCREMENTAL_CACHE_DIR = CompilerConfigurationKey.create<String>("INCREMENTAL_CACHE_DIR")
-
-    // Path to a file where the list of all cache archives produced by this build should be written.
-    @JvmField
-    val DUMP_BUILT_CACHES_TO = CompilerConfigurationKey.create<String>("DUMP_BUILT_CACHES_TO")
-
-    // Mapping from library paths to cache paths.
-    @JvmField
-    val CACHED_LIBRARIES = CompilerConfigurationKey.create<Map<String, String>>("CACHED_LIBRARIES")
-
-    // Which files should be compiled to cache.
-    @JvmField
-    val FILES_TO_CACHE = CompilerConfigurationKey.create<List<String>>("FILES_TO_CACHE")
-
-    @JvmField
-    val MAKE_PER_FILE_CACHE = CompilerConfigurationKey.create<Boolean>("MAKE_PER_FILE_CACHE")
-
-    // Combined fingerprint of external cached dependencies of the library being cached.
-    @JvmField
-    val CACHED_LIBRARY_DEPENDENCIES_FINGERPRINT = CompilerConfigurationKey.create<String>("CACHED_LIBRARY_DEPENDENCIES_FINGERPRINT")
-
-    @JvmField
-    val FRAMEWORK_IMPORT_HEADERS = CompilerConfigurationKey.create<List<String>>("FRAMEWORK_IMPORT_HEADERS")
-
-    @JvmField
-    val KONAN_FRIEND_LIBRARIES = CompilerConfigurationKey.create<List<String>>("KONAN_FRIEND_LIBRARIES")
-
-    @JvmField
-    val KONAN_REFINES_MODULES = CompilerConfigurationKey.create<List<String>>("KONAN_REFINES_MODULES")
-
-    @JvmField
-    val GENERATE_TEST_RUNNER = CompilerConfigurationKey.create<TestRunnerKind>("GENERATE_TEST_RUNNER")
-
-    @JvmField
-    val KONAN_INCLUDED_BINARIES = CompilerConfigurationKey.create<List<String>>("KONAN_INCLUDED_BINARIES")
-
-    @JvmField
-    val KONAN_HOME = CompilerConfigurationKey.create<String>("KONAN_HOME")
-
-    @JvmField
-    val KONAN_LIBRARIES = CompilerConfigurationKey.create<List<String>>("KONAN_LIBRARIES")
-
-    @JvmField
-    val LIGHT_DEBUG = CompilerConfigurationKey.create<Boolean>("LIGHT_DEBUG")
-
-    // Generates debug trampolines to make debugger breakpoint resolution more accurate.
-    @JvmField
-    val GENERATE_DEBUG_TRAMPOLINE = CompilerConfigurationKey.create<Boolean>("GENERATE_DEBUG_TRAMPOLINE")
-
-    @JvmField
-    val LINKER_ARGS = CompilerConfigurationKey.create<List<String>>("LINKER_ARGS")
-
-    @JvmField
-    val LIST_TARGETS = CompilerConfigurationKey.create<Boolean>("LIST_TARGETS")
-
-    @JvmField
-    val KONAN_MANIFEST_ADDEND = CompilerConfigurationKey.create<String>("KONAN_MANIFEST_ADDEND")
-
-    // Path to file where header klib should be produced.
-    @JvmField
-    val KONAN_GENERATED_HEADER_KLIB_PATH = CompilerConfigurationKey.create<String>("KONAN_GENERATED_HEADER_KLIB_PATH")
-
-    @JvmField
-    val KONAN_NATIVE_LIBRARIES = CompilerConfigurationKey.create<List<String>>("KONAN_NATIVE_LIBRARIES")
-
-    // Don't link with the default libraries.
-    @JvmField
-    val KONAN_NO_DEFAULT_LIBS = CompilerConfigurationKey.create<Boolean>("KONAN_NO_DEFAULT_LIBS")
-
-    // Assume 'main' entry point to be provided by external libraries.
-    @JvmField
-    val NOMAIN = CompilerConfigurationKey.create<Boolean>("NOMAIN")
-
-    // Don't link with stdlib.
-    @JvmField
-    val KONAN_NO_STDLIB = CompilerConfigurationKey.create<Boolean>("KONAN_NO_STDLIB")
-
-    // Don't pack the library into a klib file.
-    @JvmField
-    val KONAN_DONT_COMPRESS_KLIB = CompilerConfigurationKey.create<Boolean>("KONAN_DONT_COMPRESS_KLIB")
-
-    @JvmField
-    val OPTIMIZATION = CompilerConfigurationKey.create<Boolean>("OPTIMIZATION")
-
-    @JvmField
-    val KONAN_OUTPUT_PATH = CompilerConfigurationKey.create<String>("KONAN_OUTPUT_PATH")
-
-    @JvmField
-    val OVERRIDE_CLANG_OPTIONS = CompilerConfigurationKey.create<List<String>>("OVERRIDE_CLANG_OPTIONS")
-
-    @JvmField
-    val ALLOCATION_MODE = CompilerConfigurationKey.create<AllocationMode>("ALLOCATION_MODE")
-
-    @JvmField
-    val KONAN_PRINT_BITCODE = CompilerConfigurationKey.create<Boolean>("KONAN_PRINT_BITCODE")
-
-    @JvmField
-    val KONAN_PRINT_IR = CompilerConfigurationKey.create<Boolean>("KONAN_PRINT_IR")
-
-    @JvmField
-    val KONAN_PRINT_FILES = CompilerConfigurationKey.create<Boolean>("KONAN_PRINT_FILES")
-
-    @JvmField
-    val KONAN_PRODUCED_ARTIFACT_KIND = CompilerConfigurationKey.create<CompilerOutputKind>("KONAN_PRODUCED_ARTIFACT_KIND")
-
-    @JvmField
-    val KONAN_PURGE_USER_LIBS = CompilerConfigurationKey.create<Boolean>("KONAN_PURGE_USER_LIBS")
-
-    @JvmField
-    val RUNTIME_FILE = CompilerConfigurationKey.create<String>("RUNTIME_FILE")
-
-    // Klibs processed in the same manner as source files.
-    @JvmField
-    val KONAN_INCLUDED_LIBRARIES = CompilerConfigurationKey.create<List<String>>("KONAN_INCLUDED_LIBRARIES")
-
-    // Short module name for IDE and export.
-    @JvmField
-    val KONAN_SHORT_MODULE_NAME = CompilerConfigurationKey.create<String>("KONAN_SHORT_MODULE_NAME")
-
-    // Produce a static library for a framework.
-    @JvmField
-    val STATIC_FRAMEWORK = CompilerConfigurationKey.create<Boolean>("STATIC_FRAMEWORK")
-
-    @JvmField
-    val KONAN_TARGET = CompilerConfigurationKey.create<String>("KONAN_TARGET")
-
-    @JvmField
-    val TEMPORARY_FILES_DIR = CompilerConfigurationKey.create<String>("TEMPORARY_FILES_DIR")
-
-    @JvmField
-    val SAVE_LLVM_IR = CompilerConfigurationKey.create<List<String>>("SAVE_LLVM_IR")
-
-    @JvmField
-    val VERIFY_BITCODE = CompilerConfigurationKey.create<Boolean>("VERIFY_BITCODE")
-
-    @JvmField
-    val VERIFY_COMPILER = CompilerConfigurationKey.create<Boolean>("VERIFY_COMPILER")
-
-    @JvmField
-    val KONAN_WRITE_DEPENDENCIES_OF_PRODUCED_KLIB_TO = CompilerConfigurationKey.create<String>("KONAN_WRITE_DEPENDENCIES_OF_PRODUCED_KLIB_TO")
-
-    @JvmField
-    val DEBUG_INFO_VERSION = CompilerConfigurationKey.create<Int>("DEBUG_INFO_VERSION")
-
-    // Write objc header with generics support.
-    @JvmField
-    val OBJC_GENERICS = CompilerConfigurationKey.create<Boolean>("OBJC_GENERICS")
-
-    // Remap file source paths in debug info.
-    @JvmField
-    val DEBUG_PREFIX_MAP = CompilerConfigurationKey.create<Map<String, String>>("DEBUG_PREFIX_MAP")
-
-    // Perform compiler caches pre-link.
-    @JvmField
-    val PRE_LINK_CACHES = CompilerConfigurationKey.create<Boolean>("PRE_LINK_CACHES")
-
-    // Override konan.properties values.
-    @JvmField
-    val OVERRIDE_KONAN_PROPERTIES = CompilerConfigurationKey.create<Map<String, String>>("OVERRIDE_KONAN_PROPERTIES")
-
-    @JvmField
-    val PROPERTY_LAZY_INITIALIZATION = CompilerConfigurationKey.create<Boolean>("PROPERTY_LAZY_INITIALIZATION")
-
-    // The file with the graph of dependencies (libraries) collected by the build system.
-    @JvmField
-    val EXTERNAL_DEPENDENCIES = CompilerConfigurationKey.create<String>("EXTERNAL_DEPENDENCIES")
-
-    @JvmField
-    val LLVM_VARIANT = CompilerConfigurationKey.create<LlvmVariant>("LLVM_VARIANT")
-
-    @JvmField
-    val RUNTIME_LOGS = CompilerConfigurationKey.create<String>("RUNTIME_LOGS")
-
-    // Path to a file to dump the list of all available tests.
-    @JvmField
-    val TEST_DUMP_OUTPUT_PATH = CompilerConfigurationKey.create<String>("TEST_DUMP_OUTPUT_PATH")
-
-    // Do not generate binary in framework.
-    @JvmField
-    val OMIT_FRAMEWORK_BINARY = CompilerConfigurationKey.create<Boolean>("OMIT_FRAMEWORK_BINARY")
-
-    // Path to bitcode file to compile.
-    @JvmField
-    val COMPILE_FROM_BITCODE = CompilerConfigurationKey.create<String>("COMPILE_FROM_BITCODE")
-
-    // Path to serialized dependencies for native linking.
-    @JvmField
-    val SERIALIZED_DEPENDENCIES = CompilerConfigurationKey.create<String>("SERIALIZED_DEPENDENCIES")
-
-    // Path to save serialized dependencies to.
-    @JvmField
-    val SAVE_DEPENDENCIES_PATH = CompilerConfigurationKey.create<String>("SAVE_DEPENDENCIES_PATH")
-
-    // Directory to store LLVM IR from phases.
-    @JvmField
-    val SAVE_LLVM_IR_DIRECTORY = CompilerConfigurationKey.create<String>("SAVE_LLVM_IR_DIRECTORY")
-
-    // Directory for storing konan dependencies, cache and prebuilds.
-    @JvmField
-    val KONAN_DATA_DIR = CompilerConfigurationKey.create<String>("KONAN_DATA_DIR")
-
-    // Value of native_targets property to write in manifest.
-    @JvmField
-    val KONAN_MANIFEST_NATIVE_TARGETS = CompilerConfigurationKey.create<List<KonanTarget>>("KONAN_MANIFEST_NATIVE_TARGETS")
-
-    // LLVM passes to run instead of module optimization pipeline.
-    @JvmField
-    val LLVM_MODULE_PASSES = CompilerConfigurationKey.create<String>("LLVM_MODULE_PASSES")
-
-    // LLVM passes to run instead of LTO optimization pipeline.
-    @JvmField
-    val LLVM_LTO_PASSES = CompilerConfigurationKey.create<String>("LLVM_LTO_PASSES")
-
+internal object NativeExtraConfigurationKeys {
+    val BUNDLE_ID: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("BUNDLE_ID")
+    val CHECK_DEPENDENCIES: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("CHECK_DEPENDENCIES")
+    val DEBUG: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("DEBUG")
+    val FAKE_OVERRIDE_VALIDATOR: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("FAKE_OVERRIDE_VALIDATOR")
+    val EMIT_LAZY_OBJC_HEADER_FILE: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("EMIT_LAZY_OBJC_HEADER_FILE")
+    val ENABLE_ASSERTIONS: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("ENABLE_ASSERTIONS")
+    val KONAN_ENTRY_POINT: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("KONAN_ENTRY_POINT")
+    val EXPORTED_LIBRARIES: CompilerConfigurationKey<List<String>> = CompilerConfigurationKey.create<List<String>>("EXPORTED_LIBRARIES")
+    val FULL_EXPORTED_NAME_PREFIX: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("FULL_EXPORTED_NAME_PREFIX")
+    val KONAN_LIBRARY_TO_ADD_TO_CACHE: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("KONAN_LIBRARY_TO_ADD_TO_CACHE")
+    val CACHE_DIRECTORIES: CompilerConfigurationKey<List<String>> = CompilerConfigurationKey.create<List<String>>("CACHE_DIRECTORIES")
+    val AUTO_CACHEABLE_FROM: CompilerConfigurationKey<List<String>> = CompilerConfigurationKey.create<List<String>>("AUTO_CACHEABLE_FROM")
+    val AUTO_CACHE_DIR: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("AUTO_CACHE_DIR")
+    val INCREMENTAL_CACHE_DIR: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("INCREMENTAL_CACHE_DIR")
+    val DUMP_BUILT_CACHES_TO: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("DUMP_BUILT_CACHES_TO")
+    val CACHED_LIBRARIES: CompilerConfigurationKey<Map<String, String>> = CompilerConfigurationKey.create<Map<String, String>>("CACHED_LIBRARIES")
+    val FILES_TO_CACHE: CompilerConfigurationKey<List<String>> = CompilerConfigurationKey.create<List<String>>("FILES_TO_CACHE")
+    val MAKE_PER_FILE_CACHE: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("MAKE_PER_FILE_CACHE")
+    val CACHED_LIBRARY_DEPENDENCIES_FINGERPRINT: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("CACHED_LIBRARY_DEPENDENCIES_FINGERPRINT")
+    val FRAMEWORK_IMPORT_HEADERS: CompilerConfigurationKey<List<String>> = CompilerConfigurationKey.create<List<String>>("FRAMEWORK_IMPORT_HEADERS")
+    val KONAN_REFINES_MODULES: CompilerConfigurationKey<List<String>> = CompilerConfigurationKey.create<List<String>>("KONAN_REFINES_MODULES")
+    val GENERATE_TEST_RUNNER: CompilerConfigurationKey<TestRunnerKind> = CompilerConfigurationKey.create<TestRunnerKind>("GENERATE_TEST_RUNNER")
+    val KONAN_INCLUDED_BINARIES: CompilerConfigurationKey<List<String>> = CompilerConfigurationKey.create<List<String>>("KONAN_INCLUDED_BINARIES")
+    val LIGHT_DEBUG: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("LIGHT_DEBUG")
+    val GENERATE_DEBUG_TRAMPOLINE: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("GENERATE_DEBUG_TRAMPOLINE")
+    val LINKER_ARGS: CompilerConfigurationKey<List<String>> = CompilerConfigurationKey.create<List<String>>("LINKER_ARGS")
+    val LIST_TARGETS: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("LIST_TARGETS")
+    val KONAN_MANIFEST_ADDEND: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("KONAN_MANIFEST_ADDEND")
+    val KONAN_GENERATED_HEADER_KLIB_PATH: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("KONAN_GENERATED_HEADER_KLIB_PATH")
+    val KONAN_NATIVE_LIBRARIES: CompilerConfigurationKey<List<String>> = CompilerConfigurationKey.create<List<String>>("KONAN_NATIVE_LIBRARIES")
+    val NOMAIN: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("NOMAIN")
+    val KONAN_DONT_COMPRESS_KLIB: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("KONAN_DONT_COMPRESS_KLIB")
+    val OPTIMIZATION: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("OPTIMIZATION")
+    val KONAN_OUTPUT_PATH: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("KONAN_OUTPUT_PATH")
+    val OVERRIDE_CLANG_OPTIONS: CompilerConfigurationKey<List<String>> = CompilerConfigurationKey.create<List<String>>("OVERRIDE_CLANG_OPTIONS")
+    val ALLOCATION_MODE: CompilerConfigurationKey<AllocationMode> = CompilerConfigurationKey.create<AllocationMode>("ALLOCATION_MODE")
+    val KONAN_PRINT_BITCODE: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("KONAN_PRINT_BITCODE")
+    val KONAN_PRINT_IR: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("KONAN_PRINT_IR")
+    val KONAN_PRINT_FILES: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("KONAN_PRINT_FILES")
+    val KONAN_PRODUCED_ARTIFACT_KIND: CompilerConfigurationKey<CompilerOutputKind> = CompilerConfigurationKey.create<CompilerOutputKind>("KONAN_PRODUCED_ARTIFACT_KIND")
+    val KONAN_PURGE_USER_LIBS: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("KONAN_PURGE_USER_LIBS")
+    val RUNTIME_FILE: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("RUNTIME_FILE")
+    val KONAN_SHORT_MODULE_NAME: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("KONAN_SHORT_MODULE_NAME")
+    val STATIC_FRAMEWORK: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("STATIC_FRAMEWORK")
+    val KONAN_TARGET: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("KONAN_TARGET")
+    val TEMPORARY_FILES_DIR: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("TEMPORARY_FILES_DIR")
+    val SAVE_LLVM_IR: CompilerConfigurationKey<List<String>> = CompilerConfigurationKey.create<List<String>>("SAVE_LLVM_IR")
+    val VERIFY_BITCODE: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("VERIFY_BITCODE")
+    val VERIFY_COMPILER: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("VERIFY_COMPILER")
+    val KONAN_WRITE_DEPENDENCIES_OF_PRODUCED_KLIB_TO: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("KONAN_WRITE_DEPENDENCIES_OF_PRODUCED_KLIB_TO")
+    val DEBUG_INFO_VERSION: CompilerConfigurationKey<Int> = CompilerConfigurationKey.create<Int>("DEBUG_INFO_VERSION")
+    val OBJC_GENERICS: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("OBJC_GENERICS")
+    val DEBUG_PREFIX_MAP: CompilerConfigurationKey<Map<String, String>> = CompilerConfigurationKey.create<Map<String, String>>("DEBUG_PREFIX_MAP")
+    val PRE_LINK_CACHES: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("PRE_LINK_CACHES")
+    val OVERRIDE_KONAN_PROPERTIES: CompilerConfigurationKey<Map<String, String>> = CompilerConfigurationKey.create<Map<String, String>>("OVERRIDE_KONAN_PROPERTIES")
+    val PROPERTY_LAZY_INITIALIZATION: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("PROPERTY_LAZY_INITIALIZATION")
+    val EXTERNAL_DEPENDENCIES: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("EXTERNAL_DEPENDENCIES")
+    val LLVM_VARIANT: CompilerConfigurationKey<LlvmVariant> = CompilerConfigurationKey.create<LlvmVariant>("LLVM_VARIANT")
+    val RUNTIME_LOGS: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("RUNTIME_LOGS")
+    val TEST_DUMP_OUTPUT_PATH: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("TEST_DUMP_OUTPUT_PATH")
+    val OMIT_FRAMEWORK_BINARY: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey.create<Boolean>("OMIT_FRAMEWORK_BINARY")
+    val COMPILE_FROM_BITCODE: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("COMPILE_FROM_BITCODE")
+    val SERIALIZED_DEPENDENCIES: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("SERIALIZED_DEPENDENCIES")
+    val SAVE_DEPENDENCIES_PATH: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("SAVE_DEPENDENCIES_PATH")
+    val SAVE_LLVM_IR_DIRECTORY: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("SAVE_LLVM_IR_DIRECTORY")
+    val KONAN_DATA_DIR: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("KONAN_DATA_DIR")
+    val KONAN_MANIFEST_NATIVE_TARGETS: CompilerConfigurationKey<List<KonanTarget>> = CompilerConfigurationKey.create<List<KonanTarget>>("KONAN_MANIFEST_NATIVE_TARGETS")
+    val LLVM_MODULE_PASSES: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("LLVM_MODULE_PASSES")
+    val LLVM_LTO_PASSES: CompilerConfigurationKey<String> = CompilerConfigurationKey.create<String>("LLVM_LTO_PASSES")
 }
+
+val NativeConfigurationKeys.BUNDLE_ID: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.BUNDLE_ID
+
+val NativeConfigurationKeys.CHECK_DEPENDENCIES: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.CHECK_DEPENDENCIES
+
+val NativeConfigurationKeys.DEBUG: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.DEBUG
+
+val NativeConfigurationKeys.FAKE_OVERRIDE_VALIDATOR: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.FAKE_OVERRIDE_VALIDATOR
+
+val NativeConfigurationKeys.EMIT_LAZY_OBJC_HEADER_FILE: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.EMIT_LAZY_OBJC_HEADER_FILE
+
+val NativeConfigurationKeys.ENABLE_ASSERTIONS: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.ENABLE_ASSERTIONS
+
+val NativeConfigurationKeys.KONAN_ENTRY_POINT: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.KONAN_ENTRY_POINT
+
+val NativeConfigurationKeys.EXPORTED_LIBRARIES: CompilerConfigurationKey<List<String>>
+    get() = NativeExtraConfigurationKeys.EXPORTED_LIBRARIES
+
+val NativeConfigurationKeys.FULL_EXPORTED_NAME_PREFIX: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.FULL_EXPORTED_NAME_PREFIX
+
+val NativeConfigurationKeys.KONAN_LIBRARY_TO_ADD_TO_CACHE: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.KONAN_LIBRARY_TO_ADD_TO_CACHE
+
+val NativeConfigurationKeys.CACHE_DIRECTORIES: CompilerConfigurationKey<List<String>>
+    get() = NativeExtraConfigurationKeys.CACHE_DIRECTORIES
+
+val NativeConfigurationKeys.AUTO_CACHEABLE_FROM: CompilerConfigurationKey<List<String>>
+    get() = NativeExtraConfigurationKeys.AUTO_CACHEABLE_FROM
+
+val NativeConfigurationKeys.AUTO_CACHE_DIR: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.AUTO_CACHE_DIR
+
+val NativeConfigurationKeys.INCREMENTAL_CACHE_DIR: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.INCREMENTAL_CACHE_DIR
+
+val NativeConfigurationKeys.DUMP_BUILT_CACHES_TO: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.DUMP_BUILT_CACHES_TO
+
+val NativeConfigurationKeys.CACHED_LIBRARIES: CompilerConfigurationKey<Map<String, String>>
+    get() = NativeExtraConfigurationKeys.CACHED_LIBRARIES
+
+val NativeConfigurationKeys.FILES_TO_CACHE: CompilerConfigurationKey<List<String>>
+    get() = NativeExtraConfigurationKeys.FILES_TO_CACHE
+
+val NativeConfigurationKeys.MAKE_PER_FILE_CACHE: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.MAKE_PER_FILE_CACHE
+
+val NativeConfigurationKeys.CACHED_LIBRARY_DEPENDENCIES_FINGERPRINT: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.CACHED_LIBRARY_DEPENDENCIES_FINGERPRINT
+
+val NativeConfigurationKeys.FRAMEWORK_IMPORT_HEADERS: CompilerConfigurationKey<List<String>>
+    get() = NativeExtraConfigurationKeys.FRAMEWORK_IMPORT_HEADERS
+
+val NativeConfigurationKeys.KONAN_REFINES_MODULES: CompilerConfigurationKey<List<String>>
+    get() = NativeExtraConfigurationKeys.KONAN_REFINES_MODULES
+
+val NativeConfigurationKeys.GENERATE_TEST_RUNNER: CompilerConfigurationKey<TestRunnerKind>
+    get() = NativeExtraConfigurationKeys.GENERATE_TEST_RUNNER
+
+val NativeConfigurationKeys.KONAN_INCLUDED_BINARIES: CompilerConfigurationKey<List<String>>
+    get() = NativeExtraConfigurationKeys.KONAN_INCLUDED_BINARIES
+
+val NativeConfigurationKeys.LIGHT_DEBUG: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.LIGHT_DEBUG
+
+val NativeConfigurationKeys.GENERATE_DEBUG_TRAMPOLINE: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.GENERATE_DEBUG_TRAMPOLINE
+
+val NativeConfigurationKeys.LINKER_ARGS: CompilerConfigurationKey<List<String>>
+    get() = NativeExtraConfigurationKeys.LINKER_ARGS
+
+val NativeConfigurationKeys.LIST_TARGETS: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.LIST_TARGETS
+
+val NativeConfigurationKeys.KONAN_MANIFEST_ADDEND: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.KONAN_MANIFEST_ADDEND
+
+val NativeConfigurationKeys.KONAN_GENERATED_HEADER_KLIB_PATH: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.KONAN_GENERATED_HEADER_KLIB_PATH
+
+val NativeConfigurationKeys.KONAN_NATIVE_LIBRARIES: CompilerConfigurationKey<List<String>>
+    get() = NativeExtraConfigurationKeys.KONAN_NATIVE_LIBRARIES
+
+val NativeConfigurationKeys.NOMAIN: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.NOMAIN
+
+val NativeConfigurationKeys.KONAN_DONT_COMPRESS_KLIB: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.KONAN_DONT_COMPRESS_KLIB
+
+val NativeConfigurationKeys.OPTIMIZATION: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.OPTIMIZATION
+
+val NativeConfigurationKeys.KONAN_OUTPUT_PATH: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.KONAN_OUTPUT_PATH
+
+val NativeConfigurationKeys.OVERRIDE_CLANG_OPTIONS: CompilerConfigurationKey<List<String>>
+    get() = NativeExtraConfigurationKeys.OVERRIDE_CLANG_OPTIONS
+
+val NativeConfigurationKeys.ALLOCATION_MODE: CompilerConfigurationKey<AllocationMode>
+    get() = NativeExtraConfigurationKeys.ALLOCATION_MODE
+
+val NativeConfigurationKeys.KONAN_PRINT_BITCODE: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.KONAN_PRINT_BITCODE
+
+val NativeConfigurationKeys.KONAN_PRINT_IR: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.KONAN_PRINT_IR
+
+val NativeConfigurationKeys.KONAN_PRINT_FILES: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.KONAN_PRINT_FILES
+
+val NativeConfigurationKeys.KONAN_PRODUCED_ARTIFACT_KIND: CompilerConfigurationKey<CompilerOutputKind>
+    get() = NativeExtraConfigurationKeys.KONAN_PRODUCED_ARTIFACT_KIND
+
+val NativeConfigurationKeys.KONAN_PURGE_USER_LIBS: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.KONAN_PURGE_USER_LIBS
+
+val NativeConfigurationKeys.RUNTIME_FILE: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.RUNTIME_FILE
+
+val NativeConfigurationKeys.KONAN_SHORT_MODULE_NAME: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.KONAN_SHORT_MODULE_NAME
+
+val NativeConfigurationKeys.STATIC_FRAMEWORK: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.STATIC_FRAMEWORK
+
+val NativeConfigurationKeys.KONAN_TARGET: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.KONAN_TARGET
+
+val NativeConfigurationKeys.TEMPORARY_FILES_DIR: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.TEMPORARY_FILES_DIR
+
+val NativeConfigurationKeys.SAVE_LLVM_IR: CompilerConfigurationKey<List<String>>
+    get() = NativeExtraConfigurationKeys.SAVE_LLVM_IR
+
+val NativeConfigurationKeys.VERIFY_BITCODE: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.VERIFY_BITCODE
+
+val NativeConfigurationKeys.VERIFY_COMPILER: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.VERIFY_COMPILER
+
+val NativeConfigurationKeys.KONAN_WRITE_DEPENDENCIES_OF_PRODUCED_KLIB_TO: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.KONAN_WRITE_DEPENDENCIES_OF_PRODUCED_KLIB_TO
+
+val NativeConfigurationKeys.DEBUG_INFO_VERSION: CompilerConfigurationKey<Int>
+    get() = NativeExtraConfigurationKeys.DEBUG_INFO_VERSION
+
+val NativeConfigurationKeys.OBJC_GENERICS: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.OBJC_GENERICS
+
+val NativeConfigurationKeys.DEBUG_PREFIX_MAP: CompilerConfigurationKey<Map<String, String>>
+    get() = NativeExtraConfigurationKeys.DEBUG_PREFIX_MAP
+
+val NativeConfigurationKeys.PRE_LINK_CACHES: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.PRE_LINK_CACHES
+
+val NativeConfigurationKeys.OVERRIDE_KONAN_PROPERTIES: CompilerConfigurationKey<Map<String, String>>
+    get() = NativeExtraConfigurationKeys.OVERRIDE_KONAN_PROPERTIES
+
+val NativeConfigurationKeys.PROPERTY_LAZY_INITIALIZATION: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.PROPERTY_LAZY_INITIALIZATION
+
+val NativeConfigurationKeys.EXTERNAL_DEPENDENCIES: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.EXTERNAL_DEPENDENCIES
+
+val NativeConfigurationKeys.LLVM_VARIANT: CompilerConfigurationKey<LlvmVariant>
+    get() = NativeExtraConfigurationKeys.LLVM_VARIANT
+
+val NativeConfigurationKeys.RUNTIME_LOGS: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.RUNTIME_LOGS
+
+val NativeConfigurationKeys.TEST_DUMP_OUTPUT_PATH: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.TEST_DUMP_OUTPUT_PATH
+
+val NativeConfigurationKeys.OMIT_FRAMEWORK_BINARY: CompilerConfigurationKey<Boolean>
+    get() = NativeExtraConfigurationKeys.OMIT_FRAMEWORK_BINARY
+
+val NativeConfigurationKeys.COMPILE_FROM_BITCODE: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.COMPILE_FROM_BITCODE
+
+val NativeConfigurationKeys.SERIALIZED_DEPENDENCIES: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.SERIALIZED_DEPENDENCIES
+
+val NativeConfigurationKeys.SAVE_DEPENDENCIES_PATH: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.SAVE_DEPENDENCIES_PATH
+
+val NativeConfigurationKeys.SAVE_LLVM_IR_DIRECTORY: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.SAVE_LLVM_IR_DIRECTORY
+
+val NativeConfigurationKeys.KONAN_DATA_DIR: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.KONAN_DATA_DIR
+
+val NativeConfigurationKeys.KONAN_MANIFEST_NATIVE_TARGETS: CompilerConfigurationKey<List<KonanTarget>>
+    get() = NativeExtraConfigurationKeys.KONAN_MANIFEST_NATIVE_TARGETS
+
+val NativeConfigurationKeys.LLVM_MODULE_PASSES: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.LLVM_MODULE_PASSES
+
+val NativeConfigurationKeys.LLVM_LTO_PASSES: CompilerConfigurationKey<String>
+    get() = NativeExtraConfigurationKeys.LLVM_LTO_PASSES
 
 var CompilerConfiguration.bundleId: String?
     get() = get(NativeConfigurationKeys.BUNDLE_ID)
@@ -364,10 +374,6 @@ var CompilerConfiguration.frameworkImportHeaders: List<String>
     get() = getList(NativeConfigurationKeys.FRAMEWORK_IMPORT_HEADERS)
     set(value) { put(NativeConfigurationKeys.FRAMEWORK_IMPORT_HEADERS, value) }
 
-var CompilerConfiguration.konanFriendLibraries: List<String>
-    get() = getList(NativeConfigurationKeys.KONAN_FRIEND_LIBRARIES)
-    set(value) { put(NativeConfigurationKeys.KONAN_FRIEND_LIBRARIES, value) }
-
 var CompilerConfiguration.konanRefinesModules: List<String>
     get() = getList(NativeConfigurationKeys.KONAN_REFINES_MODULES)
     set(value) { put(NativeConfigurationKeys.KONAN_REFINES_MODULES, value) }
@@ -379,14 +385,6 @@ var CompilerConfiguration.generateTestRunner: TestRunnerKind?
 var CompilerConfiguration.konanIncludedBinaries: List<String>
     get() = getList(NativeConfigurationKeys.KONAN_INCLUDED_BINARIES)
     set(value) { put(NativeConfigurationKeys.KONAN_INCLUDED_BINARIES, value) }
-
-var CompilerConfiguration.konanHome: String?
-    get() = get(NativeConfigurationKeys.KONAN_HOME)
-    set(value) { put(NativeConfigurationKeys.KONAN_HOME, requireNotNull(value) { "nullable values are not allowed" }) }
-
-var CompilerConfiguration.konanLibraries: List<String>
-    get() = getList(NativeConfigurationKeys.KONAN_LIBRARIES)
-    set(value) { put(NativeConfigurationKeys.KONAN_LIBRARIES, value) }
 
 var CompilerConfiguration.lightDebug: Boolean
     get() = getBoolean(NativeConfigurationKeys.LIGHT_DEBUG)
@@ -416,17 +414,9 @@ var CompilerConfiguration.konanNativeLibraries: List<String>
     get() = getList(NativeConfigurationKeys.KONAN_NATIVE_LIBRARIES)
     set(value) { put(NativeConfigurationKeys.KONAN_NATIVE_LIBRARIES, value) }
 
-var CompilerConfiguration.konanNoDefaultLibs: Boolean
-    get() = getBoolean(NativeConfigurationKeys.KONAN_NO_DEFAULT_LIBS)
-    set(value) { put(NativeConfigurationKeys.KONAN_NO_DEFAULT_LIBS, value) }
-
 var CompilerConfiguration.nomain: Boolean
     get() = getBoolean(NativeConfigurationKeys.NOMAIN)
     set(value) { put(NativeConfigurationKeys.NOMAIN, value) }
-
-var CompilerConfiguration.konanNoStdlib: Boolean
-    get() = getBoolean(NativeConfigurationKeys.KONAN_NO_STDLIB)
-    set(value) { put(NativeConfigurationKeys.KONAN_NO_STDLIB, value) }
 
 var CompilerConfiguration.konanDontCompressKlib: Boolean
     get() = getBoolean(NativeConfigurationKeys.KONAN_DONT_COMPRESS_KLIB)
@@ -471,10 +461,6 @@ var CompilerConfiguration.konanPurgeUserLibs: Boolean
 var CompilerConfiguration.runtimeFile: String?
     get() = get(NativeConfigurationKeys.RUNTIME_FILE)
     set(value) { put(NativeConfigurationKeys.RUNTIME_FILE, requireNotNull(value) { "nullable values are not allowed" }) }
-
-var CompilerConfiguration.konanIncludedLibraries: List<String>
-    get() = getList(NativeConfigurationKeys.KONAN_INCLUDED_LIBRARIES)
-    set(value) { put(NativeConfigurationKeys.KONAN_INCLUDED_LIBRARIES, value) }
 
 var CompilerConfiguration.konanShortModuleName: String?
     get() = get(NativeConfigurationKeys.KONAN_SHORT_MODULE_NAME)
@@ -583,4 +569,3 @@ var CompilerConfiguration.llvmModulePasses: String?
 var CompilerConfiguration.llvmLtoPasses: String?
     get() = get(NativeConfigurationKeys.LLVM_LTO_PASSES)
     set(value) { put(NativeConfigurationKeys.LLVM_LTO_PASSES, requireNotNull(value) { "nullable values are not allowed" }) }
-

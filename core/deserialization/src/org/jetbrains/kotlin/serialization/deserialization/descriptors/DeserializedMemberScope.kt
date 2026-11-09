@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.metadata.ProtoBuf
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.protobuf.AbstractMessageLite
+import org.jetbrains.kotlin.protobuf.CodedInputStream
 import org.jetbrains.kotlin.protobuf.MessageLite
 import org.jetbrains.kotlin.protobuf.Parser
 import org.jetbrains.kotlin.resolve.MemberComparator
@@ -35,8 +36,6 @@ import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.utils.Printer
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.compact
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import kotlin.collections.ArrayList
 
 @K1Deprecation
@@ -157,7 +156,7 @@ abstract class DeserializedMemberScope protected constructor(
     protected abstract fun addEnumEntryDescriptors(result: MutableCollection<DeclarationDescriptor>, nameFilter: (Name) -> Boolean)
 
     override fun printScopeStructure(p: Printer) {
-        p.println(this::class.java.simpleName, " {")
+        p.println(this::class.simpleName, " {")
         p.pushIndent()
 
         p.println("containingDeclaration = " + c.containingDeclaration)
@@ -244,9 +243,7 @@ abstract class DeserializedMemberScope protected constructor(
 
         private fun Map<Name, Collection<AbstractMessageLite>>.packToByteArray(): Map<Name, ByteArray> =
             mapValues { entry ->
-                val byteArrayOutputStream = ByteArrayOutputStream()
-                entry.value.map { proto -> proto.writeDelimitedTo(byteArrayOutputStream) }
-                byteArrayOutputStream.toByteArray()
+                entry.value.packDelimitedMetadata()
             }
 
         private val functions =
@@ -288,9 +285,9 @@ abstract class DeserializedMemberScope protected constructor(
         ): Collection<D> =
             computeDescriptors(
                 bytesByName[name]?.let {
-                    val inputStream = ByteArrayInputStream(it)
+                    val inputStream = CodedInputStream.newInstance(it)
                     generateSequence {
-                        parser.parseDelimitedFrom(inputStream, c.components.extensionRegistryLite)
+                        parser.readDelimitedMetadata(inputStream, c.components.extensionRegistryLite)
                     }.toList()
                 } ?: emptyList(),
                 factory,
@@ -320,8 +317,8 @@ abstract class DeserializedMemberScope protected constructor(
         private fun createTypeAlias(name: Name): TypeAliasDescriptor? {
             val byteArray = typeAliasBytes[name] ?: return null
             val proto =
-                ProtoBuf.TypeAlias.parseDelimitedFrom(
-                    ByteArrayInputStream(byteArray), c.components.extensionRegistryLite
+                ProtoBuf.TypeAlias.PARSER.readDelimitedMetadata(
+                    CodedInputStream.newInstance(byteArray), c.components.extensionRegistryLite
                 ) ?: return null
             return c.memberDeserializer.loadTypeAlias(proto)
         }

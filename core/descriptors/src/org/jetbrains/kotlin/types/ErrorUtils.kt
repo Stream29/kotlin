@@ -21,7 +21,6 @@ object ErrorUtils {
         message = "Please migrate to the org.jetbrains.kotlin.types.error.ErrorUtils",
         plugins = "android/safeargs"
     )
-    @JvmStatic
     fun createUnresolvedType(presentableName: String, arguments: List<TypeProjection>): SimpleType {
         return org.jetbrains.kotlin.types.error.ErrorUtils.createErrorTypeWithArguments(
             ErrorTypeKind.UNRESOLVED_TYPE, arguments, this.toString()
@@ -33,7 +32,6 @@ object ErrorUtils {
         message = "Please migrate to the org.jetbrains.kotlin.types.error.ErrorUtils",
         plugins = "mobile-ide/kotlin-ocswift"
     )
-    @JvmStatic
     fun createErrorType(debugMessage: String): SimpleType {
         return org.jetbrains.kotlin.types.error.ErrorUtils.createErrorType(ErrorTypeKind.UNRESOLVED_TYPE, debugMessage)
     }

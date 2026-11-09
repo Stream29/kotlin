@@ -22,7 +22,6 @@ import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFra
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedPackageMemberScope
 import org.jetbrains.kotlin.serialization.deserialization.getClassId
 import org.jetbrains.kotlin.storage.StorageManager
-import java.lang.ref.SoftReference
 
 open class KlibMetadataDeserializedPackageFragment(
     fqName: FqName,
@@ -39,14 +38,14 @@ open class KlibMetadataDeserializedPackageFragment(
     // packages from the library.
     override val protoForNames: ProtoBuf.PackageFragment get() = ensureStorage()
 
-    private var protoForNamesStorage: SoftReference<ProtoBuf.PackageFragment> = SoftReference(null)
+    private var protoForNamesStorage: ProtoBuf.PackageFragment? = null
 
     private fun ensureStorage(): ProtoBuf.PackageFragment {
-        var tmp = protoForNamesStorage.get()
+        var tmp = protoForNamesStorage
         if (tmp == null) {
             tmp = customMetadataProtoLoader?.loadPackageFragment(library, fqName.asString(), partName)
                 ?: parsePackageFragment(metadata.getPackageFragment(fqName.asString(), partName))
-            protoForNamesStorage = SoftReference(tmp)
+            protoForNamesStorage = tmp
         }
         return tmp
     }
@@ -118,7 +117,7 @@ abstract class KlibMetadataPackageFragment(
         KlibMetadataClassDataFinder(protoForNames, nameResolver, containerSource)
     }
 
-    override fun getSource(): SourceElement = containerSource ?: super.source
+    override fun getSource(): SourceElement = containerSource ?: super.getSource()
 
     private val _memberScope: DeserializedPackageMemberScope by lazy {
         DeserializedPackageMemberScope(

@@ -32,7 +32,7 @@ abstract class PackageFragmentDescriptorImpl(
     // Not inlined in order to not capture ref on 'module'
     private val debugString: String = "package $fqName of $module"
 
-    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
+    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R? =
             visitor.visitPackageFragmentDescriptor(this, data)
 
     override fun getContainingDeclaration(): ModuleDescriptor {

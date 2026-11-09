@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlin.name
 
-import java.util.concurrent.atomic.AtomicReference
-
 object NativeRuntimeNames {
     private val kotlinNativePackage = FqName("kotlin.native")
     private val kotlinNativeInternalPackage = kotlinNativePackage.child(Name.identifier("internal"))

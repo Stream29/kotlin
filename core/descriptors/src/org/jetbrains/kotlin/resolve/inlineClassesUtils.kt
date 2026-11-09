@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.resolve
 
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName

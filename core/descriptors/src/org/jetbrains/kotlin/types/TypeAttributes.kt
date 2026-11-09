@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.types.model.AnnotationMarker
 import org.jetbrains.kotlin.util.AttributeArrayOwner
 import org.jetbrains.kotlin.util.TypeRegistry
 import org.jetbrains.kotlin.utils.addIfNotNull
-import java.util.concurrent.ConcurrentHashMap
+import org.jetbrains.kotlin.storage.ConcurrentHashMap
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 
@@ -46,9 +46,7 @@ class TypeAttributes private constructor(attributes: List<TypeAttribute<*>>) : A
             key: String,
             compute: (String) -> Int
         ): Int {
-            return this[key] ?: synchronized(this) {
-                this[key] ?: compute(key).also { this.putIfAbsent(key, it) }
-            }
+            return computeIfAbsent(key, compute)
         }
 
         val Empty: TypeAttributes = TypeAttributes(emptyList())

@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.resolve.scopes
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
@@ -30,10 +32,10 @@ import org.jetbrains.kotlin.utils.filterIsInstanceMapTo
 abstract class MemberScopeImpl : MemberScope {
     override fun getContributedClassifier(name: Name, location: LookupLocation): ClassifierDescriptor? = null
 
-    override fun getContributedVariables(name: Name, location: LookupLocation): Collection<@JvmWildcard PropertyDescriptor> =
+    override fun getContributedVariables(name: Name, location: LookupLocation): Collection<PropertyDescriptor> =
         emptyList()
 
-    override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<@JvmWildcard SimpleFunctionDescriptor> =
+    override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<SimpleFunctionDescriptor> =
         emptyList()
 
     override fun getContributedDescriptors(kindFilter: DescriptorKindFilter,

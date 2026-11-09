@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.types.checker
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.container.DefaultImplementation
 import org.jetbrains.kotlin.resolve.calls.inference.CapturedTypeConstructorImpl
 import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstructor

@@ -159,7 +159,7 @@ class JavaIncompatibilityRulesOverridabilityCondition : ExternalOverridabilityCo
             val classDescriptor =
                 f.containingDeclaration as? ClassDescriptor ?: return false
             val parameterClass =
-                f.valueParameters.single().type.constructor.declarationDescriptor as? ClassDescriptor
+                f.valueParameters.single().type.constructor.getDeclarationDescriptor() as? ClassDescriptor
                     ?: return false
             return KotlinBuiltIns.isPrimitiveClass(classDescriptor) && classDescriptor.fqNameSafe == parameterClass.fqNameSafe
         }

@@ -8,9 +8,7 @@ package org.jetbrains.kotlin.library.impl
 import org.jetbrains.kotlin.library.SerializedIrFile
 import org.jetbrains.kotlin.library.components.KlibIrComponentLayout
 import org.jetbrains.kotlin.library.writer.KlibComponentWriter
-import java.nio.file.Path
-import kotlin.io.path.absolute
-import kotlin.io.path.createDirectories
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 /**
  * An implementation of [KlibComponentWriter] that writes IR to the constructed Klib library.

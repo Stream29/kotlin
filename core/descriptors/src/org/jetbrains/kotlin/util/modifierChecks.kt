@@ -16,6 +16,11 @@
 
 package org.jetbrains.kotlin.util
 
+import org.jetbrains.kotlin.builtins.*
+
+import org.jetbrains.kotlin.resolve.scopes.receivers.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.ReflectionTypes
 import org.jetbrains.kotlin.descriptors.*

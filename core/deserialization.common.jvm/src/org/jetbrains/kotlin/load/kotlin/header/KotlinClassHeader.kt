@@ -5,7 +5,11 @@
 
 package org.jetbrains.kotlin.load.kotlin.header
 
-import org.jetbrains.kotlin.load.java.JvmAnnotationNames.*
+import org.jetbrains.kotlin.load.java.JvmAnnotationNames.METADATA_MULTIFILE_PARTS_INHERIT_FLAG
+import org.jetbrains.kotlin.load.java.JvmAnnotationNames.METADATA_JVM_IR_FLAG
+import org.jetbrains.kotlin.load.java.JvmAnnotationNames.METADATA_JVM_IR_STABLE_ABI_FLAG
+import org.jetbrains.kotlin.load.java.JvmAnnotationNames.METADATA_PRE_RELEASE_FLAG
+import org.jetbrains.kotlin.load.java.JvmAnnotationNames.METADATA_SCRIPT_FLAG
 import org.jetbrains.kotlin.load.kotlin.header.KotlinClassHeader.MultifileClassKind.DELEGATING
 import org.jetbrains.kotlin.load.kotlin.header.KotlinClassHeader.MultifileClassKind.INHERITING
 import org.jetbrains.kotlin.metadata.deserialization.MetadataVersion
@@ -32,7 +36,6 @@ class KotlinClassHeader(
         companion object {
             private val entryById = values().associateBy(Kind::id)
 
-            @JvmStatic
             fun getById(id: Int) = entryById[id] ?: UNKNOWN
         }
     }

@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.builtins.jvm
 
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor

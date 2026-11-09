@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlin.builtins
 
+import org.jetbrains.kotlin.descriptors.impl.*
+
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.builtins.StandardNames.CONTINUATION_INTERFACE_FQ_NAME
 import org.jetbrains.kotlin.builtins.StandardNames.COROUTINES_PACKAGE_FQ_NAME
 import org.jetbrains.kotlin.descriptors.ClassKind

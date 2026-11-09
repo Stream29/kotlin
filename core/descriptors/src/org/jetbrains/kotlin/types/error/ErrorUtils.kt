@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlin.types.error
 
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.resolve.scopes.receivers.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -19,7 +23,7 @@ import org.jetbrains.kotlin.types.typeUtil.isUnresolvedType
 
 object ErrorUtils {
     val errorModule: ModuleDescriptor = ErrorModuleDescriptor
-    val errorClass: ErrorClassDescriptor = ErrorClassDescriptor(Name.special(ErrorEntity.ERROR_CLASS.debugText.format("unknown class")))
+    val errorClass: ErrorClassDescriptor = ErrorClassDescriptor(Name.special(formatErrorMessage(ErrorEntity.ERROR_CLASS.debugText, "unknown class")))
 
     // Do not move it into AbstractTypeConstructor.Companion because of cycle in initialization(see KT-13264)
     val errorTypeForLoopInSupertypes: KotlinType = createErrorType(ErrorTypeKind.CYCLIC_SUPERTYPES)
@@ -51,15 +55,12 @@ object ErrorUtils {
         return false
     }
 
-    @JvmStatic
     fun createErrorScope(kind: ErrorScopeKind, vararg formatParams: String): ErrorScope =
         createErrorScope(kind, throwExceptions = false, *formatParams)
 
-    @JvmStatic
     fun createErrorScope(kind: ErrorScopeKind, throwExceptions: Boolean, vararg formatParams: String): ErrorScope =
         if (throwExceptions) ThrowingScope(kind, *formatParams) else ErrorScope(kind, *formatParams)
 
-    @JvmStatic
     fun createErrorType(kind: ErrorTypeKind, vararg formatParams: String): ErrorType =
         createErrorTypeWithArguments(kind, emptyList(), *formatParams)
 
@@ -92,13 +93,11 @@ object ErrorUtils {
         return false
     }
 
-    @JvmStatic
     fun isError(candidate: DeclarationDescriptor?): Boolean =
         candidate != null && (isErrorClass(candidate) || isErrorClass(candidate.containingDeclaration) || candidate === errorModule)
 
     private fun isErrorClass(candidate: DeclarationDescriptor?): Boolean = candidate is ErrorClassDescriptor
 
-    @JvmStatic
     fun isUninferredTypeVariable(type: KotlinType?): Boolean {
         if (type == null) return false
         val constructor = type.constructor

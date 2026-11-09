@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.library.components.KlibMetadataConstants.KLIB_ROOT_P
 import org.jetbrains.kotlin.library.impl.KlibMetadataComponentImpl
 import org.jetbrains.kotlin.library.metadata.KlibMetadataProtoBuf
 import org.jetbrains.kotlin.metadata.ProtoBuf
-import java.nio.file.Path
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 /**
  * This component provides read access to Klib metadata.

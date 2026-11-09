@@ -16,6 +16,9 @@
 
 package org.jetbrains.kotlin.serialization.deserialization
 
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.*

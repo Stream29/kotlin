@@ -16,6 +16,10 @@
 
 package org.jetbrains.kotlin.builtins.functions
 
+import org.jetbrains.kotlin.descriptors.impl.*
+import org.jetbrains.kotlin.resolve.scopes.receivers.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.builtins.extractParameterNameFromFunctionTypeArgument
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations

@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.resolve.jvm
 
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.*

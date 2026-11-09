@@ -59,7 +59,9 @@ import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.utils.SmartSet
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.ifEmpty
-import java.util.*
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.descriptors.impl.*
 
 @K1Deprecation
 class LazyJavaClassMemberScope(
@@ -724,7 +726,7 @@ class LazyJavaClassMemberScope(
             classDescriptor, Annotations.EMPTY, /* isPrimary = */ true, c.components.sourceElementFactory.source(jClass)
         )
         val valueParameters = if (isAnnotation) createAnnotationConstructorParameters(constructorDescriptor)
-        else Collections.emptyList<ValueParameterDescriptor>()
+        else emptyList<ValueParameterDescriptor>()
         constructorDescriptor.setHasSynthesizedParameterNames(false)
 
         constructorDescriptor.initialize(valueParameters, getConstructorVisibility(classDescriptor))

@@ -8,7 +8,6 @@ package org.jetbrains.kotlin.library.impl
 import org.jetbrains.kotlin.library.KlibLayoutReader
 import org.jetbrains.kotlin.library.components.KlibIrComponent
 import org.jetbrains.kotlin.library.components.KlibIrComponentLayout
-import kotlin.io.path.exists
 
 /**
  * The default implementation of [KlibIrComponent].

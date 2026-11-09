@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.types.error
 
+import org.jetbrains.kotlin.descriptors.impl.*
+
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl

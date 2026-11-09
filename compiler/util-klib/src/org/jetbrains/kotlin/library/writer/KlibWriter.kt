@@ -14,15 +14,10 @@ import org.jetbrains.kotlin.library.impl.KlibManifestComponentWriterImpl
 import org.jetbrains.kotlin.library.impl.KlibManifestComponentWriterImpl.Companion.NON_CUSTOMIZED_PROPERTY_NAMES
 import org.jetbrains.kotlin.library.impl.KlibManifestComponentWriterImpl.Companion.getPropertyNameForListOfTargetNames
 import org.jetbrains.kotlin.library.impl.KlibResourcesComponentWriterImpl
-import java.nio.file.Files.createTempDirectory
-import java.nio.file.Path
-import java.util.*
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.Path
-import kotlin.io.path.absolute
-import kotlin.io.path.createDirectories
-import kotlin.io.path.deleteRecursively
-import kotlin.io.path.exists
+import org.jetbrains.kotlin.library.KlibFiles.createTempDirectory
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.konan.properties.Properties
+import org.jetbrains.kotlin.library.createDirectories
 
 /**
  * The [KlibWriter] component is the unified endpoint for writing [KotlinLibrary] artifacts to the file system.
@@ -92,7 +87,6 @@ class KlibWriter(init: KlibWriterSpec.() -> Unit) {
         }.init()
     }
 
-    @OptIn(ExperimentalPathApi::class)
     fun writeTo(destinationPath: Path) {
         check(!allowIncrementalOverwriting || format != KlibFormat.ZipArchive) {
             "Writing a KLIB in ZIP format if `allowIncrementalOverwriting` is set to `true` is not supported."

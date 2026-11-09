@@ -16,6 +16,10 @@
 
 package org.jetbrains.kotlin.load.java.lazy.descriptors
 
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.impl.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement

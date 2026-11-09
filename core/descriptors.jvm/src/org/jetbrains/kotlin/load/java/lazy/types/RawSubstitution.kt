@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.load.java.lazy.types
 
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.types.TypeUsage
 import org.jetbrains.kotlin.resolve.descriptorUtil.classId

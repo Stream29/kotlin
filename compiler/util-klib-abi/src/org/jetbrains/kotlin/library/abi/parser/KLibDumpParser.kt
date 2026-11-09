@@ -21,8 +21,9 @@ package org.jetbrains.kotlin.library.abi.parser
 import org.jetbrains.kotlin.library.abi.*
 import org.jetbrains.kotlin.library.abi.impl.*
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
-import java.io.File
-import java.text.ParseException
+import org.jetbrains.kotlin.konan.file.File
+
+class ParseException(message: String, val errorOffset: Int) : Exception(message)
 
 /**
  * Parser for klib dump format created by [org.jetbrains.kotlin.library.abi.LibraryAbiRenderer]

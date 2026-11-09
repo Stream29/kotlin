@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
 
 object ConstUtil {
-    @JvmStatic fun canBeUsedForConstVal(type: KotlinType) = type.canBeUsedForConstVal()
+    fun canBeUsedForConstVal(type: KotlinType) = type.canBeUsedForConstVal()
 }
 
 fun KotlinType.canBeUsedForConstVal() =
