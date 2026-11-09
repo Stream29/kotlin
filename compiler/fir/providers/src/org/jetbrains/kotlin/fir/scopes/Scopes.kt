@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.fir.scopes
 
-import org.jetbrains.annotations.TestOnly
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
@@ -23,7 +22,6 @@ fun ConeClassLikeLookupTag.getNestedClassifierScope(session: FirSession, scopeSe
  * Use this function to collect direct overridden tree for debug purposes
  */
 @Suppress("unused")
-@TestOnly
 fun debugCollectOverrides(symbol: FirCallableSymbol<*>, session: FirSession, scopeSession: ScopeSession): Map<Any, Any> {
     val scope = symbol.dispatchReceiverType?.scope(
         session,
@@ -35,7 +33,6 @@ fun debugCollectOverrides(symbol: FirCallableSymbol<*>, session: FirSession, sco
     return debugCollectOverrides(symbol, scope)
 }
 
-@TestOnly
 fun debugCollectOverrides(symbol: FirCallableSymbol<*>, scope: FirTypeScope): Map<Any, Any> {
     fun process(scope: FirTypeScope, symbol: FirCallableSymbol<*>): Map<Any, Any> {
         val result = mutableMapOf<Any, Any>()

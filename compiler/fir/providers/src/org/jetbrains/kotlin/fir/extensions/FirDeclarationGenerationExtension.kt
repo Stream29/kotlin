@@ -129,7 +129,7 @@ sealed class DeclarationGenerationContext<T : FirContainingNamesAwareScope>(
     }
 
     override fun equals(other: Any?): Boolean {
-        if (this.javaClass !== other?.javaClass) {
+        if (other == null || this::class != other::class) {
             return false
         }
         require(other is DeclarationGenerationContext<*>)

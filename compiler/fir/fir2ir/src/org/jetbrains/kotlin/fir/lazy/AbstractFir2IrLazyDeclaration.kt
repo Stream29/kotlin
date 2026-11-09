@@ -5,9 +5,13 @@
 
 package org.jetbrains.kotlin.fir.lazy
 
+import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.fir.backend.Fir2IrComponents
+import org.jetbrains.kotlin.fir.declarations.FirCallableDeclaration
+import org.jetbrains.kotlin.fir.declarations.FirClassLikeDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
+import org.jetbrains.kotlin.fir.declarations.utils.sourceElement
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirExpressionEvaluator
@@ -23,10 +27,17 @@ import org.jetbrains.kotlin.ir.declarations.lazy.lazyVar
 import org.jetbrains.kotlin.ir.expressions.IrAnnotation
 import kotlin.properties.ReadWriteProperty
 
-interface AbstractFir2IrLazyDeclaration<F> :
-    IrDeclaration, IrLazyDeclarationBase, Fir2IrComponents where F : FirDeclaration {
+interface Fir2IrLazyDeclaration<F> :
+    AbstractFir2IrLazyDeclaration<Any>, IrDeclaration, IrLazyDeclarationBase, Fir2IrComponents where F : FirDeclaration {
 
-    val fir: F
+    override val fir: F
+
+    override val containerSourceElement: SourceElement?
+        get() = when (val f = fir) {
+            is FirCallableDeclaration -> f.containerSource
+            is FirClassLikeDeclaration -> f.sourceElement
+            else -> null
+        }
 
     override val factory: IrFactory
         get() = IrFactoryImpl

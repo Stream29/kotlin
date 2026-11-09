@@ -286,7 +286,6 @@ interface ExpectActualMatchingContext<T : DeclarationSymbolMarker> : TypeSystemC
     )
 
     companion object {
-        @JvmStatic
         val abstractMutableListModCountCallableId = CallableId(
             ClassId(FqName("kotlin.collections"), Name.identifier("AbstractMutableList")),
             Name.identifier("modCount")

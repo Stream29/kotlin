@@ -1376,7 +1376,7 @@ class CallAndReferenceGenerator(
 
                 val typeProjection = parametersSubstitutor.substituteArgument(typeArgument, index) ?: typeArgument
                 val type = typeProjection as? ConeKotlinType
-                    ?: ConeErrorType(diagnostic = ConeSimpleDiagnostic("Expansion contains unexpected type ${typeProjection.javaClass}"))
+                    ?: ConeErrorType(diagnostic = ConeSimpleDiagnostic("Expansion contains unexpected type ${typeProjection::class}"))
                 add(type)
             }
         }
@@ -1565,7 +1565,7 @@ class CallAndReferenceGenerator(
                 // no receivers
             }
 
-            else -> error("Can't apply receivers of ${statement.javaClass.simpleName} to ${this.javaClass.simpleName}")
+            else -> error("Can't apply receivers of ${statement::class.simpleName} to ${this::class.simpleName}")
         }
 
         return ReceiverInfo(hasDispatchReceiver, hasExtensionReceiver)

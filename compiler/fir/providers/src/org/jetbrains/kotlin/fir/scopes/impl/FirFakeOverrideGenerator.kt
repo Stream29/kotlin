@@ -943,7 +943,7 @@ object FirFakeOverrideGenerator {
             message = {
                 "Status should be resolved for a declaration to create its fake override, " +
                         "otherwise the status of the fake override will never be resolved." +
-                        "The status was unresolved for ${member::class.java.simpleName}"
+                        "The status was unresolved for ${member::class.simpleName}"
             }
         ) {
             withFirEntry("declaration", member)

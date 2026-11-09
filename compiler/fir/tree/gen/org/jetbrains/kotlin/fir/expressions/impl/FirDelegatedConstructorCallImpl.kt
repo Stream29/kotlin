@@ -93,7 +93,7 @@ internal class FirDelegatedConstructorCallImpl(
     }
 
     override fun replaceConeTypeOrNull(newConeTypeOrNull: ConeKotlinType?) {
-        require(newConeTypeOrNull == coneTypeOrNull) { "${javaClass.simpleName}.replaceConeTypeOrNull() called with invalid type '${newConeTypeOrNull}'. Current type is '$coneTypeOrNull'" }
+        require(newConeTypeOrNull == coneTypeOrNull) { "${this::class.simpleName}.replaceConeTypeOrNull() called with invalid type '${newConeTypeOrNull}'. Current type is '$coneTypeOrNull'" }
     }
 
     override fun replaceConstructedTypeRef(newConstructedTypeRef: FirTypeRef) {

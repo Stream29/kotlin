@@ -59,5 +59,5 @@ interface DescriptorSerializerPlugin {
     }
 
     companion object : ProjectExtensionDescriptor<DescriptorSerializerPlugin>(
-        "org.jetbrains.kotlin.DescriptorSerializerPlugin", DescriptorSerializerPlugin::class.java)
+        "org.jetbrains.kotlin.DescriptorSerializerPlugin", DescriptorSerializerPlugin::class)
 }

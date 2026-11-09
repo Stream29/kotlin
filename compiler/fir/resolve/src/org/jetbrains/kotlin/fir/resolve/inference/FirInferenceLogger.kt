@@ -155,14 +155,19 @@ open class FirInferenceLogger : InferenceLogger(), FirSessionComponent {
         // The constraint position must be rendered right away, because it may contain
         // FIR renders, and the FIR may have changed by the time we finish inference.
         val element = InitialConstraintElement(formatConstraint(constraint), sanitizeFqNames(constraint.position.toString()))
-        initialConstraintToKnownElement.putIfAbsent(constraint, element)
+        if (constraint !in initialConstraintToKnownElement) {
+            initialConstraintToKnownElement[constraint] = element
+        }
         currentBlockItemElements += element
     }
 
     override fun log(variable: TypeVariableMarker, constraint: Constraint, system: ConstraintSystemMarker) {
         prepareProperBlock(system)
         val element = VariableConstraintElement(formatConstraint(variable, constraint), origins)
-        variableConstraintToKnownElement.putIfAbsent(variable to constraint, element)
+        val key = variable to constraint
+        if (key !in variableConstraintToKnownElement) {
+            variableConstraintToKnownElement[key] = element
+        }
         currentBlockItemElements += element
     }
 
@@ -260,7 +265,6 @@ open class FirInferenceLogger : InferenceLogger(), FirSessionComponent {
     }
 
     companion object {
-        @JvmStatic
         protected fun formatConstraint(constraint: InitialConstraint): String {
             return when (constraint.constraintKind) {
                 ConstraintKind.UPPER -> "${constraint.a} <: ${constraint.b}"
@@ -269,7 +273,6 @@ open class FirInferenceLogger : InferenceLogger(), FirSessionComponent {
             }
         }
 
-        @JvmStatic
         protected fun formatConstraint(variable: TypeVariableMarker, constraint: Constraint): String {
             return when (constraint.kind) {
                 ConstraintKind.LOWER -> "${constraint.type} <: $variable"
@@ -280,7 +283,6 @@ open class FirInferenceLogger : InferenceLogger(), FirSessionComponent {
 
         private val fqNameRegex = """(?:\w+\.)*(\w+)@\w+""".toRegex()
 
-        @JvmStatic
         fun sanitizeFqNames(string: String): String = string.replace(fqNameRegex, "$1")
     }
 }

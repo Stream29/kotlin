@@ -84,7 +84,7 @@ class FirModuleDescriptor private constructor(
     override val stableName: Name
         get() = name
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         shouldNotBeCalled()
     }
 

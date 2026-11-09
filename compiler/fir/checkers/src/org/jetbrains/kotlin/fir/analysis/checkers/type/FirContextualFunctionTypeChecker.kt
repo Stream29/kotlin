@@ -56,8 +56,8 @@ object FirContextualFunctionTypeChecker : FirResolvedTypeRefChecker(MppCheckerKi
         fun PsiElement.findContextReceiverListSource(): KtPsiSourceElement? {
             return when (this) {
                 is KtTypeReference -> typeElement?.findContextReceiverListSource()
-                is KtNullableType -> innerType?.findContextReceiverListSource()
-                is KtFunctionType -> contextParameterList?.toKtPsiSourceElement()
+                is KtNullableType -> getInnerType()?.findContextReceiverListSource()
+                is KtFunctionType -> getContextParameterList()?.toKtPsiSourceElement()
                 else -> null
             }
         }

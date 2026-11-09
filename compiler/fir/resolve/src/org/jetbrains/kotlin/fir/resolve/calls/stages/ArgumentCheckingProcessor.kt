@@ -153,7 +153,7 @@ internal object ArgumentCheckingProcessor {
 
             is ConeSimpleLeafResolutionAtom, is ConeAtomWithCandidate -> resolvePlainExpressionArgument(atom)
 
-            is ConePostponedResolvedAtom -> error("Unexpected type of atom: ${atom::class.java}")
+            is ConePostponedResolvedAtom -> error("Unexpected type of atom: ${atom::class}")
             is ConeResolutionAtomWithSingleChild -> {
                 when (atom.expression) {
                     // x?.bar() is desugared to `x SAFE-CALL-OPERATOR { $not-null-receiver$.bar() }`

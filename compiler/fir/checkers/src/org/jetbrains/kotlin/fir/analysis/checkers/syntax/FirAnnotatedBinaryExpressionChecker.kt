@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors
 import org.jetbrains.kotlin.fir.expressions.FirStatement
 import org.jetbrains.kotlin.psi.KtAnnotatedExpression
 import org.jetbrains.kotlin.psi.KtBinaryExpression
-import org.jetbrains.kotlin.psi.KtPsiUtil.isStatementContainer
+import org.jetbrains.kotlin.psi.KtPsiUtil.Companion.isStatementContainer
 
 object FirAnnotatedBinaryExpressionChecker : FirExpressionSyntaxChecker<FirStatement, PsiElement>() {
     override fun isApplicable(element: FirStatement, source: KtSourceElement): Boolean {
@@ -24,7 +24,7 @@ object FirAnnotatedBinaryExpressionChecker : FirExpressionSyntaxChecker<FirState
     }
 
     private val KtSourceElement.hasAnnotatedLhs: Boolean
-        get() = (psi as? KtBinaryExpression)?.left is KtAnnotatedExpression
+        get() = (psi as? KtBinaryExpression)?.getLeft() is KtAnnotatedExpression
                 || treeStructure.getChildrenArray(lighterASTNode).firstOrNull()?.tokenType == KtNodeTypes.ANNOTATED_EXPRESSION
 
     context(context: CheckerContext, reporter: DiagnosticReporter)
@@ -37,7 +37,7 @@ object FirAnnotatedBinaryExpressionChecker : FirExpressionSyntaxChecker<FirState
         var parent = current.parent
 
         while (parent is KtBinaryExpression) {
-            if (parent.left != current) {
+            if (parent.getLeft() != current) {
                 return
             }
 

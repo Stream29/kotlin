@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.fir.resolve.transformers
 
+import org.jetbrains.kotlin.fir.resolve.FirNodeReplacingTransformer
+
 import org.jetbrains.kotlin.KtFakeSourceElementKind
 import org.jetbrains.kotlin.builtins.functions.FunctionTypeKind
 import org.jetbrains.kotlin.config.LanguageFeature
@@ -585,7 +587,7 @@ class FirCallCompletionResultsWriterTransformer(
     ) {
         val mapping = (argumentList as? FirResolvedArgumentList)?.mapping
 
-        class ArgumentTransformer : FirTransformer<Nothing?>() {
+        class ArgumentTransformer : FirNodeReplacingTransformer<Nothing?>() {
             override fun <E : FirElement> transformElement(element: E, data: Nothing?): E {
                 // We want to handle only the most top-level "real" expressions
                 // We only recursively transform named, spread, lambda argument and vararg expressions.
@@ -1216,7 +1218,7 @@ class FirCallCompletionResultsWriterTransformer(
         return map { returnInfo ->
             val replacement = replacements[returnInfo.expression] ?: return@map returnInfo
 
-            class ReturnExpressionReplacer : FirTransformer<Nothing?>() {
+            class ReturnExpressionReplacer : FirNodeReplacingTransformer<Nothing?>() {
                 override fun <E : FirElement> transformElement(element: E, data: Nothing?): E {
                     @Suppress("UNCHECKED_CAST")
                     return when {

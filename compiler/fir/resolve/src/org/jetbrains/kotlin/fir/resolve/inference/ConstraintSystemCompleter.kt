@@ -507,7 +507,7 @@ class ConstraintSystemCompleter(components: BodyResolveComponents) {
                     candidateProcessor = { candidate ->
                         if (isPostponedAtomFoundForAssertion != null) {
                             for (atom in candidate.postponedAtoms) {
-                                isPostponedAtomFoundForAssertion.computeIfAbsent(atom) { false }
+                                isPostponedAtomFoundForAssertion.getOrPut(atom) { false }
                             }
                         }
                     },

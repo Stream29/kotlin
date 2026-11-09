@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.fir.serialization.FirKLibSerializerExtension
 import org.jetbrains.kotlin.fir.serialization.serializeSingleFirFile
 import org.jetbrains.kotlin.metadata.ProtoBuf
 import org.jetbrains.kotlin.util.metadataVersion
-import java.io.File
+import nativekotlin.host.files.NativeFile as File
 
 /**
  * Responsible for serializing a FIR file metadata into a protobuf to be later written to a KLIB.

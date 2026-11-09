@@ -7,7 +7,8 @@ package org.jetbrains.kotlin.fir.expressions
 
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.util.OperatorNameConventions
-import java.util.*
+import org.jetbrains.kotlin.utils.addToStdlib.EnumMap
+import org.jetbrains.kotlin.utils.addToStdlib.EnumSet
 
 enum class FirOperation(val operator: String = "???") {
     // Binary

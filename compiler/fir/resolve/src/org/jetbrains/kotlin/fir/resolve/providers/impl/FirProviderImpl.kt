@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.fir.resolve.providers.impl
 
-import org.jetbrains.annotations.TestOnly
 import org.jetbrains.kotlin.fir.*
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.synthetic.FirSyntheticProperty
@@ -112,7 +111,7 @@ class FirProviderImpl(val session: FirSession, val kotlinScopeProvider: FirKotli
 
     private fun recordFile(file: FirFile, state: State) {
         val packageName = file.packageFqName
-        state.fileMap.merge(packageName, listOf(file)) { a, b -> a + b }
+        state.fileMap[packageName] = state.fileMap[packageName]?.let { it + file } ?: listOf(file)
         generateSequence(packageName) { it.parentOrNull() }.forEach(state.allSubPackages::add)
         file.acceptChildren(FirRecorder, FirRecorderData(state, file, session.nameConflictsTracker))
     }
@@ -175,7 +174,7 @@ class FirProviderImpl(val session: FirSession, val kotlinScopeProvider: FirKotli
             // TODO: KT-78984: we shouldn't call this function for symbols with callableId == null
             val callableId = symbol.callableId
                 ?: return // For scripts, we can come here with local variables like <local>/<destruct>
-            map.merge(callableId, listOf(symbol)) { a, b -> a + b }
+            map[callableId] = map[callableId]?.let { it + symbol } ?: listOf(symbol)
             data.state.callableContainerMap[symbol] = data.file
         }
 
@@ -276,7 +275,6 @@ class FirProviderImpl(val session: FirSession, val kotlinScopeProvider: FirKotli
         return state.classifierMap[classId]
     }
 
-    @TestOnly
     fun ensureConsistent(files: List<FirFile>) {
         val newState = State()
         files.forEach { recordFile(it, newState) }

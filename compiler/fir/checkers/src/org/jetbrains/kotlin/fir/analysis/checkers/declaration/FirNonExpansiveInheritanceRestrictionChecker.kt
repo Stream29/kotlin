@@ -167,7 +167,7 @@ object FirNonExpansiveInheritanceRestrictionChecker : FirRegularClassChecker(Mpp
 
         private fun collectReachable(from: T): List<T> {
             val handler = object : DFS.NodeHandlerWithListResult<T, T>() {
-                override fun afterChildren(current: T?) {
+                override fun afterChildren(current: T) {
                     result.add(current)
                 }
             }

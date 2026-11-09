@@ -707,7 +707,7 @@ class ConeSimpleConstraintSystemImpl(val system: NewConstraintSystemImpl, val se
             for (upperBound in typeParameter.symbol.resolvedBounds) {
                 addSubtypeConstraint(
                     substitutionMap[typeParameter.typeParameterSymbol]
-                        ?: errorWithAttachment("No ${typeParameter.symbol.fir::class.java} in substitution map") {
+                        ?: errorWithAttachment("No ${typeParameter.symbol.fir::class} in substitution map") {
                             withFirEntry("typeParameter", typeParameter.symbol.fir)
                         },
                     substitutor.substituteOrSelf(adjustedUpperBoundForTypeParameter(typeParameter, upperBound.coneType))

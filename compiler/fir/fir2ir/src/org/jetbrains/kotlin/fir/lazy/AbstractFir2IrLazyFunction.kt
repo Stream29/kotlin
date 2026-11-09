@@ -31,7 +31,7 @@ abstract class AbstractFir2IrLazyFunction<F : FirCallableDeclaration>(
     override val symbol: IrSimpleFunctionSymbol,
     parent: IrDeclarationParent,
     override var isFakeOverride: Boolean,
-) : IrSimpleFunction(), IrLazyFunctionBase, AbstractFir2IrLazyDeclaration<F>, Fir2IrTypeParametersContainer,
+) : IrSimpleFunction(), IrLazyFunctionBase, Fir2IrLazyDeclaration<F>, Fir2IrTypeParametersContainer,
     Fir2IrComponents by c {
     init {
         this.parent = parent
@@ -97,9 +97,9 @@ abstract class AbstractFir2IrLazyFunction<F : FirCallableDeclaration>(
     }
 
     override val factory: IrFactory
-        get() = super<AbstractFir2IrLazyDeclaration>.factory
+        get() = super<Fir2IrLazyDeclaration>.factory
 
     override fun createLazyAnnotations(): ReadWriteProperty<Any?, List<IrAnnotation>> {
-        return super<AbstractFir2IrLazyDeclaration>.createLazyAnnotations()
+        return super<Fir2IrLazyDeclaration>.createLazyAnnotations()
     }
 }

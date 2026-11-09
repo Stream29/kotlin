@@ -537,7 +537,7 @@ fun FirBasedSymbol<*>.getOwnerLookupTag(): ConeClassLikeLookupTag? {
         is FirClassLikeSymbol<*> -> getContainingClassLookupTag()
         is FirCallableSymbol<*> -> containingClassLookupTag()
         is FirScriptSymbol, is FirCodeFragmentSymbol -> null
-        else -> errorWithAttachment("Unsupported owner search for ${fir::class.java}") {
+        else -> errorWithAttachment("Unsupported owner search for ${fir::class}") {
             withFirEntry("ownerDeclaration", fir)
         }
     }

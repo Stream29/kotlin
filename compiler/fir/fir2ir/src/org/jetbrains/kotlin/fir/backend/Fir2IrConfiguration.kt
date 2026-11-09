@@ -67,14 +67,14 @@ class Fir2IrConfiguration private constructor(
                 inlineConstTracker = compilerConfiguration[CommonConfigurationKeys.INLINE_CONST_TRACKER],
                 expectActualTracker = compilerConfiguration[CommonConfigurationKeys.EXPECT_ACTUAL_TRACKER],
                 allowNonCachedDeclarations = false,
-                skipBodies = compilerConfiguration.getBoolean(JVMConfigurationKeys.SKIP_BODIES),
+                skipBodies = false,
                 irVerificationSettings = IrVerificationSettings(
                     mode = compilerConfiguration.get(CommonConfigurationKeys.VERIFY_IR, IrVerificationMode.NONE),
                     disableIrCheckers = compilerConfiguration.disableIrCheckers,
                     additionalIrCheckers = compilerConfiguration.additionalIrCheckers,
                     validateForKlibSerialization = false,
                 ),
-                carefulApproximationOfContravariantProjectionForSam = compilerConfiguration.get(JVMConfigurationKeys.SAM_CONVERSIONS) != JvmClosureGenerationScheme.CLASS,
+                carefulApproximationOfContravariantProjectionForSam = false,
                 propagateLazyIrPrivateMembers = false,
             )
 
@@ -89,14 +89,14 @@ class Fir2IrConfiguration private constructor(
                 inlineConstTracker = compilerConfiguration[CommonConfigurationKeys.INLINE_CONST_TRACKER],
                 expectActualTracker = compilerConfiguration[CommonConfigurationKeys.EXPECT_ACTUAL_TRACKER],
                 allowNonCachedDeclarations = false,
-                skipBodies = compilerConfiguration.getBoolean(JVMConfigurationKeys.SKIP_BODIES),
+                skipBodies = false,
                 irVerificationSettings = IrVerificationSettings(
                     mode = compilerConfiguration.get(CommonConfigurationKeys.VERIFY_IR, IrVerificationMode.NONE),
                     disableIrCheckers = compilerConfiguration.disableIrCheckers,
                     additionalIrCheckers = compilerConfiguration.additionalIrCheckers,
                     validateForKlibSerialization = false,
                 ),
-                carefulApproximationOfContravariantProjectionForSam = compilerConfiguration.get(JVMConfigurationKeys.SAM_CONVERSIONS) != JvmClosureGenerationScheme.CLASS,
+                carefulApproximationOfContravariantProjectionForSam = false,
                 propagateLazyIrPrivateMembers = true,
             )
 
@@ -141,7 +141,7 @@ class Fir2IrConfiguration private constructor(
                     additionalIrCheckers = compilerConfiguration.additionalIrCheckers,
                     validateForKlibSerialization = false,
                 ),
-                carefulApproximationOfContravariantProjectionForSam = compilerConfiguration.get(JVMConfigurationKeys.SAM_CONVERSIONS) != JvmClosureGenerationScheme.CLASS,
+                carefulApproximationOfContravariantProjectionForSam = false,
                 propagateLazyIrPrivateMembers = false,
             )
     }

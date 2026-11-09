@@ -426,7 +426,7 @@ class FirSubstitutionOverrideStorage(val session: FirSession) : FirSessionCompon
                 when (original) {
                     is FirPropertySymbol -> scope.createSubstitutionOverrideProperty(original)
                     is FirFieldSymbol -> scope.createSubstitutionOverrideField(original)
-                    else -> errorWithAttachment("symbol ${original::class.java} is not overridable") {
+                    else -> errorWithAttachment("symbol ${original::class} is not overridable") {
                         withFirEntry("original", original.fir)
                     }
                 }

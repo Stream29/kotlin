@@ -30,7 +30,6 @@ abstract class PathAwareControlFlowGraphVisitor<K : Any, V : Any>(
 
     abstract fun mergeInfo(a: ControlFlowInfo<K, V>, b: ControlFlowInfo<K, V>, node: CFGNode<*>): ControlFlowInfo<K, V>
 
-    @JvmName("mergePathAwareInfo")
     fun mergeInfo(a: PathAwareControlFlowInfo<K, V>, b: PathAwareControlFlowInfo<K, V>, node: CFGNode<*>): PathAwareControlFlowInfo<K, V> =
         a.merge(b) { left, right -> mergeInfo(left, right, node) }
 

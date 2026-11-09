@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.serialization.SerializerExtensionProtocol
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
 import org.jetbrains.kotlin.serialization.deserialization.getName
 import org.jetbrains.kotlin.utils.mapToSetOrEmpty
-import java.nio.file.Path
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 class PackagePartsCacheData(
     val proto: ProtoBuf.Package,

@@ -45,7 +45,7 @@ class Fir2IrLazyField(
     val containingClass: FirRegularClass?,
     override val symbol: IrFieldSymbol,
     correspondingPropertySymbol: IrPropertySymbol?
-) : IrField(), AbstractFir2IrLazyDeclaration<FirField>, Fir2IrComponents by c {
+) : IrField(), Fir2IrLazyDeclaration<FirField>, Fir2IrComponents by c {
     init {
         symbol.bind(this)
     }

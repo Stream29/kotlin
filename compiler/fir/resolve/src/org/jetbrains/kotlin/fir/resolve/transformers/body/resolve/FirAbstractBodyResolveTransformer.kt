@@ -77,7 +77,6 @@ abstract class FirAbstractBodyResolveTransformer(phase: FirResolvePhase) : FirAb
     }
 
     private fun suppressOrThrowError(message: String, element: FirElement) {
-        if (System.getProperty("kotlin.suppress.lazy.expression.access").toBoolean()) return
         errorWithAttachment(message) {
             withFirEntry("firElement", element)
         }

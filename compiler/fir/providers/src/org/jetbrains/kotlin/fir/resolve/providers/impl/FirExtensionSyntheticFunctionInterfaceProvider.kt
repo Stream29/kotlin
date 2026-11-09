@@ -39,7 +39,7 @@ import org.jetbrains.kotlin.name.*
 import org.jetbrains.kotlin.resolve.ReturnValueStatus
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.util.OperatorNameConventions
-import java.util.concurrent.ConcurrentHashMap
+import org.jetbrains.kotlin.storage.ConcurrentHashMap
 
 /**
  * Provides function interfaces for function kinds from compiler plugins

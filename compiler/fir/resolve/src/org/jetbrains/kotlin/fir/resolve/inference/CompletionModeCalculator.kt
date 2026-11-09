@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.resolve.calls.model.CollectionLiteralAtomMarker
 import org.jetbrains.kotlin.types.AbstractTypeChecker
 import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.utils.newLinkedHashMapWithExpectedSize
-import java.util.*
 
 fun Candidate.computeCompletionMode(
     components: InferenceComponents,
@@ -65,7 +64,7 @@ private class CalculatorForNestedCall(
     private val fixationDirectionsForVariables: MutableMap<VariableWithConstraints, FixationDirection> =
         newLinkedHashMapWithExpectedSize(context.notFixedTypeVariables.size)
     private val variablesWithQueuedConstraints = mutableSetOf<TypeVariableMarker>()
-    private val typesToProcess: Queue<KotlinTypeMarker> = ArrayDeque()
+    private val typesToProcess: ArrayDeque<KotlinTypeMarker?> = ArrayDeque()
 
     private val postponedAtoms: List<ConePostponedResolvedAtom> by lazy {
         ConstraintSystemCompleter.getOrderedNotAnalyzedPostponedArguments(candidate)
@@ -107,7 +106,7 @@ private class CalculatorForNestedCall(
 
     private fun CsCompleterContext.computeDirections() {
         while (typesToProcess.isNotEmpty()) {
-            val type = typesToProcess.poll() ?: break
+            val type = typesToProcess.removeFirstOrNull() ?: break
 
             if (!type.contains { it.typeConstructor() in notFixedTypeVariables })
                 continue

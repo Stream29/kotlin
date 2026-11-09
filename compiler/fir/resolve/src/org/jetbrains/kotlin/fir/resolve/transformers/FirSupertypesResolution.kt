@@ -532,7 +532,7 @@ open class FirSupertypeResolverVisitor(
                 }
             }
             if (someTypesWereGenerated && superTypes.isNotEmpty()) {
-                superTypes.removeIf { it.coneType.isAny }
+                superTypes.removeAll { it.coneType.isAny }
             }
             nestedClass.replaceSuperTypeRefs(superTypes)
         }

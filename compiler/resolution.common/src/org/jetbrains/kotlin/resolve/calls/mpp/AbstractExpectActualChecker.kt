@@ -23,7 +23,8 @@ import org.jetbrains.kotlin.types.model.TypeSubstitutorMarker
 import org.jetbrains.kotlin.utils.addToStdlib.enumMapOf
 import org.jetbrains.kotlin.utils.addToStdlib.enumSetOf
 import org.jetbrains.kotlin.utils.zipIfSizesAreEqual
-import java.util.*
+import org.jetbrains.kotlin.utils.addToStdlib.EnumMap
+import org.jetbrains.kotlin.utils.addToStdlib.EnumSet
 
 /**
  * This object is responsible for checking of expect-actual pairs
@@ -524,7 +525,8 @@ object AbstractExpectActualChecker {
         val expectEffectiveModality = effectiveModality(expectModality, expectContainingClassModality)
         val actualEffectiveModality = effectiveModality(actualModality, actualContainingClassModality)
 
-        return actualEffectiveModality in compatibleModalityMap.getValue(expectEffectiveModality)
+        val key = expectEffectiveModality ?: throw NoSuchElementException("Key null is missing in the map.")
+        return actualEffectiveModality in compatibleModalityMap.getValue(key)
     }
 
     /*

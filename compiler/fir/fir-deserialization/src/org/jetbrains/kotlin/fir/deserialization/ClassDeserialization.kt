@@ -333,11 +333,11 @@ fun FirRegularClassBuilder.addCloneForArrayIfNeeded(classId: ClassId, dispatchRe
     }
 }
 
-private fun ProtoBuf.ClassOrBuilder.getPropertyOrderFromMetadataExtension(): Set<Int> {
+private fun ProtoBuf.Class.getPropertyOrderFromMetadataExtension(): Set<Int> {
     return getExtension(SerializationPluginMetadataExtensions.propertiesNamesInProgramOrder).toSet()
 }
 
-private fun ProtoBuf.ClassOrBuilder.propertiesInOrder(
+private fun ProtoBuf.Class.propertiesInOrder(
     versionRequirements: List<VersionRequirement>,
     orderFromExtension: Set<Int>,
 ): List<ProtoBuf.Property> {

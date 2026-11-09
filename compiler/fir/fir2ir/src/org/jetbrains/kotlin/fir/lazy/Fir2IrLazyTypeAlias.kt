@@ -33,7 +33,7 @@ class Fir2IrLazyTypeAlias(
     override val fir: FirTypeAlias,
     override val symbol: IrTypeAliasSymbol,
     parent: IrDeclarationParent,
-) : IrTypeAlias(), AbstractFir2IrLazyDeclaration<FirTypeAlias>, Fir2IrTypeParametersContainer, Fir2IrComponents by c {
+) : IrTypeAlias(), Fir2IrLazyDeclaration<FirTypeAlias>, Fir2IrTypeParametersContainer, Fir2IrComponents by c {
     init {
         this.parent = parent
         symbol.bind(this)

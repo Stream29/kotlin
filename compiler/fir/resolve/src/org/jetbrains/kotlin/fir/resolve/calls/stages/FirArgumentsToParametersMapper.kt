@@ -285,7 +285,7 @@ private class FirCallArgumentsProcessor(
         for ([parameter, resolvedArgument] in result) {
             if (!parameter.isVararg) {
                 if (resolvedArgument !is ResolvedCallArgument.SimpleArgument) {
-                    errorWithAttachment("Incorrect resolved argument for parameter ${parameter::class.java}: ${resolvedArgument::class.java}") {
+                    errorWithAttachment("Incorrect resolved argument for parameter ${parameter::class}: ${resolvedArgument::class}") {
                         withFirEntry("parameter", parameter)
                         withEntryGroup("arguments") {
                             for ([index, argument] in resolvedArgument.arguments.withIndex()) {

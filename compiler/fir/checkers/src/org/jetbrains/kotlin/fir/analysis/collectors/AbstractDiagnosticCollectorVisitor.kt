@@ -233,7 +233,6 @@ abstract class AbstractDiagnosticCollectorVisitor(
     }
 
     private fun suppressOrThrowError(element: FirElement) {
-        if (System.getProperty("kotlin.suppress.lazy.expression.access").toBoolean()) return
         errorWithAttachment("${element::class.simpleName} should be calculated before accessing") {
             withFirEntry("firElement", element)
         }

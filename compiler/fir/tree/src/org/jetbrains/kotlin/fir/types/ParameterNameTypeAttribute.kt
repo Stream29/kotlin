@@ -41,7 +41,7 @@ class ParameterNameTypeAttribute(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other == null || this::class != other::class) return false
 
         other as ParameterNameTypeAttribute
 
@@ -65,7 +65,6 @@ class ParameterNameTypeAttribute(
 val ConeAttributes.parameterNameAttribute: ParameterNameTypeAttribute? by ConeAttributes.attributeAccessor<ParameterNameTypeAttribute>()
 
 // Intentionally break binary compatibility but keep source compatibility to help compiler plugin migration.
-@get:JvmName("parameterNameDeprecated")
 @Deprecated(
     message = "Parameter name access without a session is not supported.",
     replaceWith = ReplaceWith("this.valueParameterName(session)"),

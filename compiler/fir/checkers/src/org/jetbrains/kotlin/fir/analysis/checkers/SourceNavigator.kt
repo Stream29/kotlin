@@ -128,7 +128,7 @@ private open class LightTreeSourceNavigator : SourceNavigator {
 
     private fun getNullableChild(source: KtSourceElement, node: LighterASTNode, ref: Ref<Array<LighterASTNode?>>): LighterASTNode? {
         source.treeStructure.getChildren(node, ref)
-        val firstChild = ref.get().firstOrNull() ?: return null
+        val firstChild = ref.get()?.firstOrNull() ?: return null
         return if (firstChild.tokenType != KtNodeTypes.NULLABLE_TYPE) null else firstChild
     }
 
@@ -168,7 +168,7 @@ private object PsiSourceNavigator : LightTreeSourceNavigator() {
     override fun KtSourceElement.getRawIdentifier(): CharSequence? = psi<PsiElement>()?.getRawIdentifier()
 
     private fun PsiElement.getRawIdentifier(): CharSequence? = when (this) {
-        is KtNameReferenceExpression -> getReferencedNameElement().node.chars
+        is KtNameReferenceExpression -> getReferencedNameElement().node?.chars
         is KtTypeProjection -> typeReference?.typeElement?.text
         is LeafPsiElement if elementType == KtTokens.IDENTIFIER -> chars
         is KtQualifiedExpression -> selectorExpression?.getRawIdentifier()

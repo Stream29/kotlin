@@ -8,7 +8,23 @@ package org.jetbrains.kotlin.fir.builder
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.kotlin.*
-import org.jetbrains.kotlin.KtNodeTypes.*
+import org.jetbrains.kotlin.KtNodeTypes.Companion.ANNOTATED_EXPRESSION
+import org.jetbrains.kotlin.KtNodeTypes.Companion.ARRAY_ACCESS_EXPRESSION
+import org.jetbrains.kotlin.KtNodeTypes.Companion.BOOLEAN_CONSTANT
+import org.jetbrains.kotlin.KtNodeTypes.Companion.CATCH
+import org.jetbrains.kotlin.KtNodeTypes.Companion.CHARACTER_CONSTANT
+import org.jetbrains.kotlin.KtNodeTypes.Companion.ESCAPE_STRING_TEMPLATE_ENTRY
+import org.jetbrains.kotlin.KtNodeTypes.Companion.FLOAT_CONSTANT
+import org.jetbrains.kotlin.KtNodeTypes.Companion.INTEGER_CONSTANT
+import org.jetbrains.kotlin.KtNodeTypes.Companion.LABELED_EXPRESSION
+import org.jetbrains.kotlin.KtNodeTypes.Companion.LITERAL_STRING_TEMPLATE_ENTRY
+import org.jetbrains.kotlin.KtNodeTypes.Companion.LONG_STRING_TEMPLATE_ENTRY
+import org.jetbrains.kotlin.KtNodeTypes.Companion.NULL
+import org.jetbrains.kotlin.KtNodeTypes.Companion.PARENTHESIZED
+import org.jetbrains.kotlin.KtNodeTypes.Companion.PRIMARY_CONSTRUCTOR
+import org.jetbrains.kotlin.KtNodeTypes.Companion.SAFE_ACCESS_EXPRESSION
+import org.jetbrains.kotlin.KtNodeTypes.Companion.SHORT_STRING_TEMPLATE_ENTRY
+import org.jetbrains.kotlin.KtNodeTypes.Companion.STRING_INTERPOLATION_PREFIX
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -40,7 +56,10 @@ import org.jetbrains.kotlin.fir.types.builder.buildResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
 import org.jetbrains.kotlin.fir.types.impl.FirImplicitBuiltinTypeRef
-import org.jetbrains.kotlin.lexer.KtTokens.*
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.CLOSING_QUOTE
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.MINUS
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.OPEN_QUOTE
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.PLUS
 import org.jetbrains.kotlin.name.*
 import org.jetbrains.kotlin.parsing.*
 import org.jetbrains.kotlin.psi.KtPsiUtil
@@ -1381,7 +1400,7 @@ abstract class AbstractRawFirBuilder<T : Any>(val baseSession: FirSession, val c
                     message = { "More than one REPL snippet configurator is found for the file" },
                 ) {
                     withEntry("fileName", sourceFile.name)
-                    withEntry("configurators", snippetConfiguratorExtensions.joinToString { "${it::class.java.name}" })
+                    withEntry("configurators", snippetConfiguratorExtensions.joinToString { "${it::class.qualifiedName}" })
                 }
 
                 snippetConfiguratorExtensions.firstOrNull()

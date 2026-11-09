@@ -48,7 +48,7 @@ import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.symbols.lazyResolveToPhase
 import org.jetbrains.kotlin.fir.types.*
-import org.jetbrains.kotlin.lexer.KtTokens.VAL_VAR
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.VAL_VAR
 import org.jetbrains.kotlin.name.*
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.resolve.AnnotationTargetList
@@ -646,7 +646,7 @@ fun extractArgumentsTypeRefAndSource(typeRef: FirTypeRef?): List<FirTypeRefSourc
 
 data class FirTypeRefSource(val typeRef: FirTypeRef?, val source: KtSourceElement?) {
     override fun toString(): String {
-        return "FirTypeRefSource(typeRef=${typeRef?.render()}, source=${source?.kind?.javaClass?.simpleName})"
+        return "FirTypeRefSource(typeRef=${typeRef?.render()}, source=${source?.kind?.let { it::class.simpleName }})"
     }
 }
 
@@ -802,7 +802,7 @@ fun FirQualifiedAccessExpression.explicitReceiverIsNotSuperReference(): Boolean 
 
 internal val KtSourceElement.defaultValueForParameter: KtSourceElement?
     get() = when (this) {
-        is KtPsiSourceElement -> (psi as? KtParameter)?.defaultValue?.toKtPsiSourceElement()
+        is KtPsiSourceElement -> (psi as? KtParameter)?.getDefaultValue()?.toKtPsiSourceElement()
         is KtLightSourceElement -> findDefaultValue(this)
     }
 

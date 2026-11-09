@@ -8,6 +8,8 @@
 
 package org.jetbrains.kotlin.fir
 
+import kotlin.concurrent.Volatile
+
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.fir.declarations.FirResolveState
 import org.jetbrains.kotlin.fir.declarations.ResolveStateAccess

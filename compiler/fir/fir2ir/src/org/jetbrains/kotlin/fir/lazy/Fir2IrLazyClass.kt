@@ -38,7 +38,7 @@ import org.jetbrains.kotlin.ir.util.isEnumClass
 import org.jetbrains.kotlin.ir.util.isObject
 import org.jetbrains.kotlin.name.Name
 
-class Fir2IrLazyClass(
+class Fir2IrLazyClassImpl(
     private val c: Fir2IrComponents,
     override var startOffset: Int,
     override var endOffset: Int,
@@ -46,13 +46,16 @@ class Fir2IrLazyClass(
     override val fir: FirRegularClass,
     override val symbol: IrClassSymbol,
     parent: IrDeclarationParent,
-) : IrClass(), AbstractFir2IrLazyDeclaration<FirRegularClass>, Fir2IrTypeParametersContainer,
+) : Fir2IrLazyClass(), Fir2IrLazyDeclaration<FirRegularClass>, Fir2IrTypeParametersContainer,
     IrLazyClassBase, Fir2IrComponents by c {
     init {
         this.parent = parent
         symbol.bind(this)
         classifierStorage.preCacheTypeParameters(fir)
     }
+
+    override val containerSourceElement: SourceElement?
+        get() = fir.sourceElement
 
     override var annotations: List<IrAnnotation> by createLazyAnnotations()
     override lateinit var typeParameters: List<IrTypeParameter>
@@ -264,3 +267,13 @@ class Fir2IrLazyClass(
 
     override val isK2: Boolean get() = true
 }
+
+fun Fir2IrLazyClass(
+    c: Fir2IrComponents,
+    startOffset: Int,
+    endOffset: Int,
+    origin: IrDeclarationOrigin,
+    fir: FirRegularClass,
+    symbol: IrClassSymbol,
+    parent: IrDeclarationParent,
+): Fir2IrLazyClassImpl = Fir2IrLazyClassImpl(c, startOffset, endOffset, origin, fir, symbol, parent)

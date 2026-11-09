@@ -274,7 +274,6 @@ object FirCliExceptionHandler : FirExceptionHandler() {
     }
 }
 
-@JvmInline
 value class MutableOrEmptyList<out T>(internal val list: MutableList<@UnsafeVariance T>?) : List<T> {
 
     private constructor(list: Nothing?) : this(list as MutableList<T>?)

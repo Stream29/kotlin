@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.expressions.FirAnonymousObjectExpression
 import org.jetbrains.kotlin.fir.lazy.Fir2IrLazyClass
+import org.jetbrains.kotlin.fir.lazy.Fir2IrLazyClassImpl
 import org.jetbrains.kotlin.fir.resolve.getContainingClassSymbol
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.resolve.toClassSymbol
@@ -30,7 +31,7 @@ import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
-import java.util.concurrent.ConcurrentHashMap
+import org.jetbrains.kotlin.storage.ConcurrentHashMap
 
 class Fir2IrClassifierStorage(
     private val c: Fir2IrComponents,
@@ -227,10 +228,10 @@ class Fir2IrClassifierStorage(
      * Use [getIrClass] instead.
      */
     @DelicateDeclarationStorageApi
-    fun getFir2IrLazyClass(firClass: FirClass): Fir2IrLazyClass =
-        getCachedIrClass(firClass)?.let { it as Fir2IrLazyClass } ?: createFir2IrLazyClass(firClass)
+    fun getFir2IrLazyClass(firClass: FirClass): Fir2IrLazyClassImpl =
+        getCachedIrClass(firClass)?.let { it as Fir2IrLazyClassImpl } ?: createFir2IrLazyClass(firClass)
 
-    private fun createFir2IrLazyClass(firClass: FirClass): Fir2IrLazyClass {
+    private fun createFir2IrLazyClass(firClass: FirClass): Fir2IrLazyClassImpl {
         require(firClass is FirRegularClass)
         val symbol = createClassSymbol()
         val classId = firClass.symbol.classId
@@ -445,7 +446,7 @@ class Fir2IrClassifierStorage(
         val symbol = createClassSymbol()
         return classifiersGenerator.createEarlierSnippetClass(snippetSymbol.fir, containingPackageFragment, symbol).also {
             earlierSnippetsCache[snippetSymbol] = it
-            (it as? Fir2IrLazyClass)?.let { lazyClass ->
+            (it as? Fir2IrLazyClassImpl)?.let { lazyClass ->
                 classCache[lazyClass.fir] = symbol
             }
         }

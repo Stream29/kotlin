@@ -150,12 +150,12 @@ class FirOverrideService(val session: FirSession) : FirSessionComponent {
 
         return when (aFir) {
             is FirNamedFunction -> {
-                require(bFir is FirNamedFunction) { "b is " + bFir.javaClass }
+                require(bFir is FirNamedFunction) { "b is " + bFir::class }
                 byVisibilityAndType
             }
 
             is FirVariable -> {
-                require(bFir is FirVariable) { "b is " + bFir.javaClass }
+                require(bFir is FirVariable) { "b is " + bFir::class }
                 // At least one of `subtypes` is true here, so `!xSubtypesY` implies `ySubtypesX`, meaning y's type
                 // is a *strict* subtype of x's. Vars are more specific than vals, so if one is a var and another
                 // has a strict subtype, then they are unorderable - one is a val with a more specific type than
@@ -172,7 +172,7 @@ class FirOverrideService(val session: FirSession) : FirSessionComponent {
                 merge(aFir.isVar, bFir.isVar, byExplicitBackingField)
             }
 
-            else -> throw IllegalArgumentException("Unexpected callable: " + aFir.javaClass)
+            else -> throw IllegalArgumentException("Unexpected callable: " + aFir::class)
         }
     }
 }

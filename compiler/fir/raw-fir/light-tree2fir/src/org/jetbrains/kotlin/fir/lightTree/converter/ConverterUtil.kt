@@ -6,7 +6,15 @@
 package org.jetbrains.kotlin.fir.lightTree.converter
 
 import com.intellij.lang.LighterASTNode
-import org.jetbrains.kotlin.KtNodeTypes.*
+import org.jetbrains.kotlin.KtNodeTypes.Companion.BLOCK
+import org.jetbrains.kotlin.KtNodeTypes.Companion.CLASS_BODY
+import org.jetbrains.kotlin.KtNodeTypes.Companion.ENUM_ENTRY
+import org.jetbrains.kotlin.KtNodeTypes.Companion.FUN
+import org.jetbrains.kotlin.KtNodeTypes.Companion.KT_FILE
+import org.jetbrains.kotlin.KtNodeTypes.Companion.OBJECT_DECLARATION
+import org.jetbrains.kotlin.KtNodeTypes.Companion.OBJECT_LITERAL
+import org.jetbrains.kotlin.KtNodeTypes.Companion.PROPERTY
+import org.jetbrains.kotlin.KtNodeTypes.Companion.SCRIPT
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.builder.FirCallBuilder
 import org.jetbrains.kotlin.fir.expressions.builder.buildArgumentList

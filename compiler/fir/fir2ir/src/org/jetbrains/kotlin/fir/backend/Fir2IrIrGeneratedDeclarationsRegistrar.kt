@@ -786,7 +786,7 @@ class Fir2IrIrGeneratedDeclarationsRegistrar(private val components: Fir2IrCompo
         irDeclaration: IrDeclaration,
         pluginId: String,
     ): ByteArray? {
-        val firDeclaration = (irDeclaration as? AbstractFir2IrLazyDeclaration<*>)?.fir ?: return null
+        val firDeclaration = (irDeclaration as? AbstractFir2IrLazyDeclaration<*>)?.fir as? FirDeclaration ?: return null
         return firDeclaration.compilerPluginMetadata?.get(pluginId)
     }
 

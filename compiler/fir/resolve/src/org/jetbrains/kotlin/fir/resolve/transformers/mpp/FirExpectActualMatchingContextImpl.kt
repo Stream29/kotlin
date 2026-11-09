@@ -42,7 +42,7 @@ import org.jetbrains.kotlin.types.model.SimpleTypeMarker
 import org.jetbrains.kotlin.types.model.TypeSubstitutorMarker
 import org.jetbrains.kotlin.types.model.TypeSystemContext
 import org.jetbrains.kotlin.utils.zipIfSizesAreEqual
-import java.util.concurrent.ConcurrentHashMap
+import org.jetbrains.kotlin.storage.ConcurrentHashMap
 
 class FirExpectActualMatchingContextImpl private constructor(
     private val actualSession: FirSession,
@@ -571,8 +571,11 @@ class FirExpectActualMatchingContextImpl private constructor(
         check(allowedWritingMemberExpectForActualMapping) { "Writing memberExpectForActual is not allowed in this context" }
         val expectForActualMap = actualSession.expectActualMappingStorage.cache.getValue(this)
 
-        val expectToCompatibilityMap = expectForActualMap
-            .computeIfAbsent(actualMember to expectClassSymbol) { ConcurrentHashMap() }
+        val expectForActualKey = actualMember to expectClassSymbol
+        val expectToCompatibilityMap = expectForActualMap[expectForActualKey]
+            ?: ConcurrentHashMap<FirBasedSymbol<*>, ExpectActualMatchingCompatibility>().let {
+                expectForActualMap.putIfAbsent(expectForActualKey, it) ?: it
+            }
 
         /*
         Don't report when value is overwritten, because it's the case for actual inner classes:

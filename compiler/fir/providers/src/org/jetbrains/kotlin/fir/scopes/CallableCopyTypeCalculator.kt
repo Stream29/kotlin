@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.coneTypeOrNull
+import org.jetbrains.kotlin.storage.ReentrantLock
 
 /**
  * A utility class that, depending on the implementation, calculates the return type of callable copies,
@@ -53,8 +54,9 @@ abstract class CallableCopyTypeCalculator {
             val callableCopyDeferredTypeCalculation = declaration.attributes.deferredCallableCopyReturnType
                 ?: return declaration.getResolvedTypeRef()
 
-            // TODO: drop synchronized in KT-60385
-            synchronized(callableCopyDeferredTypeCalculation) {
+            val lock = callableCopyDeferredTypeCalculation.calculationLock
+            lock.lock()
+            try {
                 if (declaration.attributes.deferredCallableCopyReturnType == null) {
                     return declaration.returnTypeRef as FirResolvedTypeRef
                 }
@@ -73,6 +75,8 @@ abstract class CallableCopyTypeCalculator {
                 declaration.attributes.deferredCallableCopyReturnType = null
 
                 return returnTypeRef
+            } finally {
+                lock.unlock()
             }
         }
 
@@ -113,6 +117,8 @@ var FirDeclarationAttributes.deferredCallableCopyReturnType: DeferredCallableCop
 )
 
 abstract class DeferredCallableCopyReturnType {
+    internal val calculationLock: ReentrantLock = ReentrantLock()
+
     /**
      * Performs a deferred computation some declaration's return type.
      *
@@ -121,4 +127,3 @@ abstract class DeferredCallableCopyReturnType {
      */
     abstract fun computeReturnType(calc: CallableCopyTypeCalculator): ConeKotlinType?
 }
-

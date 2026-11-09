@@ -51,7 +51,6 @@ sealed class ConeResolutionAtom : AbstractConeResolutionAtom() {
     abstract override val expression: FirExpression
 
     companion object {
-        @JvmName("createRawAtomNullable")
         fun createRawAtom(expression: FirExpression?): ConeResolutionAtom? {
             return createRawAtom(expression, allowUnresolvedExpression = false)
         }

@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.fir
 
 import org.jetbrains.kotlin.KtPsiSourceElement
 import org.jetbrains.kotlin.KtSourceElement
-import org.jetbrains.kotlin.diagnostics.DiagnosticUtils.getLineAndColumnInPsiFile
+import org.jetbrains.kotlin.diagnostics.PsiDiagnosticUtils
 import org.jetbrains.kotlin.fir.resolve.providers.firProvider
 import org.jetbrains.kotlin.fir.resolve.providers.getContainingFile
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
@@ -17,8 +17,8 @@ import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.incremental.components.Position
 import org.jetbrains.kotlin.incremental.components.ScopeKind
 import org.jetbrains.kotlin.utils.SmartList
-import java.io.File
-import java.util.concurrent.ConcurrentHashMap
+import nativekotlin.host.files.NativeFile as File
+import org.jetbrains.kotlin.storage.ConcurrentHashMap
 
 class IncrementalPassThroughLookupTrackerComponent(
     private val session: FirSession,
@@ -41,7 +41,10 @@ class IncrementalPassThroughLookupTrackerComponent(
                 return
         }
         val position = if (requiresPosition && source != null && source is KtPsiSourceElement) {
-            getLineAndColumnInPsiFile(source.psi.containingFile, source.psi.textRange).let { Position(it.line, it.column) }
+            PsiDiagnosticUtils.offsetToLineAndColumn(
+                source.psi.containingFile!!.viewProvider.document,
+                source.psi.textRange!!.startOffset
+            ).let { Position(it.line, it.column) }
         } else Position.NO_POSITION
 
         for (scope in inScopes) {

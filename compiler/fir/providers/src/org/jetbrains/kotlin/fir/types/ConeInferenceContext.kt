@@ -649,7 +649,7 @@ interface ConeInferenceContext : TypeSystemInferenceExtensionContext, ConeTypeCo
             }
         } ?: errorWithAttachment(
             """
-            Failed to find functional supertype for ${rigidType::class.java}.
+            Failed to find functional supertype for ${rigidType::class}.
             The contract of this function is that it returns a non-null value iff `isBuiltinFunctionTypeOrSubtype` returns `true`.
             """.trimIndent()
         ) {

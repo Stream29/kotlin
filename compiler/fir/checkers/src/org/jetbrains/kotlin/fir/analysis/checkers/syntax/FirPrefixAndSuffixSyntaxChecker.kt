@@ -10,7 +10,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.util.diff.FlyweightCapableTreeStructure
 import org.jetbrains.kotlin.*
-import org.jetbrains.kotlin.KtNodeTypes.BINARY_EXPRESSION
+import org.jetbrains.kotlin.KtNodeTypes.Companion.BINARY_EXPRESSION
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
@@ -94,7 +94,8 @@ object FirPrefixAndSuffixSyntaxChecker : FirExpressionSyntaxChecker<FirStatement
     private fun checkLiteralPrefixOrSuffix(
         prefixOrSuffix: PsiElement,
     ) {
-        if (illegalLiteralPrefixOrSuffix(prefixOrSuffix.node.elementType)) {
+        val elementType = prefixOrSuffix.node?.elementType ?: return
+        if (illegalLiteralPrefixOrSuffix(elementType)) {
             report(prefixOrSuffix.toKtPsiSourceElement())
         }
     }

@@ -8,24 +8,13 @@ package org.jetbrains.kotlin.fir.checkers
 import org.jetbrains.kotlin.fir.analysis.checkers.*
 import org.jetbrains.kotlin.fir.analysis.diagnostics.CliFrontendDiagnostics
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors
-import org.jetbrains.kotlin.fir.analysis.diagnostics.js.FirJsErrors
-import org.jetbrains.kotlin.fir.analysis.diagnostics.jvm.FirJvmErrors
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors
-import org.jetbrains.kotlin.fir.analysis.diagnostics.wasm.FirWasmErrors
-import org.jetbrains.kotlin.fir.analysis.diagnostics.web.common.FirWebCommonErrors
-import org.jetbrains.kotlin.fir.analysis.js.checkers.JsDeclarationCheckers
-import org.jetbrains.kotlin.fir.analysis.js.checkers.JsExpressionCheckers
-import org.jetbrains.kotlin.fir.analysis.jvm.checkers.JvmDeclarationCheckers
-import org.jetbrains.kotlin.fir.analysis.jvm.checkers.JvmExpressionCheckers
-import org.jetbrains.kotlin.fir.analysis.jvm.checkers.JvmTypeCheckers
 import org.jetbrains.kotlin.fir.analysis.native.checkers.NativeDeclarationCheckers
 import org.jetbrains.kotlin.fir.analysis.native.checkers.NativeDeclarationExtraCheckers
 import org.jetbrains.kotlin.fir.analysis.native.checkers.NativeExpressionCheckers
 import org.jetbrains.kotlin.fir.analysis.native.checkers.NativeTypeCheckers
-import org.jetbrains.kotlin.fir.analysis.wasm.checkers.*
 import org.jetbrains.kotlin.fir.builder.FirSyntaxErrors
 import org.jetbrains.kotlin.fir.session.FirSessionConfigurator
-import org.jetbrains.kotlin.platform.wasm.WasmTarget
 
 fun FirSessionConfigurator.registerCommonCheckers() {
     useCheckers(CommonDeclarationCheckers)
@@ -49,19 +38,6 @@ fun FirSessionConfigurator.registerExperimentalCheckers() {
     registerDiagnosticContainers(FirErrors)
 }
 
-fun FirSessionConfigurator.registerJvmCheckers() {
-    useCheckers(JvmDeclarationCheckers)
-    useCheckers(JvmExpressionCheckers)
-    useCheckers(JvmTypeCheckers)
-    registerDiagnosticContainers(FirJvmErrors)
-}
-
-fun FirSessionConfigurator.registerJsCheckers() {
-    useCheckers(JsDeclarationCheckers)
-    useCheckers(JsExpressionCheckers)
-    registerDiagnosticContainers(FirWebCommonErrors, FirJsErrors)
-}
-
 fun FirSessionConfigurator.registerNativeCheckers() {
     useCheckers(NativeDeclarationCheckers)
     useCheckers(NativeExpressionCheckers)
@@ -72,22 +48,4 @@ fun FirSessionConfigurator.registerNativeCheckers() {
 fun FirSessionConfigurator.registerExtraNativeCheckers() {
     useCheckers(NativeDeclarationExtraCheckers)
     registerDiagnosticContainers(FirNativeErrors)
-}
-
-fun FirSessionConfigurator.registerWasmJsCheckers() {
-    useCheckers(WasmBaseDeclarationCheckers)
-    useCheckers(WasmBaseExpressionCheckers)
-    useCheckers(WasmBaseTypeCheckers)
-    registerDiagnosticContainers(FirWebCommonErrors, FirWasmErrors)
-
-    useCheckers(WasmJsDeclarationCheckers)
-    useCheckers(WasmJsExpressionCheckers)
-}
-
-fun FirSessionConfigurator.registerWasmWasiCheckers() {
-    useCheckers(WasmBaseDeclarationCheckers)
-    useCheckers(WasmBaseExpressionCheckers)
-    useCheckers(WasmBaseTypeCheckers)
-    registerDiagnosticContainers(FirWebCommonErrors, FirWasmErrors)
-    useCheckers(WasmWasiDeclarationCheckers)
 }

@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.fir.resolve.transformers.body.resolve
 
+import org.jetbrains.kotlin.fir.resolve.FirNodeReplacingTransformer
+
 import org.jetbrains.kotlin.*
 import org.jetbrains.kotlin.config.AnalysisFlags
 import org.jetbrains.kotlin.config.LanguageFeature
@@ -1726,7 +1728,7 @@ open class FirExpressionsResolveTransformer(transformer: FirAbstractBodyResolveT
             val argument = getClassCall.argument
             val replacedArgument: FirExpression = argument.transformAsExplicitReceiver(dataForLhs, isUsedAsGetClassReceiver = true)
 
-            getClassCall.argumentList.transformArguments(object : FirTransformer<Nothing?>() {
+            getClassCall.argumentList.transformArguments(object : FirNodeReplacingTransformer<Nothing?>() {
                 @Suppress("UNCHECKED_CAST")
                 override fun <E : FirElement> transformElement(element: E, data: Nothing?): E = replacedArgument as E
             }, null)

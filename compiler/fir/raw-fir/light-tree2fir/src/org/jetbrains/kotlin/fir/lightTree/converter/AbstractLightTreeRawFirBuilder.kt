@@ -18,9 +18,14 @@ import org.jetbrains.kotlin.fir.builder.AbstractRawFirBuilder
 import org.jetbrains.kotlin.fir.builder.Context
 import org.jetbrains.kotlin.fir.types.FirImplicitTypeRef
 import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImplWithoutSource
-import org.jetbrains.kotlin.lexer.KtTokens.*
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.COMMENTS
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.DOT
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.SAFE_ACCESS
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.SEMICOLON
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.VARARG_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.WHITE_SPACE
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.psi.KtPsiUtil.unquoteIdentifier
+import org.jetbrains.kotlin.psi.KtPsiUtil.Companion.unquoteIdentifier
 
 abstract class AbstractLightTreeRawFirBuilder(
     baseSession: FirSession,
@@ -155,7 +160,7 @@ abstract class AbstractLightTreeRawFirBuilder(
 
         val kidsRef = Ref<Array<LighterASTNode?>>()
         tree.getChildren(this, kidsRef)
-        return kidsRef.get()
+        return kidsRef.get()!!
     }
 
     fun LighterASTNode?.getFirstChild(): LighterASTNode? {

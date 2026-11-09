@@ -34,11 +34,11 @@ class FirPackageViewDescriptor(override val fqName: FqName, val moduleDescriptor
         shouldNotBeCalled()
     }
 
-    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D): R {
+    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R? {
         shouldNotBeCalled()
     }
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         shouldNotBeCalled()
     }
 

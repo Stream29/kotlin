@@ -295,7 +295,7 @@ internal class ImplementationPrinter(
                     if (field.name == "coneTypeOrNull") {
                         println()
                         withIndent {
-                            println("require(newConeTypeOrNull == coneTypeOrNull) { \"\${javaClass.simpleName}.replaceConeTypeOrNull() called with invalid type '\${newConeTypeOrNull}'. Current type is '\$coneTypeOrNull'\" }")
+                            println("require(newConeTypeOrNull == coneTypeOrNull) { \"\${this::class.simpleName}.replaceConeTypeOrNull() called with invalid type '\${newConeTypeOrNull}'. Current type is '\$coneTypeOrNull'\" }")
                         }
                     }
                     println("}")

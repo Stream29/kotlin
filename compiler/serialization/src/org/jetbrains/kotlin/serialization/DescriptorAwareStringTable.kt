@@ -16,10 +16,6 @@ import org.jetbrains.kotlin.types.error.ErrorUtils
 
 @K1Deprecation
 interface DescriptorAwareStringTable : StringTable {
-    @OptIn(ClassIdBasedLocality::class)
-    fun getQualifiedClassNameIndex(classId: ClassId): Int =
-        getQualifiedClassNameIndex(classId.asString(), classId.isLocal)
-
     fun getFqNameIndex(descriptor: ClassifierDescriptorWithTypeParameters): Int {
         if (ErrorUtils.isError(descriptor)) {
             throw IllegalStateException("Cannot get FQ name of error class: ${renderDescriptor(descriptor)}")
@@ -46,3 +42,9 @@ interface DescriptorAwareStringTable : StringTable {
         DescriptorRenderer.COMPACT.render(descriptor) + " defined in " +
                 DescriptorRenderer.FQ_NAMES_IN_TYPES.render(descriptor.containingDeclaration)
 }
+
+@K1Deprecation
+@OptIn(ClassIdBasedLocality::class)
+fun DescriptorAwareStringTable.getQualifiedClassNameIndex(classId: ClassId): Int =
+    (this as? SerializableStringTable)?.getQualifiedClassNameIndex(classId)
+        ?: getQualifiedClassNameIndex(classId.asString(), classId.isLocal)

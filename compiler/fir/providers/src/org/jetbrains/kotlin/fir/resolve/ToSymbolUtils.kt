@@ -33,7 +33,7 @@ fun ConeClassifierLookupTag.toSymbol(useSiteSession: FirSession): FirClassifierS
     return when (this) {
         is ConeClassLikeLookupTag -> toSymbol(useSiteSession)
         is ConeClassifierLookupTagWithFixedSymbol -> this.symbol
-        else -> error("missing branch for ${javaClass.name}")
+        else -> error("missing branch for ${this::class.qualifiedName}")
     }
 }
 

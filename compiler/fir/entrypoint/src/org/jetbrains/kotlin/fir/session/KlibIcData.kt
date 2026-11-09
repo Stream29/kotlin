@@ -5,34 +5,11 @@
 
 package org.jetbrains.kotlin.fir.session
 
-import org.jetbrains.kotlin.incremental.js.IncrementalDataProvider
 import org.jetbrains.kotlin.library.components.KlibMetadataComponent
-import org.jetbrains.kotlin.library.metadata.KlibMetadataProtoBuf
-import org.jetbrains.kotlin.library.metadata.parsePackageFragment
-import org.jetbrains.kotlin.utils.checkWithAttachment
 
-class KlibIcData(incrementalData: IncrementalDataProvider) : KlibMetadataComponent {
-
-    private val fragments: Map<String, Map<String, ByteArray>> by lazy {
-        val result = mutableMapOf<String, MutableMap<String, ByteArray>>()
-
-        incrementalData
-            .compiledPackageParts
-            .toSortedMap() // This is so that IC is more deterministic
-            .forEach { [file, translationResultValue] ->
-                val proto = parsePackageFragment(translationResultValue.metadata)
-                val fqName = proto.getExtension(KlibMetadataProtoBuf.fqName)
-                val key = file.path
-                val existingValue = result.getOrPut(fqName, ::mutableMapOf).put(key, translationResultValue.metadata)
-                checkWithAttachment(existingValue == null, { "Duplicate metadata entry" }) {
-                    it.withAttachment("key", key)
-                    it.withAttachment("fqName", fqName)
-                    it.withAttachment("file", file)
-                }
-            }
-
-        result
-    }
+class KlibIcData(
+    private val fragments: Map<String, Map<String, ByteArray>> = emptyMap(),
+) : KlibMetadataComponent {
 
     val packageFragmentNameList: Collection<String>
         get() = fragments.keys

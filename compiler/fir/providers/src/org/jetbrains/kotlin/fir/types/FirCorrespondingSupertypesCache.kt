@@ -44,7 +44,7 @@ class FirCorrespondingSupertypesCache(private val session: FirSession) : FirSess
         if (lookupTag == supertypeConstructor) return listOf(captureType(type, typeContext))
 
         val resultTypes =
-            cache.getValue(lookupTag, typeCheckerState)?.getOrDefault(supertypeConstructor, emptyList()) ?: return null
+            cache.getValue(lookupTag, typeCheckerState)?.let { it[supertypeConstructor] ?: emptyList() } ?: return null
         if (type.typeArguments.isEmpty()) return resultTypes
 
         val capturedType = captureType(type, typeContext)
@@ -93,7 +93,7 @@ class FirCorrespondingSupertypesCache(private val session: FirSession) : FirSess
         val captured =
             state.typeSystemContext.captureFromArguments(supertype, CaptureStatus.FOR_SUBTYPING) as ConeClassLikeType? ?: supertype
 
-        val list = resultingMap.computeIfAbsent(supertypeLookupTag) { mutableListOf() }
+        val list = resultingMap.getOrPut(supertypeLookupTag) { mutableListOf() }
         list += captured
 
         return when {

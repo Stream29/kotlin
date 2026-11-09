@@ -540,7 +540,6 @@ abstract class AbstractFirSpecificAnnotationResolveTransformer(
     }
 
     @PrivateForInline
-    @JvmField
     var currentFile: FirFile? = null
 
     inline fun <T> withFile(file: FirFile, f: () -> T): T {

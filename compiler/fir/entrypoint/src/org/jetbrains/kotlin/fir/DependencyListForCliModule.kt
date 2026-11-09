@@ -8,9 +8,9 @@ package org.jetbrains.kotlin.fir
 import org.jetbrains.kotlin.fir.deserialization.LibraryPathFilter
 import org.jetbrains.kotlin.fir.deserialization.ModuleDataProvider
 import org.jetbrains.kotlin.fir.deserialization.MultipleModuleDataProvider
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.KlibPaths as Paths
 import org.jetbrains.kotlin.name.Name
-import java.nio.file.Path
-import java.nio.file.Paths
 
 /**
  * This class represents the set of dependencies for some source module.
@@ -144,7 +144,9 @@ class DependencyListForCliModule @PrivateSessionConstructor constructor(
 
             // fallback in case no explicit dependencies were added
             allRegularDependencies.singleOrNull()?.let {
-                pathFiltersMap.putIfAbsent(it, LibraryPathFilter.TakeAll)
+                if (it !in pathFiltersMap) {
+                    pathFiltersMap[it] = LibraryPathFilter.TakeAll
+                }
                 if (it !in regularDependencies) {
                     regularDependencies += it
                 }

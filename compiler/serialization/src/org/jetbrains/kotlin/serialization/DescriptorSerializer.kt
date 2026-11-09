@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.metadata.serialization.MutableVersionRequirementTabl
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.DescriptorUtils
-import org.jetbrains.kotlin.resolve.DescriptorUtils.isEnumEntry
 import org.jetbrains.kotlin.resolve.MemberComparator
 import org.jetbrains.kotlin.resolve.RequireKotlinConstants
 import org.jetbrains.kotlin.resolve.calls.components.isActualParameterWithAnyExpectedDefault
@@ -43,7 +42,6 @@ import org.jetbrains.kotlin.serialization.deserialization.memberKind
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.extensions.TypeAttributeTranslators
 import org.jetbrains.kotlin.types.typeUtil.replaceAnnotations
-import java.util.*
 
 @K1Deprecation
 class DescriptorSerializer private constructor(
@@ -144,7 +142,7 @@ class DescriptorSerializer private constructor(
                 typeAliasProto(descriptor)?.let { builder.addTypeAlias(it) }
             } else {
                 val name = getSimpleNameIndex(descriptor.name)
-                if (isEnumEntry(descriptor)) {
+                if (DescriptorUtils.isEnumEntry(descriptor)) {
                     builder.addEnumEntry(enumEntryProto(descriptor as ClassDescriptor))
                 } else {
                     builder.addNestedClassName(name)
@@ -756,7 +754,6 @@ class DescriptorSerializer private constructor(
     )
 
     companion object {
-        @JvmStatic
         fun createTopLevel(
             extension: SerializerExtension, languageVersionSettings: LanguageVersionSettings,
             project: Project? = null
@@ -768,14 +765,12 @@ class DescriptorSerializer private constructor(
                 plugins = project?.let { DescriptorSerializerPlugin.getInstances(it) }.orEmpty(),
             )
 
-        @JvmStatic
         fun createForLambda(extension: SerializerExtension, languageVersionSettings: LanguageVersionSettings): DescriptorSerializer =
             DescriptorSerializer(
                 null, Interner(), extension, MutableTypeTable(), versionRequirementTable = null,
                 serializeTypeTableToFunction = true, languageVersionSettings = languageVersionSettings,
             )
 
-        @JvmStatic
         fun create(
             descriptor: ClassDescriptor,
             extension: SerializerExtension,
@@ -830,7 +825,7 @@ class DescriptorSerializer private constructor(
         fun <T : DeclarationDescriptor> sort(descriptors: Collection<T>): List<T> =
             ArrayList(descriptors).apply {
                 //NOTE: the exact comparator does matter here
-                Collections.sort(this, MemberComparator.INSTANCE)
+                this.sortWith(MemberComparator.INSTANCE)
             }
 
         fun writeLanguageVersionRequirement(

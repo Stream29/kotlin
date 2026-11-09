@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.fir.resolve
 
 import org.jetbrains.kotlin.fir.declarations.FirTowerDataContext
 import org.jetbrains.kotlin.fir.scopes.impl.FirLocalScope
-import java.util.*
+import org.jetbrains.kotlin.utils.addToStdlib.EnumMap
 
 enum class FirTowerDataMode {
     REGULAR,
@@ -19,7 +19,7 @@ enum class FirTowerDataMode {
 }
 
 class FirRegularTowerDataContexts private constructor(
-    private val modeMap: EnumMap<FirTowerDataMode, FirTowerDataContext>,
+    private val modeMap: EnumMap<FirTowerDataMode, FirTowerDataContext?>,
     val primaryConstructorPureParametersScope: FirLocalScope?,
     val primaryConstructorAllParametersScope: FirLocalScope?,
     val activeMode: FirTowerDataMode,
@@ -44,8 +44,7 @@ class FirRegularTowerDataContexts private constructor(
         get() = modeMap[activeMode]
 
     fun replaceCurrentlyActiveContext(newContext: FirTowerDataContext): FirRegularTowerDataContexts {
-        val modeMap = EnumMap<FirTowerDataMode, FirTowerDataContext>(FirTowerDataMode::class.java)
-        modeMap.putAll(this.modeMap)
+        val modeMap = EnumMap(this.modeMap)
         modeMap[activeMode] = newContext
         return FirRegularTowerDataContexts(modeMap, primaryConstructorPureParametersScope, primaryConstructorAllParametersScope, activeMode)
     }
@@ -58,8 +57,7 @@ class FirRegularTowerDataContexts private constructor(
     // Effectively equal to replaceTowerDataMode(REGULAR) + replaceCurrentlyActiveContext(newContext)
     // But left just for sake of optimization
     fun replaceAndSetActiveRegularContext(newContext: FirTowerDataContext): FirRegularTowerDataContexts {
-        val modeMap = EnumMap<FirTowerDataMode, FirTowerDataContext>(FirTowerDataMode::class.java)
-        modeMap.putAll(this.modeMap)
+        val modeMap = EnumMap(this.modeMap)
         modeMap[FirTowerDataMode.REGULAR] = newContext
         return FirRegularTowerDataContexts(
             modeMap, primaryConstructorPureParametersScope, primaryConstructorAllParametersScope, FirTowerDataMode.REGULAR
@@ -78,9 +76,8 @@ class FirRegularTowerDataContexts private constructor(
             forCompanionBlock: FirTowerDataContext?,
             forConstructorHeaders: FirTowerDataContext?,
             forEnumEntries: FirTowerDataContext?,
-        ): EnumMap<FirTowerDataMode, FirTowerDataContext> {
-            val modeMap = EnumMap<FirTowerDataMode, FirTowerDataContext>(FirTowerDataMode::class.java)
-            modeMap[FirTowerDataMode.REGULAR] = regular
+        ): EnumMap<FirTowerDataMode, FirTowerDataContext?> {
+            val modeMap = EnumMap<FirTowerDataMode, FirTowerDataContext?>(mapOf(FirTowerDataMode.REGULAR to regular))
             modeMap[FirTowerDataMode.NESTED_CLASS] = forNestedClasses
             modeMap[FirTowerDataMode.COMPANION_OBJECT] = forCompanionObject
             modeMap[FirTowerDataMode.COMPANION_BLOCK] = forCompanionBlock

@@ -18,8 +18,9 @@ import org.jetbrains.kotlin.fir.lightTree.converter.LightTreeRawFirDeclarationBu
 import org.jetbrains.kotlin.fir.scopes.FirScopeProvider
 import org.jetbrains.kotlin.parsing.KotlinLightParser
 import org.jetbrains.kotlin.readSourceFileWithMapping
-import java.io.File
-import java.nio.file.Path
+import nativekotlin.host.files.NativeFile as File
+import com.intellij.platform.native.vfs.NativeVfsPath as Path
+import org.jetbrains.kotlin.SourceFileReader
 
 class LightTree2Fir(
     val session: FirSession,
@@ -32,7 +33,7 @@ class LightTree2Fir(
 
     fun buildFirFile(file: File): FirFile {
         val sourceFile = KtIoFileSourceFile(file)
-        val [code, linesMapping] = file.inputStream().reader(Charsets.UTF_8).use {
+        val [code, linesMapping] = SourceFileReader(sourceFile.getContentsAsStream()).use {
             it.readSourceFileWithMapping()
         }
         return buildFirFile(code, sourceFile, linesMapping)

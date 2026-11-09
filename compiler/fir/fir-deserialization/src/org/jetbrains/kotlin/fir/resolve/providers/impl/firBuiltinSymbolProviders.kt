@@ -31,8 +31,10 @@ import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.serialization.deserialization.ProtoBasedClassDataFinder
 import org.jetbrains.kotlin.serialization.deserialization.builtins.BuiltInSerializerProtocol
 import org.jetbrains.kotlin.serialization.deserialization.getName
+import org.jetbrains.kotlin.metadata.BinaryInput
+import org.jetbrains.kotlin.serialization.deserialization.InputStream
+import org.jetbrains.kotlin.serialization.deserialization.builtins.BuiltInsResourceLoader
 import org.jetbrains.kotlin.utils.mapToSetOrEmpty
-import java.io.InputStream
 
 @ThreadSafeMutableState
 abstract class AbstractFirBuiltinSymbolProvider(
@@ -215,12 +217,12 @@ class FirFallbackBuiltinSymbolProvider(
 
     companion object {
         val builtInsPackageFragments: Map<FqName, BuiltInsPackageFragment> = run {
-            val classLoader = FirFallbackBuiltinSymbolProvider::class.java.classLoader
-            val streamProvider = { path: String -> classLoader?.getResourceAsStream(path) ?: ClassLoader.getSystemResourceAsStream(path) }
+            val resourceLoader = BuiltInsResourceLoader()
+            val streamProvider = resourceLoader::loadResource
             val packageFqNames = StandardClassIds.builtInsPackages
             packageFqNames.mapNotNull { fqName ->
                 val resourcePath = BuiltInSerializerProtocol.getBuiltInsFilePath(fqName)
-                streamProvider(resourcePath)?.let { inputStream ->
+                streamProvider(resourcePath)?.use { inputStream ->
                     fqName to BuiltInsPackageFragment(inputStream)
                 }
             }.toMap()
@@ -234,7 +236,8 @@ private data class BinaryVersionAndPackageFragment(
 ) {
     companion object {
         fun createFromStream(stream: InputStream): BinaryVersionAndPackageFragment {
-            val version = BuiltInsBinaryVersion.readFrom(stream)
+            val input = BinaryInput(stream.readBytes())
+            val version = BuiltInsBinaryVersion.readFrom(input)
 
             if (!version.isCompatibleWithCurrentCompilerVersion()) {
                 // TODO: report a proper diagnostic
@@ -245,7 +248,7 @@ private data class BinaryVersionAndPackageFragment(
                 )
             }
 
-            val packageFragment = ProtoBuf.PackageFragment.parseFrom(stream, BuiltInSerializerProtocol.extensionRegistry)
+            val packageFragment = ProtoBuf.PackageFragment.parseFrom(input.readRemaining(), BuiltInSerializerProtocol.extensionRegistry)
             return BinaryVersionAndPackageFragment(version, packageFragment)
         }
     }

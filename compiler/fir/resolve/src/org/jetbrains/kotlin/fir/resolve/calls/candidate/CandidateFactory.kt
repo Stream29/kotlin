@@ -224,7 +224,7 @@ class CandidateFactory private constructor(
             }
             else -> {
                 pluginAmbiguity =
-                    AmbiguousInterceptedSymbol(variants.map { it.second::class.qualifiedName ?: it.second.javaClass.name })
+                    AmbiguousInterceptedSymbol(variants.map { it.second::class.qualifiedName ?: it.second::class.toString() })
                 unwrapIntegerOperatorSymbolIfNeeded(callInfo)
             }
         }

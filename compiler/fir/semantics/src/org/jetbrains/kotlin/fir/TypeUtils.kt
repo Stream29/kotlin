@@ -32,7 +32,7 @@ fun ConeKotlinType?.collectUpperBounds(typeContext: ConeTypeContext): Set<ConeCl
                         }
                     }
                 }
-                else -> error("missing branch for ${javaClass.name}")
+                else -> error("missing branch for ${this::class.qualifiedName}")
             }
             is ConeTypeVariableType -> {
                 val symbol = (type.typeConstructor.originalTypeParameter as? ConeTypeParameterLookupTag)?.typeParameterSymbol ?: return

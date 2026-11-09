@@ -1116,7 +1116,7 @@ class FirElementSerializer private constructor(
                 throw IllegalStateException("Captured types should not persist up to the serializer: ${type.renderForDebugging()}")
             }
             else -> {
-                throw AssertionError("Should not be here: ${type::class.java}")
+                throw AssertionError("Should not be here: ${type::class}")
             }
         }
 
@@ -1380,7 +1380,6 @@ class FirElementSerializer private constructor(
         typeParameters.intern(typeParameter)
 
     companion object {
-        @JvmStatic
         fun createTopLevel(
             session: FirSession,
             scopeSession: ScopeSession,
@@ -1398,7 +1397,6 @@ class FirElementSerializer private constructor(
                 produceHeaderKlib,
             )
 
-        @JvmStatic
         fun createForLambda(
             session: FirSession,
             scopeSession: ScopeSession,
@@ -1415,7 +1413,6 @@ class FirElementSerializer private constructor(
                 produceHeaderKlib = false,
             )
 
-        @JvmStatic
         fun create(
             session: FirSession,
             scopeSession: ScopeSession,
@@ -1471,7 +1468,6 @@ class FirElementSerializer private constructor(
             return serializer
         }
 
-        @JvmStatic
         fun createForScript(
             session: FirSession,
             scopeSession: ScopeSession,
@@ -1490,7 +1486,6 @@ class FirElementSerializer private constructor(
                 produceHeaderKlib,
             )
 
-        @JvmStatic
         fun createForSnippet(
             session: FirSession,
             scopeSession: ScopeSession,

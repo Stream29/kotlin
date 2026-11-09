@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.resolve.calls.inference.model.AssertionsOnly
 import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.utils.addToStdlib.applyIf
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
-import java.util.concurrent.ConcurrentHashMap
+import org.jetbrains.kotlin.storage.ConcurrentHashMap
 
 private typealias FunctionTypeForRigidTypeApproximation =
         context(TypeApproximatorConfiguration, AbstractTypeApproximator.Cache) (RigidTypeMarker, Int) -> KotlinTypeMarker?
@@ -101,11 +101,7 @@ abstract class AbstractTypeApproximator(
         approximateTo: context(TypeApproximatorConfiguration, Cache) (KotlinTypeMarker, Int) -> KotlinTypeMarker?,
     ): KotlinTypeMarker? {
         return context(conf, caches?.getOrPut(conf, ::Cache) ?: Cache()) {
-            try {
-                approximateTo(type, -type.typeDepthForApproximation())
-            } catch (e: StackOverflowError) {
-                throw RuntimeException("StackOverflowError during type approximation for ${type.renderForDebugInfo()}", e)
-            }
+            approximateTo(type, -type.typeDepthForApproximation())
         }
     }
 
@@ -373,7 +369,7 @@ abstract class AbstractTypeApproximator(
     ): KotlinTypeMarker? {
         val typeConstructor = type.typeConstructor()
         assert(typeConstructor.isIntersection()) {
-            "Should be intersection type: $type, typeConstructor class: ${typeConstructor::class.java.canonicalName}"
+            "Should be intersection type: $type, typeConstructor class: ${typeConstructor::class.qualifiedName}"
         }
         assert(typeConstructor.supertypes().isNotEmpty()) {
             "Supertypes for intersection type should not be empty: $type"
@@ -648,7 +644,7 @@ abstract class AbstractTypeApproximator(
             require(capturedType != null) {
                 // KT-16147
                 "Type is inconsistent -- somewhere we create type with typeConstructor = $typeConstructor " +
-                        "and class: ${type::class.java.canonicalName}. type.toString() = $type"
+                        "and class: ${type::class.qualifiedName}. type.toString() = $type"
             }
             return approximateCapturedType(capturedType, toSuper, depth)
         }

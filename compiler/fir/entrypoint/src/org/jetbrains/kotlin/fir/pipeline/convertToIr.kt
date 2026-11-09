@@ -58,7 +58,8 @@ import org.jetbrains.kotlin.utils.addToStdlib.applyIf
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
 import org.jetbrains.kotlin.utils.exceptions.rethrowIntellijPlatformExceptionIfNeeded
 
-@JvmInline
+import kotlin.reflect.KClass
+
 value class AllModulesFrontendOutput(val outputs: List<SingleModuleFrontendOutput>)
 
 data class SingleModuleFrontendOutput(
@@ -553,7 +554,7 @@ private class Fir2IrPipeline(
             customMessagePrefix = if (extension == null) {
                 "The frontend generated invalid IR. This is a compiler bug, please report it to https://kotl.in/issue."
             } else {
-                "The compiler plugin '${extension.javaClass.name}'" +
+                "The compiler plugin '${extension::class.qualifiedName ?: extension::class.simpleName}'" +
                         (if (hasIrValidationErrorFromPlugin) " (or another, previously executed plugin, check error above)" else "") +
                         " generated invalid IR. Please report this bug to the plugin vendor."
             }
@@ -572,13 +573,13 @@ private class Fir2IrPipeline(
                 }
             } catch (e: Throwable) {
                 rethrowIntellijPlatformExceptionIfNeeded(e)
-                throw IrGenerationExtensionException(e, extension::class.java)
+                throw IrGenerationExtensionException(e, extension::class)
             }
         }
         recordLookupsWithoutSpecificFile(irModuleFragment)
     }
 }
 
-class IrGenerationExtensionException(cause: Throwable, val extensionClass: Class<out IrGenerationExtension>) :
+class IrGenerationExtensionException(cause: Throwable, val extensionClass: KClass<out IrGenerationExtension>) :
     RuntimeException(cause.message, cause)
 

@@ -119,7 +119,7 @@ fun FirExpression.copyImplicitValueExpression(): FirExpression {
         is FirThisReceiverExpression -> buildThisReceiverExpressionCopy(this) {}
         is FirInaccessibleReceiverExpression -> buildInaccessibleReceiverExpressionCopy(this) {}
         is FirSmartCastExpression -> buildSmartCastExpressionCopy(this) {}
-        else -> error("Unexpected expression type '${this.javaClass.simpleName}'")
+        else -> error("Unexpected expression type '${this::class.simpleName}'")
     }
 }
 

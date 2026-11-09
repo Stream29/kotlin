@@ -15,8 +15,8 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.symbols.lazyResolveToPhase
 import org.jetbrains.kotlin.resolve.multiplatform.ExpectActualMatchingCompatibility
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentMap
+import org.jetbrains.kotlin.storage.ConcurrentHashMap
+import org.jetbrains.kotlin.storage.ConcurrentMap
 
 private object ExpectForActualAttributeKey : FirDeclarationDataKey()
 
@@ -111,4 +111,3 @@ class FirExpectActualMappingStorage(val session: FirSession) : FirSessionCompone
 }
 
 val FirSession.expectActualMappingStorage: FirExpectActualMappingStorage by FirSession.sessionComponentAccessor()
-

@@ -17,7 +17,6 @@ enum class PropertyAccessType {
     Captured,
 }
 
-@JvmInline
 value class VariableWriteData(val value: PersistentMap<FirPropertySymbol, PersistentSet<CFGNode<*>>>) {
     constructor(symbol: FirPropertySymbol, node: CFGNode<*>) : this(persistentMapOf(symbol to persistentSetOf(node)))
     constructor(symbol: FirPropertySymbol, data: PersistentSet<CFGNode<*>>) : this(persistentMapOf(symbol to data))

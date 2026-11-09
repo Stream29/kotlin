@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.util.PrivateForInline
  * A [Map] which allows storing `null` values.
  */
 @OptIn(PrivateForInline::class)
-@JvmInline
 value class NullableMap<K, V>(
     @property:PrivateForInline
     val map: MutableMap<K, Any> = HashMap()

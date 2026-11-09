@@ -35,7 +35,7 @@ class Fir2IrLazyDeclarationsGenerator(private val c: Fir2IrComponents) : Fir2IrC
         isSynthetic: Boolean,
     ): Fir2IrLazySimpleFunction {
         val irFunction = fir.convertWithOffsets { startOffset, endOffset ->
-            val firContainingClass = (lazyParent as? Fir2IrLazyClass)?.fir
+            val firContainingClass = (lazyParent as? Fir2IrLazyClassImpl)?.fir
             val isFakeOverride = fir.isFakeOverride(firContainingClass)
             Fir2IrLazySimpleFunction(
                 c,
@@ -96,7 +96,7 @@ class Fir2IrLazyDeclarationsGenerator(private val c: Fir2IrComponents) : Fir2IrC
         declarationOrigin: IrDeclarationOrigin
     ): IrProperty {
         val isPropertyForField = fir.isStubPropertyForPureField == true
-        val firContainingClass = (lazyParent as? Fir2IrLazyClass)?.fir
+        val firContainingClass = (lazyParent as? Fir2IrLazyClassImpl)?.fir
         val isFakeOverride = !isPropertyForField && fir.isFakeOverride(firContainingClass)
         // It is really required to create those properties with DEFINED origin
         // Using `declarationOrigin` here (IR_EXTERNAL_JAVA_DECLARATION_STUB in particular) causes some tests to fail, including
@@ -160,7 +160,7 @@ class Fir2IrLazyDeclarationsGenerator(private val c: Fir2IrComponents) : Fir2IrC
         firClass: FirRegularClass,
         irParent: IrDeclarationParent,
         symbol: IrClassSymbol
-    ): Fir2IrLazyClass {
+    ): Fir2IrLazyClassImpl {
         val firClassOrigin = firClass.irOrigin()
         val irClass = firClass.convertWithOffsets { startOffset, endOffset ->
             Fir2IrLazyClass(c, startOffset, endOffset, firClassOrigin, firClass, symbol, irParent)
@@ -198,7 +198,7 @@ class Fir2IrLazyDeclarationsGenerator(private val c: Fir2IrComponents) : Fir2IrC
     ): Fir2IrLazyField {
         return fir.convertWithOffsets { startOffset, endOffset ->
             Fir2IrLazyField(
-                c, startOffset, endOffset, declarationOrigin, fir, (lazyParent as? Fir2IrLazyClass)?.fir, symbol, irPropertySymbol
+                c, startOffset, endOffset, declarationOrigin, fir, (lazyParent as? Fir2IrLazyClassImpl)?.fir, symbol, irPropertySymbol
             ).apply {
                 parent = lazyParent
             }

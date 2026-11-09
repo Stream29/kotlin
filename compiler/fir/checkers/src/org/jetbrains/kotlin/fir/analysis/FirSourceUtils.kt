@@ -66,7 +66,7 @@ inline fun PsiElement.forEachChildOfType(
 ) {
     forEachChildOfType(
         this, types, depth, reverse,
-        getElementType = { it.node.elementType },
+        getElementType = { it.node?.elementType },
         getChildren = { it.allChildren.toList() },
         processChild,
     )
@@ -95,7 +95,7 @@ inline fun <T> forEachChildOfType(
     types: Set<IElementType>,
     depth: Int,
     reverse: Boolean = false,
-    getElementType: (T) -> IElementType,
+    getElementType: (T) -> IElementType?,
     getChildren: (T) -> List<T>,
     processChild: (T) -> Unit,
 ) {

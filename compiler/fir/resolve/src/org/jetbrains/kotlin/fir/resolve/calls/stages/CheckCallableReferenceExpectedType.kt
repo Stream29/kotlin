@@ -334,7 +334,7 @@ private fun varargParameterTypeByExpectedParameter(
     varargMappingState: VarargMappingState,
 ): Pair<ConeKotlinType?, VarargMappingState> {
     val elementType = substitutedParameter.returnTypeRef.coneType.arrayElementType()
-        ?: errorWithAttachment("Vararg parameter ${substitutedParameter::class.java} does not have vararg type") {
+        ?: errorWithAttachment("Vararg parameter ${substitutedParameter::class} does not have vararg type") {
             withConeTypeEntry("expectedParameterType", expectedParameterType)
             withFirEntry("substitutedParameter", substitutedParameter)
             withEntry("varargMappingState", varargMappingState.toString())

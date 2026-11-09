@@ -146,7 +146,7 @@ class Constraint(
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other?.javaClass != javaClass) return false
+        if (other !is Constraint) return false
 
         other as Constraint
 

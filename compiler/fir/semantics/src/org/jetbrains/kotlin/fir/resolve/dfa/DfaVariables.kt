@@ -27,7 +27,6 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.types.SmartcastStability
-import java.util.*
 
 sealed class DataFlowVariable {
     abstract val originalType: ConeKotlinType
@@ -77,7 +76,7 @@ class RealVariable(
                 dispatchReceiver == other.dispatchReceiver && extensionReceiver == other.extensionReceiver
 
     override fun hashCode(): Int =
-        Objects.hash(symbol, isImplicit, dispatchReceiver, extensionReceiver)
+        (((31 + symbol.hashCode()) * 31 + isImplicit.hashCode()) * 31 + (dispatchReceiver?.hashCode() ?: 0)) * 31 + (extensionReceiver?.hashCode() ?: 0)
 
     override fun toString(): String = buildString {
         if (isImplicit) {

@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.fir.expressions
 
+import org.jetbrains.kotlin.fir.platform.FirThreadLocal
+
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.contracts.description.LogicOperationKind
@@ -95,7 +97,7 @@ object FirExpressionEvaluator {
      * }
      * ```
      */
-    private val visitedCallables: ThreadLocal<HashSet<FirCallableSymbol<*>>> = ThreadLocal.withInitial(::hashSetOf)
+    private val visitedCallables: FirThreadLocal<HashSet<FirCallableSymbol<*>>> = FirThreadLocal.withInitial(::hashSetOf)
 
     fun evaluatePropertyInitializer(property: FirProperty, session: FirSession, firFile: FirFile? = null): FirEvaluatorResult? {
         property.evaluatedInitializer?.let { return it }

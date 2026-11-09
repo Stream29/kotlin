@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
 import org.jetbrains.kotlin.fir.declarations.synthetic.FirSyntheticProperty
 import org.jetbrains.kotlin.fir.declarations.synthetic.FirSyntheticPropertyAccessor
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
+import org.jetbrains.kotlin.fir.platform.FirThreadLocal
 import org.jetbrains.kotlin.util.PrivateForInline
 
 /**
@@ -25,7 +26,7 @@ import org.jetbrains.kotlin.util.PrivateForInline
 abstract class FirLazyDeclarationResolver : FirSessionComponent {
     @PrivateForInline
     @Suppress("PropertyName")
-    val _lazyResolveContractChecksEnabled: ThreadLocal<Boolean> = ThreadLocal.withInitial { true }
+    val _lazyResolveContractChecksEnabled: FirThreadLocal<Boolean> = FirThreadLocal.withInitial { true }
 
     @OptIn(PrivateForInline::class)
     val lazyResolveContractChecksEnabled: Boolean
@@ -34,7 +35,7 @@ abstract class FirLazyDeclarationResolver : FirSessionComponent {
 
     @PrivateForInline
     @Suppress("PropertyName")
-    val _lazyResolveIsAllowed: ThreadLocal<Boolean> = ThreadLocal.withInitial { true }
+    val _lazyResolveIsAllowed: FirThreadLocal<Boolean> = FirThreadLocal.withInitial { true }
 
     abstract fun startResolvingPhase(phase: FirResolvePhase)
 

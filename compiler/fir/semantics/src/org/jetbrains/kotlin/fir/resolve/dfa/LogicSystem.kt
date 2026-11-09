@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.expressions.UnresolvedExpressionTypeAccess
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.types.AbstractTypeChecker
-import java.util.*
 import kotlin.math.max
 
 abstract class LogicSystem(private val context: ConeInferenceContext) {
@@ -268,7 +267,7 @@ abstract class LogicSystem(private val context: ConeInferenceContext) {
         removeApprovedOrImpossible: Boolean
     ): TypeStatements {
         val result = mutableMapOf<DataFlowVariable, MutableTypeStatement>()
-        val queue = LinkedList<OperationStatement>().apply { this += approvedStatement }
+        val queue = ArrayDeque<OperationStatement>().apply { this += approvedStatement }
         val approved = mutableSetOf<OperationStatement>()
         while (queue.isNotEmpty()) {
             val next = queue.removeFirst()
@@ -460,7 +459,6 @@ private fun TypeStatement.toMutable(): MutableTypeStatement = when (this) {
     else -> MutableTypeStatement(variable, LinkedHashSet(upperTypes), LinkedHashSet(lowerTypes))
 }
 
-@JvmName("replaceVariableInStatements")
 private fun MutableMap<DataFlowVariable, PersistentTypeStatement>.replaceVariable(from: DataFlowVariable, to: DataFlowVariable?) {
     val existing = remove(from) ?: return
     if (to != null) {
@@ -468,7 +466,6 @@ private fun MutableMap<DataFlowVariable, PersistentTypeStatement>.replaceVariabl
     }
 }
 
-@JvmName("replaceVariableInImplications")
 private fun MutableMap<DataFlowVariable, PersistentList<Implication>>.replaceVariable(from: RealVariable, to: RealVariable?) {
     val existing = remove(from)
     val toReplace = entries.mapNotNull { [variable, implications] ->

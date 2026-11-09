@@ -5,13 +5,15 @@
 
 package org.jetbrains.kotlin.fir.pipeline
 
+import org.jetbrains.kotlin.KtInMemoryTextSourceFile
+import org.jetbrains.kotlin.KtPsiSourceFile
 import org.jetbrains.kotlin.KtSourceFile
+import org.jetbrains.kotlin.SourceFileReader
 import org.jetbrains.kotlin.config.AnalysisFlags
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.impl.BaseDiagnosticsCollector
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
-import org.jetbrains.kotlin.fir.builder.PsiRawFirBuilder
 import org.jetbrains.kotlin.fir.declarations.FirFile
 import org.jetbrains.kotlin.fir.languageVersionSettings
 import org.jetbrains.kotlin.fir.lightTree.LightTree2Fir
@@ -20,7 +22,6 @@ import org.jetbrains.kotlin.fir.resolve.providers.impl.FirProviderImpl
 import org.jetbrains.kotlin.fir.session.sourcesToPathsMapper
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.readSourceFileWithMapping
-import kotlin.reflect.KFunction2
 
 fun FirSession.buildFirViaLightTree(
     files: Collection<KtSourceFile>,
@@ -33,7 +34,7 @@ fun FirSession.buildFirViaLightTree(
     val shouldCountLines = (reportFilesAndLines != null)
     var linesCount = 0
     val firFiles = files.map { file ->
-        val [code, linesMapping] = file.getContentsAsStream().reader(Charsets.UTF_8).use {
+        val [code, linesMapping] = SourceFileReader(file.getContentsAsStream()).use {
             it.readSourceFileWithMapping()
         }
         if (shouldCountLines) {
@@ -49,13 +50,11 @@ fun FirSession.buildFirViaLightTree(
 }
 
 fun FirSession.buildFirFromKtFiles(ktFiles: Collection<KtFile>): List<FirFile> {
-    val firProvider = (firProvider as FirProviderImpl)
-    val builder = PsiRawFirBuilder(this, firProvider.kotlinScopeProvider)
-    return ktFiles.map {
-        builder.buildFirFile(it).also { firFile ->
-            firProvider.recordFile(firFile)
-        }
+    val sources = ktFiles.map { ktFile ->
+        if (ktFile.virtualFile != null) KtPsiSourceFile(ktFile)
+        else KtInMemoryTextSourceFile(ktFile.name, ktFile.virtualFilePath, ktFile.text)
     }
+    return buildFirViaLightTree(sources, diagnosticsReporter = null, reportFilesAndLines = null)
 }
 
 fun buildResolveAndCheckFirFromKtFiles(

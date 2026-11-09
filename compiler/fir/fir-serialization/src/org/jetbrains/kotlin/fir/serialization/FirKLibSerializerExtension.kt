@@ -100,7 +100,7 @@ class FirKLibSerializerExtension(
         source?.let {
             val kidsRef = Ref<Array<LighterASTNode?>>()
             it.treeStructure.getChildren(it.lighterASTNode, kidsRef)
-            kidsRef.get().singleOrNull { it?.tokenType == KtTokens.DOC_COMMENT }?.toString()
+            kidsRef.get()?.singleOrNull { it?.tokenType == KtTokens.DOC_COMMENT }?.toString()
         }
 
     @Suppress("Reformat")

@@ -163,7 +163,6 @@ fun withExpectedType(
     else -> ResolutionMode.ContextIndependent
 }
 
-@JvmName("withExpectedTypeNullable")
 fun withExpectedType(coneType: ConeKotlinType?, lastStatementInBlock: Boolean = false): ResolutionMode {
     return coneType?.let { withExpectedType(it, lastStatementInBlock) } ?: ResolutionMode.ContextDependent
 }

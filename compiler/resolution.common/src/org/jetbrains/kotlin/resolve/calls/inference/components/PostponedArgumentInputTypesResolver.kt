@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.resolve.calls.model.PostponedCallableReferenceMarker
 import org.jetbrains.kotlin.resolve.calls.model.PostponedResolvedAtomMarker
 import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.utils.SmartSet
-import java.util.Stack
 
 private typealias Context = ConstraintSystemCompletionContext
 private typealias ResolvedAtomProvider = (TypeVariableMarker) -> Any?
@@ -330,7 +329,7 @@ class PostponedArgumentInputTypesResolver(
     private fun Context.computeTypeVariablePathInsideGivenType(
         type: KotlinTypeMarker,
         targetVariable: TypeConstructorMarker,
-        path: Stack<Pair<TypeConstructorMarker, Int>> = Stack()
+        path: MutableList<Pair<TypeConstructorMarker, Int>> = mutableListOf()
     ): List<Pair<TypeConstructorMarker, Int>>? {
         val typeConstructor = type.typeConstructor()
 
@@ -344,9 +343,9 @@ class PostponedArgumentInputTypesResolver(
             if (argumentType.typeConstructor() == targetVariable) {
                 return path.toList() + (typeConstructor to i)
             } else if (argumentType.argumentsCount() != 0) {
-                path.push(typeConstructor to i)
+                path.add(typeConstructor to i)
                 computeTypeVariablePathInsideGivenType(argumentType, targetVariable, path)?.let { return it }
-                path.pop()
+                path.removeAt(path.lastIndex)
             }
         }
 

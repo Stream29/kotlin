@@ -136,7 +136,7 @@ internal inline fun <R> convertCatching(element: FirElement, conversionScope: Fi
     try {
         return block()
     } catch (e: Throwable) {
-        rethrowExceptionWithDetails("Exception was thrown during transformation of ${element::class.java}", e) {
+        rethrowExceptionWithDetails("Exception was thrown during transformation of ${element::class}", e) {
             withFirEntry("element", element)
             conversionScope?.containingFileIfAny()?.let { withEntry("file", it.path) }
         }

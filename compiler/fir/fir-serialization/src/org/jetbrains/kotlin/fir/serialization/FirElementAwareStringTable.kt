@@ -11,12 +11,9 @@ import org.jetbrains.kotlin.fir.render
 import org.jetbrains.kotlin.metadata.serialization.StringTable
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.ClassIdBasedLocality
+import org.jetbrains.kotlin.serialization.SerializableStringTable
 
 interface FirElementAwareStringTable : StringTable {
-    @OptIn(ClassIdBasedLocality::class)
-    fun getQualifiedClassNameIndex(classId: ClassId): Int =
-        getQualifiedClassNameIndex(classId.asString(), classId.isLocal)
-
     fun getFqNameIndex(classLikeDeclaration: FirClassLikeDeclaration): Int {
         val classId = classLikeDeclaration.symbol.takeIf { !it.isLocal }?.classId
             ?: getLocalClassLikeDeclarationIdReplacement(classLikeDeclaration)
@@ -27,3 +24,8 @@ interface FirElementAwareStringTable : StringTable {
 
     fun getLocalClassLikeDeclarationIdReplacement(declaration: FirClassLikeDeclaration): ClassId? = null
 }
+
+@OptIn(ClassIdBasedLocality::class)
+fun FirElementAwareStringTable.getQualifiedClassNameIndex(classId: ClassId): Int =
+    (this as? SerializableStringTable)?.getQualifiedClassNameIndex(classId)
+        ?: getQualifiedClassNameIndex(classId.asString(), classId.isLocal)

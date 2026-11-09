@@ -387,8 +387,8 @@ class FirMemberDeserializer(private val c: FirDeserializationContext) {
         // by taking hasAnnotations/visibility/modality from property flags, and using false for the rest
         val defaultAccessorFlags = Flags.getAccessorFlags(
             Flags.HAS_ANNOTATIONS.get(flags),
-            Flags.VISIBILITY.get(flags),
-            Flags.MODALITY.get(flags),
+            Flags.VISIBILITY.get(flags)!!,
+            Flags.MODALITY.get(flags)!!,
             false, false, false
         )
 
@@ -555,7 +555,7 @@ class FirMemberDeserializer(private val c: FirDeserializationContext) {
                 hasBackingFieldAttr = hasBackingField
             }
 
-            if (Flags.IS_DELEGATED[proto.flags]) {
+            if (Flags.IS_DELEGATED.get(proto.flags)) {
                 @OptIn(FirImplementationDetail::class)
                 isDelegatedPropertyAttr = true
             }
@@ -592,7 +592,7 @@ class FirMemberDeserializer(private val c: FirDeserializationContext) {
     }
 
     private fun loadContextParametersTo(
-        contextParameterList: MutableList<ProtoBuf.ValueParameter>,
+        contextParameterList: List<ProtoBuf.ValueParameter>,
         legacyContextReceiverTypes: List<ProtoBuf.Type>,
         symbol: FirBasedSymbol<*>,
         proto: MessageLite,

@@ -41,7 +41,7 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.render
 import org.jetbrains.kotlin.resolve.ReturnValueStatus
-import java.text.MessageFormat
+import nativekotlin.host.format.NativeMessageFormat as MessageFormat
 
 @Suppress("NO_EXPLICIT_RETURN_TYPE_IN_API_MODE_WARNING")
 object FirDiagnosticRenderers {
