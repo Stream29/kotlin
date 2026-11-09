@@ -157,7 +157,7 @@ internal fun debugInfoLocalVariableLocation(builder: DIBuilderRef?,
             scope = functionScope,
             name = name.asString(),
             file = file,
-            line = line,
+            line = line.toUInt(),
             type = diType)
 
     return VariableDebugLocation(localVariable = variableDeclaration!!, location = location, file = file, line = line)
@@ -171,9 +171,9 @@ internal fun debugInfoParameterLocation(builder: DIBuilderRef?,
             builder = builder,
             scope = functionScope,
             name = name.asString(),
-            argNo = argNo,
+            argNo = argNo.toUInt(),
             file = file,
-            line = line,
+            line = line.toUInt(),
             type = diType)
 
     return VariableDebugLocation(localVariable = variableDeclaration!!, location = location, file = file, line = line)

@@ -20,8 +20,7 @@ import org.jetbrains.kotlin.ir.util.isAnnotationWithEqualFqName
 import org.jetbrains.kotlin.ir.util.sourceElement
 import org.jetbrains.kotlin.ir.visitors.IrVisitor
 import org.jetbrains.kotlin.name.FqName
-import java.io.File
-import java.util.*
+import nativekotlin.host.files.NativeFile as File
 
 class KtDiagnosticReporterWithImplicitIrBasedContext(
     diagnosticReporter: DiagnosticReporter,
@@ -144,29 +143,31 @@ internal class IrBasedSuppressCache : AbstractKotlinSuppressCache<IrElement>() {
 
     private val annotationKeys = mutableMapOf<IrElement, Set<String>>()
 
-    @Synchronized
-    private fun ensureRootProcessed(rootElement: IrElement) =
+    private val nativeLock = IrLock()
+
+    private fun ensureRootProcessed(rootElement: IrElement) = synchronized(nativeLock) {
         annotatedAncestorsPerRoot.getOrPut(rootElement) {
             val visitor = AnnotatedTreeVisitor()
-            rootElement.accept(visitor, Stack())
+            rootElement.accept(visitor, ArrayDeque())
             visitor.annotatedAncestors
         }
+    }
 
-    private inner class AnnotatedTreeVisitor : IrVisitor<Unit, Stack<IrElement>>() {
+    private inner class AnnotatedTreeVisitor : IrVisitor<Unit, ArrayDeque<IrElement>>() {
 
         val annotatedAncestors = mutableMapOf<IrElement, IrElement>()
 
-        override fun visitElement(element: IrElement, data: Stack<IrElement>) {
+        override fun visitElement(element: IrElement, data: ArrayDeque<IrElement>) {
             if (data.isNotEmpty()) {
-                annotatedAncestors[element] = data.peek()
+                annotatedAncestors[element] = data.last()
             }
             val isAnnotated = collectSuppressAnnotationKeys(element)
             if (isAnnotated) {
-                data.push(element)
+                data.addLast(element)
             }
             element.acceptChildren(this, data)
             if (isAnnotated) {
-                data.pop()
+                data.removeLast()
             }
         }
 

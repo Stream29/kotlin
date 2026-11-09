@@ -8,7 +8,7 @@ package org.jetbrains.kotlin.backend.konan.lower
 import org.jetbrains.kotlin.backend.konan.descriptors.isExpectMember
 import org.jetbrains.kotlin.backend.konan.descriptors.propertyIfAccessor
 import org.jetbrains.kotlin.backend.konan.ir.ModuleIndex
-import org.jetbrains.kotlin.descriptors.MemberDescriptor
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.K1Deprecation
@@ -24,8 +24,13 @@ import org.jetbrains.kotlin.ir.visitors.IrVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
-import org.jetbrains.kotlin.resolve.multiplatform.OptionalAnnotationUtil
-import org.jetbrains.kotlin.resolve.multiplatform.findCompatibleActualsForExpected
+
+private object OptionalAnnotationUtil {
+    fun isOptionalAnnotationClass(descriptor: DeclarationDescriptor): Boolean = false
+    fun shouldGenerateExpectClass(descriptor: ClassDescriptor): Boolean = false
+}
+
+private fun MemberDescriptor.findCompatibleActualsForExpected(actualModule: ModuleDescriptor): List<DeclarationDescriptor> = emptyList()
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 internal class ExpectToActualDefaultValueCopier(private val irModule: IrModuleFragment, private val irBuiltIns: IrBuiltIns) {

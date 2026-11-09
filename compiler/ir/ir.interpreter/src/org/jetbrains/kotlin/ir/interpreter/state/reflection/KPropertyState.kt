@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.ir.interpreter.proxy.reflection.KTypeProxy
 import org.jetbrains.kotlin.ir.interpreter.state.State
 import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
 import org.jetbrains.kotlin.ir.types.classOrNull
-import kotlin.reflect.KParameter
+import org.jetbrains.kotlin.ir.interpreter.proxy.reflection.KParameter
 import kotlin.reflect.KType
 
 internal class KPropertyState(
@@ -90,7 +90,7 @@ internal class KPropertyState(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (this::class != other?.let { it::class }) return false
 
         other as KPropertyState
 

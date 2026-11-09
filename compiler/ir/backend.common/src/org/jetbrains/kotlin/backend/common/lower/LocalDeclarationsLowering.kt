@@ -1186,7 +1186,6 @@ open class LocalDeclarationsLowering(
         }
     }
 
-    @JvmInline
     value class DeclarationKeyForScope private constructor(private val name: String) {
         companion object {
             fun createDeclarationKeyForScopeBySanitizedName(name: Name, nameSanitizer: (String) -> String): DeclarationKeyForScope =

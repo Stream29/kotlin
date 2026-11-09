@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.cli.report
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.io.canonicalPathString
 import org.jetbrains.kotlin.konan.config.filesToCache
-import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.library.KotlinLibrary
@@ -75,18 +75,16 @@ class CachedLibraries(
         protected fun readMetadataOrNull(directory: File): CacheMetadata? {
             val metadataFile = directory.child(METADATA_FILE_NAME)
             if (!metadataFile.exists) return null
-            return metadataFile.bufferedReader().use {
-                CacheMetadataSerializer.deserialize(it)
-            }
+            return CacheMetadataSerializer.deserialize(metadataFile)
         }
 
         class Monolithic(target: KonanTarget, kind: Kind, path: String)
-            : Cache(target, kind, path, File(path).parentFile.parentFile.absolutePath)
+            : Cache(target, kind, path, File(path).absoluteFile.parentFile!!.parentFile!!.absolutePath)
         {
             fun getMetadataOrNull(): CacheMetadata? = readMetadataOrNull(File(rootDirectory))
 
             override fun computeBitcodeDependencies(): List<DependenciesTracker.UnresolvedDependency> {
-                val directory = File(path).absoluteFile.parentFile
+                val directory = File(path).absoluteFile.parentFile!!
                 val data = directory.child(BITCODE_DEPENDENCIES_FILE_NAME).readStrings()
                 return DependenciesSerializer.deserialize(path, data)
             }
@@ -94,25 +92,25 @@ class CachedLibraries(
             override fun computeBinariesPaths() = listOf(path)
 
             override fun computeSerializedInlineFunctionBodies() = mutableListOf<SerializedInlineFunctionReference>().also {
-                val directory = File(path).absoluteFile.parentFile.parentFile
+                val directory = File(path).absoluteFile.parentFile!!.parentFile!!
                 val data = directory.child(PER_FILE_CACHE_IR_LEVEL_DIR_NAME).child(INLINE_FUNCTION_BODIES_FILE_NAME).readBytes()
                 InlineFunctionBodyReferenceSerializer.deserializeTo(data, it)
             }
 
             override fun computeSerializedClassFields() = mutableListOf<SerializedClassFields>().also {
-                val directory = File(path).absoluteFile.parentFile.parentFile
+                val directory = File(path).absoluteFile.parentFile!!.parentFile!!
                 val data = directory.child(PER_FILE_CACHE_IR_LEVEL_DIR_NAME).child(CLASS_FIELDS_FILE_NAME).readBytes()
                 ClassFieldsSerializer.deserializeTo(data, it)
             }
 
             override fun computeSerializedEagerInitializedFiles() = mutableListOf<SerializedEagerInitializedFile>().also {
-                val directory = File(path).absoluteFile.parentFile.parentFile
+                val directory = File(path).absoluteFile.parentFile!!.parentFile!!
                 val data = directory.child(PER_FILE_CACHE_IR_LEVEL_DIR_NAME).child(EAGER_INITIALIZED_PROPERTIES_FILE_NAME).readBytes()
                 EagerInitializedPropertySerializer.deserializeTo(data, it)
             }
 
             override fun computeSerializedTrivialGetters() = mutableListOf<SerializedTrivialGetter>().also {
-                val directory = File(path).absoluteFile.parentFile.parentFile
+                val directory = File(path).absoluteFile.parentFile!!.parentFile!!
                 val data = directory.child(PER_FILE_CACHE_IR_LEVEL_DIR_NAME).child(TRIVIAL_GETTERS_FILE_NAME).readBytes()
                 TrivialGettersSerializer.deserializeTo(data, it)
             }
@@ -325,3 +323,13 @@ class CachedLibraries(
         const val TRIVIAL_GETTERS_FILE_NAME = "trivial_getters"
     }
 }
+
+internal val File.listFiles: List<File>
+    get() = listFilesOrEmpty
+
+internal val File.listFilesOrEmpty: List<File>
+    get() = if (isDirectory) {
+        runCatching { toPath().listDirectoryEntries().map { it.toFile() } }.getOrDefault(emptyList())
+    } else {
+        emptyList()
+    }

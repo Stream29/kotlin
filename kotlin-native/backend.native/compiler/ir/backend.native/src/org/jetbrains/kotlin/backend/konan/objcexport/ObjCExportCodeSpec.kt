@@ -18,8 +18,8 @@ import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.ir.util.IdSignatureComposer
 import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassNotAny
-import java.io.PrintStream
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 internal fun ObjCExportedInterface.createCodeSpec(symbolTable: SymbolTable): ObjCExportCodeSpec {
@@ -157,12 +157,12 @@ internal class ObjCExportCodeSpec(
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 internal fun ObjCExportCodeSpec.dumpSelectorToSignatureMapping(path: String, signaturer: IdSignatureComposer, mapper: ObjCExportMapper) {
-    PrintStream(path).use { out ->
-        out.println("# Classes mapping")
+    val content = buildString {
+        appendLine("# Classes mapping")
         for (type in types) {
             val objcClass = type.binaryName
             val kotlinClass = type.irClassSymbol.signature.toString()
-            out.println("$objcClass,$kotlinClass")
+            appendLine("$objcClass,$kotlinClass")
         }
         fun ObjCMethodSpec.isInstanceMethod(): Boolean = when (this) {
             is ObjCFactoryMethodForKotlinArrayConstructor -> baseMethod.bridge.isInstance
@@ -188,7 +188,7 @@ internal fun ObjCExportCodeSpec.dumpSelectorToSignatureMapping(path: String, sig
             }
             is ObjCGetterForNSEnumType -> null
         }
-        out.println("\n# Instance methods mapping")
+        appendLine("\n# Instance methods mapping")
         for (type in types) {
             val overrides = buildMap {
                 for (method in type.irClassSymbol.descriptor.contributedMethods) {
@@ -200,26 +200,27 @@ internal fun ObjCExportCodeSpec.dumpSelectorToSignatureMapping(path: String, sig
                 }
             }
             for (mapping in type.methods.filter { it.isInstanceMethod() }) {
-                out.println(mapping.getMapping(type.binaryName, overrides) ?: continue)
+                appendLine(mapping.getMapping(type.binaryName, overrides) ?: continue)
             }
             if (type is ObjCClassForKotlinClass) {
                 for (mapping in type.categoryMethods) {
-                    out.println(mapping.getMapping(type.binaryName, emptyMap()) ?: continue)
+                    appendLine(mapping.getMapping(type.binaryName, emptyMap()) ?: continue)
                 }
             }
         }
-        out.println("\n# Class methods mapping")
+        appendLine("\n# Class methods mapping")
         for (type in types) {
             for (mapping in type.methods.filterNot { it.isInstanceMethod() }) {
-                out.println(mapping.getMapping(type.binaryName, emptyMap()) ?: continue)
+                appendLine(mapping.getMapping(type.binaryName, emptyMap()) ?: continue)
             }
         }
         for (file in files) {
             for (mapping in file.methods) {
-                out.println(mapping.getMapping(file.binaryName, emptyMap()) ?: continue)
+                appendLine(mapping.getMapping(file.binaryName, emptyMap()) ?: continue)
             }
         }
     }
+    File(path).writeText(content)
 }
 
 internal sealed class ObjCMethodSpec {

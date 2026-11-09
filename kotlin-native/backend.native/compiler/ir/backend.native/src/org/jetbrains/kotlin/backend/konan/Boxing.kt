@@ -173,7 +173,7 @@ private fun initCache(cache: BoxCache, generationState: NativeGenerationState, c
     val [start, end] = cache.defaultRange
 
     return if (declareOnly) {
-        staticData.createGlobal(LLVMArrayType(llvmBoxType, end - start + 1)!!, cacheName, true)
+        staticData.createGlobal(LLVMArrayType(llvmBoxType, (end - start + 1).toUInt())!!, cacheName, true)
     } else {
         // Constancy of these globals allows LLVM's constant propagation and DCE
         // to remove fast path of boxing function in case of empty range.
@@ -219,7 +219,7 @@ internal fun IrConstantPrimitive.toBoxCacheValue(generationState: NativeGenerati
                 BoxCache.INT -> llvm.int32Type
                 BoxCache.LONG -> llvm.int64Type
             })
-            val llvmArrayType = LLVMArrayType(llvmType, end - start + 1)!!
+            val llvmArrayType = LLVMArrayType(llvmType, (end - start + 1).toUInt())!!
             llvm.boxCacheGlobals[cacheType]?.pointer?.getElementPtr(llvm, llvmArrayType, value.toInt() - start)?.getElementPtr(llvm, llvmType, 0)
         }
     } else {
@@ -228,4 +228,4 @@ internal fun IrConstantPrimitive.toBoxCacheValue(generationState: NativeGenerati
 }
 
 private fun createConstant(llvmType: LLVMTypeRef, value: Int): ConstValue =
-        constValue(LLVMConstInt(llvmType, value.toLong(), 1)!!)
+        constValue(LLVMConstInt(llvmType, value.toLong().toULong(), 1)!!)

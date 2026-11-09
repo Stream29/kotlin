@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.descriptors.DescriptorVisibility
 import org.jetbrains.kotlin.ir.interpreter.CallInterceptor
 import org.jetbrains.kotlin.ir.interpreter.proxy.Proxy
 import org.jetbrains.kotlin.ir.interpreter.state.reflection.*
-import kotlin.reflect.KVisibility
+import org.jetbrains.kotlin.ir.interpreter.proxy.reflection.KVisibility
 
 internal interface ReflectionProxy : Proxy {
     fun DescriptorVisibility.toKVisibility(): KVisibility? {

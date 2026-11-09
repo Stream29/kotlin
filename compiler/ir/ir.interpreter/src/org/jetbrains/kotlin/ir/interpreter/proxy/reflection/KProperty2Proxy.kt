@@ -7,8 +7,8 @@ package org.jetbrains.kotlin.ir.interpreter.proxy.reflection
 
 import org.jetbrains.kotlin.ir.interpreter.CallInterceptor
 import org.jetbrains.kotlin.ir.interpreter.state.reflection.KPropertyState
-import kotlin.reflect.KMutableProperty2
-import kotlin.reflect.KProperty2
+import org.jetbrains.kotlin.ir.interpreter.proxy.reflection.KMutableProperty2
+import org.jetbrains.kotlin.ir.interpreter.proxy.reflection.KProperty2
 
 internal open class KProperty2Proxy(
     state: KPropertyState, callInterceptor: CallInterceptor

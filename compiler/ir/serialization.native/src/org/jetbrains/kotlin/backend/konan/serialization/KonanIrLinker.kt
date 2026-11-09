@@ -28,7 +28,7 @@ import org.jetbrains.kotlin.library.metadata.DeserializedKlibModuleOrigin
 import org.jetbrains.kotlin.library.metadata.impl.KlibResolvedModuleDescriptorsFactoryImpl
 import org.jetbrains.kotlin.library.metadata.isCInteropLibrary
 import org.jetbrains.kotlin.library.metadata.klibModuleOrigin
-import java.nio.file.Path
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 class KonanIrLinker(

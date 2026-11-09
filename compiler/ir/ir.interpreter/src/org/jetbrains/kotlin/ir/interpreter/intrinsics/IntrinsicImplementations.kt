@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.util.hasShape
 import org.jetbrains.kotlin.ir.util.toIrConst
 import org.jetbrains.kotlin.types.Variance
-import java.util.*
 
 internal sealed class IntrinsicBase {
     abstract fun getListOfAcceptableFunctions(): List<String>
@@ -325,15 +324,15 @@ internal object DataClassArrayToString : IntrinsicBase() {
     private fun arrayToString(array: Any?): String {
         return when (array) {
             null -> "null"
-            is Array<*> -> Arrays.toString(array)
-            is ByteArray -> Arrays.toString(array)
-            is ShortArray -> Arrays.toString(array)
-            is IntArray -> Arrays.toString(array)
-            is LongArray -> Arrays.toString(array)
-            is CharArray -> Arrays.toString(array)
-            is BooleanArray -> Arrays.toString(array)
-            is FloatArray -> Arrays.toString(array)
-            is DoubleArray -> Arrays.toString(array)
+            is Array<*> -> array.contentToString()
+            is ByteArray -> array.contentToString()
+            is ShortArray -> array.contentToString()
+            is IntArray -> array.contentToString()
+            is LongArray -> array.contentToString()
+            is CharArray -> array.contentToString()
+            is BooleanArray -> array.contentToString()
+            is FloatArray -> array.contentToString()
+            is DoubleArray -> array.contentToString()
             else -> stop { "Only arrays are supported in `dataClassArrayMemberToString` call" }
         }
     }

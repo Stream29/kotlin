@@ -36,7 +36,6 @@ fun <T : IrElement, D> MutableList<T>.transformInPlace(transformer: IrTransforme
     }
 }
 
-@JvmName("transformInPlaceNullable")
 fun <T : IrElement, D> MutableList<T?>.transformInPlace(transformer: IrTransformer<D>, data: D) {
     for (i in 0 until size) {
         // Cast to IrElementBase to avoid casting to interface and invokeinterface, both of which are slow.

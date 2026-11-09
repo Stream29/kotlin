@@ -28,8 +28,8 @@ import org.jetbrains.kotlin.backend.konan.llvm.name
 import org.jetbrains.kotlin.backend.konan.llvm.verifyModule
 import org.jetbrains.kotlin.backend.konan.optimizations.RemoveRedundantSafepointsPass
 import org.jetbrains.kotlin.config.nativeBinaryOptions.SanitizerKind
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.util.PerformanceManager
-import java.io.File
 import kotlin.sequences.forEach
 
 
@@ -47,7 +47,12 @@ internal val WriteBitcodeFilePhase = createSimpleNamedCompilerPhase<NativeBacken
 ) { context, (llvmModule, outputFile) ->
     // Insert `_main` after pipeline, so we won't worry about optimizations corrupting entry point.
     insertAliasToEntryPoint(context, llvmModule)
-    LLVMWriteBitcodeToFile(llvmModule, outputFile.canonicalPath)
+    val outputPath = if (outputFile.exists) {
+        outputFile.canonicalPath
+    } else {
+        "${File(outputFile.absolutePath.substringBeforeLast('/').ifEmpty { "/" }).canonicalPath}/${outputFile.name}"
+    }
+    LLVMWriteBitcodeToFile(llvmModule, outputPath)
 }
 
 internal val CheckExternalCallsPhase = createSimpleNamedCompilerPhase<NativeGenerationState, Unit>(

@@ -7,69 +7,38 @@ package org.jetbrains.kotlin.backend.konan
 
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.backend.konan.driver.phases.FrontendContext
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportLazy
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportLazyImpl
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportProblemCollector
-import org.jetbrains.kotlin.backend.konan.objcexport.dumpObjCHeader
 import org.jetbrains.kotlin.config.nativeBinaryOptions.BinaryOptions
 import org.jetbrains.kotlin.config.nativeBinaryOptions.UnitSuspendFunctionObjCExport
-import org.jetbrains.kotlin.container.*
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.konan.config.emitLazyObjcHeaderFile
 import org.jetbrains.kotlin.konan.config.objcGenerics
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.resolve.deprecation.DeprecationResolver
 import org.jetbrains.kotlin.K1Deprecation
 
-@OptIn(K1Deprecation::class)
-internal fun StorageComponentContainer.initContainer(config: NativeSecondStageCompilationConfig) {
-    useImpl<FrontendServices>()
+class DeprecationResolver {
+    fun getDeprecations(@Suppress("UNUSED_PARAMETER") descriptor: CallableMemberDescriptor): List<Any> = emptyList()
+}
 
-    if (!config.configuration.emitLazyObjcHeaderFile.isNullOrEmpty()) {
-        useImpl<ObjCExportLazyImpl>()
-        useInstance(object : ObjCExportProblemCollector {
-            override fun reportWarning(text: String) {}
-            override fun reportWarning(declaration: DeclarationDescriptor, text: String) {}
-            override fun reportError(text: String) {}
-            override fun reportError(declaration: DeclarationDescriptor, text: String) {}
-            override fun reportException(throwable: Throwable) = throw throwable
-        })
-
-        useInstance(object : ObjCExportLazy.Configuration {
-            override val frameworkName: String
-                get() = config.fullExportedNamePrefix
-
-            override fun isIncluded(moduleInfo: ModuleInfo): Boolean = true
-
-            override fun getCompilerModuleName(moduleInfo: ModuleInfo): String {
-                TODO()
-            }
-
-            override val objcGenerics: Boolean
-                get() = config.configuration.objcGenerics
-
-            override val objcExportBlockExplicitParameterNames: Boolean
-                get() = config.configuration.get(BinaryOptions.objcExportBlockExplicitParameterNames, false)
-
-            override val disableSwiftMemberNameMangling: Boolean
-                get() = config.configuration.getBoolean(BinaryOptions.objcExportDisableSwiftMemberNameMangling)
-
-            override val unitSuspendFunctionExport: UnitSuspendFunctionObjCExport
-                get() = config.unitSuspendFunctionObjCExport
-
-            override val ignoreInterfaceMethodCollisions: Boolean
-                get() = config.configuration.getBoolean(BinaryOptions.objcExportIgnoreInterfaceMethodCollisions)
-        })
+interface ObjCExportLazy {
+    interface Configuration {
+        val frameworkName: String
+        fun isIncluded(moduleInfo: ModuleInfo): Boolean
+        fun getCompilerModuleName(moduleInfo: ModuleInfo): String
+        val objcGenerics: Boolean
+        val objcExportBlockExplicitParameterNames: Boolean
+        val disableSwiftMemberNameMangling: Boolean
+        val unitSuspendFunctionExport: UnitSuspendFunctionObjCExport
+        val ignoreInterfaceMethodCollisions: Boolean
     }
+
+    fun dumpObjCHeader(files: Collection<KtFile>, outputFile: String, shouldExportKDoc: Boolean)
 }
 
 @OptIn(K1Deprecation::class)
-internal fun ComponentProvider.postprocessComponents(context: FrontendContext, files: Collection<KtFile>) {
-    context.frontendServices = this.get<FrontendServices>()
-
-    context.config.configuration.emitLazyObjcHeaderFile?.takeIf { it.isNotEmpty() }?.let {
-        this.get<ObjCExportLazy>().dumpObjCHeader(files, it, context.shouldExportKDoc())
-    }
+internal fun KonanComponentProvider.postprocessComponents(context: FrontendContext, @Suppress("UNUSED_PARAMETER") files: Collection<KtFile>) {
+    context.frontendServices = this.frontendServices
 }
 
 @OptIn(K1Deprecation::class)

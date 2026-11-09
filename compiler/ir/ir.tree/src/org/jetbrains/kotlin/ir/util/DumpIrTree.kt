@@ -511,7 +511,7 @@ class DumpIrTreeVisitor(
         if (isBound)
             printer.println("$label: ", owner.accept(elementRenderer, null))
         else
-            printer.println("$label: UNBOUND ${javaClass.simpleName}")
+            printer.println("$label: UNBOUND ${this::class.simpleName}")
     }
 
     private fun IrSymbol.dumpAsReference(label: String? = null) =

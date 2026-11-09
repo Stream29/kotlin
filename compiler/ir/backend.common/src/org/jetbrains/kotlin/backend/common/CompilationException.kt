@@ -66,10 +66,8 @@ class CompilationException(
                 content?.let { appendLine("Problem with `$it`") }
                 append("Details: " + super.message)
             }
-        } catch (_: Throwable) {
-            throw IllegalStateException("Problem with constructing exception message").also {
-                it.stackTrace = stackTrace
-            }
+        } catch (e: Throwable) {
+            throw IllegalStateException("Problem with constructing exception message", e)
         }
 }
 
@@ -128,7 +126,5 @@ fun Throwable.wrapWithCompilationException(
             file,
             element,
             cause = this
-        ).apply {
-            stackTrace = this@wrapWithCompilationException.stackTrace
-        }
+        )
 }

@@ -15,7 +15,7 @@ abstract class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boo
     KotlinExportChecker<DeclarationDescriptor> {
 
     override fun check(declaration: DeclarationDescriptor, type: SpecialDeclarationType): Boolean =
-        declaration.accept(this, type)
+        declaration.accept(this, type)!!
 
     private fun <D> D.isExported(): Boolean where D : DeclarationDescriptorNonRoot, D : DeclarationDescriptorWithVisibility {
         if (getContainingDeclaration() is PackageFragmentDescriptor) {
@@ -26,7 +26,7 @@ abstract class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boo
         }
 
         return visibility !== DescriptorVisibilities.LOCAL &&
-                getContainingDeclaration().accept(this@DescriptorExportCheckerVisitor, SpecialDeclarationType.REGULAR)
+                getContainingDeclaration().accept(this@DescriptorExportCheckerVisitor, SpecialDeclarationType.REGULAR)!!
     }
 
     override fun visitPackageFragmentDescriptor(descriptor: PackageFragmentDescriptor, data: SpecialDeclarationType) = true
@@ -39,7 +39,7 @@ abstract class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boo
         !descriptor.name.isAnonymous && descriptor.isExported()
 
     override fun visitTypeParameterDescriptor(descriptor: TypeParameterDescriptor, data: SpecialDeclarationType): Boolean =
-        descriptor.containingDeclaration.accept(this, data)
+        descriptor.getContainingDeclaration().accept(this, data)!!
 
     override fun visitClassDescriptor(descriptor: ClassDescriptor, data: SpecialDeclarationType): Boolean {
         if (data == SpecialDeclarationType.ANON_INIT) return false

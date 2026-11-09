@@ -95,7 +95,7 @@ internal data class ClassBodyAndAlignmentInfo(
 private fun ContextUtils.createClassBody(name: String, fields: List<ClassLayoutBuilder.FieldInfo>): ClassBodyAndAlignmentInfo {
     val classType = LLVMStructCreateNamed(LLVMGetModuleContext(llvm.module), name)!!
     val packed = context.config.packFields ||
-        fields.any { LLVMABIAlignmentOfType(runtime.targetData, it.type.toLLVMType(llvm)) != it.alignment }
+        fields.any { LLVMABIAlignmentOfType(runtime.targetData, it.type.toLLVMType(llvm)).toInt() != it.alignment }
     val alignment = maxOf(runtime.objectAlignment, fields.maxOfOrNull { it.alignment } ?: 0)
     val indices = mutableMapOf<IrFieldSymbol, Int>()
 
@@ -103,7 +103,7 @@ private fun ContextUtils.createClassBody(name: String, fields: List<ClassLayoutB
         var currentOffset = 0L
         fun addAndCount(type: LLVMTypeRef) {
             add(type)
-            currentOffset += LLVMStoreSizeOfType(runtime.targetData, type)
+            currentOffset += LLVMStoreSizeOfType(runtime.targetData, type).toLong()
         }
         addAndCount(runtime.objHeaderType)
         for (field in fields) {
@@ -111,7 +111,7 @@ private fun ContextUtils.createClassBody(name: String, fields: List<ClassLayoutB
                 val offset = (currentOffset % field.alignment).toInt()
                 if (offset != 0) {
                     val toInsert = field.alignment - offset
-                    addAndCount(LLVMArrayType(llvm.int8Type, toInsert)!!)
+                    addAndCount(LLVMArrayType(llvm.int8Type, toInsert.toUInt())!!)
                 }
                 require(currentOffset % field.alignment == 0L)
             }
@@ -119,12 +119,12 @@ private fun ContextUtils.createClassBody(name: String, fields: List<ClassLayoutB
             addAndCount(field.type.toLLVMType(llvm))
         }
     }
-    LLVMStructSetBody(classType, fieldTypes.toCValues(), fieldTypes.size, if (packed) 1 else 0)
+    LLVMStructSetBody(classType, fieldTypes.toCValues(), fieldTypes.size.toUInt(), if (packed) 1 else 0)
 
     context.logMultiple {
         +"$name has following fields:"
         for (i in fieldTypes.indices) {
-            +"  $i: ${llvmtype2string(fieldTypes[i])} at offset ${LLVMOffsetOfElement(runtime.targetData, classType, i)}"
+            +"  $i: ${llvmtype2string(fieldTypes[i])} at offset ${LLVMOffsetOfElement(runtime.targetData, classType, i.toUInt())}"
         }
         +"  Overall llvm alignment is ${LLVMABIAlignmentOfType(runtime.targetData, classType)}"
         +"  Overall required alignment is ${alignment}"
@@ -146,7 +146,7 @@ private class DeclarationsGeneratorVisitor(override val generationState: NativeG
 
         fun getName(parent: FqName, declaration: IrDeclaration): Name {
             return names.getOrPut(declaration) {
-                val count = counts.getOrDefault(parent, 0) + 1
+                val count = counts.getOrElse(parent) { 0 } + 1
                 counts[parent] = count
                 Name.identifier(prefix + count)
             }
@@ -241,7 +241,7 @@ private class DeclarationsGeneratorVisitor(override val generationState: NativeG
 
         val packedFields = mutableListOf<IndexedField>()
         for (field in fields) {
-            val size = LLVMStoreSizeOfType(llvm.runtime.targetData, field.type.toLLVMType(llvm))
+            val size = LLVMStoreSizeOfType(llvm.runtime.targetData, field.type.toLLVMType(llvm)).toLong()
             check(size == 1L || size == 2L || size == 4L || size % 8 == 0L)
             check(min(size, 8L) % field.alignment == 0L)
             val offset = nextOffset(size)
@@ -293,7 +293,7 @@ private class DeclarationsGeneratorVisitor(override val generationState: NativeG
 
             val typeInfoWithVtableType = llvm.structType(
                     runtime.typeInfoType,
-                    LLVMArrayType(llvm.pointerType, context.getLayoutBuilder(declaration).vtableEntries.size)!!
+                    LLVMArrayType(llvm.pointerType, context.getLayoutBuilder(declaration).vtableEntries.size.toUInt())!!
             )
 
             typeInfoGlobal = staticData.createGlobal(
@@ -311,7 +311,7 @@ private class DeclarationsGeneratorVisitor(override val generationState: NativeG
             // This works only if there is no gap between the beginning of the global and the TypeInfo part,
             // which should always be the case, since it is the zeroth element.
             // Still, better be safe than sorry, checking this explicitly:
-            val typeInfoOffsetInGlobal = LLVMOffsetOfElement(llvmTargetData, typeInfoWithVtableType, 0)
+            val typeInfoOffsetInGlobal = LLVMOffsetOfElement(llvmTargetData, typeInfoWithVtableType, 0u).toLong()
             check(typeInfoOffsetInGlobal == 0L) { "Offset for $typeInfoSymbolName TypeInfo is $typeInfoOffsetInGlobal" }
 
             typeInfoPtr = typeInfoGlobal.pointer.getElementPtr(llvm, typeInfoWithVtableType, 0)
@@ -406,7 +406,7 @@ private class DeclarationsGeneratorVisitor(override val generationState: NativeG
                     FieldLlvmDeclarations(
                             index,
                             bodyType,
-                            gcd(LLVMOffsetOfElement(llvm.runtime.targetData, bodyType, index), llvm.runtime.objectAlignment.toLong()).toInt()
+                            gcd(LLVMOffsetOfElement(llvm.runtime.targetData, bodyType, index.toUInt()).toLong(), llvm.runtime.objectAlignment.toLong()).toInt()
                     )
             )
         } else {

@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.util.superClass
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.NameUtils.getPackagePartClassNamePrefix
-import java.io.File
+import nativekotlin.host.files.NativeFile as File
 
 /**
  * This does two different things:
@@ -64,9 +64,9 @@ fun IrClass.addAll(members: List<IrDeclaration>) {
 }
 
 val IrFile.path: String get() = fileEntry.name
-val IrFile.name: String get() = File(path).name
+val IrFile.name: String get() = File(path.trimEnd('/')).name
 val IrFile.nameWithPackage: String get() = packageFqName.child(Name.identifier(name)).asString()
-val IrFile.packagePartClassName: String get() = getPackagePartClassNamePrefix(File(path).nameWithoutExtension) + "Kt"
+val IrFile.packagePartClassName: String get() = getPackagePartClassNamePrefix(name.substringBeforeLast('.', name)) + "Kt"
 
 val IrFunction.isStaticMethodOfClass: Boolean
     get() = this is IrSimpleFunction && parent is IrClass && dispatchReceiverParameter == null

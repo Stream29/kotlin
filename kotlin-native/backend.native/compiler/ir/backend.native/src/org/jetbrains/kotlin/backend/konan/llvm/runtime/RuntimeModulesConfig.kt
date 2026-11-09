@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.backend.konan.llvm.runtime
 
 import org.jetbrains.kotlin.backend.konan.NativeSecondStageCompilationConfig
 import org.jetbrains.kotlin.konan.config.runtimeFile
-import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.file.*
 
 class RuntimeModulesConfig(private val config: NativeSecondStageCompilationConfig) {
     /**

@@ -73,7 +73,7 @@ fun quoteAsCStringLiteral(str: String): String = buildString {
     // Encoding the string to UTF-8 is arguable (e.g. what if the target platform uses another encoding?),
     // but we anyway encode the generated C stubs to UTF-8 when writing them to file in CStubsManager.
     // So here we just do the same for fragments of them but earlier.
-    for (byte in str.toByteArray(Charsets.UTF_8)) {
+    for (byte in str.encodeToByteArray()) {
         when (byte) {
             in asciiCharsAllowedInCStringLiterals -> {
                 // It is an allowed ASCII char and therefore can be rendered as is.

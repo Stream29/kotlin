@@ -233,7 +233,7 @@ internal interface ContextUtils : RuntimeAware {
 /**
  * Converts this string to the sequence of bytes to be used for hashing/storing to binary/etc.
  */
-internal fun stringAsBytes(str: String) = str.toByteArray(Charsets.UTF_8)
+internal fun stringAsBytes(str: String) = str.encodeToByteArray()
 
 internal class ScopeInitializersGenerationState {
     var globalInitState: LLVMValueRef? = null
@@ -260,31 +260,31 @@ internal class InitializersGenerationState {
 }
 
 internal class ConstInt1(llvm: CodegenLlvmHelpers, val value: Boolean) : ConstValue {
-    override val llvm = LLVMConstInt(llvm.int1Type, if (value) 1 else 0, 1)!!
+    override val llvm = LLVMConstInt(llvm.int1Type, if (value) 1uL else 0uL, 1)!!
 }
 
 internal class ConstInt8(llvm: CodegenLlvmHelpers, val value: Byte) : ConstValue {
-    override val llvm = LLVMConstInt(llvm.int8Type, value.toLong(), 1)!!
+    override val llvm = LLVMConstInt(llvm.int8Type, value.toLong().toULong(), 1)!!
 }
 
 internal class ConstUInt8(llvm: CodegenLlvmHelpers, val value: UByte) : ConstValue {
-    override val llvm = LLVMConstInt(llvm.int8Type, value.toLong(), 1)!!
+    override val llvm = LLVMConstInt(llvm.int8Type, value.toULong(), 1)!!
 }
 
 internal class ConstInt16(llvm: CodegenLlvmHelpers, val value: Short) : ConstValue {
-    override val llvm = LLVMConstInt(llvm.int16Type, value.toLong(), 1)!!
+    override val llvm = LLVMConstInt(llvm.int16Type, value.toLong().toULong(), 1)!!
 }
 
 internal class ConstChar16(llvm: CodegenLlvmHelpers, val value: Char) : ConstValue {
-    override val llvm = LLVMConstInt(llvm.int16Type, value.code.toLong(), 1)!!
+    override val llvm = LLVMConstInt(llvm.int16Type, value.code.toLong().toULong(), 1)!!
 }
 
 internal class ConstInt32(llvm: CodegenLlvmHelpers, val value: Int) : ConstValue {
-    override val llvm = LLVMConstInt(llvm.int32Type, value.toLong(), 1)!!
+    override val llvm = LLVMConstInt(llvm.int32Type, value.toLong().toULong(), 1)!!
 }
 
 internal class ConstInt64(llvm: CodegenLlvmHelpers, val value: Long) : ConstValue {
-    override val llvm = LLVMConstInt(llvm.int64Type, value, 1)!!
+    override val llvm = LLVMConstInt(llvm.int64Type, value.toULong(), 1)!!
 }
 
 internal class ConstFloat32(llvm: CodegenLlvmHelpers, val value: Float) : ConstValue {
@@ -309,13 +309,13 @@ internal open class BasicLlvmHelpers(bitcodeContext: BitcodePostProcessingContex
                 ?.groupBy(
                         {
                             LLVMGetInitializer(
-                                    if (bitcodeContext.config.useLlvmOpaquePointers) LLVMGetOperand(it, 1)
-                                    else LLVMGetOperand(LLVMGetOperand(it, 1), 0)
+                                    if (bitcodeContext.config.useLlvmOpaquePointers) LLVMGetOperand(it, 1u)
+                                    else LLVMGetOperand(LLVMGetOperand(it, 1u), 0u)
                             )?.getAsCString() ?: ""
                         },
                         {
-                            if (bitcodeContext.config.useLlvmOpaquePointers) LLVMGetOperand(it, 0)!!
-                            else LLVMGetOperand(LLVMGetOperand(it, 0), 0)!!
+                            if (bitcodeContext.config.useLlvmOpaquePointers) LLVMGetOperand(it, 0u)!!
+                            else LLVMGetOperand(LLVMGetOperand(it, 0u), 0u)!!
                         }
                 )
                 ?.filterKeys { it != "" }
@@ -517,7 +517,7 @@ internal class CodegenLlvmHelpers(private val generationState: NativeGenerationS
     val intptrType = LLVMIntPtrTypeInContext(llvmContext, runtime.targetData)!!
     val floatType = LLVMFloatTypeInContext(llvmContext)!!
     val doubleType = LLVMDoubleTypeInContext(llvmContext)!!
-    val vector128Type = LLVMVectorType(floatType, 4)!!
+    val vector128Type = LLVMVectorType(floatType, 4u)!!
     val voidType = LLVMVoidTypeInContext(llvmContext)!!
     val pointerType = runtime.pointerType
 
@@ -527,15 +527,15 @@ internal class CodegenLlvmHelpers(private val generationState: NativeGenerationS
             Struct(structType(elements.map { it.llvmType }, packed), *elements)
 
     private fun structType(types: List<LLVMTypeRef>, packed: Boolean = false): LLVMTypeRef =
-            LLVMStructTypeInContext(llvmContext, types.toCValues(), types.size, if (packed) 1 else 0)!!
+            LLVMStructTypeInContext(llvmContext, types.toCValues(), types.size.toUInt(), if (packed) 1 else 0)!!
 
     fun structTypeWithFlexibleArray(original: LLVMTypeRef, newSize: Int): LLVMTypeRef {
         assert(LLVMGetTypeKind(original) == LLVMTypeKind.LLVMStructTypeKind) { "not a struct" }
-        val types = (0 until LLVMCountStructElementTypes(original)).mapTo(mutableListOf()) { LLVMStructGetTypeAtIndex(original, it) }
+        val types = (0 until LLVMCountStructElementTypes(original).toInt()).mapTo(mutableListOf()) { LLVMStructGetTypeAtIndex(original, it.toUInt()) }
         val array = types.last()
-        assert(LLVMGetTypeKind(array) == LLVMTypeKind.LLVMArrayTypeKind && LLVMGetArrayLength(array) == 0) { "not a flexible array" }
-        types[types.lastIndex] = LLVMArrayType(LLVMGetElementType(array), newSize)
-        return LLVMStructTypeInContext(llvmContext, types.toCValues(), types.size, LLVMIsPackedStruct(original))!!
+        assert(LLVMGetTypeKind(array) == LLVMTypeKind.LLVMArrayTypeKind && LLVMGetArrayLength(array).toInt() == 0) { "not a flexible array" }
+        types[types.lastIndex] = LLVMArrayType(LLVMGetElementType(array), newSize.toUInt())
+        return LLVMStructTypeInContext(llvmContext, types.toCValues(), types.size.toUInt(), LLVMIsPackedStruct(original))!!
     }
 
     fun constInt1(value: Boolean) = ConstInt1(this, value)
@@ -554,7 +554,7 @@ internal class CodegenLlvmHelpers(private val generationState: NativeGenerationS
     fun char16(value: Char): LLVMValueRef = constChar16(value).llvm
     fun int32(value: Int): LLVMValueRef = constInt32(value).llvm
     fun int64(value: Long): LLVMValueRef = constInt64(value).llvm
-    fun intptr(value: Int): LLVMValueRef = LLVMConstInt(intptrType, value.toLong(), 1)!!
+    fun intptr(value: Int): LLVMValueRef = LLVMConstInt(intptrType, value.toLong().toULong(), 1)!!
     fun float32(value: Float): LLVMValueRef = constFloat32(value).llvm
     fun float64(value: Double): LLVMValueRef = constFloat64(value).llvm
 
@@ -625,7 +625,7 @@ internal class CodegenLlvmHelpers(private val generationState: NativeGenerationS
     )
 
     private fun getSizeOfTypeInBits(type: LLVMTypeRef): Long {
-        return LLVMSizeOfTypeInBits(runtime.targetData, type)
+        return LLVMSizeOfTypeInBits(runtime.targetData, type).toLong()
     }
 
     /**
@@ -648,7 +648,6 @@ class IrStaticInitializer(val konanLibrary: KotlinLibrary?, val runtimeInitializ
 /**
  * Function of the [CodeGeneratorVisitor.kInitFuncType] type (aka `Initializer` in `Runtime.h`).
  */
-@JvmInline
 value class RuntimeInitializer(val llvmCallable: LlvmCallable)
 
 context(llvm: CodegenLlvmHelpers)

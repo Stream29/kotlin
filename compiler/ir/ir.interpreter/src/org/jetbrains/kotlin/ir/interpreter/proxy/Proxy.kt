@@ -18,7 +18,8 @@ import org.jetbrains.kotlin.ir.interpreter.state.reflection.ReflectionState
 import org.jetbrains.kotlin.ir.types.isArray
 import org.jetbrains.kotlin.ir.types.isFloat
 import org.jetbrains.kotlin.name.Name
-import java.lang.invoke.MethodType
+import kotlin.reflect.KClass
+import org.jetbrains.kotlin.ir.interpreter.MethodType
 
 internal interface Proxy {
     val state: State
@@ -31,7 +32,7 @@ internal interface Proxy {
     override fun toString(): String
 }
 
-internal fun State.wrap(callInterceptor: CallInterceptor, remainArraysAsIs: Boolean, extendFrom: Class<*>? = null): Any? {
+internal fun State.wrap(callInterceptor: CallInterceptor, remainArraysAsIs: Boolean, extendFrom: KClass<*>? = null): Any? {
     return when (this) {
         is ExceptionState -> this
         is Wrapper -> this.value
@@ -69,6 +70,6 @@ internal fun List<State>.wrap(callInterceptor: CallInterceptor, irFunction: IrFu
     }
 }
 
-internal fun Class<*>.isObject(): Boolean {
-    return this == Any::class.java
+internal fun KClass<*>.isObject(): Boolean {
+    return this == Any::class
 }

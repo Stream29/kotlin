@@ -54,7 +54,7 @@ internal class ClassifierExplorer(
                 ?: arguments.firstUnusable { it.typeOrNull?.exploreType(visitedSymbols) }
                 ?: Usable
             is IrDynamicType -> Usable
-            else -> throw IllegalArgumentException("Unsupported IR type: ${this::class.java}, $this")
+            else -> throw IllegalArgumentException("Unsupported IR type: ${this::class}, $this")
         }
     }
 

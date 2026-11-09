@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.library.*
 import org.jetbrains.kotlin.library.metadata.KlibMetadataHeaderFlags
 import org.jetbrains.kotlin.library.metadata.KlibMetadataProtoBuf
 import org.jetbrains.kotlin.util.toMetadataVersion
-import java.io.File
+import nativekotlin.host.files.NativeFile as File
 
 /**
  * Holds the binary data for a single Kotlin file to be written to a KLIB, i.e., its metadata and IR (unless it's a metadata-only KLIB).
@@ -63,7 +63,7 @@ class SerializerOutput(
 fun KtSourceFile.toIoFileOrNull(): File? = when (this) {
     is KtIoFileSourceFile -> file
     is KtVirtualFileSourceFile -> VfsUtilCore.virtualToIoFile(virtualFile)
-    is KtPsiSourceFile -> VfsUtilCore.virtualToIoFile(psiFile.virtualFile)
+    is KtPsiSourceFile -> VfsUtilCore.virtualToIoFile(psiFile.virtualFile!!)
     else -> path?.let(::File)
 }
 

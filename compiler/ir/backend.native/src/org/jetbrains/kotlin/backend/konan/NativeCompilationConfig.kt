@@ -7,9 +7,9 @@ package org.jetbrains.kotlin.backend.konan
 
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.metadataKlib
-import org.jetbrains.kotlin.konan.config.NativeConfigurationKeys
 import org.jetbrains.kotlin.konan.config.konanFriendLibraries
 import org.jetbrains.kotlin.konan.config.konanIncludedBinaries
+import org.jetbrains.kotlin.konan.config.konanManifestNativeTargets
 import org.jetbrains.kotlin.konan.config.konanNativeLibraries
 import org.jetbrains.kotlin.konan.config.konanOutputPath
 import org.jetbrains.kotlin.konan.config.konanProducedArtifactKind
@@ -56,7 +56,7 @@ interface NativeCompilationConfig {
         get() = configuration.konanWriteDependenciesOfProducedKlibTo
 
     val nativeTargetsForManifest: Collection<KonanTarget>?
-        get() = configuration[NativeConfigurationKeys.KONAN_MANIFEST_NATIVE_TARGETS]
+        get() = configuration.konanManifestNativeTargets.ifEmpty { null }
 
     val manifestProperties: Properties?
 

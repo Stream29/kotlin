@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.ir.validation
 
+import kotlin.reflect.KClass
+
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
 import org.jetbrains.kotlin.config.IrVerificationMode
 import org.jetbrains.kotlin.diagnostics.KtSourcelessDiagnosticFactory
@@ -78,14 +80,14 @@ private class IrFileValidator(
     private val typeCheckers: List<IrTypeChecker> = config.checkers.filterIsInstance<IrTypeChecker>()
     private val typeContextUpdaters: List<ContextUpdater> = typeCheckers.flatMap { it.requiredContextUpdaters }
 
-    private val checkersPerElementCache = hashMapOf<Class<out IrElement>, List<IrElementChecker<*>>>()
+    private val checkersPerElementCache = hashMapOf<KClass<out IrElement>, List<IrElementChecker<*>>>()
 
     private fun List<ContextUpdater>.runWithContextUpdaters(element: IrElement, block: () -> Unit) {
         this.fold(block) { currentBlock, updater -> { updater.runInNewContext(context, element, currentBlock) } }.invoke()
     }
 
-    private fun getCheckersFor(type: Class<out IrElement>) = checkersPerElementCache.computeIfAbsent(type) {
-        elementCheckers.filter { it.elementClass.isAssignableFrom(type) }
+    private fun getCheckersFor(element: IrElement) = checkersPerElementCache.getOrPut(element::class) {
+        elementCheckers.filter { it.elementClass.isInstance(element) }
     }
 
     override fun visitElement(element: IrElement) {
@@ -93,7 +95,7 @@ private class IrFileValidator(
         // This is because the children of a given element may have their own properties that need context-specific validation.
         contextUpdaters.runWithContextUpdaters(element) { element.acceptChildrenVoid(this) }
 
-        for (checker in getCheckersFor(element.javaClass)) {
+        for (checker in getCheckersFor(element)) {
             @Suppress("UNCHECKED_CAST")
             (checker as IrElementChecker<IrElement>).check(element, context)
         }

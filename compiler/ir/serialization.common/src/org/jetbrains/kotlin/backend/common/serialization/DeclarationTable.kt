@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.backend.common.serialization
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import kotlin.collections.HashMap as Object2ObjectOpenHashMap
 import org.jetbrains.kotlin.backend.common.diagnostics.IdSignatureClashDetector
 import org.jetbrains.kotlin.backend.common.serialization.signature.FileLocalIdSignatureComputer
 import org.jetbrains.kotlin.backend.common.serialization.signature.PublicIdSignatureComputer

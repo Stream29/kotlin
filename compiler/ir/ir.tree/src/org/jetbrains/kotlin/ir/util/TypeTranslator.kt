@@ -22,7 +22,6 @@ import org.jetbrains.kotlin.types.typesApproximation.approximateCapturedTypes
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.memoryOptimizedMap
 import org.jetbrains.kotlin.utils.threadLocal
-import java.util.*
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 abstract class TypeTranslator(
@@ -40,7 +39,7 @@ abstract class TypeTranslator(
 
     private val typeParametersResolver by threadLocal { typeParametersResolverBuilder() }
 
-    private val erasureStack = Stack<PropertyDescriptor>()
+    private val erasureStack = NativeIrStack<PropertyDescriptor>()
 
     private val supportDefinitelyNotNullTypes: Boolean = languageVersionSettings.supportsFeature(LanguageFeature.DefinitelyNonNullableTypes)
 

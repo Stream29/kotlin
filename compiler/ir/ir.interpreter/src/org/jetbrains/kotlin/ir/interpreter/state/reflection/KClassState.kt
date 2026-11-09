@@ -14,10 +14,10 @@ import org.jetbrains.kotlin.ir.interpreter.CallInterceptor
 import org.jetbrains.kotlin.ir.interpreter.internalName
 import org.jetbrains.kotlin.ir.interpreter.proxy.reflection.*
 import org.jetbrains.kotlin.ir.types.classOrNull
-import kotlin.reflect.KCallable
-import kotlin.reflect.KFunction
+import org.jetbrains.kotlin.ir.interpreter.proxy.reflection.KCallable
+import org.jetbrains.kotlin.ir.interpreter.proxy.reflection.KFunction
 import kotlin.reflect.KType
-import kotlin.reflect.KTypeParameter
+import org.jetbrains.kotlin.ir.interpreter.proxy.reflection.KTypeParameter
 
 internal class KClassState(val classReference: IrClass, override val irClass: IrClass) : ReflectionState() {
     private var _members: Collection<KCallable<*>>? = null
@@ -85,7 +85,7 @@ internal class KClassState(val classReference: IrClass, override val irClass: Ir
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (this::class != other?.let { it::class }) return false
 
         other as KClassState
 

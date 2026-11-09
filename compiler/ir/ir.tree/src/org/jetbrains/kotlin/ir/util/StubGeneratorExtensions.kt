@@ -61,7 +61,6 @@ open class StubGeneratorExtensions {
     open fun generateRawTypeAnnotation(): IrAnnotation? = null
 
     companion object {
-        @JvmField
         val EMPTY = StubGeneratorExtensions()
     }
 }

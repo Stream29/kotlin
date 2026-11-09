@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.backend.konan.llvm.objcexport.KotlinToObjCMethodAdap
 import org.jetbrains.kotlin.backend.konan.lower.getLoweredConstructorFunction
 import org.jetbrains.kotlin.backend.konan.lower.getObjectClassInstanceFunction
 import org.jetbrains.kotlin.backend.konan.objcexport.*
+import org.jetbrains.kotlin.builtins.*
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
@@ -38,11 +39,9 @@ import org.jetbrains.kotlin.ir.types.isNothing
 import org.jetbrains.kotlin.ir.types.isUnit
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
-import org.jetbrains.kotlin.konan.target.LinkerOutputKind
 import org.jetbrains.kotlin.library.isNativeStdlib
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.DFS
-import kotlin.jvm.Throws
 
 internal fun TypeBridge.makeNothing(llvm: CodegenLlvmHelpers) = when (this) {
     is ReferenceBridge, is BlockPointerBridge -> llvm.kNull
@@ -185,7 +184,7 @@ internal fun ObjCExportFunctionGenerationContext.callAndMaybeRetainAutoreleased(
         val result = actualCallable.buildCall(builder, actualArgs).let { callResult ->
             // Simplified version of emitAutoreleasedReturnValueMarker in Clang:
             objCExportCodegen.objcRetainAutoreleasedReturnValueMarker?.let {
-                LLVMBuildCall2(arg0 = builder, functionType(llvm.voidType), Fn = it, Args = null, NumArgs = 0, Name = "")
+                LLVMBuildCall2(builder, functionType(llvm.voidType), it, null, 0u, "")
             }
 
             call(objCExportCodegen.objcRetainAutoreleasedReturnValue, listOf(callResult)).also {
@@ -482,10 +481,10 @@ internal class ObjCExportCodeGenerator(
 
         // The following two also contain stuff from swift-export
         generationState.bindClassToObjCNameClassAdapters.forEach { [name, ptr] ->
-            placedClassAdapters.putIfAbsent(name, ptr)
+            if (name !in placedClassAdapters) placedClassAdapters[name] = ptr
         }
         generationState.bindClassToObjCNameInterfaceAdapters.forEach { [name, ptr] ->
-            placedInterfaceAdapters.putIfAbsent(name, ptr)
+            if (name !in placedInterfaceAdapters) placedInterfaceAdapters[name] = ptr
         }
 
         fun emitSortedAdapters(nameToAdapter: Map<String, ConstPointer>, prefix: String) {
@@ -542,7 +541,7 @@ internal class ObjCExportCodeGenerator(
 
                 val irFunction = irBuiltIns.anyClass.owner.simpleFunctions().single { it.name == name }
 
-                val descriptor = context.builtIns.any.unsubstitutedMemberScope
+                val descriptor = context.builtIns.any.getUnsubstitutedMemberScope()
                         .getContributedFunctions(name, NoLookupLocation.FROM_BACKEND).single()
 
                 val baseMethod = createObjCMethodSpecBaseMethod(mapper, namer, irFunction.symbol, descriptor)
@@ -672,6 +671,8 @@ private fun ObjCExportCodeGenerator.generateUnitContinuationToRetainedCompletion
     }
 }
 
+private fun IrClass.isMappedFunctionClass(): Boolean = name.asString().startsWith("Function")
+
 private val ObjCExportBlockCodeGenerator.mappedFunctionNClasses: List<IrClass>
     get() {
         val stdlibModule = context.irLinker.modules.values.firstOrNull { it.kotlinLibrary?.isNativeStdlib == true }
@@ -708,7 +709,7 @@ private fun ObjCExportBlockCodeGenerator.emitBlockToKotlinFunctionConverters() {
             "",
             llvm.pointerType,
             converters
-    ).pointer.getElementPtr(llvm, LLVMArrayType(llvm.pointerType, converters.size)!!, 0)
+    ).pointer.getElementPtr(llvm, LLVMArrayType(llvm.pointerType, converters.size.toUInt())!!, 0)
 
     // Note: defining globals declared in runtime.
     staticData.placeGlobal("Kotlin_ObjCExport_blockToFunctionConverters", ptr, isExported = true)
@@ -1518,7 +1519,7 @@ private fun ObjCExportCodeGenerator.createTypeAdapter(
         val table = rttiGenerator.vtable(irClass)
         staticData.placeGlobal("", table).also {
             it.setConstant(true)
-        }.pointer.getElementPtr(llvm, LLVMArrayType(llvm.pointerType, table.elements.size)!!, 0)
+        }.pointer.getElementPtr(llvm, LLVMArrayType(llvm.pointerType, table.elements.size.toUInt())!!, 0)
     } else {
         null
     }

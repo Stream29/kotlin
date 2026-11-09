@@ -3,6 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+
 package org.jetbrains.kotlin.ir.util
 
 import com.intellij.openapi.util.text.StringUtil
@@ -10,6 +12,9 @@ import com.intellij.util.applyIf
 import org.jetbrains.kotlin.DeprecatedCompilerApi
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
+import org.jetbrains.kotlin.descriptors.containingDeclaration
+import org.jetbrains.kotlin.descriptors.name
+import org.jetbrains.kotlin.descriptors.type
 import org.jetbrains.kotlin.descriptors.annotations.KotlinRetention
 import org.jetbrains.kotlin.ir.AbstractIrFileEntry
 import org.jetbrains.kotlin.ir.IrElement
@@ -32,7 +37,7 @@ import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
 import org.jetbrains.kotlin.utils.addToStdlib.runUnless
-import java.io.File
+import nativekotlin.host.files.NativeFile as File
 
 fun IrElement.render(options: DumpIrTreeOptions = DumpIrTreeOptions()) =
     accept(RenderIrElementVisitor(options), null)
@@ -57,7 +62,7 @@ class RenderIrElementVisitor(
     }
 
     fun renderFilePath(fileEntry: IrFileEntry): String {
-        val fileName = if (options.printFilePath) fileEntry.name else File(fileEntry.name).name
+        val fileName = if (options.printFilePath) fileEntry.name else File(fileEntry.name.trimEnd('/')).name
         return options.filePathRenderer(fileEntry, fileName)
     }
 
@@ -80,7 +85,7 @@ class RenderIrElementVisitor(
         fun renderReferenceInClassicWay(): String = if (isBound)
             owner.accept(BoundSymbolReferenceRenderer(variableNameData, hideParameterNames, options.copy(printSourceOffsets = false)), null)
         else
-            "UNBOUND ${javaClass.simpleName}"
+            "UNBOUND ${this::class.simpleName}"
 
         return when (val strategy = options.referenceRenderingStrategy) {
             is ReferenceRenderingStrategy.Default -> renderReferenceInClassicWay()
@@ -98,7 +103,7 @@ class RenderIrElementVisitor(
 
         override fun visitElement(element: IrElement, data: Nothing?) = buildTrimEnd {
             append('{')
-            append(element.javaClass.simpleName)
+            append(element::class.simpleName)
             append('}')
             if (element is IrDeclaration) {
                 if (element is IrDeclarationWithName) {
@@ -270,16 +275,16 @@ class RenderIrElementVisitor(
 
         private fun StringBuilder.renderElementNameFallback(element: Any) {
             append('{')
-            append(element.javaClass.simpleName)
+            append(element::class.simpleName)
             append('}')
         }
     }
 
     override fun visitElement(element: IrElement, data: Nothing?): String =
-        "?ELEMENT? ${element::class.java.simpleName} $element"
+        "?ELEMENT? ${element::class.simpleName} $element"
 
     override fun visitDeclaration(declaration: IrDeclarationBase, data: Nothing?): String =
-        "?DECLARATION? ${declaration::class.java.simpleName} $declaration"
+        "?DECLARATION? ${declaration::class.simpleName} $declaration"
 
     override fun visitModuleFragment(declaration: IrModuleFragment, data: Nothing?): String {
         return buildString {
@@ -423,7 +428,7 @@ class RenderIrElementVisitor(
         "SYNTHETIC_BODY${body.renderOffsets(options)} kind=${body.kind}"
 
     override fun visitExpression(expression: IrExpression, data: Nothing?): String =
-        "? ${expression::class.java.simpleName} type=${expression.type.render()}"
+        "? ${expression::class.simpleName} type=${expression.type.render()}"
 
     override fun visitConst(expression: IrConst, data: Nothing?): String =
         "CONST" +
@@ -731,7 +736,7 @@ internal fun IrClassifierSymbol.renderClassifierFqn(options: DumpIrTreeOptions):
         is IrTypeParameterSymbol if isBound -> owner.renderTypeParameterFqn(options)
         is IrScriptSymbol if isBound -> owner.renderScriptFqn(options)
         else -> null
-    } ?: "<unbound ${this.javaClass.simpleName}>"
+    } ?: "<unbound ${this::class.simpleName}>"
 }
 
 internal fun IrTypeAliasSymbol.renderTypeAliasFqn(options: DumpIrTreeOptions): String =

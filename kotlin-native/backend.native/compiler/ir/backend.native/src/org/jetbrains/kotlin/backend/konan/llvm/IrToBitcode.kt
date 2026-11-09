@@ -458,7 +458,7 @@ internal class CodeGeneratorVisitor(
         val nextInitNode = llvm.kNull
         val argList = cValuesOf(initFunction.toConstPointer().llvm, nextInitNode)
         // Create static object of class InitNode.
-        val initNode = LLVMConstNamedStruct(kNodeInitType, argList, 2)!!
+        val initNode = LLVMConstNamedStruct(kNodeInitType, argList, 2u)!!
         // Create global variable with init record data.
         return codegen.staticData.placeGlobal("init_node", constPointer(initNode), isExported = false).llvmGlobal
     }
@@ -686,7 +686,7 @@ internal class CodeGeneratorVisitor(
     private fun getThreadLocalInitStateFor(container: IrDeclarationContainer): AddressAccess =
             llvm.initializersGenerationState.fileThreadLocalInitStates.getOrPut(container) {
                 codegen.addKotlinThreadLocal("state_thread_local$${container.initVariableSuffix}", llvm.intptrType,
-                        LLVMPreferredAlignmentOfType(llvm.runtime.targetData, llvm.intptrType), false).also {
+                        LLVMPreferredAlignmentOfType(llvm.runtime.targetData, llvm.intptrType).toInt(), false).also {
                     LLVMSetInitializer((it as GlobalAddressAccess).getAddress(null), llvm.intptr(FILE_NOT_INITIALIZED))
                 }
             }
@@ -1358,8 +1358,8 @@ internal class CodeGeneratorVisitor(
         assert(value.argument.type.isInt())
         val llvmSrcType = value.argument.type.toLLVMType(llvm)
         val llvmDstType = type.toLLVMType(llvm)
-        val srcWidth    = LLVMGetIntTypeWidth(llvmSrcType)
-        val dstWidth    = LLVMGetIntTypeWidth(llvmDstType)
+        val srcWidth    = LLVMGetIntTypeWidth(llvmSrcType).toInt()
+        val dstWidth    = LLVMGetIntTypeWidth(llvmDstType).toInt()
         return when {
             srcWidth == dstWidth           -> result
             srcWidth > dstWidth            -> LLVMBuildTrunc(functionGenerationContext.builder, result, llvmDstType, "")!!
@@ -1731,7 +1731,7 @@ internal class CodeGeneratorVisitor(
     private fun fieldPtrOfClass(thisPtr: LLVMValueRef, value: IrField): LLVMValueRef {
         val fieldInfo = generationState.llvmDeclarations.forField(value)
         val classBodyType = fieldInfo.classBodyType
-        val fieldPtr = LLVMBuildStructGEP2(functionGenerationContext.builder, classBodyType, thisPtr, fieldInfo.index, "")
+        val fieldPtr = LLVMBuildStructGEP2(functionGenerationContext.builder, classBodyType, thisPtr, fieldInfo.index.toUInt(), "")
         return fieldPtr!!
     }
 
@@ -1761,8 +1761,8 @@ internal class CodeGeneratorVisitor(
      * Also, java.lang classes are used here to avoid unexpected NaN values if a compiler and stdlib
      * are built in an arm64 architecture environment.
      */
-    private fun Float.normalizeNan() = if (isNaN()) java.lang.Float.NaN else this
-    private fun Double.normalizeNan() = if (isNaN()) java.lang.Double.NaN else this
+    private fun Float.normalizeNan() = if (isNaN()) Float.NaN else this
+    private fun Double.normalizeNan() = if (isNaN()) Double.NaN else this
 
     private fun evaluateConst(value: IrConst): ConstValue {
         context.log{"evaluateConst                  : ${ir2string(value)}"}
@@ -2170,11 +2170,11 @@ internal class CodeGeneratorVisitor(
                     refScope = scope.scope as DIScopeOpaqueRef,
                     name = expression.computeSymbolName(),
                     file = fileEntry.diFileScope(),
-                    lineNum = expression.startLine(),
-                    sizeInBits = sizeInBits,
-                    alignInBits = alignInBits,
-                    offsetInBits = scope.offsetInBits,
-                    flags = 0,
+                    lineNum = expression.startLine().toUInt(),
+                    sizeInBits = sizeInBits.toULong(),
+                    alignInBits = alignInBits.toULong(),
+                    offsetInBits = scope.offsetInBits.toULong(),
+                    flags = 0u,
                     type = expression.type.diType(codegen.llvmTargetData)
             )!!)
         }
@@ -2706,7 +2706,7 @@ internal class CodeGeneratorVisitor(
         }
         val data = llvm.kNull
         val argList = cValuesOf(priority, ctorFunction.toConstPointer().llvm, data)
-        val ctorItem = LLVMConstNamedStruct(kCtorType, argList, 3)!!
+        val ctorItem = LLVMConstNamedStruct(kCtorType, argList, 3u)!!
         return constPointer(ctorItem)
     }
 

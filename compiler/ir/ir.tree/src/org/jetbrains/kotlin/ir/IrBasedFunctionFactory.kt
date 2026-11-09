@@ -43,7 +43,6 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.types.Variance
-import java.io.File
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 abstract class IrAbstractFunctionFactory {
@@ -426,4 +425,3 @@ class IrBasedFunctionFactory(
         }
     }
 }
-

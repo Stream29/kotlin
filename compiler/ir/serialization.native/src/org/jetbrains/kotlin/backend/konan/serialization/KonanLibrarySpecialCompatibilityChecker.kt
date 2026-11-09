@@ -9,9 +9,9 @@ import org.jetbrains.kotlin.backend.common.diagnostics.LibrarySpecialCompatibili
 import org.jetbrains.kotlin.io.readProperties
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.isNativeStdlib
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
+import org.jetbrains.kotlin.library.KlibFiles as Files
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.KlibPaths as Paths
 
 object KonanLibrarySpecialCompatibilityChecker : LibrarySpecialCompatibilityChecker() {
     override fun KotlinLibrary.toCheckedLibrary(): CheckedLibrary? = when {

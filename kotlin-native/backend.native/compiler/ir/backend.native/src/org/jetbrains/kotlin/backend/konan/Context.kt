@@ -21,9 +21,11 @@ import org.jetbrains.kotlin.backend.konan.serialization.InlineFunctionDeserializ
 import org.jetbrains.kotlin.backend.konan.serialization.KonanIrLinker
 import org.jetbrains.kotlin.backend.konan.serialization.KonanPartialModuleDeserializer
 import org.jetbrains.kotlin.backend.konan.serialization.TrivialGettersDeserializer
+import org.jetbrains.kotlin.builtins.*
 import org.jetbrains.kotlin.builtins.konan.KonanBuiltIns
 import org.jetbrains.kotlin.cli.common.diagnosticsCollector
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.name
 import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.KtDiagnosticReporterWithImplicitIrBasedContext
 import org.jetbrains.kotlin.ir.declarations.*
@@ -33,10 +35,9 @@ import org.jetbrains.kotlin.ir.types.IrTypeSystemContextImpl
 import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
 import org.jetbrains.kotlin.ir.util.isTrivialGetter
 import org.jetbrains.kotlin.ir.util.render
+import org.jetbrains.kotlin.library.KlibPath as Path
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.utils.addToStdlib.getOrSetIfNull
-import java.nio.file.Path
-import java.util.concurrent.ConcurrentHashMap
 
 private var IrClass.layoutBuilder: ClassLayoutBuilder? by irAttribute(copyByDefault = false)
 
@@ -69,7 +70,7 @@ internal class Context(
         ExternalDeclarationFileNameProvider(moduleDeserializerProvider)
     }
 
-    private val inlineFunctionDeserializers = ConcurrentHashMap<KonanPartialModuleDeserializer, InlineFunctionDeserializer>()
+    private val inlineFunctionDeserializers = mutableMapOf<KonanPartialModuleDeserializer, InlineFunctionDeserializer>()
 
     fun getInlineFunctionDeserializer(function: IrFunction): InlineFunctionDeserializer {
         val deserializer = moduleDeserializerProvider.getDeserializerOrNull(function)
@@ -103,9 +104,7 @@ internal class Context(
         (irClass.metadata as? KonanMetadata.Class)?.layoutBuilder?.let {
             return it
         }
-        synchronized(irClass) {
-            return irClass::layoutBuilder.getOrSetIfNull { ClassLayoutBuilder(irClass, this) }
-        }
+        return irClass::layoutBuilder.getOrSetIfNull { ClassLayoutBuilder(irClass, this) }
     }
 
     lateinit var globalHierarchyAnalysisResult: GlobalHierarchyAnalysisResult

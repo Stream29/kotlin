@@ -37,6 +37,12 @@ private val cEnumEntryValueTypes = setOf(
         "UByte", "UShort", "UInt", "ULong"
 )
 
+private fun IrClass.inheritsFromCStruct(): Boolean =
+        superTypes.any { it.classOrNull?.owner?.hasEqualFqName(InteropFqNames.cStructVar) == true }
+
+private fun IrClass.inheritsFromCEnum(): Boolean =
+        superTypes.any { it.classOrNull?.owner?.hasEqualFqName(InteropFqNames.cEnum) == true }
+
 /**
  * Creates implementation (mostly IR bodies) for C structs and C enums deserialized from C-interop Klib.
  * Unlike other declarations from C/Objective-C, for which only linkable stubs are generated, C structs and C enums

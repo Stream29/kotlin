@@ -48,12 +48,15 @@ internal class ExceptionState private constructor(
         exception: Throwable, irClass: IrClass, stackTrace: List<String>, environment: IrInterpreterEnvironment
     ) : this(irClass, evaluateFields(exception, irClass, environment), stackTrace + evaluateAdditionalStackTrace(exception, environment)) {
         setCause(null)  // TODO check this fact
-        if (irClass.name.asString() != exception::class.java.simpleName) {
-            // ir class wasn't found in classpath, a stub was passed => need to save java class hierarchy
-            this.exceptionFqName = exception::class.java.name
+        if (irClass.name.asString() != exception::class.simpleName) {
+            val simple = exception::class.simpleName ?: "Throwable"
+            val pkg = if (simple == "NoSuchElementException" || simple == "ConcurrentModificationException") "java.util" else "java.lang"
+            this.exceptionFqName = "$pkg.$simple"
             exceptionHierarchy += this.exceptionFqName
-            generateSequence(exception::class.java.superclass) { it.superclass }.forEach { exceptionHierarchy += it.name }
-            exceptionHierarchy.removeAt(exceptionHierarchy.lastIndex) // remove unnecessary java.lang.Object
+            if (exception is Error) exceptionHierarchy += "java.lang.Error"
+            if (exception is RuntimeException) exceptionHierarchy += "java.lang.RuntimeException"
+            if (exception is Exception) exceptionHierarchy += "java.lang.Exception"
+            exceptionHierarchy += "java.lang.Throwable"
         }
     }
 
@@ -116,40 +119,12 @@ internal class ExceptionState private constructor(
 
             val messageVar = messageProperty.symbol to Primitive(exception.message, messageProperty.getter!!.returnType)
             val causeVar = exception.cause?.let {
-                causeProperty.symbol to ExceptionState(it, irClass, stackTrace + it.stackTrace.reversed().map { "at $it" }, environment)
+                causeProperty.symbol to ExceptionState(it, irClass, stackTrace, environment)
             }
             return causeVar?.let { mutableMapOf(messageVar, it) } ?: mutableMapOf(messageVar)
         }
 
-        private fun evaluateAdditionalStackTrace(e: Throwable, environment: IrInterpreterEnvironment): List<String> {
-            // TODO do we really need this?... It will point to JVM stdlib
-            val additionalStack = mutableListOf<String>()
-            if (e.stackTrace.any { it.className == "java.lang.invoke.MethodHandle" }) {
-                for ([index, stackTraceElement] in e.stackTrace.withIndex()) {
-                    if (stackTraceElement.methodName == "invokeWithArguments") {
-                        additionalStack.addAll(e.stackTrace.slice(0 until index).reversed().map { "at $it" })
-                        break
-                    }
-                }
-
-                var cause = e.cause
-                val lastNeededValue = e.stackTrace.first().let { it.className + "." + it.methodName }
-                while (cause != null) {
-                    for ([causeStackIndex, causeStackTraceElement] in cause.stackTrace.withIndex()) {
-                        val currentStackTraceValue = causeStackTraceElement.let { it.className + "." + it.methodName }
-                        if (currentStackTraceValue == lastNeededValue) {
-                            cause.stackTrace = cause.stackTrace.sliceArray(0 until causeStackIndex).reversedArray()
-                            break
-                        }
-                    }
-                    cause = cause.cause
-                }
-            }
-
-            if (environment.configuration.collapseStackTraceFromJDK && additionalStack.isNotEmpty()) {
-                return listOf("at <JDK>")
-            }
-            return additionalStack
-        }
+        @Suppress("UNUSED_PARAMETER")
+        private fun evaluateAdditionalStackTrace(e: Throwable, environment: IrInterpreterEnvironment): List<String> = emptyList()
     }
 }

@@ -28,7 +28,7 @@ internal class ExternalDeclarationFileNameProvider(
             moduleDeserializer.getFileNameOf(declaration)
         }
 
-        else -> error("Unknown package fragment kind ${packageFragment::class.java}")
+        else -> error("Unknown package fragment kind ${packageFragment::class}")
     }
 
 }

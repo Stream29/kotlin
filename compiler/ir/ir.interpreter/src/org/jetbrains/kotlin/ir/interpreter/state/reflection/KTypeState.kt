@@ -35,7 +35,7 @@ internal class KTypeState(val irType: IrType, override val irClass: IrClass) : R
 
     fun getArguments(callInterceptor: CallInterceptor): List<KTypeProjection> {
         if (_arguments != null) return _arguments!!
-        callInterceptor.environment.javaClassToIrClass += KTypeProjection::class.java to callInterceptor.environment.kTypeProjectionClass.owner
+        callInterceptor.environment.javaClassToIrClass += KTypeProjection::class to callInterceptor.environment.kTypeProjectionClass.owner
         _arguments = (irType as IrSimpleType).arguments
             .map {
                 when (it.getVariance()) {
@@ -58,7 +58,7 @@ internal class KTypeState(val irType: IrType, override val irClass: IrClass) : R
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (this::class != other?.let { it::class }) return false
 
         other as KTypeState
 

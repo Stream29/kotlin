@@ -21,7 +21,6 @@ import org.jetbrains.kotlin.metadata.deserialization.Flags
 import org.jetbrains.kotlin.serialization.deserialization.ProtoEnumFlags
 import org.jetbrains.kotlin.types.Variance
 
-@JvmInline
 value class ClassFlags(val flags: Long) {
 
     val modality: Modality get() = ProtoEnumFlags.modality(IrFlags.MODALITY.get(flags.toInt()))
@@ -59,7 +58,6 @@ value class ClassFlags(val flags: Long) {
     }
 }
 
-@JvmInline
 value class FunctionFlags(val flags: Long) {
 
     val modality: Modality get() = ProtoEnumFlags.modality(IrFlags.MODALITY.get(flags.toInt()))
@@ -112,7 +110,6 @@ value class FunctionFlags(val flags: Long) {
     }
 }
 
-@JvmInline
 value class PropertyFlags(val flags: Long) {
 
     val modality: Modality get() = ProtoEnumFlags.modality(IrFlags.MODALITY.get(flags.toInt()))
@@ -154,7 +151,6 @@ value class PropertyFlags(val flags: Long) {
     }
 }
 
-@JvmInline
 value class ValueParameterFlags(val flags: Long) {
 
     val isCrossInline: Boolean get() = IrFlags.IS_CROSSINLINE.get(flags.toInt())
@@ -180,7 +176,6 @@ value class ValueParameterFlags(val flags: Long) {
     }
 }
 
-@JvmInline
 value class TypeAliasFlags(val flags: Long) {
 
     val visibility: DescriptorVisibility get() = ProtoEnumFlags.visibility(IrFlags.VISIBILITY.get(flags.toInt())).toDescriptorVisibility()
@@ -191,10 +186,9 @@ value class TypeAliasFlags(val flags: Long) {
     }
 }
 
-@JvmInline
 value class TypeParameterFlags(val flags: Long) {
 
-    val variance: Variance get() = ProtoEnumFlags.variance(IrFlags.VARIANCE.get(flags.toInt()))
+    val variance: Variance get() = ProtoEnumFlags.variance(IrFlags.VARIANCE.get(flags.toInt())!!)
     val isReified: Boolean get() = IrFlags.IS_REIFIED.get(flags.toInt())
 
     companion object {
@@ -209,7 +203,6 @@ value class TypeParameterFlags(val flags: Long) {
     }
 }
 
-@JvmInline
 value class FieldFlags(val flags: Long) {
 
     val visibility: DescriptorVisibility get() = ProtoEnumFlags.visibility(IrFlags.VISIBILITY.get(flags.toInt())).toDescriptorVisibility()
@@ -229,7 +222,6 @@ value class FieldFlags(val flags: Long) {
     }
 }
 
-@JvmInline
 value class LocalVariableFlags(val flags: Long) {
 
     val isVar: Boolean get() = IrFlags.IS_LOCAL_VAR.get(flags.toInt())
@@ -253,7 +245,6 @@ value class LocalVariableFlags(val flags: Long) {
     }
 }
 
-@JvmInline
 value class RichFunctionReferenceFlags(val flags: Long) {
     val hasUnitConversion: Boolean get() = HAS_UNIT_CONVERSION.get(flags.toInt())
     val hasSuspendConversion: Boolean get() = HAS_SUSPEND_CONVERSION.get(flags.toInt())

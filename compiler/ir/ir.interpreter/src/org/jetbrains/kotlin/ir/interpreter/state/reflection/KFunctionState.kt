@@ -29,9 +29,9 @@ import org.jetbrains.kotlin.ir.util.resolveFakeOverride
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.util.OperatorNameConventions
-import kotlin.reflect.KParameter
+import org.jetbrains.kotlin.ir.interpreter.proxy.reflection.KParameter
 import kotlin.reflect.KType
-import kotlin.reflect.KTypeParameter
+import org.jetbrains.kotlin.ir.interpreter.proxy.reflection.KTypeParameter
 
 internal class KFunctionState(
     val irFunction: IrFunction,

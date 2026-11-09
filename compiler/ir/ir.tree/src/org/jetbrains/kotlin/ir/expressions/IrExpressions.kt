@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.ir.expressions
 
+import org.jetbrains.kotlin.descriptors.correspondingProperty
+import org.jetbrains.kotlin.descriptors.typeParameters
+
 import org.jetbrains.kotlin.CompilerVersionOfApiDeprecation
 import org.jetbrains.kotlin.DeprecatedCompilerApi
 import org.jetbrains.kotlin.DeprecatedForRemovalCompilerApi
@@ -71,7 +74,7 @@ internal fun IrMemberAccessExpression<*>.checkArgumentSlotAccess(kind: String, i
     if (index >= total) {
         // KT-69558: TODO convert this throw to `irError(...) { withIrEntry(this) }`
         throw AssertionError(
-            "No such $kind argument slot in ${this::class.java.simpleName}: $index (total=$total)" +
+            "No such $kind argument slot in ${this::class.simpleName}: $index (total=$total)" +
                     (symbol.signature?.let { ".\nSymbol: $it" } ?: "") +
                     "\nExpression: ${render()}"
         )

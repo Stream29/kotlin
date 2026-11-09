@@ -33,7 +33,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.capitalizeAsciiOnly
 import org.jetbrains.kotlin.utils.keysToMap
-import java.lang.invoke.MethodType
+import kotlin.reflect.KClass
 
 val intrinsicConstEvaluationAnnotation = FqName("kotlin.internal.IntrinsicConstEvaluation")
 val compileTimeAnnotation = FqName("kotlin.CompileTimeCalculation")
@@ -68,18 +68,19 @@ fun IrAnnotationContainer.getAnnotation(annotation: FqName): IrAnnotation {
         ?: ((this as IrFunction).parent as IrClass).annotations.first { it.isAnnotationWithEqualFqName(annotation) }
 }
 
-internal fun getPrimitiveClass(irType: IrType, asObject: Boolean = false): Class<*>? =
+@Suppress("UNUSED_PARAMETER")
+internal fun getPrimitiveClass(irType: IrType, asObject: Boolean = false): KClass<*>? =
     when (irType.getPrimitiveType()) {
-        PrimitiveType.BOOLEAN -> if (asObject) Boolean::class.javaObjectType else Boolean::class.java
-        PrimitiveType.CHAR -> if (asObject) Char::class.javaObjectType else Char::class.java
-        PrimitiveType.BYTE -> if (asObject) Byte::class.javaObjectType else Byte::class.java
-        PrimitiveType.SHORT -> if (asObject) Short::class.javaObjectType else Short::class.java
-        PrimitiveType.INT -> if (asObject) Int::class.javaObjectType else Int::class.java
-        PrimitiveType.FLOAT -> if (asObject) Float::class.javaObjectType else Float::class.java
-        PrimitiveType.LONG -> if (asObject) Long::class.javaObjectType else Long::class.java
-        PrimitiveType.DOUBLE -> if (asObject) Double::class.javaObjectType else Double::class.java
+        PrimitiveType.BOOLEAN -> Boolean::class
+        PrimitiveType.CHAR -> Char::class
+        PrimitiveType.BYTE -> Byte::class
+        PrimitiveType.SHORT -> Short::class
+        PrimitiveType.INT -> Int::class
+        PrimitiveType.FLOAT -> Float::class
+        PrimitiveType.LONG -> Long::class
+        PrimitiveType.DOUBLE -> Double::class
         else -> when {
-            irType.isString() -> String::class.java
+            irType.isString() -> String::class
             else -> null
         }
     }

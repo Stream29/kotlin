@@ -314,7 +314,7 @@ class IrModuleDeserializerWithBuiltIns(
 open class CurrentModuleDeserializer(
     override val moduleFragment: IrModuleFragment,
 ) : IrModuleDeserializer(moduleFragment.descriptor, KotlinAbiVersion.CURRENT) {
-    override val klib get() = error("'klib' is not available for ${this::class.java}")
+    override val klib get() = error("'klib' is not available for ${this::class}")
 
     override fun contains(idSig: IdSignature): Boolean = false // TODO:
 

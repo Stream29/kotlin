@@ -8,7 +8,11 @@ package org.jetbrains.kotlin.ir.interpreter.proxy.reflection
 import org.jetbrains.kotlin.ir.interpreter.CallInterceptor
 import org.jetbrains.kotlin.ir.interpreter.state.reflection.KTypeParameterState
 import org.jetbrains.kotlin.types.Variance
-import kotlin.reflect.*
+import kotlin.reflect.KClass
+import kotlin.reflect.KClassifier
+import kotlin.reflect.KType
+import kotlin.reflect.KTypeProjection
+import kotlin.reflect.KVariance
 
 internal class KTypeParameterProxy(
     override val state: KTypeParameterState, override val callInterceptor: CallInterceptor

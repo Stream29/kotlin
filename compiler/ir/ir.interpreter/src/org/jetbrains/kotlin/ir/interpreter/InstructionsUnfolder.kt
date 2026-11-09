@@ -75,7 +75,7 @@ internal fun unfoldInstruction(element: IrElement?, environment: IrInterpreterEn
         is IrComposite -> unfoldComposite(element, callStack)
         is IrRichCallableReference<*> -> unfoldRichCallableReferenceReference(element, callStack)
 
-        else -> TODO("${element.javaClass} not supported")
+        else -> TODO("${element::class} not supported")
     }
 }
 

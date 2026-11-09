@@ -6,6 +6,8 @@
 package org.jetbrains.kotlin.ir.declarations.lazy
 
 import org.jetbrains.kotlin.ir.IrLock
+import org.jetbrains.kotlin.ir.synchronized
+import kotlin.concurrent.Volatile
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 

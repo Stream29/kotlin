@@ -991,7 +991,7 @@ private class InteropTransformerPart2(
                 IntrinsicType.INTEROP_BITS_TO_FLOAT -> {
                     val argument = expression.arguments[0]
                     if (argument is IrConst && argument.kind == IrConstKind.Int) {
-                        val floatValue = kotlinx.cinterop.bitsToFloat(argument.value as Int)
+                        val floatValue = Float.fromBits(argument.value as Int)
                         builder.irFloat(floatValue)
                     } else {
                         expression
@@ -1000,7 +1000,7 @@ private class InteropTransformerPart2(
                 IntrinsicType.INTEROP_BITS_TO_DOUBLE -> {
                     val argument = expression.arguments[0]
                     if (argument is IrConst && argument.kind == IrConstKind.Long) {
-                        val doubleValue = kotlinx.cinterop.bitsToDouble(argument.value as Long)
+                        val doubleValue = Double.fromBits(argument.value as Long)
                         builder.irDouble(doubleValue)
                     } else {
                         expression

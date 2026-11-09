@@ -27,7 +27,7 @@ import org.jetbrains.kotlin.resolve.calls.mpp.AbstractExpectActualChecker
 import org.jetbrains.kotlin.resolve.calls.mpp.AbstractExpectActualMatcher
 import org.jetbrains.kotlin.resolve.multiplatform.ExpectActualIncompatibility
 import org.jetbrains.kotlin.resolve.multiplatform.ExpectActualMatchingCompatibility
-import java.io.File
+import nativekotlin.host.files.NativeFile as File
 
 /**
  * This class is used to collect mapping between all expect and actuals declarations, which are declared in passed module fragments
@@ -526,6 +526,6 @@ internal class ExpectActualLinkCollector {
 }
 
 private fun IrFile.toIoFile(): File? = when (val fe = fileEntry) {
-    is PsiIrFileEntry -> fe.psiFile.virtualFile.let { it.fileSystem.getNioPath(it)?.toFile() }
+    is PsiIrFileEntry -> fe.psiFile.virtualFile?.let { it.fileSystem.getNioPath(it)?.toFile() }
     else -> File(fileEntry.name).takeIf { it.exists() }
 }

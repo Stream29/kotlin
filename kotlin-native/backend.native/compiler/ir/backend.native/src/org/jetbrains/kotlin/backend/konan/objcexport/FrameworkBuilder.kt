@@ -6,8 +6,9 @@
 package org.jetbrains.kotlin.backend.konan.objcexport
 
 import org.jetbrains.kotlin.backend.konan.NativeSecondStageCompilationConfig
+import org.jetbrains.kotlin.backend.konan.createAsSymlink
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.target.Family
 
 /**
@@ -47,7 +48,7 @@ internal class FrameworkBuilder(
 
         val moduleMap = moduleMapBuilder.build(frameworkName, moduleDependencies)
 
-        modules.child("module.modulemap").writeBytes(moduleMap.toByteArray())
+        modules.child("module.modulemap").writeBytes(moduleMap.encodeToByteArray())
 
         val directory = when (target.family) {
             Family.IOS,
@@ -60,7 +61,7 @@ internal class FrameworkBuilder(
 
         val infoPlistFile = directory.child("Info.plist")
         val infoPlistContents = infoPListBuilder.build(frameworkName, mainPackageGuesser, moduleDescriptor)
-        infoPlistFile.writeBytes(infoPlistContents.toByteArray())
+        infoPlistFile.writeBytes(infoPlistContents.encodeToByteArray())
         if (target.family == Family.OSX) {
             frameworkDirectory.child("Versions/Current").createAsSymlink("A")
             for (child in listOf(frameworkName, "Headers", "Modules", "Resources")) {

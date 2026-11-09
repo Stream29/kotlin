@@ -35,7 +35,6 @@ import org.jetbrains.kotlin.ir.types.isBoolean
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.*
 import org.jetbrains.kotlin.name.Name
-import java.util.*
 
 internal val STATEMENT_ORIGIN_NO_CAST_NEEDED = IrStatementOriginImpl("NO_CAST_NEEDED")
 
@@ -59,7 +58,7 @@ private sealed class LeafTerm {
 private class ComplexTerm(val element: IrElement, var depth: Int) : LeafTerm() {
     override fun format(inverted: Boolean) = when (element) {
         is IrValueDeclaration -> if (inverted) "!${element.name}" else "${element.name}"
-        else -> "[${element::class.java.simpleName}@0x${System.identityHashCode(element).toString(16)} is ${!inverted}]"
+        else -> "[${element::class.simpleName}@0x${element.hashCode().toString(16)} is ${!inverted}]"
     }
 }
 

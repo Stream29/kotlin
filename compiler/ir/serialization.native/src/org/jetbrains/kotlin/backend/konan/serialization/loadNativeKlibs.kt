@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.backend.common.LoadedNativeKlibs
 import org.jetbrains.kotlin.backend.common.eliminateLibrariesWithDuplicatedUniqueNames
 import org.jetbrains.kotlin.backend.common.loadFriendLibraries
 import org.jetbrains.kotlin.backend.common.reportLoadingProblemsIfAny
+import org.jetbrains.kotlin.backend.common.serialization.serializationAbsoluteFile
 import org.jetbrains.kotlin.cli.common.testEnvironment
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.konan.config.*
@@ -26,8 +27,7 @@ import org.jetbrains.kotlin.library.loader.KlibLoaderResult.ProblematicLibrary
 import org.jetbrains.kotlin.library.loader.KlibPlatformChecker
 import org.jetbrains.kotlin.utils.KotlinNativePaths
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
-import java.io.File
-import kotlin.io.path.pathString
+import nativekotlin.host.files.NativeFile as File
 
 /**
  * This is the entry point to load Kotlin/Native KLIBs.
@@ -45,7 +45,7 @@ fun loadNativeKlibs(
 
     val distributionLibrariesProvider: KlibNativeDistributionLibraryProvider? = runIf(loadStdlib || loadPlatformLibs) {
         val nativeHome = configuration.konanHome?.let(::File) ?: KotlinNativePaths.homePath
-        KlibNativeDistributionLibraryProvider(nativeHome.absoluteFile) {
+        KlibNativeDistributionLibraryProvider(nativeHome.serializationAbsoluteFile()) {
             runIf(loadStdlib) { withStdlib() }
             runIf(loadPlatformLibs) { withPlatformLibs(nativeTarget) }
         }

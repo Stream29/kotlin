@@ -228,7 +228,7 @@ internal class ObjCDataGenerator(val codegen: CodeGenerator) {
                 LLVMABIAlignmentOfType(
                         llvm.runtime.targetData,
                         LLVMGetInitializer(global.llvmGlobal)!!.type
-                )
+                ).toInt()
         )
 
         global.setSection(section)
@@ -266,7 +266,7 @@ internal class ObjCDataGenerator(val codegen: CodeGenerator) {
 
     class CStringLiteralsGenerator(val label: String, val section: String) {
         fun generate(module: LLVMModuleRef, llvm: CodegenLlvmHelpers, value: String): ConstPointer {
-            val bytes = value.toByteArray(Charsets.UTF_8).map { llvm.constInt8(it) } + llvm.constInt8(0)
+            val bytes = value.encodeToByteArray().map { llvm.constInt8(it) } + llvm.constInt8(0)
             val initializer = ConstArray(llvm.int8Type, bytes)
             val llvmGlobal = LLVMAddGlobal(module, initializer.llvmType, label)!!
             LLVMSetInitializer(llvmGlobal, initializer.llvm)
@@ -275,7 +275,7 @@ internal class ObjCDataGenerator(val codegen: CodeGenerator) {
             LLVMSetLinkage(llvmGlobal, LLVMLinkage.LLVMPrivateLinkage)
             LLVMSetSection(llvmGlobal, section)
             LLVMSetUnnamedAddr(llvmGlobal, 1)
-            LLVMSetAlignment(llvmGlobal, 1)
+            LLVMSetAlignment(llvmGlobal, 1u)
 
             return constPointer(llvmGlobal)
         }

@@ -82,12 +82,13 @@ import org.jetbrains.kotlin.ir.util.isInterface
 import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.ir.util.simpleFunctions
+import com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.kotlin.ir.visitors.IrVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
-import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.NameUtils
 import kotlin.collections.plus
 
 class TestProcessor(
@@ -227,9 +228,12 @@ class TestProcessor(
 
         val topLevelFunctions = mutableListOf<TestFunction>()
         val topLevelSuiteClassId: ClassId by lazy {
-            ClassId(irFile.packageFqName, PackagePartClassUtils.getFilePartShortName(irFile.fileName).let(Name::identifier))
+            ClassId(irFile.packageFqName, getFilePartShortName(irFile.fileName).let(Name::identifier))
         }
         val topLevelSuiteName: String get() = topLevelSuiteClassId.asFqNameString()
+
+        private fun getFilePartShortName(fileName: String): String =
+            NameUtils.getPackagePartClassNamePrefix(FileUtil.getNameWithoutExtension(fileName)) + "Kt"
 
         private fun MutableMap<IrClass, TestClass>.getTestClass(key: IrClass) =
                 getOrPut(key) { TestClass(key) }

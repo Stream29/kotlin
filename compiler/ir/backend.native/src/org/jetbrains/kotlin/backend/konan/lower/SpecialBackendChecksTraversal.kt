@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.backend.konan.reportCompilationError
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.isClass
+import org.jetbrains.kotlin.descriptors.type
 import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
@@ -36,13 +37,16 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.util.isNullable
 import org.jetbrains.kotlin.ir.visitors.IrVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
+import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.file.absoluteFile
+import org.jetbrains.kotlin.konan.file.isAbsolute
+import org.jetbrains.kotlin.konan.file.toPath
+import org.jetbrains.kotlin.konan.file.toRelativeString
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.NativeStandardInteropNames
 import org.jetbrains.kotlin.name.NativeStandardInteropNames.objCActionClassId
 import org.jetbrains.kotlin.name.isSubpackageOf
 import org.jetbrains.kotlin.types.Variance
-import org.jetbrains.kotlin.utils.fileUtils.descendantRelativeTo
-import java.io.File
 
 /**
  * Kotlin/Native-specific language checks. Most importantly, it checks C/Objective-C interop restrictions.
@@ -919,4 +923,12 @@ private fun BackendChecker.reportUnsupportedType(reason: String, type: IrType, l
 
     reportError(location.element, "type ${type.render()} $typeLocation is not supported here" +
             if (reason.isNotEmpty()) ": $reason" else "")
+}
+
+private fun File.descendantRelativeTo(base: File): File {
+    assert(base.isAbsolute) { "$base" }
+    assert(base.isDirectory) { "$base" }
+    val cwd = base.toPath().normalize()
+    val filePath = this.absoluteFile.toPath().normalize()
+    return if (filePath.startsWith(cwd)) File(filePath.toFile().toRelativeString(cwd.toFile())) else this
 }

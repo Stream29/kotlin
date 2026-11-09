@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlin.ir.types
 
+import org.jetbrains.kotlin.descriptors.typeConstructor
+import org.jetbrains.kotlin.descriptors.defaultType
+import org.jetbrains.kotlin.types.parameters
+
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrClass

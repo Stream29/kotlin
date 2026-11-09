@@ -34,8 +34,8 @@ internal class Common private constructor(override val irClass: IrClass, overrid
         }
     }
 
-    fun getIrFunction(method: java.lang.reflect.Method): IrFunction? {
-        val methodName = getKotlinName(method.declaringClass.name, method.name)
+    fun getIrFunction(declaringClassName: String, name: String): IrFunction? {
+        val methodName = getKotlinName(declaringClassName, name)
         return when (val declaration =
             irClass.declarations.singleOrNull { it is IrDeclarationWithName && it.name.asString() == methodName }
         ) {

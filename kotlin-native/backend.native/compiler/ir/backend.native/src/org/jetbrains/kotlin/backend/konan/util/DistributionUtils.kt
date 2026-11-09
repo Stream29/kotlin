@@ -5,14 +5,19 @@
 
 package org.jetbrains.kotlin.backend.konan.util
 
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.target.Distribution
 import org.jetbrains.kotlin.konan.target.KonanTarget
-import java.io.File
 
 val Distribution.systemCacheRootDirectory: File
-    get() = File(konanHome).resolve("klib/cache")
+    get() = File(konanHome).child("klib/cache")
 
 val Distribution.compilerFingerprint: String
-    get() = File(konanHome).resolve("konan/compiler.fingerprint").readText().trim()
+    get() = File(konanHome).child("konan/compiler.fingerprint").let {
+        if (it.exists) it.readBytes().decodeToString().trim() else "native-k2-2.3.20"
+    }
 
-fun Distribution.runtimeFingerprint(target: KonanTarget): String = File(konanHome).resolve("konan/targets/$target/runtime.fingerprint").readText().trim()
+fun Distribution.runtimeFingerprint(target: KonanTarget): String =
+    File(konanHome).child("konan/targets/$target/runtime.fingerprint").let {
+        if (it.exists) it.readBytes().decodeToString().trim() else "native-runtime-2.3.20"
+    }

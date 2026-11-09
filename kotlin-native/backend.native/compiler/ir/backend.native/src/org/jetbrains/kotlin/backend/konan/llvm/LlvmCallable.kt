@@ -29,7 +29,7 @@ class LlvmCallable(val functionType: LLVMTypeRef, val returnsObjectType: Boolean
     }
 
     val numParams by lazy {
-        LLVMCountParamTypes(functionType)
+        LLVMCountParamTypes(functionType).toInt()
     }
 
     val isConstant by lazy {
@@ -37,17 +37,17 @@ class LlvmCallable(val functionType: LLVMTypeRef, val returnsObjectType: Boolean
     }
 
     fun buildCall(builder: LLVMBuilderRef, args: List<LLVMValueRef>, name: String = "") =
-            LLVMBuildCall2(builder, functionType, llvmValue, args.toCValues(), args.size, name)!!.also {
+            LLVMBuildCall2(builder, functionType, llvmValue, args.toCValues(), args.size.toUInt(), name)!!.also {
                 attributeProvider.addCallSiteAttributes(it)
             }
 
     fun buildInvoke(builder: LLVMBuilderRef, args: List<LLVMValueRef>, success: LLVMBasicBlockRef, catch: LLVMBasicBlockRef, name: String = "") =
-            LLVMBuildInvoke2(builder, functionType, llvmValue, args.toCValues(), args.size, success, catch, name)!!.also {
+            LLVMBuildInvoke2(builder, functionType, llvmValue, args.toCValues(), args.size.toUInt(), success, catch, name)!!.also {
                 attributeProvider.addCallSiteAttributes(it)
             }
 
     fun buildLandingpad(builder: LLVMBuilderRef, landingpadType: LLVMTypeRef, numClauses: Int, name: String = "") =
-            LLVMBuildLandingPad(builder, landingpadType, llvmValue, numClauses, name)!!
+            LLVMBuildLandingPad(builder, landingpadType, llvmValue, numClauses.toUInt(), name)!!
 
     fun addBasicBlock(context: LLVMContextRef, name: String = "") =
             LLVMAppendBasicBlockInContext(context, llvmValue, name)!!
@@ -73,17 +73,17 @@ class LlvmCallable(val functionType: LLVMTypeRef, val returnsObjectType: Boolean
             scope = scope,
             function = llvmValue,
             file = file,
-            lineNo = lineNo,
+            lineNo = lineNo.toUInt(),
             type = type,
             isLocal = isLocal,
             isDefinition = isDefinition,
-            scopeLine = scopeLine,
+            scopeLine = scopeLine.toUInt(),
             isTransparentStepping = if (isTransparentStepping) 1 else 0,
     )!!
 
     fun param(i: Int) : LLVMValueRef {
         require(i in 0 until numParams)
-        return LLVMGetParam(llvmValue, i)!!
+        return LLVMGetParam(llvmValue, i.toUInt())!!
     }
 
     val isNoUnwind by lazy {

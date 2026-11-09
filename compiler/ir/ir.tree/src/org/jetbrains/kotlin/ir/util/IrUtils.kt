@@ -42,7 +42,6 @@ import org.jetbrains.kotlin.utils.addToStdlib.assignFrom
 import org.jetbrains.kotlin.utils.memoryOptimizedMap
 import org.jetbrains.kotlin.utils.memoryOptimizedMapIndexed
 import org.jetbrains.kotlin.utils.memoryOptimizedPlus
-import java.io.StringWriter
 
 /**
  * Binds all arguments represented in the IR to the parameters of the accessed function.
@@ -709,7 +708,7 @@ fun ir2string(ir: IrElement?): String = ir?.render() ?: ""
 
 @Suppress("unused") // Used in kotlin-native
 fun ir2stringWhole(ir: IrElement?): String {
-    val strWriter = StringWriter()
+    val strWriter = StringBuilder()
     ir?.accept(DumpIrTreeVisitor(strWriter), "")
     return strWriter.toString()
 }
@@ -1482,7 +1481,7 @@ fun IrElement.extractRelatedDeclaration(): IrDeclaration? {
 }
 
 inline fun <reified Symbol : IrSymbol> IrSymbol.unexpectedSymbolKind(): Nothing {
-    throw IllegalArgumentException("Unexpected kind of ${Symbol::class.java.typeName}: $this")
+    throw IllegalArgumentException("Unexpected kind of ${Symbol::class.qualifiedName}: $this")
 }
 
 inline fun <reified T> convertTo(value: Any): T {
@@ -1688,4 +1687,3 @@ val IrSimpleFunction.isTrivialGetter: Boolean
 
 fun IrSimpleFunction.findOverriddenMethodOfAny() =
     allOverridden().firstOrNull { it.parentClassOrNull?.isAny() == true }
-

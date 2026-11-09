@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.backend.common.serialization.encodings.*
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrSimpleTypeNullability
 import org.jetbrains.kotlin.config.KlibAbiCompatibilityLevel
 import org.jetbrains.kotlin.descriptors.*
-import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.INTERNAL
+import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.Companion.INTERNAL
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrFileEntry
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -33,7 +33,9 @@ import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.utils.addToStdlib.applyIf
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
 import org.jetbrains.kotlin.utils.filterIsInstanceAnd
-import java.io.File
+import nativekotlin.host.files.NativeFile as File
+import org.jetbrains.kotlin.konan.file.toPath
+import org.jetbrains.kotlin.konan.file.toRelativeString
 import org.jetbrains.kotlin.backend.common.serialization.proto.FieldAccessCommon as ProtoFieldAccessCommon
 import org.jetbrains.kotlin.backend.common.serialization.proto.FileEntry as ProtoFileEntry
 import org.jetbrains.kotlin.backend.common.serialization.proto.IdSignature as ProtoIdSignature
@@ -1560,7 +1562,7 @@ open class IrFileSerializer(
             is IrLocalDelegatedProperty ->
                 proto.irLocalDelegatedProperty = serializeIrLocalDelegatedProperty(declaration, parent)
             else ->
-                error("Serialization of ${declaration::class.java} is not supported: $declaration")
+                error("Serialization of ${declaration::class} is not supported: $declaration")
         }
 
         return proto.build()

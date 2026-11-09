@@ -33,7 +33,6 @@ import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.utils.compactIfPossible
 import org.jetbrains.kotlin.utils.memoryOptimizedMap
 import org.jetbrains.kotlin.utils.memoryOptimizedMapIndexed
-import kotlin.reflect.full.declaredMemberProperties
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrAnnotation as ProtoAnnotation
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrAnonymousInit as ProtoAnonymousInit
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrClass as ProtoClass
@@ -184,7 +183,7 @@ class IrDeclarationDeserializer(
     }
 
     private fun deserializeErrorType(proto: ProtoErrorType): IrErrorType {
-        if (!settings.allowErrorNodes) throw IrDisallowedErrorNode(IrErrorType::class.java)
+        if (!settings.allowErrorNodes) throw IrDisallowedErrorNode(IrErrorType::class)
         val annotations = deserializeAnnotations(proto.annotationList, null)
         return IrErrorTypeImpl(null, annotations, Variance.INVARIANT)
     }
@@ -814,12 +813,7 @@ class IrDeclarationDeserializer(
         }
 
     private companion object {
-        private val declarationOriginIndex by lazy {
-            IrDeclarationOrigin.Companion::class
-                .declaredMemberProperties
-                .mapNotNull { it.get(IrDeclarationOrigin.Companion) as? IrDeclarationOriginImpl }
-                .associateBy { it.name }
-        }
+        private val declarationOriginIndex get() = nativeIrDeclarationOriginIndex
         private val unknownDeclarationOriginCache = mutableMapOf<String, IrDeclarationOrigin>()
     }
 
@@ -890,7 +884,7 @@ class IrDeclarationDeserializer(
             return it(this, fallbackSymbolKind) as S
         }
 
-        throw IrSymbolTypeMismatchException(S::class.java, this)
+        throw IrSymbolTypeMismatchException(S::class, this)
     }
 
     private inline fun <Declaration : IrDeclaration, Symbol : IrBindableSymbol<*, Declaration>> createIfUnbound(

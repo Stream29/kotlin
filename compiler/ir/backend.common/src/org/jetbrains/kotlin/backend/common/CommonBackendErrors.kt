@@ -54,8 +54,8 @@ object BackendDiagnosticRenderers {
         val message = result?.getOrNull(3)
         when {
             !message.isNullOrBlank() -> message
-            exceptionName == StackOverflowError::class.java.name -> "stack overflow (potentially due to infinite recursion)"
-            exceptionName == NullPointerException::class.java.name -> "null reference access"
+            exceptionName == "java.lang.StackOverflowError" || exceptionName == "org.jetbrains.kotlin.ir.interpreter.StackOverflowError" -> "stack overflow (potentially due to infinite recursion)"
+            exceptionName == "java.lang.NullPointerException" || exceptionName == NullPointerException::class.qualifiedName -> "null reference access"
             exceptionName != null -> exceptionName.split('.').last()
             else -> it
         }

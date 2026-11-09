@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.interpreter.CallInterceptor
 import org.jetbrains.kotlin.ir.interpreter.property
 import org.jetbrains.kotlin.ir.interpreter.proxy.reflection.KTypeProxy
-import kotlin.reflect.KParameter
+import org.jetbrains.kotlin.ir.interpreter.proxy.reflection.KParameter
 import kotlin.reflect.KType
 
 internal class KParameterState(
@@ -26,7 +26,7 @@ internal class KParameterState(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (this::class != other?.let { it::class }) return false
 
         other as KParameterState
 

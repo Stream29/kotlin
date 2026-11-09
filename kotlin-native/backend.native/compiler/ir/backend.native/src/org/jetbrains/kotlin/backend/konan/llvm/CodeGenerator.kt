@@ -40,10 +40,10 @@ internal class CodeGenerator(override val generationState: NativeGenerationState
 
     val llvmDeclarations = generationState.llvmDeclarations
     val intPtrType = LLVMIntPtrTypeInContext(llvm.llvmContext, llvmTargetData)!!
-    internal val immOneIntPtrType = LLVMConstInt(intPtrType, 1, 1)!!
-    internal val immThreeIntPtrType = LLVMConstInt(intPtrType, 3, 1)!!
+    internal val immOneIntPtrType = LLVMConstInt(intPtrType, 1u, 1)!!
+    internal val immThreeIntPtrType = LLVMConstInt(intPtrType, 3u, 1)!!
     // Keep in sync with OBJECT_TAG_MASK in C++.
-    internal val immTypeInfoMask = LLVMConstNot(LLVMConstInt(intPtrType, 3, 0)!!)!!
+    internal val immTypeInfoMask = LLVMConstNot(LLVMConstInt(intPtrType, 3u, 0)!!)!!
 
     //-------------------------------------------------------------------------//
 
@@ -60,10 +60,10 @@ internal class CodeGenerator(override val generationState: NativeGenerationState
     }
 
     fun generateLocationInfo(locationInfo: LocationInfo): DILocationRef? = if (locationInfo.inlinedAt != null)
-        LLVMCreateLocationInlinedAt(LLVMGetModuleContext(llvm.module), locationInfo.line, locationInfo.column,
+        LLVMCreateLocationInlinedAt(LLVMGetModuleContext(llvm.module), locationInfo.line.toUInt(), locationInfo.column.toUInt(),
                 locationInfo.scope, generateLocationInfo(locationInfo.inlinedAt))
     else
-        LLVMCreateLocation(LLVMGetModuleContext(llvm.module), locationInfo.line, locationInfo.column, locationInfo.scope)
+        LLVMCreateLocation(LLVMGetModuleContext(llvm.module), locationInfo.line.toUInt(), locationInfo.column.toUInt(), locationInfo.scope)
 
     val objCDataGenerator = when {
         context.config.target.family.isAppleFamily -> ObjCDataGenerator(this)
@@ -417,7 +417,7 @@ internal class StackLocalsManagerImpl(
         val type = classInfo.bodyType.llvmBodyType
         val stackLocal = appendingTo(bbInitStackLocals) {
             val stackSlot = LLVMBuildAlloca(builder, type, "")!!
-            LLVMSetAlignment(stackSlot, classInfo.alignment)
+            LLVMSetAlignment(stackSlot, classInfo.alignment.toUInt())
 
             memset(stackSlot, 0, LLVMSizeOfTypeInBits(codegen.llvmTargetData, type).toInt() / 8)
 
@@ -444,9 +444,9 @@ internal class StackLocalsManagerImpl(
         val name = "local#${irClass.name}${count}#internal"
         // Create new type or get already created.
         context.declaredLocalArrays.getOrPut(name) {
-            val fieldTypes = listOf(kArrayHeader, LLVMArrayType(arrayToElementType[irClass.symbol]!!, count))
+            val fieldTypes = listOf(kArrayHeader, LLVMArrayType(arrayToElementType[irClass.symbol]!!, count.toUInt()))
             val classType = LLVMStructCreateNamed(LLVMGetModuleContext(llvm.module), name)!!
-            LLVMStructSetBody(classType, fieldTypes.toCValues(), fieldTypes.size, 1)
+            LLVMStructSetBody(classType, fieldTypes.toCValues(), fieldTypes.size.toUInt(), 1)
             classType
         }
     }
@@ -531,7 +531,7 @@ internal class StackLocalsManagerImpl(
                 val bodyPtr = ptrToInt(stackLocal.stackAllocationPtr, codegen.intPtrType)
                 val bodySize = LLVMSizeOfTypeInBits(codegen.llvmTargetData, type).toInt() / 8
                 val serviceInfoSize = runtime.pointerSize
-                val serviceInfoSizeLlvm = LLVMConstInt(codegen.intPtrType, serviceInfoSize.toLong(), 1)!!
+                val serviceInfoSizeLlvm = LLVMConstInt(codegen.intPtrType, serviceInfoSize.toLong().toULong(), 1)!!
                 val bodyWithSkippedServiceInfoPtr = intToPtr(add(bodyPtr, serviceInfoSizeLlvm), llvm.pointerType)
                 memset(bodyWithSkippedServiceInfoPtr, 0, bodySize - serviceInfoSize)
             }
@@ -607,7 +607,7 @@ internal abstract class FunctionGenerationContext(
         private set
     private var slotsPhi: LLVMValueRef? = null
     private val frameOverlaySlotCount =
-            (LLVMStoreSizeOfType(llvmTargetData, runtime.frameOverlayType) / runtime.pointerSize).toInt()
+            (LLVMStoreSizeOfType(llvmTargetData, runtime.frameOverlayType).toLong() / runtime.pointerSize).toInt()
     private var slotCount = frameOverlaySlotCount
     private var localAllocs = 0
     // TODO: remove if exactly unused.
@@ -690,7 +690,7 @@ internal abstract class FunctionGenerationContext(
                         location = it.location,
                         bb = prologueBb,
                         expr = null,
-                        exprCount = 0)
+                        exprCount = 0u)
             }
             return slotAddress
         }
@@ -703,7 +703,7 @@ internal abstract class FunctionGenerationContext(
 
     private fun applyMemoryOrderAndAlignment(value: LLVMValueRef, memoryOrder: LLVMAtomicOrdering?, alignment: Int?): LLVMValueRef {
         memoryOrder?.let { LLVMSetOrdering(value, it) }
-        alignment?.let { LLVMSetAlignment(value, it) }
+        alignment?.let { LLVMSetAlignment(value, it.toUInt()) }
         return value
     }
 
@@ -725,7 +725,7 @@ internal abstract class FunctionGenerationContext(
     ): LLVMValueRef {
         val value = LLVMBuildLoad2(builder, type, address, name)!!
         memoryOrder?.let { LLVMSetOrdering(value, it) }
-        alignment?.let { LLVMSetAlignment(value, it) }
+        alignment?.let { LLVMSetAlignment(value, it.toUInt()) }
         if (isObjectType && isVar) {
             val slot = resultSlot ?: alloca(type, isObjectType, variableLocation = null)
             storeStackRef(value, slot)
@@ -736,7 +736,7 @@ internal abstract class FunctionGenerationContext(
     fun store(value: LLVMValueRef, ptr: LLVMValueRef, memoryOrder: LLVMAtomicOrdering? = null, alignment: Int? = null) {
         val store = LLVMBuildStore(builder, value, ptr)
         memoryOrder?.let { LLVMSetOrdering(store, it) }
-        alignment?.let { LLVMSetAlignment(store, it) }
+        alignment?.let { LLVMSetAlignment(store, it.toUInt()) }
     }
 
     fun storeHeapRef(value: LLVMValueRef, ptr: LLVMValueRef) {
@@ -875,7 +875,7 @@ internal abstract class FunctionGenerationContext(
             val incomingValues = incoming.map { it.second }.toCValues()
             val incomingBlocks = incoming.map { it.first }.toCValues()
 
-            LLVMAddIncoming(phi, incomingValues, incomingBlocks, incoming.size)
+            LLVMAddIncoming(phi, incomingValues, incomingBlocks, incoming.size.toUInt())
         }
     }
 
@@ -967,7 +967,7 @@ internal abstract class FunctionGenerationContext(
             if (amount == 0) {
                 arg
             } else {
-                LLVMBuildBinOp(builder, op, arg, LLVMConstInt(arg.type, amount.toLong(), 0), "")!!
+                LLVMBuildBinOp(builder, op, arg, LLVMConstInt(arg.type, amount.toLong().toULong(), 0), "")!!
             }
 
     fun shl(arg: LLVMValueRef, amount: Int) = shift(LLVMOpcode.LLVMShl, arg, amount)
@@ -1012,13 +1012,13 @@ internal abstract class FunctionGenerationContext(
     fun ptrToInt(value: LLVMValueRef?, DestTy: LLVMTypeRef, Name: String = "") = LLVMBuildPtrToInt(builder, value, DestTy, Name)!!
 
     fun gep(type: LLVMTypeRef, base: LLVMValueRef, index: LLVMValueRef, name: String = ""): LLVMValueRef =
-            LLVMBuildGEP2(builder, type, base, cValuesOf(index), 1, name)!!
+            LLVMBuildGEP2(builder, type, base, cValuesOf(index), 1u, name)!!
 
     fun structGep(type: LLVMTypeRef, base: LLVMValueRef, index: Int, name: String = ""): LLVMValueRef =
-            LLVMBuildStructGEP2(builder, type, base, index, name)!!
+            LLVMBuildStructGEP2(builder, type, base, index.toUInt(), name)!!
 
     fun extractValue(aggregate: LLVMValueRef, index: Int, name: String = ""): LLVMValueRef =
-            LLVMBuildExtractValue(builder, aggregate, index, name)!!
+            LLVMBuildExtractValue(builder, aggregate, index.toUInt(), name)!!
 
     fun gxxLandingpad(numClauses: Int, name: String = "", switchThreadState: Boolean = false): LLVMValueRef {
         val personalityFunction = llvm.gxxPersonalityFunction
@@ -1241,14 +1241,14 @@ internal abstract class FunctionGenerationContext(
     }
 
     fun indirectBr(address: LLVMValueRef, destinations: Collection<LLVMBasicBlockRef>): LLVMValueRef? {
-        val indirectBr = LLVMBuildIndirectBr(builder, address, destinations.size)
+        val indirectBr = LLVMBuildIndirectBr(builder, address, destinations.size.toUInt())
         destinations.forEach { LLVMAddDestination(indirectBr, it) }
         currentPositionHolder.setAfterTerminator()
         return indirectBr
     }
 
     fun switch(value: LLVMValueRef, cases: Collection<Pair<LLVMValueRef, LLVMBasicBlockRef>>, elseBB: LLVMBasicBlockRef): LLVMValueRef? {
-        val switch = LLVMBuildSwitch(builder, value, elseBB, cases.size)
+        val switch = LLVMBuildSwitch(builder, value, elseBB, cases.size.toUInt())
         cases.forEach { LLVMAddCase(switch, it.first, it.second) }
         currentPositionHolder.setAfterTerminator()
         return switch
@@ -1369,7 +1369,7 @@ internal abstract class FunctionGenerationContext(
                             location      = variable.location,
                             bb            = prologueBb,
                             expr          = expr,
-                            exprCount     = 2)
+                            exprCount     = 2u)
                 }
             }
             br(localsInitBb)

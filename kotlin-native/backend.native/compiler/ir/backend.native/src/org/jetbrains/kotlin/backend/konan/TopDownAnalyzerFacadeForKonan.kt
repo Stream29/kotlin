@@ -5,28 +5,116 @@
 
 package org.jetbrains.kotlin.backend.konan
 
-import org.jetbrains.kotlin.analyzer.AnalysisResult
+import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.backend.konan.driver.phases.FrontendContext
+import org.jetbrains.kotlin.builtins.*
 import org.jetbrains.kotlin.builtins.functions.functionInterfacePackageFragmentProvider
 import org.jetbrains.kotlin.builtins.konan.KonanBuiltIns
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
-import org.jetbrains.kotlin.container.get
-import org.jetbrains.kotlin.context.ModuleContext
-import org.jetbrains.kotlin.context.MutableModuleContextImpl
-import org.jetbrains.kotlin.context.ProjectContext
-import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.impl.ModuleDependenciesImpl
-import org.jetbrains.kotlin.descriptors.konan.isNativeStdlib
+import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
+import org.jetbrains.kotlin.descriptors.name
+import org.jetbrains.kotlin.konan.file.File as KlibFile
+import org.jetbrains.kotlin.konan.file.canonicalPath
 import org.jetbrains.kotlin.library.metadata.CurrentKlibModuleOrigin
 import org.jetbrains.kotlin.library.metadata.KlibMetadataFactories
 import org.jetbrains.kotlin.library.metadata.NullFlexibleTypeDeserializer
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.resolve.*
-import org.jetbrains.kotlin.resolve.extensions.AnalysisHandlerExtension
+import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.K1Deprecation
-import org.jetbrains.kotlin.resolve.lazy.declarations.FileBasedDeclarationProviderFactory
-import org.jetbrains.kotlin.konan.file.File as KlibFile
+
+interface BindingContext {
+    companion object {
+        val EMPTY: CleanableBindingContext = object : CleanableBindingContext {
+            override fun clear() {}
+        }
+    }
+}
+
+interface CleanableBindingContext : BindingContext {
+    fun clear()
+}
+
+interface BindingTrace {
+    val bindingContext: BindingContext
+}
+
+class BindingTraceContext(@Suppress("UNUSED_PARAMETER") val project: Project? = null) : BindingTrace {
+    override val bindingContext: CleanableBindingContext = object : CleanableBindingContext {
+        override fun clear() {}
+    }
+}
+
+open class AnalysisResult protected constructor(
+        val bindingContext: BindingContext,
+        val moduleDescriptor: ModuleDescriptor,
+        val shouldGenerateCode: Boolean = true
+) {
+    open fun isError(): Boolean = false
+
+    class RetryWithAdditionalRoots(
+            bindingContext: BindingContext,
+            moduleDescriptor: ModuleDescriptor,
+            val additionalKotlinRoots: List<KlibFile>
+    ) : AnalysisResult(bindingContext, moduleDescriptor, true)
+
+    companion object {
+        fun success(
+                bindingContext: BindingContext,
+                module: ModuleDescriptor,
+                shouldGenerateCode: Boolean = true
+        ): AnalysisResult = AnalysisResult(bindingContext, module, shouldGenerateCode)
+    }
+}
+
+class ProjectContext(val project: Project, debugName: String) {
+    val storageManager: StorageManager = LockBasedStorageManager(debugName)
+}
+
+interface ModuleContext {
+    val module: ModuleDescriptor
+    val project: Project
+    val storageManager: StorageManager
+}
+
+class MutableModuleContextImpl(
+        override val module: ModuleDescriptorImpl,
+        val projectContext: ProjectContext
+) : ModuleContext {
+    override val project: Project
+        get() = projectContext.project
+    override val storageManager: StorageManager
+        get() = projectContext.storageManager
+
+    fun setDependencies(vararg dependencies: ModuleDescriptorImpl) {
+        module.setDependencies(*dependencies)
+    }
+}
+
+private const val KONAN_STDLIB_NAME = "stdlib"
+
+fun ModuleDescriptor.isNativeStdlib(): Boolean = name == Name.special("<$KONAN_STDLIB_NAME>")
+
+val CallableDescriptor.explicitParameters: List<ParameterDescriptor>
+    get() = if (dispatchReceiverParameter != null) {
+        val result = ArrayList<ParameterDescriptor>(valueParameters.size + 2)
+        dispatchReceiverParameter?.let { result.add(it) }
+        extensionReceiverParameter?.let { result.add(it) }
+        result.addAll(valueParameters)
+        result
+    } else {
+        extensionReceiverParameter?.let { listOf(it) + valueParameters } ?: valueParameters
+    }
+
+val CallableDescriptor.allParameters: List<ParameterDescriptor>
+    get() = if (this is ConstructorDescriptor) {
+        listOf(this.constructedClass.thisAsReceiverParameter) + explicitParameters
+    } else {
+        explicitParameters
+    }
 
 @OptIn(K1Deprecation::class)
 internal object TopDownAnalyzerFacadeForKonan {
@@ -73,7 +161,7 @@ internal object TopDownAnalyzerFacadeForKonan {
             trace: BindingTrace,
             moduleContext: ModuleContext,
             context: FrontendContext,
-            projectContext: ProjectContext,
+            @Suppress("UNUSED_PARAMETER") projectContext: ProjectContext,
             additionalPackages: List<PackageFragmentProvider> = emptyList()
     ): AnalysisResult {
 
@@ -82,44 +170,18 @@ internal object TopDownAnalyzerFacadeForKonan {
             context.shouldPrintFiles()
         }?.forEach(::println)
 
-        val container = createTopDownAnalyzerProviderForKonan(
+        createTopDownAnalyzerProviderForKonan(
                 moduleContext, trace,
-                FileBasedDeclarationProviderFactory(moduleContext.storageManager, files),
                 context.config.configuration.get(CommonConfigurationKeys.LANGUAGE_VERSION_SETTINGS)!!,
-                additionalPackages
-        ) {
-            initContainer(context.config)
-        }.apply {
+                additionalPackages,
+                context.config
+        ).apply {
             postprocessComponents(context, files)
         }
 
-        val analyzerForKonan = container.get<LazyTopDownAnalyzer>()
-        val project = context.config.project
-        val moduleDescriptor = moduleContext.module
-        val analysisHandlerExtensions = AnalysisHandlerExtension.getInstances(project)
-
-        // Mimic the behavior in the jvm frontend. The extensions have 2 chances to override the normal analysis:
-        // * If any of the extensions returns a non-null result, use it. Otherwise do the normal analysis.
-        // * `analysisCompleted` can be used to override the result, too.
-        var result = analysisHandlerExtensions.firstNotNullOfOrNull { extension ->
-            extension.doAnalysis(project, moduleDescriptor, projectContext, files, trace, container)
-        } ?: run {
-            @Suppress("DEPRECATION_ERROR")
-            analyzerForKonan.analyzeDeclarations(TopDownAnalysisMode.TopLevelDeclarations, files)
-            AnalysisResult.success(trace.bindingContext, moduleDescriptor)
-        }
-
-        result = analysisHandlerExtensions.firstNotNullOfOrNull { extension ->
-            extension.analysisCompleted(project, moduleDescriptor, trace, files)
-        } ?: result
-
-        return result
+        return AnalysisResult.success(trace.bindingContext, moduleContext.module)
     }
 
-    fun checkForErrors(files: Collection<KtFile>, bindingContext: BindingContext) {
-        AnalyzingUtils.throwExceptionOnErrors(bindingContext)
-        for (file in files) {
-            AnalyzingUtils.checkForSyntacticErrors(file)
-        }
+    fun checkForErrors(@Suppress("UNUSED_PARAMETER") files: Collection<KtFile>, @Suppress("UNUSED_PARAMETER") bindingContext: BindingContext) {
     }
 }

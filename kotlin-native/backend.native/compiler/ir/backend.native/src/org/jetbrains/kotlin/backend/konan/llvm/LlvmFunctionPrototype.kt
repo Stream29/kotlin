@@ -48,7 +48,7 @@ private object DummyLlvmFunctionAttributeProvider : LlvmFunctionAttributeProvide
  */
 private class LlvmFunctionAttributesCopier(private val externalFunction: LLVMValueRef) : LlvmFunctionAttributeProvider {
 
-    private val paramsCount: Int by lazy { LLVMCountParams(externalFunction) }
+    private val paramsCount: Int by lazy { LLVMCountParams(externalFunction).toInt() }
 
     private val attributesForCallSite: List<List<LLVMAttributeRef>> by lazy {
         attributesForFunctionDeclaration.map {
@@ -65,9 +65,9 @@ private class LlvmFunctionAttributesCopier(private val externalFunction: LLVMVal
         memScoped {
             val result = mutableListOf<List<LLVMAttributeRef>>()
             for (index in LLVMAttributeFunctionIndex..paramsCount) {
-                val count = LLVMGetAttributeCountAtIndex(externalFunction, index)
+                val count = LLVMGetAttributeCountAtIndex(externalFunction, index.toUInt()).toInt()
                 val attributesBuffer = allocArray<LLVMAttributeRefVar>(count)
-                LLVMGetAttributesAtIndex(externalFunction, index, attributesBuffer)
+                LLVMGetAttributesAtIndex(externalFunction, index.toUInt(), attributesBuffer)
                 result += (0 until count).map { attributesBuffer[it]!! }
             }
             result
@@ -77,7 +77,7 @@ private class LlvmFunctionAttributesCopier(private val externalFunction: LLVMVal
     override fun addCallSiteAttributes(callSite: LLVMValueRef) {
         attributesForCallSite.withIndex().forEach { [listIndex, attributeList] ->
             attributeList.forEach { attributeRef ->
-                LLVMAddCallSiteAttribute(callSite, LLVMAttributeFunctionIndex + listIndex, attributeRef)
+                LLVMAddCallSiteAttribute(callSite, (LLVMAttributeFunctionIndex + listIndex).toUInt(), attributeRef)
             }
         }
     }
@@ -85,7 +85,7 @@ private class LlvmFunctionAttributesCopier(private val externalFunction: LLVMVal
     override fun addFunctionAttributes(function: LLVMValueRef) {
         attributesForFunctionDeclaration.withIndex().forEach { [listIndex, attributeList] ->
             attributeList.forEach { attributeRef ->
-                LLVMAddAttributeAtIndex(function, LLVMAttributeFunctionIndex + listIndex, attributeRef)
+                LLVMAddAttributeAtIndex(function, (LLVMAttributeFunctionIndex + listIndex).toUInt(), attributeRef)
             }
         }
     }
@@ -94,14 +94,14 @@ private class LlvmFunctionAttributesCopier(private val externalFunction: LLVMVal
 private fun addCallSiteAttributesAtIndex(context: LLVMContextRef, callSite: LLVMValueRef, index: Int, attributes: List<LlvmAttribute>) {
     attributes.forEach { attribute ->
         val llvmAttributeRef = createLlvmEnumAttribute(context, attribute.asAttributeKindId())
-        LLVMAddCallSiteAttribute(callSite, index, llvmAttributeRef)
+        LLVMAddCallSiteAttribute(callSite, index.toUInt(), llvmAttributeRef)
     }
 }
 
 private fun addDeclarationAttributesAtIndex(context: LLVMContextRef, function: LLVMValueRef, index: Int, attributes: List<LlvmAttribute>) {
     attributes.forEach { attribute ->
         val llvmAttributeRef = createLlvmEnumAttribute(context, attribute.asAttributeKindId())
-        LLVMAddAttributeAtIndex(function, index, llvmAttributeRef)
+        LLVMAddAttributeAtIndex(function, index.toUInt(), llvmAttributeRef)
     }
 }
 

@@ -8,7 +8,7 @@ package org.jetbrains.kotlin.backend.common.serialization.metadata
 import org.jetbrains.kotlin.KtSourceFile
 import org.jetbrains.kotlin.metadata.ProtoBuf
 import org.jetbrains.kotlin.name.FqName
-import java.io.File
+import nativekotlin.host.files.NativeFile as File
 
 /**
  * Something capable of serializing the metadata of a source file to a protobuf message, one file at a time.

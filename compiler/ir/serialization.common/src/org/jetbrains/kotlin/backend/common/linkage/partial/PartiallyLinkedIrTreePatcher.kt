@@ -41,7 +41,6 @@ import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 import org.jetbrains.kotlin.utils.compact
 import org.jetbrains.kotlin.utils.newHashSetWithExpectedSize
-import java.util.*
 import kotlin.properties.Delegates
 import org.jetbrains.kotlin.backend.common.linkage.partial.PartialLinkageSources.File as PLFile
 import org.jetbrains.kotlin.backend.common.linkage.partial.PartialLinkageSources.Module as PLModule
@@ -167,9 +166,9 @@ internal class PartiallyLinkedIrTreePatcher(
             withRemovalInContext(DeclarationTransformerContext.StatementContainer(this), action)
 
         private inline fun <T : IrElement> T.withRemovalInContext(context: DeclarationTransformerContext, action: T.() -> Unit): T {
-            stack.push(context)
+            stack.addFirst(context)
             action()
-            assert(stack.pop() === context)
+            assert(stack.removeFirst() === context)
 
             context.performRemoval()
 
@@ -179,7 +178,7 @@ internal class PartiallyLinkedIrTreePatcher(
         private fun IrDeclaration.scheduleForRemoval() {
             // The declarations with origin = PartiallyLinkedDeclarationOrigin.MISSING_DECLARATION are already effectively removed.
             if (origin != PartiallyLinkedDeclarationOrigin.MISSING_DECLARATION)
-                stack.peek().scheduleForRemoval(this)
+                stack.first().scheduleForRemoval(this)
         }
 
         override fun visitClass(declaration: IrClass): IrStatement {
@@ -1156,7 +1155,7 @@ internal class PartiallyLinkedIrTreePatcher(
 
     private inner class NonLocalReturnsPatcher(private val irBuiltIns: IrBuiltIns, startingFile: PLFile) : FileAwareIrElementTransformerVoid(startingFile) {
         private val stack = ArrayDeque<ReturnTargetContext>()
-        private val currentContext: ReturnTargetContext get() = stack.peek() ?: ReturnTargetContext.Empty
+        private val currentContext: ReturnTargetContext get() = stack.firstOrNull() ?: ReturnTargetContext.Empty
 
         private inline fun <R> withContext(
             getNewContext: (oldContext: ReturnTargetContext) -> ReturnTargetContext = { it },
@@ -1165,12 +1164,12 @@ internal class PartiallyLinkedIrTreePatcher(
             val oldContext: ReturnTargetContext = currentContext
             val newContext: ReturnTargetContext = getNewContext(oldContext)
 
-            if (newContext !== oldContext) stack.push(newContext)
+            if (newContext !== oldContext) stack.addFirst(newContext)
 
             return try {
                 block(newContext)
             } finally {
-                if (newContext !== oldContext) assert(stack.pop() == newContext)
+                if (newContext !== oldContext) assert(stack.removeFirst() == newContext)
             }
         }
 

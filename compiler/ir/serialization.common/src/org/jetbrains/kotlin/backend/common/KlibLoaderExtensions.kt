@@ -17,11 +17,9 @@ import org.jetbrains.kotlin.library.loader.KlibLoader
 import org.jetbrains.kotlin.library.loader.KlibLoaderResult
 import org.jetbrains.kotlin.library.loader.reportLoadingProblemsIfAny
 import org.jetbrains.kotlin.library.uniqueName
-import java.nio.file.InvalidPathException
-import java.nio.file.Path
-import java.nio.file.Paths
-import kotlin.io.path.exists
-import kotlin.io.path.pathString
+import org.jetbrains.kotlin.library.InvalidKlibPathException as InvalidPathException
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.KlibPaths as Paths
 
 /**
  * Checks for existence of duplicated [uniqueName]s among [KlibLoaderResult.librariesStdlibFirst].

@@ -24,7 +24,6 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeSubstitutor
-import java.util.*
 
 interface IrBuiltinOperatorDescriptor : SimpleFunctionDescriptor
 
@@ -39,7 +38,7 @@ abstract class IrBuiltinOperatorDescriptorBase(containingDeclaration: Declaratio
     override fun getOriginal(): SimpleFunctionDescriptor = this
     override fun substitute(substitutor: TypeSubstitutor): FunctionDescriptor = throw UnsupportedOperationException()
     override fun getOverriddenDescriptors(): Collection<FunctionDescriptor> = emptyList()
-    override fun setOverriddenDescriptors(overriddenDescriptors: Collection<CallableMemberDescriptor>) =
+    override fun setOverriddenDescriptors(overriddenDescriptors: Collection<CallableMemberDescriptor?>) =
         throw UnsupportedOperationException()
 
     override fun getTypeParameters(): List<TypeParameterDescriptor> = emptyList()
@@ -48,7 +47,7 @@ abstract class IrBuiltinOperatorDescriptorBase(containingDeclaration: Declaratio
     override fun getKind(): CallableMemberDescriptor.Kind = CallableMemberDescriptor.Kind.SYNTHESIZED
     override fun getInitialSignatureDescriptor(): FunctionDescriptor? = null
     override fun isExternal(): Boolean = false
-    override fun <V : Any> getUserData(key: CallableDescriptor.UserDataKey<V>?): V? = null
+    override fun <V> getUserData(key: CallableDescriptor.UserDataKey<V>): V? = null
     override fun isHiddenForResolutionEverywhereBesideSupercalls(): Boolean = false
     override fun isHiddenToOvercomeSignatureClash(): Boolean = false
     override fun isInfix(): Boolean = false
@@ -62,8 +61,8 @@ abstract class IrBuiltinOperatorDescriptorBase(containingDeclaration: Declaratio
     override fun hasSynthesizedParameterNames(): Boolean = false
 
     override fun copy(
-            newOwner: DeclarationDescriptor?, modality: Modality?, visibility: DescriptorVisibility?,
-            kind: CallableMemberDescriptor.Kind?, copyOverrides: Boolean
+            newOwner: DeclarationDescriptor, modality: Modality, visibility: DescriptorVisibility,
+            kind: CallableMemberDescriptor.Kind, copyOverrides: Boolean
     ) =
         throw UnsupportedOperationException()
 
@@ -71,7 +70,7 @@ abstract class IrBuiltinOperatorDescriptorBase(containingDeclaration: Declaratio
         throw UnsupportedOperationException()
 
     override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R {
-        return visitor.visitFunctionDescriptor(this, data)
+        return platformVisitorResult(visitor.visitFunctionDescriptor(this, data))
     }
 }
 
@@ -130,7 +129,7 @@ class IrBuiltinValueParameterDescriptorImpl(
         throw UnsupportedOperationException()
 
     override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R {
-        return visitor.visitValueParameterDescriptor(this, data)
+        return platformVisitorResult(visitor.visitValueParameterDescriptor(this, data))
     }
 
     override fun equals(other: Any?): Boolean {

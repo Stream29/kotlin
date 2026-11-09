@@ -278,7 +278,7 @@ internal class RTTIGenerator(
 
     private fun getObjOffsets(bodyType: ObjectBodyType): List<ConstInt32> =
             bodyType.sortedIndicesOfObjectFields.map { index ->
-                llvm.constInt32(LLVMOffsetOfElement(llvmTargetData, bodyType.llvmBodyType, index).toInt())
+                llvm.constInt32(LLVMOffsetOfElement(llvmTargetData, bodyType.llvmBodyType, index.toUInt()).toInt())
             }
 
     fun vtable(irClass: IrClass): ConstArray {
@@ -410,7 +410,7 @@ internal class RTTIGenerator(
     val debugOperationsSize: ConstValue by lazy {
         if (debugRuntimeOrNull != null) {
             val external = LLVMGetNamedGlobal(debugRuntimeOrNull, "Konan_debugOperationsList")!!
-            llvm.constInt32(LLVMGetArrayLength(LLVMGlobalGetValueType(external)))
+            llvm.constInt32(LLVMGetArrayLength(LLVMGlobalGetValueType(external)).toInt())
         } else
             llvm.constInt32(0)
     }
@@ -442,8 +442,8 @@ internal class RTTIGenerator(
                 val index = llvmDeclarations.fieldIndices[it.irFieldSymbol]!!
                 val isObjectType = index in objectFieldIndices
                 FieldRecord(
-                        LLVMOffsetOfElement(llvmTargetData, bodyType, index).toInt(),
-                        mapRuntimeType(LLVMStructGetTypeAtIndex(bodyType, index)!!, isObjectType),
+                        LLVMOffsetOfElement(llvmTargetData, bodyType, index.toUInt()).toInt(),
+                        mapRuntimeType(LLVMStructGetTypeAtIndex(bodyType, index.toUInt())!!, isObjectType),
                         it.name)
             }
             val offsetsPtr = staticData.placeGlobalConstArray("kextoff:$className", llvm.int32Type,
@@ -538,7 +538,7 @@ internal class RTTIGenerator(
             } else {
                 val vtableEntries = layoutBuilder.interfaceVTableEntries.map { methodImpls[it]!! }
                 val interfaceVTable = staticData.placeGlobalArray("", llvm.pointerType, vtableEntries)
-                val interfaceVTableType = LLVMArrayType(llvm.pointerType, vtableEntries.size)!!
+                val interfaceVTableType = LLVMArrayType(llvm.pointerType, vtableEntries.size.toUInt())!!
                 InterfaceTableRecord(
                         llvm.constInt32(layoutBuilder.classId),
                         llvm.constInt32(layoutBuilder.interfaceVTableEntries.size),

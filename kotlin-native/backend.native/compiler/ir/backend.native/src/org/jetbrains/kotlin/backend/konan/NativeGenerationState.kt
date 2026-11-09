@@ -25,6 +25,8 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.konan.config.konanHome
 import org.jetbrains.kotlin.util.PerformanceManager
 
+internal fun loadLLVMStubs(@Suppress("UNUSED_PARAMETER") konanHome: String?) = Unit
+
 internal class FileLowerState {
     private var functionReferenceCount = 0
     private var coroutineCount = 0

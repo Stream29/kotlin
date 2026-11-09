@@ -13,10 +13,11 @@ import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.isFakeOverriddenFromAny
 import org.jetbrains.kotlin.ir.util.isUnsigned
 import org.jetbrains.kotlin.ir.util.nonDispatchParameters
+import kotlin.reflect.KClass
 
 internal class CommonProxy private constructor(override val state: Common, override val callInterceptor: CallInterceptor) : Proxy {
     private fun defaultEquals(other: Any?): Boolean = if (other is Proxy) this.state === other.state else false
-    private fun defaultHashCode(): Int = System.identityHashCode(state)
+    private fun defaultHashCode(): Int = state.hashCode()
     private fun defaultToString(): String = "${state.irClass.internalName()}@" + hashCode().toString(16).padStart(8, '0')
 
     /**
@@ -68,42 +69,9 @@ internal class CommonProxy private constructor(override val state: Common, overr
     }
 
     companion object {
-        internal fun Common.asProxy(callInterceptor: CallInterceptor, extendFrom: Class<*>? = null): Any {
-            val commonProxy = CommonProxy(this, callInterceptor)
-            val interfaces = when (extendFrom) {
-                null, Any::class.java -> arrayOf(Proxy::class.java)
-                else -> arrayOf(extendFrom, Proxy::class.java)
-            }
-
-            return java.lang.reflect.Proxy.newProxyInstance(this::class.java.classLoader, interfaces)
-            { /*proxy*/_, method, args ->
-                when {
-                    method.declaringClass == Proxy::class.java && method.name == "getState" -> commonProxy.state
-                    method.declaringClass == Proxy::class.java && method.name == "getCallInterceptor" -> commonProxy.callInterceptor
-                    method.name == "equals" && method.parameterTypes.single().isObject() -> commonProxy.equals(args.single())
-                    method.name == "hashCode" && method.parameterTypes.isEmpty() -> commonProxy.hashCode()
-                    method.name == "toString" && method.parameterTypes.isEmpty() -> commonProxy.toString()
-                    else -> {
-                        val irFunction = commonProxy.state.getIrFunction(method)
-                            ?: return@newProxyInstance commonProxy.fallbackIfMethodNotFound(method)
-                        val valueArguments = mutableListOf<State>(commonProxy.state)
-                        valueArguments += irFunction.nonDispatchParameters.mapIndexed { index, parameter ->
-                            callInterceptor.environment.convertToState(args[index], parameter.type)
-                        }
-                        callInterceptor.interceptProxy(irFunction, valueArguments, method.returnType)
-                    }
-                }
-            }
-        }
-
-        private fun CommonProxy.fallbackIfMethodNotFound(method: java.lang.reflect.Method): Any {
-            return when {
-                method.name == "toArray" && method.parameterTypes.isEmpty() -> {
-                    val wrapper = this.state.superWrapperClass
-                    if (wrapper == null) arrayOf() else (wrapper.value as Collection<*>).toTypedArray()
-                }
-                else -> throw AssertionError("Cannot find method $method in ${this.state}")
-            }
+        @Suppress("UNUSED_PARAMETER")
+        internal fun Common.asProxy(callInterceptor: CallInterceptor, extendFrom: KClass<*>? = null): Any {
+            return CommonProxy(this, callInterceptor)
         }
     }
 }

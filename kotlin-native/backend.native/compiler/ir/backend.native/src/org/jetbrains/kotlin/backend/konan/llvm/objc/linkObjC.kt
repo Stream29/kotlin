@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.backend.konan.llvm.objc
 
 import kotlinx.cinterop.*
 import llvm.*
+import platform.posix.size_tVar
 import org.jetbrains.kotlin.backend.konan.NativeGenerationState
 import org.jetbrains.kotlin.backend.konan.isFinalBinary
 import org.jetbrains.kotlin.backend.konan.llvm.*
@@ -174,7 +175,7 @@ private fun getStringValue(initializer: LLVMValueRef): String? = when (LLVMGetVa
 
         val lengthVar = alloc<size_tVar>()
         val bytePtr = LLVMGetAsString(initializer, lengthVar.ptr)!!
-        val length = lengthVar.value
+        val length = lengthVar.value.toLong()
 
         val lastByte = bytePtr[length - 1]
         require(lastByte == 0.toByte()) {
@@ -224,10 +225,10 @@ private fun LLVMValueRef.isFirstCharPtr(llvm: CodegenLlvmHelpers, global: LLVMVa
     this.type == llvm.pointerType &&
                 LLVMIsConstant(this) != 0 && LLVMGetConstOpcode(this) == LLVMOpcode.LLVMGetElementPtr
                 && LLVMGetNumOperands(this) == 3
-                && LLVMGetOperand(this, 0) == global
-                && LLVMGetOperand(this, 1).isZeroConst()
-                && LLVMGetOperand(this, 2).isZeroConst()
+                && LLVMGetOperand(this, 0u) == global
+                && LLVMGetOperand(this, 1u).isZeroConst()
+                && LLVMGetOperand(this, 2u).isZeroConst()
 
 private fun LLVMValueRef?.isZeroConst(): Boolean =
         this != null && LLVMGetValueKind(this) == LLVMValueKind.LLVMConstantIntValueKind
-                && LLVMConstIntGetZExtValue(this) == 0L
+                && LLVMConstIntGetZExtValue(this).toLong() == 0L

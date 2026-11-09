@@ -19,6 +19,9 @@ import org.jetbrains.kotlin.ir.util.nonDispatchParameters
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.resolve.OverridingUtil.OverrideCompatibilityInfo
 import org.jetbrains.kotlin.resolve.OverridingUtil.OverrideCompatibilityInfo.*
+import org.jetbrains.kotlin.resolve.OverridingUtil.OverrideCompatibilityInfo.Companion.incompatible
+import org.jetbrains.kotlin.resolve.OverridingUtil.OverrideCompatibilityInfo.Companion.success
+import org.jetbrains.kotlin.resolve.result
 import org.jetbrains.kotlin.types.AbstractTypeChecker
 import org.jetbrains.kotlin.types.TypeCheckerState
 
@@ -175,7 +178,7 @@ class IrOverrideChecker(
             when (result) {
                 INCOMPATIBLE -> return incompatible("External condition")
                 OVERRIDABLE -> error(
-                    "Contract violation in ${externalCondition.javaClass} condition. It's not supposed to end with success"
+                    "Contract violation in ${externalCondition::class} condition. It's not supposed to end with success"
                 )
                 UNKNOWN -> {}
             }

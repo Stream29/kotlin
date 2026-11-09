@@ -15,8 +15,7 @@ import org.jetbrains.kotlin.backend.konan.serialization.TrivialGettersSerializer
 import org.jetbrains.kotlin.backend.konan.util.compilerFingerprint
 import org.jetbrains.kotlin.backend.konan.util.runtimeFingerprint
 import org.jetbrains.kotlin.konan.config.cachedLibraryDependenciesFingerprint
-import org.jetbrains.kotlin.konan.file.File
-import org.jetbrains.kotlin.konan.library.javaFile
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.target.HostManager
 import org.jetbrains.kotlin.library.isNativeStdlib
 import kotlin.random.Random
@@ -72,9 +71,7 @@ internal class CacheStorage(private val generationState: NativeGenerationState) 
     }
 
     private fun saveMetadata() {
-        outputFiles.cacheMetadata!!.javaFile().bufferedWriter().use {
-            CacheMetadataSerializer.serialize(it, generationState.generateCacheMetadata())
-        }
+        CacheMetadataSerializer.serialize(outputFiles.cacheMetadata!!.javaFile(), generationState.generateCacheMetadata())
     }
 
     private fun saveCacheBitcodeDependencies() {

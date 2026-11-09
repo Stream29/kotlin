@@ -31,7 +31,7 @@ internal inline fun withExceptionHandler(environment: IrInterpreterEnvironment, 
 }
 
 internal fun Throwable.handleUserException(environment: IrInterpreterEnvironment) {
-    val exceptionName = this::class.java.simpleName
+    val exceptionName = this::class.simpleName
     val irExceptionClass = environment.irExceptions.firstOrNull { it.name.asString() == exceptionName }
         ?: environment.irBuiltIns.throwableClass.owner
     environment.callStack.pushState(ExceptionState(this, irExceptionClass, environment.callStack.getStackTrace(), environment))

@@ -20,9 +20,8 @@ import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
 import org.jetbrains.kotlin.ir.util.isTypeParameter
 import org.jetbrains.kotlin.ir.util.isUnsigned
 import org.jetbrains.kotlin.ir.util.render
-import org.jetbrains.kotlin.konan.config.NativeConfigurationKeys
-import org.jetbrains.kotlin.konan.config.debugInfoVersion
-import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.config.*
+import org.jetbrains.kotlin.konan.file.*
 
 internal object DWARF {
     val producer = "kotlin-compiler: ${KotlinVersion.CURRENT}"
@@ -70,7 +69,7 @@ internal class DebugInfo(override val generationState: NativeGenerationState) : 
         val path = generationState.outputFile.toFileAndFolder(config)
         compilationUnit = DICreateCompilationUnit(
             builder = builder,
-            lang = DWARF.language(config),
+            lang = DWARF.language(config).toUInt(),
                 // we don't split path to filename and directory to provide enough level uniquely for dsymutil to avoid symbol
                 // clashing, which happens on linking with libraries produced from intercepting sources.
             File = path.path(),
@@ -78,7 +77,7 @@ internal class DebugInfo(override val generationState: NativeGenerationState) : 
             producer = DWARF.producer,
             isOptimized = 0,
             flags = "",
-            rv = DWARF.runtimeVersion(config)
+            rv = DWARF.runtimeVersion(config).toUInt()
         )!!.reinterpret()
         module = DICreateModule(
                 builder = builder,
@@ -122,13 +121,13 @@ internal class DebugInfo(override val generationState: NativeGenerationState) : 
                 scope = null,
                 name = "ObjHeader",
                 file = null,
-                lineNumber = 0,
-                sizeInBits = 0,
-                alignInBits = 0,
-                flags = DWARF.flagsForwardDeclaration,
+                lineNumber = 0u,
+                sizeInBits = 0u,
+                alignInBits = 0u,
+                flags = DWARF.flagsForwardDeclaration.toUInt(),
                 derivedFrom = null,
                 elements = null,
-                elementsCount = 0,
+                elementsCount = 0u,
                 refPlace = null
         )!!.reinterpret()
         objHeaderPointerType = dwarfPointerType(objHeaderType)
@@ -150,19 +149,19 @@ internal class DebugInfo(override val generationState: NativeGenerationState) : 
             context.irBuiltIns.longType to llvm.int64Type,
             context.irBuiltIns.floatType to llvm.floatType,
             context.irBuiltIns.doubleType to llvm.doubleType)
-    private val llvmTypeSizes = llvmTypes.map { it.key to LLVMSizeOfTypeInBits(llvmTargetData, it.value) }.toMap()
-    private val llvmTypeAlignments = llvmTypes.map { it.key to LLVMPreferredAlignmentOfType(llvmTargetData, it.value) }.toMap()
-    private val otherLlvmType = LLVMPointerType(llvm.int64Type, 0)!!
-    private val otherTypeSize = LLVMSizeOfTypeInBits(llvmTargetData, otherLlvmType)
-    private val otherTypeAlignment = LLVMPreferredAlignmentOfType(llvmTargetData, otherLlvmType)
+    private val llvmTypeSizes = llvmTypes.map { it.key to LLVMSizeOfTypeInBits(llvmTargetData, it.value).toLong() }.toMap()
+    private val llvmTypeAlignments = llvmTypes.map { it.key to LLVMPreferredAlignmentOfType(llvmTargetData, it.value).toInt() }.toMap()
+    private val otherLlvmType = LLVMPointerType(llvm.int64Type, 0u)!!
+    private val otherTypeSize = LLVMSizeOfTypeInBits(llvmTargetData, otherLlvmType).toLong()
+    private val otherTypeAlignment = LLVMPreferredAlignmentOfType(llvmTargetData, otherLlvmType).toInt()
 
     val compilerGeneratedFile by lazy { DICreateFile(builder, "<compiler-generated>", "")!! }
 
     val IrType.size: Long
-        get() = llvmTypeSizes.getOrDefault(this, otherTypeSize)
+        get() = llvmTypeSizes.getOrElse(this) { otherTypeSize }
 
     val IrType.alignment: Long
-        get() = llvmTypeAlignments.getOrDefault(this, otherTypeAlignment).toLong()
+        get() = llvmTypeAlignments.getOrElse(this) { otherTypeAlignment }.toLong()
 
     fun IrType.diType(llvmTargetData: LLVMTargetDataRef): DITypeOpaqueRef =
             types.getOrPut(this) { dwarfType(llvmTargetData) }
@@ -175,7 +174,7 @@ internal class DebugInfo(override val generationState: NativeGenerationState) : 
             if (idx == 0 && type.isVoidAsReturnType()) null
             else type.diType(llvmTargetData)
         }
-        DICreateSubroutineType(builder, allocArrayOf(diTypes), types.size)!!
+        DICreateSubroutineType(builder, allocArrayOf(diTypes), types.size.toUInt())!!
     }
 
     fun IrFileEntry.diFileScope() = files.getOrPut(this.name) {
@@ -213,12 +212,12 @@ internal class DebugInfo(override val generationState: NativeGenerationState) : 
             name = (if (nodebug) "<NODEBUG>" else "") + name,
             linkageName = linkageName,
             file = fileEntry.diFileScope(),
-            lineNo = startLine,
+            lineNo = startLine.toUInt(),
             type = subroutineType,
             //TODO: need more investigations.
             isLocal = 0,
             isDefinition = 1,
-            scopeLine = 0,
+            scopeLine = 0u,
             isTransparentStepping = if (isTransparentStepping) 1 else 0,
     )!!
 
@@ -237,7 +236,7 @@ internal class DebugInfo(override val generationState: NativeGenerationState) : 
             DICreateBasicType(
                     builder, typeName,
                     LLVMSizeOfTypeInBits(targetData, type),
-                    LLVMPreferredAlignmentOfType(targetData, type).toLong(), encoding
+                    LLVMPreferredAlignmentOfType(targetData, type).toULong(), encoding.toUInt()
             )!!.reinterpret()
 
     private fun IrType.llvmType(): LLVMTypeRef = llvmTypes.getOrElse(this@llvmType) {

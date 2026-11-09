@@ -26,14 +26,14 @@ import org.jetbrains.kotlin.ir.types.isUnsignedType
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.name.FqName
-import java.lang.invoke.MethodHandle
+import kotlin.reflect.KClass
 
 internal interface CallInterceptor {
     val environment: IrInterpreterEnvironment
     val irBuiltIns: IrBuiltIns
     val interpreter: IrInterpreter
 
-    fun interceptProxy(irFunction: IrFunction, valueArguments: List<State>, expectedResultClass: Class<*> = Any::class.java): Any?
+    fun interceptProxy(irFunction: IrFunction, valueArguments: List<State>, expectedResultClass: KClass<*> = Any::class): Any?
     fun interceptCall(call: IrCall, irFunction: IrFunction, args: List<State>, defaultAction: () -> Unit)
     fun interceptConstructor(constructorCall: IrFunctionAccessExpression, args: List<State>, defaultAction: () -> Unit)
     fun interceptGetObjectValue(expression: IrGetObjectValue, defaultAction: () -> Unit)
@@ -47,7 +47,7 @@ internal class DefaultCallInterceptor(override val interpreter: IrInterpreter) :
     override val irBuiltIns: IrBuiltIns = environment.irBuiltIns
     private val bodyMap: Map<IdSignature, IrBody> = interpreter.bodyMap
 
-    override fun interceptProxy(irFunction: IrFunction, valueArguments: List<State>, expectedResultClass: Class<*>): Any? {
+    override fun interceptProxy(irFunction: IrFunction, valueArguments: List<State>, expectedResultClass: KClass<*>): Any? {
         val irCall = irFunction.createCall()
         return interpreter.withNewCallStack(irCall) {
             this@withNewCallStack.environment.callStack.pushSimpleInstruction(irCall)

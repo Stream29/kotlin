@@ -23,7 +23,6 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.IrTransformer
 import org.jetbrains.kotlin.utils.memoryOptimizedPlus
-import java.util.*
 
 open class VersionOverloadsLowering(val irFactory: IrFactory, val irBuiltIns: IrBuiltIns) : FileLoweringPass, IrElementTransformerVoid() {
     constructor(context: LoweringContext) : this(context.irFactory, context.irBuiltIns)
@@ -228,5 +227,7 @@ open class VersionOverloadsLowering(val irFactory: IrFactory, val irBuiltIns: Ir
     }
 }
 
-private inline fun <K : Comparable<K>, V> buildSortedMap(block: SortedMap<K?, V>.() -> Unit): SortedMap<K?, V> =
-    sortedMapOf<K?, V>(nullsLast(compareByDescending { it })).apply(block)
+private inline fun <K : Comparable<K>, V> buildSortedMap(block: MutableMap<K?, V>.() -> Unit): Map<K?, V> =
+    linkedMapOf<K?, V>().apply(block).entries
+        .sortedWith(compareBy(nullsLast(compareByDescending<K> { it })) { it.key })
+        .associate { it.key to it.value }

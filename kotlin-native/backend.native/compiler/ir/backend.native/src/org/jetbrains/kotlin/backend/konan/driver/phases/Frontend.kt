@@ -5,19 +5,14 @@
 
 package org.jetbrains.kotlin.backend.konan.driver.phases
 
-import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.backend.common.phaser.createSimpleNamedCompilerPhase
 import org.jetbrains.kotlin.backend.konan.*
 import org.jetbrains.kotlin.backend.konan.TopDownAnalyzerFacadeForKonan
 import org.jetbrains.kotlin.backend.konan.driver.BasicNativeBackendPhaseContext
 import org.jetbrains.kotlin.backend.konan.driver.NativeBackendPhaseContext
-import org.jetbrains.kotlin.cli.common.messages.AnalyzerWithCompilerReport
-import org.jetbrains.kotlin.cli.common.renderDiagnosticInternalName
-import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
-import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 import org.jetbrains.kotlin.K1Deprecation
 
@@ -50,8 +45,6 @@ internal val FrontendPhase = createSimpleNamedCompilerPhase(
     lateinit var analysisResult: AnalysisResult
 
     do {
-        val analyzerWithCompilerReport = AnalyzerWithCompilerReport(input.configuration)
-
         val sourceFiles = input.getSourceFiles()
 
         require(context.config.produce == CompilerOutputKind.LIBRARY || sourceFiles.isEmpty()) {
@@ -60,14 +53,11 @@ internal val FrontendPhase = createSimpleNamedCompilerPhase(
                     "KonanDriver.kt::splitOntoTwoStages() must transform such compilation into two-stage compilation. Please report this here: https://kotl.in/issue"
         }
 
-        // Build AST and binding info.
-        analyzerWithCompilerReport.analyzeAndReport(sourceFiles) {
-            TopDownAnalyzerFacadeForKonan.analyzeFiles(sourceFiles, context)
-        }
-        if (analyzerWithCompilerReport.hasErrors()) {
+        // Build module descriptor and binding info.
+        analysisResult = TopDownAnalyzerFacadeForKonan.analyzeFiles(sourceFiles, context)
+        if (analysisResult.isError()) {
             throw KonanCompilationException()
         }
-        analysisResult = analyzerWithCompilerReport.analysisResult
         if (analysisResult is AnalysisResult.RetryWithAdditionalRoots) {
             input.addKotlinSourceRoots(analysisResult.additionalKotlinRoots)
         }

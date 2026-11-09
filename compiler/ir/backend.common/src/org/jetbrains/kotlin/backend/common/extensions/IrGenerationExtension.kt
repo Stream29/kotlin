@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 interface IrGenerationExtension {
     companion object : ExtensionPointDescriptor<IrGenerationExtension>(
         name = "org.jetbrains.kotlin.irGenerationExtension",
-        extensionClass = IrGenerationExtension::class.java,
+        extensionClass = IrGenerationExtension::class,
     )
 
     fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext)

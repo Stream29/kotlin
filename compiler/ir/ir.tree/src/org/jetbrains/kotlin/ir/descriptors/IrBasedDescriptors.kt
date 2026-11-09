@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.ir.descriptors
 
+import org.jetbrains.kotlin.builtins.array
+
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
@@ -64,7 +66,7 @@ abstract class IrBasedDeclarationDescriptor<T : IrDeclaration>(val owner: T) : D
 
     override fun hashCode(): Int = owner.hashCode()
 
-    override fun toString(): String = javaClass.simpleName + ": " + owner.render()
+    override fun toString(): String = this::class.simpleName + ": " + owner.render()
 }
 
 fun IrDeclaration.toIrBasedDescriptor(): DeclarationDescriptor = when (this) {
@@ -124,15 +126,15 @@ abstract class IrBasedCallableDescriptor<T : IrDeclaration>(owner: T) : Callable
         unsupportedInIrBasedDescriptor()
     }
 
-    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D): R {
+    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R {
         unsupportedInIrBasedDescriptor()
     }
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         unsupportedInIrBasedDescriptor()
     }
 
-    override fun <V : Any?> getUserData(key: CallableDescriptor.UserDataKey<V>?): V? = null
+    override fun <V : Any?> getUserData(key: CallableDescriptor.UserDataKey<V>): V? = null
 }
 
 // Do not create this kind of descriptor for dispatch receiver parameters
@@ -178,10 +180,10 @@ open class IrBasedValueParameterDescriptor(owner: IrValueParameter) : ValueParam
 
     override fun getReturnType(): KotlinType? = owner.type.toIrBasedKotlinType()
 
-    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D) =
+    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D) =
         visitor!!.visitValueParameterDescriptor(this, data)!!
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         visitor!!.visitValueParameterDescriptor(this, null)
     }
 }
@@ -208,10 +210,10 @@ open class IrBasedReceiverParameterDescriptor(owner: IrValueParameter) : Receive
 
     override fun getReturnType(): KotlinType? = owner.type.toIrBasedKotlinType()
 
-    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D) =
+    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D) =
         visitor!!.visitReceiverParameterDescriptor(this, data)!!
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         visitor!!.visitReceiverParameterDescriptor(this, null)
     }
 }
@@ -277,10 +279,10 @@ open class IrBasedTypeParameterDescriptor(owner: IrTypeParameter) : TypeParamete
 
     override fun getStorageManager() = LockBasedStorageManager.NO_LOCKS
 
-    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D): R =
-        visitor!!.visitTypeParameterDescriptor(this, data)
+    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
+        platformVisitorResult(visitor.visitTypeParameterDescriptor(this, data))
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         visitor!!.visitTypeParameterDescriptor(this, null)
     }
 
@@ -315,10 +317,10 @@ open class IrBasedVariableDescriptor(owner: IrVariable) : VariableDescriptor, Ir
         unsupportedInIrBasedDescriptor()
     }
 
-    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D): R =
-        visitor!!.visitVariableDescriptor(this, data)
+    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
+        platformVisitorResult(visitor.visitVariableDescriptor(this, data))
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         visitor!!.visitVariableDescriptor(this, null)
     }
 }
@@ -412,7 +414,7 @@ open class IrBasedSimpleFunctionDescriptor(owner: IrSimpleFunction) : SimpleFunc
         unsupportedInIrBasedDescriptor()
     }
 
-    override fun setOverriddenDescriptors(overriddenDescriptors: MutableCollection<out CallableMemberDescriptor>) {
+    override fun setOverriddenDescriptors(overriddenDescriptors: Collection<CallableMemberDescriptor?>) {
         unsupportedInIrBasedDescriptor()
     }
 
@@ -421,10 +423,10 @@ open class IrBasedSimpleFunctionDescriptor(owner: IrSimpleFunction) : SimpleFunc
         else CallableMemberDescriptor.Kind.SYNTHESIZED
 
     override fun copy(
-        newOwner: DeclarationDescriptor?,
-        modality: Modality?,
-        visibility: DescriptorVisibility?,
-        kind: CallableMemberDescriptor.Kind?,
+        newOwner: DeclarationDescriptor,
+        modality: Modality,
+        visibility: DescriptorVisibility,
+        kind: CallableMemberDescriptor.Kind,
         copyOverrides: Boolean
     ): Nothing {
         unsupportedInIrBasedDescriptor()
@@ -435,16 +437,16 @@ open class IrBasedSimpleFunctionDescriptor(owner: IrSimpleFunction) : SimpleFunc
 
     override fun getInitialSignatureDescriptor(): FunctionDescriptor? = null
 
-    override fun <V : Any?> getUserData(key: CallableDescriptor.UserDataKey<V>?): V? = null
+    override fun <V : Any?> getUserData(key: CallableDescriptor.UserDataKey<V>): V? = null
 
     override fun newCopyBuilder(): FunctionDescriptor.CopyBuilder<out SimpleFunctionDescriptor> {
         unsupportedInIrBasedDescriptor()
     }
 
-    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D) =
-        visitor!!.visitFunctionDescriptor(this, data)
+    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
+        platformVisitorResult(visitor.visitFunctionDescriptor(this, data))
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         visitor!!.visitFunctionDescriptor(this, null)
     }
 }
@@ -486,7 +488,7 @@ open class IrBasedClassConstructorDescriptor(owner: IrConstructor) : ClassConstr
     override fun getModality() = Modality.FINAL
 
 
-    override fun setOverriddenDescriptors(overriddenDescriptors: MutableCollection<out CallableMemberDescriptor>) {
+    override fun setOverriddenDescriptors(overriddenDescriptors: Collection<CallableMemberDescriptor?>) {
         unsupportedInIrBasedDescriptor()
     }
 
@@ -528,7 +530,7 @@ open class IrBasedClassConstructorDescriptor(owner: IrConstructor) : ClassConstr
 
     override fun isSuspend() = false
 
-    override fun <V : Any?> getUserData(key: CallableDescriptor.UserDataKey<V>?): V? = null
+    override fun <V : Any?> getUserData(key: CallableDescriptor.UserDataKey<V>): V? = null
 
     override fun isExternal() = owner.isExternal
 
@@ -536,10 +538,10 @@ open class IrBasedClassConstructorDescriptor(owner: IrConstructor) : ClassConstr
         unsupportedInIrBasedDescriptor()
     }
 
-    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D): R =
-        visitor!!.visitConstructorDescriptor(this, data)
+    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
+        platformVisitorResult(visitor.visitConstructorDescriptor(this, data))
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         visitor!!.visitConstructorDescriptor(this, null)
     }
 }
@@ -555,7 +557,7 @@ fun IrFunction.toIrBasedDescriptor(): FunctionDescriptor =
 open class IrBasedClassDescriptor(owner: IrClass) : ClassDescriptor, IrBasedDeclarationDescriptor<IrClass>(owner) {
     override fun getName() = owner.name
 
-    override fun getMemberScope(typeArguments: MutableList<out TypeProjection>) = MemberScope.Empty
+    override fun getMemberScope(typeArguments: List<TypeProjection>) = MemberScope.Empty
 
     override fun getMemberScope(typeSubstitution: TypeSubstitution) = MemberScope.Empty
 
@@ -646,10 +648,10 @@ open class IrBasedClassDescriptor(owner: IrClass) : ClassDescriptor, IrBasedDecl
 
     override fun isExternal() = owner.isExternal
 
-    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D): R =
-        visitor!!.visitClassDescriptor(this, data)
+    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
+        platformVisitorResult(visitor.visitClassDescriptor(this, data))
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         visitor!!.visitClassDescriptor(this, null)
     }
 
@@ -688,7 +690,7 @@ class LazyTypeConstructor(
 open class IrBasedEnumEntryDescriptor(owner: IrEnumEntry) : ClassDescriptor, IrBasedDeclarationDescriptor<IrEnumEntry>(owner) {
     override fun getName() = owner.name
 
-    override fun getMemberScope(typeArguments: MutableList<out TypeProjection>) = MemberScope.Empty
+    override fun getMemberScope(typeArguments: List<TypeProjection>) = MemberScope.Empty
 
     override fun getMemberScope(typeSubstitution: TypeSubstitution) = MemberScope.Empty
 
@@ -769,10 +771,10 @@ open class IrBasedEnumEntryDescriptor(owner: IrEnumEntry) : ClassDescriptor, IrB
 
     override fun isExternal() = false
 
-    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D): R =
-        visitor!!.visitClassDescriptor(this, data)
+    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
+        platformVisitorResult(visitor.visitClassDescriptor(this, data))
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         visitor!!.visitClassDescriptor(this, null)
     }
 
@@ -788,7 +790,7 @@ open class IrBasedPropertyDescriptor(owner: IrProperty) :
     PropertyDescriptor, DescriptorWithContainerSource, IrBasedDeclarationDescriptor<IrProperty>(owner) {
     override fun getModality() = owner.modality
 
-    override fun setOverriddenDescriptors(overriddenDescriptors: MutableCollection<out CallableMemberDescriptor>) {
+    override fun setOverriddenDescriptors(overriddenDescriptors: Collection<CallableMemberDescriptor?>) {
         unsupportedInIrBasedDescriptor()
     }
 
@@ -805,10 +807,10 @@ open class IrBasedPropertyDescriptor(owner: IrProperty) :
     override fun getOverriddenDescriptors(): MutableCollection<out PropertyDescriptor> = mutableListOf()
 
     override fun copy(
-        newOwner: DeclarationDescriptor?,
-        modality: Modality?,
-        visibility: DescriptorVisibility?,
-        kind: CallableMemberDescriptor.Kind?,
+        newOwner: DeclarationDescriptor,
+        modality: Modality,
+        visibility: DescriptorVisibility,
+        kind: CallableMemberDescriptor.Kind,
         copyOverrides: Boolean
     ): CallableMemberDescriptor {
         unsupportedInIrBasedDescriptor()
@@ -833,6 +835,7 @@ open class IrBasedPropertyDescriptor(owner: IrProperty) :
     override fun getVisibility() = owner.visibility
 
     override val setter: PropertySetterDescriptor? get() = owner.setter?.toIrBasedDescriptor() as? PropertySetterDescriptor
+    override fun getSetter(): PropertySetterDescriptor? = setter
 
     override val containerSource: DeserializedContainerSource? = owner.containerSource
 
@@ -849,7 +852,7 @@ open class IrBasedPropertyDescriptor(owner: IrProperty) :
 
     override fun hasStableParameterNames() = false
 
-    override fun getType(): KotlinType = returnType
+    override fun getType(): KotlinType = getReturnType()
 
     override fun isVar() = owner.isVar
 
@@ -870,14 +873,15 @@ open class IrBasedPropertyDescriptor(owner: IrProperty) :
 
     override fun isExternal() = owner.isExternal
 
-    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D) =
-        visitor!!.visitPropertyDescriptor(this, data)
+    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
+        platformVisitorResult(visitor.visitPropertyDescriptor(this, data))
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         visitor!!.visitPropertyDescriptor(this, null)
     }
 
     override val getter: PropertyGetterDescriptor? get() = owner.getter?.toIrBasedDescriptor() as? PropertyGetterDescriptor
+    override fun getGetter(): PropertyGetterDescriptor? = getter
 
     override fun newCopyBuilder(): CallableMemberDescriptor.CopyBuilder<out PropertyDescriptor> {
         unsupportedInIrBasedDescriptor()
@@ -893,7 +897,7 @@ open class IrBasedPropertyDescriptor(owner: IrProperty) :
 
     override fun getInType(): KotlinType? = setter?.valueParameters?.get(0)?.type
 
-    override fun <V : Any?> getUserData(key: CallableDescriptor.UserDataKey<V>?): V? = null
+    override fun <V : Any?> getUserData(key: CallableDescriptor.UserDataKey<V>): V? = null
 }
 
 private fun IrField.toIrBackingFieldDescriptor(
@@ -926,8 +930,8 @@ open class IrBasedPropertyGetterDescriptor(owner: IrSimpleFunction) : IrBasedPro
 
     override fun getOriginal(): IrBasedPropertyGetterDescriptor = this
 
-    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D): R =
-        visitor!!.visitPropertyGetterDescriptor(this, data)
+    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
+        platformVisitorResult(visitor.visitPropertyGetterDescriptor(this, data))
 }
 
 class IrBasedBackingFieldDescriptor(val owner: IrField, override val correspondingProperty: PropertyDescriptor) : FieldDescriptor {
@@ -944,8 +948,8 @@ open class IrBasedPropertySetterDescriptor(owner: IrSimpleFunction) : IrBasedPro
 
     override fun getOriginal(): IrBasedPropertySetterDescriptor = this
 
-    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D): R =
-        visitor!!.visitPropertySetterDescriptor(this, data)
+    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
+        platformVisitorResult(visitor.visitPropertySetterDescriptor(this, data))
 }
 
 open class IrBasedTypeAliasDescriptor(owner: IrTypeAlias) : IrBasedDeclarationDescriptor<IrTypeAlias>(owner), TypeAliasDescriptor {
@@ -992,9 +996,9 @@ open class IrBasedTypeAliasDescriptor(owner: IrTypeAlias) : IrBasedDeclarationDe
     override fun isExternal(): Boolean = false
 
     override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
-        visitor.visitTypeAliasDescriptor(this, data)
+        platformVisitorResult(visitor.visitTypeAliasDescriptor(this, data))
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         visitor.visitTypeAliasDescriptor(this, null)
     }
 }
@@ -1004,7 +1008,7 @@ fun IrTypeAlias.toIrBasedDescriptor() = IrBasedTypeAliasDescriptor(this)
 open class IrBasedFieldDescriptor(owner: IrField) : PropertyDescriptor, IrBasedDeclarationDescriptor<IrField>(owner) {
     override fun getModality() = if (owner.isFinal) Modality.FINAL else Modality.OPEN
 
-    override fun setOverriddenDescriptors(overriddenDescriptors: MutableCollection<out CallableMemberDescriptor>) {
+    override fun setOverriddenDescriptors(overriddenDescriptors: Collection<CallableMemberDescriptor?>) {
         unsupportedInIrBasedDescriptor()
     }
 
@@ -1019,10 +1023,10 @@ open class IrBasedFieldDescriptor(owner: IrField) : PropertyDescriptor, IrBasedD
     override fun getOverriddenDescriptors(): MutableCollection<out PropertyDescriptor> = mutableListOf()
 
     override fun copy(
-        newOwner: DeclarationDescriptor?,
-        modality: Modality?,
-        visibility: DescriptorVisibility?,
-        kind: CallableMemberDescriptor.Kind?,
+        newOwner: DeclarationDescriptor,
+        modality: Modality,
+        visibility: DescriptorVisibility,
+        kind: CallableMemberDescriptor.Kind,
         copyOverrides: Boolean
     ): CallableMemberDescriptor {
         unsupportedInIrBasedDescriptor()
@@ -1047,6 +1051,7 @@ open class IrBasedFieldDescriptor(owner: IrField) : PropertyDescriptor, IrBasedD
     override fun getVisibility() = owner.visibility
 
     override val setter: PropertySetterDescriptor? get() = null
+    override fun getSetter(): PropertySetterDescriptor? = setter
 
     override fun getOriginal() = this
 
@@ -1083,14 +1088,15 @@ open class IrBasedFieldDescriptor(owner: IrField) : PropertyDescriptor, IrBasedD
 
     override fun isExternal() = owner.isExternal
 
-    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D) =
-        visitor!!.visitPropertyDescriptor(this, data)
+    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
+        platformVisitorResult(visitor.visitPropertyDescriptor(this, data))
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         visitor!!.visitPropertyDescriptor(this, null)
     }
 
     override val getter: PropertyGetterDescriptor? get() = null
+    override fun getGetter(): PropertyGetterDescriptor? = getter
 
     override fun newCopyBuilder(): CallableMemberDescriptor.CopyBuilder<out PropertyDescriptor> {
         unsupportedInIrBasedDescriptor()
@@ -1107,7 +1113,7 @@ open class IrBasedFieldDescriptor(owner: IrField) : PropertyDescriptor, IrBasedD
 
     override fun getInType(): KotlinType? = setter?.valueParameters?.get(0)?.type
 
-    override fun <V : Any?> getUserData(key: CallableDescriptor.UserDataKey<V>?): V? = null
+    override fun <V : Any?> getUserData(key: CallableDescriptor.UserDataKey<V>): V? = null
 }
 
 class IrBasedDelegateFieldDescriptor(owner: IrField) : IrBasedFieldDescriptor(owner), IrImplementingDelegateDescriptor {

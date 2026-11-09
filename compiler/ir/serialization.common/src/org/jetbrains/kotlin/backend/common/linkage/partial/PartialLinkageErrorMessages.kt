@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.backend.common.linkage.partial
 
-import com.intellij.util.PathUtil
+import org.jetbrains.kotlin.backend.common.serialization.getFileName
 import org.jetbrains.kotlin.backend.common.linkage.partial.ClassifierPartialLinkageStatus.Unusable
 import org.jetbrains.kotlin.backend.common.linkage.partial.DeclarationKind.*
 import org.jetbrains.kotlin.backend.common.linkage.partial.ExpressionKind.*
@@ -228,7 +228,7 @@ private fun Appendable.signature(symbol: IrSymbol): Appendable {
                     // Avoid printing full paths from FileSignature.
                     val container = it.container
                     if (container is FileSignature) {
-                        file = PathUtil.getFileName(container.fileName).takeIf(String::isNotEmpty) ?: UNKNOWN_FILE
+                        file = getFileName(container.fileName).takeIf(String::isNotEmpty) ?: UNKNOWN_FILE
                         it.inner.render()
                     } else it.render()
                 }

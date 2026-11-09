@@ -4,12 +4,21 @@
  */
 package org.jetbrains.kotlin.backend.konan
 
-import org.jetbrains.kotlin.util.prefixBaseNameIfNot
-import org.jetbrains.kotlin.util.suffixIfNot
-import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.KonanTarget
+import org.jetbrains.kotlin.util.suffixIfNot
 import kotlin.random.Random
+
+fun String.prefixBaseNameIfNot(prefix: String): String {
+    val file = File(this).absoluteFile
+    val name = file.name
+    val directory = file.parent
+    return "$directory/${name.prefixIfNot(prefix)}"
+}
+
+fun String.prefixIfNot(prefix: String) =
+    if (this.startsWith(prefix)) this else "$prefix$this"
 
 
 /**

@@ -29,7 +29,7 @@ fun <T> Iterable<T>.collectForMangler(builder: StringBuilder, params: MangleCons
     if (!addSeparator) {
         if (builder.last() == params.separator) {
             // avoid signatures like foo(Int;)
-            builder.deleteCharAt(builder.lastIndex)
+            builder.deleteAt(builder.lastIndex)
         }
     }
 

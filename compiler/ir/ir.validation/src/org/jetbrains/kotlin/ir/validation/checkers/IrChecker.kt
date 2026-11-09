@@ -21,7 +21,7 @@ sealed interface IrChecker : IrValidationError.Cause {
 abstract class IrElementChecker<in E : IrElement>(
     elementClass: KClass<in E>,
 ) : IrChecker {
-    internal val elementClass: Class<in E> = elementClass.java
+    internal val elementClass: KClass<in E> = elementClass
 
     abstract fun check(element: E, context: CheckerContext)
 }

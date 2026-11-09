@@ -19,7 +19,7 @@ internal class KTypeProxy(override val state: KTypeState, override val callInter
         get() = state.getArguments(callInterceptor)
     override val isMarkedNullable: Boolean
         get() = state.irType.isMarkedNullable()
-    override val annotations: List<Annotation>
+    val annotations: List<Annotation>
         get() = TODO("Not yet implemented")
 
     override fun equals(other: Any?): Boolean {

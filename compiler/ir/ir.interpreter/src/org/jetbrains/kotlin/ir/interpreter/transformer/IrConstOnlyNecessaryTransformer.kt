@@ -12,14 +12,14 @@ import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.interpreter.isConst
 import org.jetbrains.kotlin.ir.interpreter.property
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
-import org.jetbrains.kotlin.name.JsStandardClassIds
+import org.jetbrains.kotlin.name.FqName
 
 /**
  * This transformer will visit all expressions and will evaluate only those that are necessary.
  * By "necessary" we mean expressions that are used in `const val`, inside annotations and js() call arguments.
  */
 internal class IrConstOnlyNecessaryTransformer(context: IrConstEvaluationContext) : IrConstExpressionTransformer(context) {
-    private val jsCodeFqName = JsStandardClassIds.Callables.JsCode.asSingleFqName()
+    private val jsCodeFqName = FqName("kotlin.js.js")
 
     override fun visitCall(expression: IrCall, data: Data): IrElement {
         val isJsCodeCall = expression.symbol.owner.fqNameWhenAvailable == jsCodeFqName

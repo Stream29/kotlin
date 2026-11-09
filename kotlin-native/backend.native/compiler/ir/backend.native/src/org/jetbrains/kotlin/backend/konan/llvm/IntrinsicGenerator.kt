@@ -238,7 +238,7 @@ internal class IntrinsicGenerator(private val environment: IntrinsicGeneratorEnv
                     SingleThread = 0
             )!!
 
-            LLVMBuildExtractValue(builder, cmp, mode.index, "")!!
+            LLVMBuildExtractValue(builder, cmp, mode.index.toUInt(), "")!!
         }
     }
 
@@ -369,7 +369,7 @@ internal class IntrinsicGenerator(private val environment: IntrinsicGeneratorEnv
             }
 
     private fun FunctionGenerationContext.emitGetPointerSize(): LLVMValueRef =
-            llvm.int32(LLVMPointerSize(codegen.llvmTargetData))
+            llvm.int32(LLVMPointerSize(codegen.llvmTargetData).toInt())
 
     private fun FunctionGenerationContext.emitReadPrimitive(callSite: IrCall, args: List<LLVMValueRef>): LLVMValueRef =
             load(callSite.llvmReturnType, args.last())
@@ -393,7 +393,7 @@ internal class IntrinsicGenerator(private val environment: IntrinsicGeneratorEnv
         // Note: LLVM allows to read without padding tail up to byte boundary, but the result seems to be incorrect.
 
         val bitsWithPaddingNum = prefixBitsNum + size + suffixBitsNum
-        val bitsWithPaddingType = LLVMIntTypeInContext(llvm.llvmContext, bitsWithPaddingNum)!!
+        val bitsWithPaddingType = LLVMIntTypeInContext(llvm.llvmContext, bitsWithPaddingNum.toUInt())!!
 
         val bitsWithPaddingPtr = gep(llvm.int8Type, ptr, llvm.int64(offset / 8))
         val bitsWithPadding = load(bitsWithPaddingType, bitsWithPaddingPtr).setUnaligned()
@@ -419,13 +419,13 @@ internal class IntrinsicGenerator(private val environment: IntrinsicGeneratorEnv
         val value = args[3]
         assert(value.type == llvm.int64Type)
 
-        val bitsType = LLVMIntTypeInContext(llvm.llvmContext, size)!!
+        val bitsType = LLVMIntTypeInContext(llvm.llvmContext, size.toUInt())!!
 
         val prefixBitsNum = (offset % 8).toInt()
         val suffixBitsNum = (8 - ((size + offset) % 8).toInt()) % 8
 
         val bitsWithPaddingNum = prefixBitsNum + size + suffixBitsNum
-        val bitsWithPaddingType = LLVMIntTypeInContext(llvm.llvmContext, bitsWithPaddingNum)!!
+        val bitsWithPaddingType = LLVMIntTypeInContext(llvm.llvmContext, bitsWithPaddingNum.toUInt())!!
 
         // 0011111000:
         val discardBitsMask = shl(
@@ -493,10 +493,10 @@ internal class IntrinsicGenerator(private val environment: IntrinsicGeneratorEnv
 
         val superClass = args.single()
         val messenger = LLVMBuildSelect(builder,
-                If = icmpEq(superClass, llvm.kNull),
-                Then = normalMessenger.toConstPointer().llvm,
-                Else = superMessenger.toConstPointer().llvm,
-                Name = ""
+                icmpEq(superClass, llvm.kNull),
+                normalMessenger.toConstPointer().llvm,
+                superMessenger.toConstPointer().llvm,
+                ""
         )!!
 
         return messenger
@@ -510,7 +510,7 @@ internal class IntrinsicGenerator(private val environment: IntrinsicGeneratorEnv
             LLVMTypeKind.LLVMFloatTypeKind, LLVMTypeKind.LLVMDoubleTypeKind,
             LLVMTypeKind.LLVMVectorTypeKind -> {
                 // TODO LLVM API does not provide guarantee for LLVMIntTypeInContext availability for longer types; consider meaningful diag message instead of NPE
-                val integerType = LLVMIntTypeInContext(llvm.llvmContext, first.type.sizeInBits())!!
+                val integerType = LLVMIntTypeInContext(llvm.llvmContext, first.type.sizeInBits().toUInt())!!
                 icmpEq(bitcast(integerType, first), bitcast(integerType, second))
             }
             LLVMTypeKind.LLVMIntegerTypeKind, LLVMTypeKind.LLVMPointerTypeKind -> icmpEq(first, second)
@@ -543,7 +543,7 @@ internal class IntrinsicGenerator(private val environment: IntrinsicGeneratorEnv
         val elementCount = vectorSize / elementSize
         emitThrowIfOOB(index, llvm.int32((elementCount)))
 
-        val targetType = LLVMVectorType(callSite.llvmReturnType, elementCount)!!
+        val targetType = LLVMVectorType(callSite.llvmReturnType, elementCount.toUInt())!!
         return extractElement(
                 (if (targetType == vector.type) vector else bitcast(targetType, vector)),
                 index)
@@ -691,12 +691,12 @@ internal class IntrinsicGenerator(private val environment: IntrinsicGeneratorEnv
             nonOverflowValue: () -> LLVMValueRef
     ): LLVMValueRef {
         val minValue = when (val sizeInBits = type.sizeInBits()) {
-            32 -> LLVMConstInt(type, Int.MIN_VALUE.toLong(), 1)!!
-            64 -> LLVMConstInt(type, Long.MIN_VALUE, 1)!!
+            32 -> LLVMConstInt(type, Int.MIN_VALUE.toLong().toULong(), 1)!!
+            64 -> LLVMConstInt(type, Long.MIN_VALUE.toULong(), 1)!!
             else -> error("Unsupported signed integer division argument width: $sizeInBits")
         }
 
-        val minusOne = LLVMConstInt(type, -1, 1)!!
+        val minusOne = LLVMConstInt(type, (-1L).toULong(), 1)!!
         val overflowValue = if (retZeroOnOverflow) Zero(type).llvm else minValue
 
         return ifThenElse(and(icmpEq(dividend, minValue), icmpEq(divisor, minusOne)), overflowValue, nonOverflowValue)

@@ -84,7 +84,7 @@ private class AutoboxingTransformer(val context: Context) : AbstractValueUsageTr
         val irTypeOperatorCall = expression.statements.singleOrNull()
                 ?: error("Expected exactly one statement in IrBlock marked with $STATEMENT_ORIGIN_NO_CAST_NEEDED")
         check(irTypeOperatorCall is IrTypeOperatorCall) {
-            "Expected a type operator call: ${irTypeOperatorCall::class.java}"
+            "Expected a type operator call: ${irTypeOperatorCall::class}"
         }
         check(irTypeOperatorCall.operator == IrTypeOperator.IMPLICIT_CAST) {
             "Expected an implicit cast: ${irTypeOperatorCall.operator}"

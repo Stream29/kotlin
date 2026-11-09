@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.backend.konan.llvm.objc
 
-import kotlinx.cinterop.signExtend
 import llvm.*
 import org.jetbrains.kotlin.backend.konan.getARCRetainAutoreleasedReturnValueMarker
 import org.jetbrains.kotlin.backend.konan.llvm.*
@@ -64,9 +63,9 @@ internal open class ObjCCodeGenerator(val codegen: CodeGenerator) {
         LLVMGetInlineAsm(
                 Ty = functionType(llvm.voidType, false),
                 AsmString = asmString,
-                AsmStringSize = asmString.toByteArray().size.signExtend(),
+                AsmStringSize = asmString.encodeToByteArray().size.toULong(),
                 Constraints = null,
-                ConstraintsSize = 0,
+                ConstraintsSize = 0u,
                 HasSideEffects = 1,
                 IsAlignStack = 0,
                 Dialect = LLVMInlineAsmDialect.LLVMInlineAsmDialectATT,

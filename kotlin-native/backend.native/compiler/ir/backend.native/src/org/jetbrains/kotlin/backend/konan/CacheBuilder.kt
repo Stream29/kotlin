@@ -14,25 +14,22 @@ import org.jetbrains.kotlin.backend.konan.util.reportCompilationErrorAndThrow
 import org.jetbrains.kotlin.cli.reportLog
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.konan.config.*
-import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.library.isExplicitlySpecifiedByUserInCLIArgument
 import org.jetbrains.kotlin.konan.library.isImplicitlyLoadedFromKotlinNativeDistribution
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.KonanTarget
+import org.jetbrains.kotlin.library.KlibPath as Path
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.isNativeStdlib
 import org.jetbrains.kotlin.library.metadata.isCInteropLibrary
 import org.jetbrains.kotlin.library.uniqueName
 import org.jetbrains.kotlin.library.unresolvedDependencies
-import java.nio.channels.FileChannel
-import java.nio.channels.FileLock
-import java.nio.channels.OverlappingFileLockException
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.StandardOpenOption
-import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
 import org.jetbrains.kotlin.io.canonicalPathString
+import platform.posix.O_CREAT
+import platform.posix.O_RDWR
+import platform.posix.close
+import platform.posix.open
 
 internal fun KotlinLibrary.getAllTransitiveDependencies(allLibraries: Map<String, KotlinLibrary>): List<KotlinLibrary> {
     val allDependencies = mutableSetOf<KotlinLibrary>()
@@ -452,30 +449,19 @@ class CacheBuilder(
             return buildAction()
         }
 
-        FileChannel.open(
-                Paths.get(lockFile.absolutePath),
-                StandardOpenOption.CREATE,
-                StandardOpenOption.READ,
-                StandardOpenOption.WRITE
-        ).use { channel ->
-            channel.acquireLockWithRetry().use {
+        val fd = open(lockFile.absolutePath, O_CREAT or O_RDWR, 438)
+        if (fd < 0) {
+            if (skipBuildAction()) return
+            return buildAction()
+        }
+        try {
+            try {
                 if (skipBuildAction()) return
                 buildAction()
+            } finally {
             }
-        }
-    }
-
-    private fun FileChannel.acquireLockWithRetry(): FileLock {
-        while (true) {
-            try {
-                return this.lock()
-            } catch (_: OverlappingFileLockException) {
-                // Another thread in the same JVM holds the lock. Just wait:
-                // — if that thread dies with a crash, the whole process dies.
-                // - if that thread fails with an exception, the lock is released.
-                // - if that thread hangs, we might be tight on resources, so waiting is wise.
-                Thread.sleep(200L)
-            }
+        } finally {
+            close(fd)
         }
     }
 

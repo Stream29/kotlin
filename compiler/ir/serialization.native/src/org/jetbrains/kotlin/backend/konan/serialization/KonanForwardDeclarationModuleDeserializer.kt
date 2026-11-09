@@ -44,7 +44,7 @@ internal class KonanForwardDeclarationModuleDeserializer(
         require(moduleDescriptor.isForwardDeclarationModule)
     }
 
-    override val klib get() = error("'klib' is not available for ${this::class.java}")
+    override val klib get() = error("'klib' is not available for ${this::class}")
     override val kind get() = IrModuleDeserializerKind.SYNTHETIC
     override val moduleFragment: IrModuleFragment = IrModuleFragmentImpl(moduleDescriptor)
     private val symbolTable = linker.symbolTable
@@ -62,9 +62,10 @@ internal class KonanForwardDeclarationModuleDeserializer(
             "Only class could be a Forward declaration $idSig (kind $symbolKind)"
         }
 
-        return declaredClasses.computeIfAbsent(idSig as IdSignature.CommonSignature) {
-            buildForwardDeclarationClassStub(it)
-        }?.symbol
+        val signature = idSig as IdSignature.CommonSignature
+        return (declaredClasses[signature] ?: buildForwardDeclarationClassStub(signature)?.also {
+            declaredClasses[signature] = it
+        })?.symbol
     }
 
     private fun buildForwardDeclarationClassStub(signature: IdSignature.CommonSignature): IrClass? {
@@ -110,7 +111,7 @@ internal class KonanForwardDeclarationModuleDeserializer(
     }
 
     private fun getOrCreateContainingPackage(packageFqName: FqName): IrExternalPackageFragment {
-        return declaredPackageFragments.computeIfAbsent(packageFqName) {
+        return declaredPackageFragments.getOrPut(packageFqName) {
             val descriptor = EmptyPackageFragmentDescriptor(moduleDescriptor, packageFqName)
             IrExternalPackageFragmentImpl(IrExternalPackageFragmentSymbolImpl(descriptor), packageFqName)
         }

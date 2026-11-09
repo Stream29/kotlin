@@ -91,7 +91,7 @@ internal class ActualizerSymbolRemapper(private val expectActualMap: IrExpectAct
     private inline fun <reified S : IrSymbol> S.actualizeSymbol(): S {
         val actualSymbol = expectActualMap.symbolMap[this] ?: return this
         return actualSymbol as? S
-            ?: error("Unexpected type of actual symbol. Expected: ${S::class.java.simpleName}, got ${actualSymbol.javaClass.simpleName}")
+            ?: error("Unexpected type of actual symbol. Expected: ${S::class.simpleName}, got ${actualSymbol::class.simpleName}")
     }
 }
 

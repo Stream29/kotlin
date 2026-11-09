@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.backend.konan
 
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.isLateInit
 import org.jetbrains.kotlin.ir.util.StubGeneratorExtensions
 
 object KonanStubGeneratorExtensions : StubGeneratorExtensions() {

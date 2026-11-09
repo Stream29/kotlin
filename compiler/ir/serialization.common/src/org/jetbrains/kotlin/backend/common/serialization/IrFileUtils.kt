@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.backend.common.serialization
 
 import org.jetbrains.kotlin.ir.AbstractIrFileEntry
 import org.jetbrains.kotlin.ir.IrFileEntry
-import java.io.File
+import nativekotlin.host.files.NativeFile as File
 
 internal val IrFileEntry.lineStartOffsetsForSerialization: List<Int>
     get() = when (this) {
@@ -23,10 +23,10 @@ private fun File.directlyReadLineStartOffsets(): List<Int> {
     //                .map { document.getLineStartOffset(it) }
     //                .toIntArray()
     // as in PSI.
-    val separatorLength = System.lineSeparator().length
+    val separatorLength = 1
     val buffer = ArrayList<Int>()
     var currentOffset = 0
-    this.forEachLine { line ->
+    this.serializationForEachLine { line ->
         buffer.add(currentOffset)
         currentOffset += line.length + separatorLength
     }

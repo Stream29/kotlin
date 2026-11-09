@@ -88,7 +88,7 @@ abstract class IrDelegateDescriptorBase(
     override fun isVar(): Boolean = false
 
     override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
-        visitor.visitPropertyDescriptor(this, data)
+        platformVisitorResult(visitor.visitPropertyDescriptor(this, data))
 }
 
 class IrPropertyDelegateDescriptorImpl(
@@ -138,5 +138,5 @@ class IrLocalDelegatedPropertyDelegateDescriptorImpl(
     override fun getVisibility(): DescriptorVisibility = DescriptorVisibilities.LOCAL
 
     override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
-        visitor.visitVariableDescriptor(this, data)
+        platformVisitorResult(visitor.visitVariableDescriptor(this, data))
 }

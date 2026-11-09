@@ -3,6 +3,9 @@ package org.jetbrains.kotlin.backend.common.overrides
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
+import org.jetbrains.kotlin.descriptors.kind
+import org.jetbrains.kotlin.descriptors.visibility
+import org.jetbrains.kotlin.descriptors.unsubstitutedMemberScope
 import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrClass

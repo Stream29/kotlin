@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.ir.interpreter.proxy.reflection
 
 import org.jetbrains.kotlin.ir.interpreter.CallInterceptor
 import org.jetbrains.kotlin.ir.interpreter.state.reflection.KParameterState
-import kotlin.reflect.KParameter
+import org.jetbrains.kotlin.ir.interpreter.proxy.reflection.KParameter
 import kotlin.reflect.KType
 
 internal class KParameterProxy(override val state: KParameterState, override val callInterceptor: CallInterceptor) : ReflectionProxy, KParameter {

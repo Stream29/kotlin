@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.backend.konan
 
-import com.google.common.base.StandardSystemProperty
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.backend.common.linkage.partial.partialLinkageConfig
 import org.jetbrains.kotlin.backend.konan.ir.BridgesPolicy
@@ -23,16 +22,17 @@ import org.jetbrains.kotlin.config.nativeBinaryOptions.SanitizerKind
 import org.jetbrains.kotlin.config.nativeBinaryOptions.UnitSuspendFunctionObjCExport
 import org.jetbrains.kotlin.io.readProperties
 import org.jetbrains.kotlin.konan.config.*
-import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.file.*
+import org.jetbrains.kotlin.konan.file.createTempDir
 import org.jetbrains.kotlin.konan.library.isExplicitlySpecifiedByUserInCLIArgument
+import org.jetbrains.kotlin.konan.properties.Properties
 import org.jetbrains.kotlin.konan.target.*
+import org.jetbrains.kotlin.library.KlibFiles as Files
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.KlibPaths as Paths
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.native.resolve.KonanLibrariesResolveSupport
 import org.jetbrains.kotlin.utils.KotlinNativePaths
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.util.Properties
-import kotlin.io.path.Path
 
 class NativeSecondStageCompilationConfig(
         val project: Project,
@@ -87,7 +87,7 @@ class NativeSecondStageCompilationConfig(
     }
 
     private val platformManager = PlatformManager(distribution)
-    internal val targetManager = platformManager.targetManager(configuration.konanTarget)
+    internal val targetManager = platformManager.createBackendTargetManager(configuration.konanTarget)
     override val target = targetManager.target
     internal val phaseConfig = configuration.phaseConfig!!
 
@@ -688,15 +688,15 @@ class NativeSecondStageCompilationConfig(
     /**
      * Directory to store LLVM IR from -Xsave-llvm-ir-after.
      */
-    internal val saveLlvmIrDirectory: java.io.File by lazy {
+    internal val saveLlvmIrDirectory: File by lazy {
         val path = configuration.saveLlvmIrDirectory
         if (path == null) {
-            val tempDir = Files.createTempDirectory(Paths.get(StandardSystemProperty.JAVA_IO_TMPDIR.value()!!), /* prefix= */ null).toFile()
+            val tempDir = createTempDir("save-llvm-ir")
             configuration.report(CliDiagnostics.KONAN_ARGUMENT_WARNING,
                     "Temporary directory for LLVM IR is ${tempDir.canonicalPath}")
             tempDir
         } else {
-            java.io.File(path)
+            File(path)
         }
     }
 
@@ -724,6 +724,26 @@ class NativeSecondStageCompilationConfig(
     val isInteropStubs: Boolean
         get() = manifestProperties?.getProperty("interop") == "true"
 }
+
+private fun HostManager.createBackendTargetManager(userRequest: String? = null): TargetManager =
+    object : TargetManager {
+        override val target: KonanTarget =
+            if (userRequest == null || userRequest == "host") {
+                HostManager.host
+            } else {
+                val resolvedAlias = HostManager.resolveAlias(userRequest)
+                targets.getValue(known(resolvedAlias))
+            }
+        override val targetName: String
+            get() = target.visibleName
+        override fun list() {
+            enabled.forEach {
+                val isDefault = if (it == target) " (default)" else ""
+                val isDeprecated = if (it in KonanTarget.deprecatedTargets) " (deprecated)" else ""
+                println("${it.visibleName}$isDefault$isDeprecated")
+            }
+        }
+    }
 
 private fun String.isRelease(): Boolean {
     // major.minor.patch-meta-build where patch, meta and build are optional.

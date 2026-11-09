@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.backend.common.linkage.partial
 
 import org.jetbrains.kotlin.builtins.FunctionInterfacePackageFragment
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
+import org.jetbrains.kotlin.descriptors.name
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.UNDEFINED_COLUMN_NUMBER
 import org.jetbrains.kotlin.ir.UNDEFINED_LINE_NUMBER
@@ -47,7 +48,7 @@ object PartialLinkageSources {
                 onMissingDeclaration = MissingDeclarations,
                 onSyntheticBuiltInFunction = SyntheticBuiltInFunctions,
                 onIrBased = { Real(it.module.name) },
-                onLazyIrBased = { Real(it.containingDeclaration.name) },
+                onLazyIrBased = { Real(it.getContainingDeclaration().name) },
                 onError = { error("Can't determine module for $declaration, name=${(declaration as? IrDeclarationWithName)?.name}") }
             )
         }
@@ -72,7 +73,7 @@ object PartialLinkageSources {
         }
 
         class LazyIrBased(packageFragmentDescriptor: PackageFragmentDescriptor) : File {
-            override val module = Module.Real(packageFragmentDescriptor.containingDeclaration.name)
+            override val module = Module.Real(packageFragmentDescriptor.getContainingDeclaration().name)
             private val defaultLocation = module.defaultLocationWithoutPath()
 
             override fun equals(other: Any?) = (other as? LazyIrBased)?.module == module

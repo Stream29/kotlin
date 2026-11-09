@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.ir.symbols.impl
 
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
+import org.jetbrains.kotlin.descriptors.original
+import org.jetbrains.kotlin.descriptors.containingDeclaration
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrSymbolOwner
@@ -34,7 +36,7 @@ abstract class IrSymbolBase<out Descriptor : DeclarationDescriptor, Owner : IrSy
     private var _owner: Owner? = null
     final override val owner: Owner
         get() = _owner // Please keep `_owner` and `?: error()` at separate lines to make it easier to set different breakpoints.
-            ?: error("${javaClass.simpleName} is unbound. Signature: $signature")
+            ?: error("${this::class.simpleName} is unbound. Signature: $signature")
 
     override val signature: IdSignature?
         get() = null
@@ -65,17 +67,17 @@ abstract class IrSymbolBase<out Descriptor : DeclarationDescriptor, Owner : IrSy
         if (_owner == null) {
             _owner = owner
         } else {
-            error("${javaClass.simpleName} is already bound. Signature: $signature. Owner: ${_owner?.render()}")
+            error("${this::class.simpleName} is already bound. Signature: $signature. Owner: ${_owner?.render()}")
         }
     }
 
     override fun toString(): String {
         if (isBound) return owner.render()
         return if (isPublicApi)
-            "Unbound public symbol ${this::class.java.simpleName}: $signature"
+            "Unbound public symbol ${this::class.simpleName}: $signature"
         else
             "Unbound private symbol " +
-                    if (_descriptor != null) "${this::class.java.simpleName}: $_descriptor" else super.toString()
+                    if (_descriptor != null) "${this::class.simpleName}: $_descriptor" else super.toString()
     }
 }
 

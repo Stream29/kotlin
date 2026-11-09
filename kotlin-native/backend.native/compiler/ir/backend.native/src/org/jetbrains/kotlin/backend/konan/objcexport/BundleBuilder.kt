@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.backend.konan.objcexport
 
 import org.jetbrains.kotlin.backend.konan.NativeSecondStageCompilationConfig
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.target.Family
 
 /**
@@ -34,7 +34,7 @@ internal class BundleBuilder(
 
         bundleContents.child("Info.plist").run {
             val infoPlistContents = infoPListBuilder.build(name, mainPackageGuesser, moduleDescriptor)
-            writeBytes(infoPlistContents.toByteArray())
+            writeBytes(infoPlistContents.encodeToByteArray())
         }
     }
 }

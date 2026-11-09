@@ -70,12 +70,12 @@ private class CallsChecker(generationState: NativeGenerationState, goodFunctions
                             ?: LLVMConstIntToPtr(llvm.int64(CALLED_LLVM_BUILTIN), llvm.pointerType)!!
                     ExternalCallInfo(value.name!!, valueOrSpecial).takeIf { value.isExternalFunction() }
                 }
-                LLVMIsACastInst(value) != null -> cleanCalledFunction(LLVMGetOperand(value, 0)!!)
+                LLVMIsACastInst(value) != null -> cleanCalledFunction(LLVMGetOperand(value, 0u)!!)
                 isIndirectCallArgument(value) -> ExternalCallInfo(null, value) // this is a callback call
                 LLVMIsAInlineAsm(value) != null -> null // this is inline assembly call
                 LLVMIsAConstantExpr(value) != null -> {
                     when (LLVMGetConstOpcode(value)) {
-                        LLVMOpcode.LLVMBitCast -> cleanCalledFunction(LLVMGetOperand(value, 0)!!)
+                        LLVMOpcode.LLVMBitCast -> cleanCalledFunction(LLVMGetOperand(value, 0u)!!)
                         else -> TODO("not implemented constant type in call")
                     }
                 }
@@ -133,30 +133,30 @@ private class CallsChecker(generationState: NativeGenerationState, goodFunctions
             when (calleeInfo.name) {
                 "objc_msgSend" -> {
                     // objc_msgSend has wrong declaration in header, so generated wrapper is strange, Let's just skip it
-                    if (LLVMGetNumArgOperands(call) < 2) continue
+                    if (LLVMGetNumArgOperands(call).toInt() < 2) continue
                     callSiteDescription = "$functionName (over objc_msgSend)"
                     calledName = null
-                    val firstArg = LLVMGetArgOperand(call, 0)!!
+                    val firstArg = LLVMGetArgOperand(call, 0u)!!
                     val firstArgClassPtr = getClass.buildCall(builder, listOf(firstArg))
                     val isNil = LLVMBuildICmp(builder, LLVMIntPredicate.LLVMIntEQ, firstArg, llvm.kNull, "")
-                    val selector = LLVMGetArgOperand(call, 1)!!
+                    val selector = LLVMGetArgOperand(call, 1u)!!
                     val calledPtrLlvmIfNotNil = getMethodImpl.buildCall(builder, listOf(firstArgClassPtr, selector))
                     val calledPtrLlvmIfNil = LLVMConstIntToPtr(llvm.int64(MSG_SEND_TO_NULL), llvm.pointerType)
                     calledPtrLlvm = LLVMBuildSelect(builder, isNil, calledPtrLlvmIfNil, calledPtrLlvmIfNotNil, "")!!
                 }
                 "objc_msgSendSuper2" -> {
-                    if (LLVMGetNumArgOperands(call) < 2) continue
+                    if (LLVMGetNumArgOperands(call).toInt() < 2) continue
                     callSiteDescription = "$functionName (over objc_msgSendSuper2)"
                     calledName = null
                     // This is https://developer.apple.com/documentation/objectivec/objc_super?language=objc
                     // We don't want to look this type up, so let's just use our own struct.
                     // TODO: Do we need this with fresh LLVM?
                     val superStructType = llvm.structType(llvm.pointerType, llvm.pointerType)
-                    val superStruct = LLVMGetArgOperand(call, 0)
-                    val superClassPtrPtr = LLVMBuildStructGEP2(builder, superStructType, superStruct, 1, "")
+                    val superStruct = LLVMGetArgOperand(call, 0u)
+                    val superClassPtrPtr = LLVMBuildStructGEP2(builder, superStructType, superStruct, 1u, "")
                     val superClassPtr = LLVMBuildLoad2(builder, llvm.pointerType, superClassPtrPtr, "")!!
                     val classPtr = getSuperClass.buildCall(builder, listOf(superClassPtr))
-                    calledPtrLlvm = getMethodImpl.buildCall(builder, listOf(classPtr, LLVMGetArgOperand(call, 1)!!))
+                    calledPtrLlvm = getMethodImpl.buildCall(builder, listOf(classPtr, LLVMGetArgOperand(call, 1u)!!))
                 }
                 else -> {
                     callSiteDescription = functionName
@@ -207,7 +207,7 @@ internal fun checkLlvmModuleExternalCalls(generationState: NativeGenerationState
             val global = if (generationState.config.useLlvmOpaquePointers) {
                 it
             } else {
-                LLVMGetOperand(it, 0)
+                LLVMGetOperand(it, 0u)
             }
             LLVMGetInitializer(global)!!.getAsCString()
         }.toList()

@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.ir.types.impl
 
+import kotlin.native.identityHashCode
+
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.expressions.IrAnnotation
 import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
@@ -24,7 +26,7 @@ class IrErrorTypeImpl(
 ) : IrErrorType(IrErrorClassImpl.symbol, isMarkedNullable) {
     override fun equals(other: Any?): Boolean = other is IrErrorTypeImpl
 
-    override fun hashCode(): Int = IrErrorTypeImpl::class.java.hashCode()
+    override fun hashCode(): Int = IrErrorTypeImpl::class.hashCode()
 }
 
 open class IrDynamicTypeImpl(
@@ -33,7 +35,7 @@ open class IrDynamicTypeImpl(
 ) : IrDynamicType() {
     override fun equals(other: Any?): Boolean = other is IrDynamicTypeImpl
 
-    override fun hashCode(): Int = IrDynamicTypeImpl::class.java.hashCode()
+    override fun hashCode(): Int = IrDynamicTypeImpl::class.hashCode()
 }
 
 class IrDynamicTypeWithOriginalKotlinTypeImpl(
@@ -70,7 +72,7 @@ class IrCapturedType(
 
     override fun equals(other: Any?): Boolean = this === other
 
-    override fun hashCode(): Int = System.identityHashCode(this)
+    override fun hashCode(): Int = identityHashCode()
 
     override fun toString(): String = render()
 }

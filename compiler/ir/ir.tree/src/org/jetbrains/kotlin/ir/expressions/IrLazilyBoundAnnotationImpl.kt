@@ -8,6 +8,8 @@ package org.jetbrains.kotlin.ir.expressions
 import org.jetbrains.kotlin.DeprecatedCompilerApi
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.ir.IrElement
+import org.jetbrains.kotlin.ir.IrLock
+import org.jetbrains.kotlin.ir.synchronized
 import org.jetbrains.kotlin.ir.IrProvider
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
@@ -42,7 +44,9 @@ class IrLazilyBoundAnnotationImpl(
     override var attributeOwnerId: IrElement = this
     override val typeArguments: MutableList<IrType?> = ArrayList(0)
 
-    private fun transitionToCtorSymbolBasedApi() = synchronized(this) {
+    private val nativeLock = IrLock()
+
+    private fun transitionToCtorSymbolBasedApi() = synchronized(nativeLock) {
         if (_symbol == null) {
             val annotationClass = linker.getDeclaration(classSymbol) as IrClass
             val constructor = annotationClass.primaryConstructor!!

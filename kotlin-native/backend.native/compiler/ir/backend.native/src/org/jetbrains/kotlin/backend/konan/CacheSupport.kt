@@ -14,20 +14,15 @@ import org.jetbrains.kotlin.backend.konan.util.reportCompilationErrorAndThrow
 import org.jetbrains.kotlin.cli.CliDiagnostics
 import org.jetbrains.kotlin.cli.report
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.konan.config.NativeConfigurationKeys
-import org.jetbrains.kotlin.konan.config.filesToCache
-import org.jetbrains.kotlin.konan.config.konanLibraryToAddToCache
-import org.jetbrains.kotlin.konan.config.preLinkCaches
-import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.config.*
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.KonanTarget
+import org.jetbrains.kotlin.library.KlibPath as Path
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.components.irOrFail
 import org.jetbrains.kotlin.library.metadata.resolver.KotlinLibraryResolveResult
 import org.jetbrains.kotlin.protobuf.ExtensionRegistryLite
-import java.nio.file.Path
-import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrFile as ProtoFile
 
 data class FileWithFqName(val filePath: String, val fqName: String)
@@ -143,9 +138,9 @@ class CacheSupport(
 
     private fun getLibrary(path: Path) =
             pathToLibrary[path] ?: error("library to cache\n" +
-                    "  ${path.absolutePathString()}\n" +
+                    "  ${path.toAbsolutePath().pathString}\n" +
                     "not found among resolved libraries:\n  " +
-                    allLibraries.joinToString("\n  ") { it.path.absolutePathString() })
+                    allLibraries.joinToString("\n  ") { it.path.toAbsolutePath().pathString })
 
     internal val libraryToCache = configuration.konanLibraryToAddToCache?.let {
         val libraryToAddToCacheFile = Path(it)
@@ -169,7 +164,7 @@ class CacheSupport(
 
     companion object {
         fun cacheFileId(fqName: String, filePath: String) =
-                "${if (fqName == "") "ROOT" else fqName}.${filePath.hashCode().toString(Character.MAX_RADIX)}"
+                "${if (fqName == "") "ROOT" else fqName}.${filePath.hashCode().toString(36)}"
     }
 
     fun checkConsistency() {

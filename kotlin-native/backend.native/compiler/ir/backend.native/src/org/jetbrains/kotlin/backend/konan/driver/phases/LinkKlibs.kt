@@ -6,6 +6,8 @@
 package org.jetbrains.kotlin.backend.konan.driver.phases
 
 import org.jetbrains.kotlin.backend.common.phaser.createSimpleNamedCompilerPhase
+import org.jetbrains.kotlin.backend.konan.BindingContext
+import org.jetbrains.kotlin.backend.konan.CleanableBindingContext
 import org.jetbrains.kotlin.backend.konan.NativeSecondStageCompilationConfig
 import org.jetbrains.kotlin.backend.konan.LinkKlibsContext
 import org.jetbrains.kotlin.backend.konan.LinkKlibsInput
@@ -19,9 +21,7 @@ import org.jetbrains.kotlin.builtins.konan.KonanBuiltIns
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
 import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.K1Deprecation
-import org.jetbrains.kotlin.resolve.CleanableBindingContext
 
 @OptIn(K1Deprecation::class)
 internal class LinkKlibsContextImpl(

@@ -66,14 +66,14 @@ interface IrTypeSystemContext : TypeSystemContext, TypeSystemCommonSuperTypesCon
     override fun FlexibleTypeMarker.upperBound(): IrSimpleType {
         return when (this) {
             is IrDynamicType -> irBuiltIns.anyNType as IrSimpleType
-            else -> error("Unexpected flexible type ${this::class.java.simpleName}: $this")
+            else -> error("Unexpected flexible type ${this::class.simpleName}: $this")
         }
     }
 
     override fun FlexibleTypeMarker.lowerBound(): IrSimpleType {
         return when (this) {
             is IrDynamicType -> irBuiltIns.nothingType as IrSimpleType
-            else -> error("Unexpected flexible type ${this::class.java.simpleName}: $this")
+            else -> error("Unexpected flexible type ${this::class.simpleName}: $this")
         }
     }
 

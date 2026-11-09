@@ -15,7 +15,6 @@ import org.jetbrains.kotlin.backend.konan.ir.konanLibrary
 import org.jetbrains.kotlin.backend.konan.serialization.CacheDeserializationStrategy
 import org.jetbrains.kotlin.backend.konan.serialization.PartialCacheInfo
 import org.jetbrains.kotlin.cli.common.config.kotlinSourceRoots
-import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.LoggingContext
 import org.jetbrains.kotlin.config.phaser.NamedCompilerPhase
 import org.jetbrains.kotlin.ir.IrBasedFunctionFactory.Companion.isFunctionInterfaceFile
@@ -29,8 +28,7 @@ import org.jetbrains.kotlin.ir.declarations.path
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.konan.TempFiles
 import org.jetbrains.kotlin.konan.config.verifyBitcode
-import org.jetbrains.kotlin.konan.file.File
-import org.jetbrains.kotlin.konan.library.javaFile
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.Family
 import org.jetbrains.kotlin.util.PerformanceManager
@@ -38,10 +36,6 @@ import org.jetbrains.kotlin.util.PerformanceManagerImpl
 import org.jetbrains.kotlin.util.PhaseType
 import org.jetbrains.kotlin.util.tryMeasureDynamicPhaseTime
 import org.jetbrains.kotlin.util.tryMeasurePhaseTime
-import java.util.concurrent.Callable
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicReference
 
 internal fun PhaseEngine<NativeBackendPhaseContext>.runFrontend(config: NativeSecondStageCompilationConfig, environment: KotlinCoreEnvironment): FrontendPhaseOutput.Full? {
     val languageVersion = config.languageVersionSettings.languageVersion
@@ -236,31 +230,9 @@ internal fun <C : NativeBackendPhaseContext> PhaseEngine<C>.runBackend(backendCo
                 runAfterLowerings(fragment, generationState)
             }
         } else {
-            if (fragmentsList.size == 1) {
-                runAfterLowerings(fragmentsList.first(), generationStates.first())
-            } else {
-                // We'd love to run entire pipeline in parallel, but it's difficult (mainly because of the lowerings,
-                // which need cross-file access all the time and it's not easy to overcome this). So, for now,
-                // we split the pipeline into two parts - everything before lowerings (including them)
-                // which is run sequentially, and everything else which is run in parallel.
-                val executor = Executors.newFixedThreadPool(threadsCount)
-                val thrownFromThread = AtomicReference<Throwable?>(null)
-                val tasks = fragmentsList.zip(generationStates).map { [fragment, generationState] ->
-                    Callable {
-                        try {
-                            // Currently, it's not possible to initialize the correct thread on `PerformanceManager` creation
-                            // because new threads are spawned here when `fragment` with its `PerformanceManager` is already initialized.
-                            fragment.performanceManager?.initializeCurrentThread()
-                            runAfterLowerings(fragment, generationState)
-                        } catch (t: Throwable) {
-                            thrownFromThread.set(t)
-                        }
-                    }
-                }
-                executor.invokeAll(tasks.toList())
-                executor.shutdown()
-                executor.awaitTermination(1, TimeUnit.DAYS)
-                thrownFromThread.get()?.let { throw it }
+            fragmentsList.zip(generationStates).forEach { [fragment, generationState] ->
+                fragment.performanceManager?.initializeCurrentThread()
+                runAfterLowerings(fragment, generationState)
             }
         }
 
@@ -361,7 +333,7 @@ private fun PhaseEngine<out Context>.splitIntoFragments(
 }
 
 internal data class ModuleCompilationOutput(
-        val bitcodeFile: java.io.File,
+        val bitcodeFile: File,
         val dependenciesTrackingResult: DependenciesTrackingResult,
 )
 
@@ -375,7 +347,7 @@ internal data class ModuleCompilationOutput(
 internal fun PhaseEngine<NativeGenerationState>.compileModule(
         module: IrModuleFragment,
         irBuiltIns: IrBuiltIns,
-        bitcodeFile: java.io.File,
+        bitcodeFile: File,
         cExportFiles: CExportFiles?,
 ) {
     runBackendCodegen(module, irBuiltIns, cExportFiles)

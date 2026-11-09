@@ -34,7 +34,6 @@ import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.utils.addToStdlib.assignFrom
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
 import org.jetbrains.kotlin.utils.memoryOptimizedMap
-import kotlin.reflect.full.declaredMemberProperties
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrAnnotation as ProtoAnnotation
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrBlock as ProtoBlock
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrBlockBody as ProtoBlockBody
@@ -1078,10 +1077,7 @@ class IrBodyDeserializer(
     ): S? = if (condition) deserializeTypedSymbol(code(), fallbackSymbolKind) else null
 
     private companion object {
-        private val statementOriginIndex = IrStatementOrigin.Companion::class
-            .declaredMemberProperties
-            .mapNotNull { it.get(IrStatementOrigin.Companion) as? IrStatementOrigin }
-            .associateBy { it.debugName }
+        private val statementOriginIndex get() = nativeIrStatementOriginIndex
         private val unknownStatementOriginCache = mutableMapOf<String, IrStatementOrigin>()
     }
 }

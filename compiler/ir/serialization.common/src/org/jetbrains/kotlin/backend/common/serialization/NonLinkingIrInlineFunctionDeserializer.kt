@@ -61,7 +61,7 @@ class NonLinkingIrInlineFunctionDeserializer(
         val deserializedContainerSource = function.containerSource
         check(deserializedContainerSource is KlibDeserializedContainerSource) {
             "Cannot deserialize inline function from a non-Kotlin library: ${function.render()}\nFunction source: " +
-                    deserializedContainerSource?.let { "${it::class.java}, ${it.presentableString}" }
+                    deserializedContainerSource?.let { "${it::class}, ${it.presentableString}" }
         }
 
         val library = deserializedContainerSource.klib

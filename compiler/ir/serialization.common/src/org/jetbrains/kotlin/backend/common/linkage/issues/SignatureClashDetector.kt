@@ -30,7 +30,7 @@ abstract class SignatureClashDetector<Signature : Any, Declaration : IrDeclarati
      * Records the declaration, so it could later participate in signature clash detection.
      */
     fun trackDeclaration(declaration: Declaration, rawSignature: Signature) {
-        declarationsBySignature.computeIfAbsent(rawSignature) { SmartSet.create() }.add(declaration)
+        declarationsBySignature.getOrPut(rawSignature) { SmartSet.create() }.add(declaration)
     }
 
     /**

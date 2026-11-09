@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.FileSignature as 
 import org.jetbrains.kotlin.backend.common.serialization.proto.IdSignature as ProtoIdSignature
 import org.jetbrains.kotlin.backend.common.serialization.proto.LocalSignature as ProtoLocalSignature
 import org.jetbrains.kotlin.ir.util.IdSignature
-import java.util.ArrayList
 
 class IdSignatureSerializer(
     private val serializeString: (String) -> Int,
@@ -105,7 +104,7 @@ class IdSignatureSerializer(
             is IdSignature.FileSignature -> proto.fileSig = serializeFileSignature(idSignature)
             is IdSignature.SpecialFakeOverrideSignature,
             is IdSignature.LoweredDeclarationSignature,
-                -> error("${idSignature::class.java} is not expected here")
+                -> error("${idSignature::class} is not expected here")
         }
         return proto.build()
     }

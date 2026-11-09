@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.backend.konan.CacheSupport
 import org.jetbrains.kotlin.backend.konan.NativeSecondStageCompilationConfig
 import org.jetbrains.kotlin.konan.TempFiles
 import org.jetbrains.kotlin.konan.config.temporaryFilesDir
-import java.io.File
+import org.jetbrains.kotlin.konan.file.*
 
 internal fun createTempFiles(config: NativeSecondStageCompilationConfig, cacheDeserializationStrategy: CacheDeserializationStrategy?): TempFiles {
     val pathToTempDir = config.configuration.temporaryFilesDir?.let {

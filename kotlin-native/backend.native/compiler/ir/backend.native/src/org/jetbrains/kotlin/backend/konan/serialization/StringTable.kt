@@ -5,51 +5,53 @@
 
 package org.jetbrains.kotlin.backend.konan.serialization
 
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-
 internal class ByteArrayStream(val buf: ByteArray) {
-    /*
-    The buffer uses the native byte order for performance reasons: this gives the JIT compiler an
-    opportunity to optimize reading multibyte values by reading all bytes at once and not performing byte swapping.
-     */
-    private val buffer = ByteBuffer.wrap(buf).order(ByteOrder.nativeOrder())
+    private var offset = 0
 
-    fun hasData() = buffer.hasRemaining()
+    fun hasData() = offset < buf.size
 
     fun readInt(): Int {
-        return buffer.getInt()
+        val b0 = buf[offset++].toInt() and 0xFF
+        val b1 = buf[offset++].toInt() and 0xFF
+        val b2 = buf[offset++].toInt() and 0xFF
+        val b3 = buf[offset++].toInt() and 0xFF
+        return b0 or (b1 shl 8) or (b2 shl 16) or (b3 shl 24)
     }
 
     fun writeInt(value: Int) {
-        buffer.putInt(value)
+        buf[offset++] = (value and 0xFF).toByte()
+        buf[offset++] = ((value ushr 8) and 0xFF).toByte()
+        buf[offset++] = ((value ushr 16) and 0xFF).toByte()
+        buf[offset++] = ((value ushr 24) and 0xFF).toByte()
     }
 
     fun readString(length: Int): String {
-        val chars = CharArray(length)
-        buffer.asCharBuffer().get(chars)
-        buffer.position(buffer.position() + chars.size * Char.SIZE_BYTES)
-        return String(chars)
+        val chars = CharArray(length) {
+            val lo = buf[offset++].toInt() and 0xFF
+            val hi = buf[offset++].toInt() and 0xFF
+            ((hi shl 8) or lo).toChar()
+        }
+        return chars.concatToString()
     }
 
     fun writeString(string: String) {
-        val chars = string.toCharArray()
-        buffer.asCharBuffer().put(chars)
-        buffer.position(buffer.position() + chars.size * Char.SIZE_BYTES)
+        for (i in 0 until string.length) {
+            val c = string[i].code
+            buf[offset++] = (c and 0xFF).toByte()
+            buf[offset++] = ((c ushr 8) and 0xFF).toByte()
+        }
     }
 
     fun readIntArray(): IntArray {
         val size = readInt()
-        val array = IntArray(size)
-        buffer.asIntBuffer().get(array)
-        buffer.position(buffer.position() + array.size * Int.SIZE_BYTES)
-        return array
+        return IntArray(size) { readInt() }
     }
 
     fun writeIntArray(array: IntArray) {
-        buffer.putInt(array.size)
-        buffer.asIntBuffer().put(array)
-        buffer.position(buffer.position() + array.size * Int.SIZE_BYTES)
+        writeInt(array.size)
+        for (v in array) {
+            writeInt(v)
+        }
     }
 }
 

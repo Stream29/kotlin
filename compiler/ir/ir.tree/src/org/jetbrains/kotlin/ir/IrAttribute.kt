@@ -7,8 +7,7 @@ package org.jetbrains.kotlin.ir
 
 import org.jetbrains.kotlin.ir.declarations.copyAttributes
 import org.jetbrains.kotlin.utils.DummyDelegate
-import java.lang.ref.WeakReference
-import java.util.function.Function
+import kotlin.native.ref.WeakReference
 import kotlin.properties.PropertyDelegateProvider
 import kotlin.reflect.KProperty
 

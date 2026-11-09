@@ -134,7 +134,7 @@ class SymbolTypeMismatch(
         computeErrorMessage()
     } catch (e: Throwable) {
         // Don't suppress the real cause if computation of error message failed.
-        throw if (e === cause) e else e.apply { addSuppressed(cause) }
+        throw if (e === cause) e else e.apply { addSuppressed(cause!!) }
     }
 
     private fun computeErrorMessage() = buildString {

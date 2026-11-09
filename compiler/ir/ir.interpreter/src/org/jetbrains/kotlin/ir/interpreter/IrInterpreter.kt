@@ -124,7 +124,7 @@ class IrInterpreter(internal val environment: IrInterpreterEnvironment, internal
             is IrGetClass -> interpretGetClass(element)
             is IrRichFunctionReference -> interpretRichFunctionReference(element)
             is IrRichPropertyReference -> interpretRichPropertyReference(element)
-            else -> TODO("${element.javaClass} not supported for interpretation")
+            else -> TODO("${element::class} not supported for interpretation")
         }
     }
 
@@ -252,7 +252,7 @@ class IrInterpreter(internal val environment: IrInterpreterEnvironment, internal
             is IrTypeOperatorCall -> (irStatement.argument as IrFunctionAccessExpression).getThisReceiver() // for enums
             is IrFunctionAccessExpression -> irStatement.getThisReceiver()
             is IrBlock -> (irStatement.statements.last() as IrFunctionAccessExpression).getThisReceiver()
-            else -> TODO("${irStatement::class.java} is not supported as first statement in constructor call")
+            else -> TODO("${irStatement::class} is not supported as first statement in constructor call")
         }
         superReceiver?.let { callStack.storeState(it, objectState) }
 

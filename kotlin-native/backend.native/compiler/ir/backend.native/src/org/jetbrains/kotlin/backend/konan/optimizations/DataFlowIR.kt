@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.backend.konan.lower.getDefaultValueForOverriddenBuil
 import org.jetbrains.kotlin.backend.konan.lower.isEagerStaticInitializer
 import org.jetbrains.kotlin.backend.konan.util.CustomBitSet
 import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.name
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.*
@@ -410,7 +411,7 @@ internal object DataFlowIR {
                     }
                 }
 
-                else -> "        UNKNOWN: ${node::class.java}"
+                else -> "        UNKNOWN: ${node::class}"
             }
 
             private fun <T> StringBuilder.appendList(list: List<T>, itemPrinter: StringBuilder.(T) -> Unit) {
@@ -535,7 +536,7 @@ internal object DataFlowIR {
             val placeToClassTable = true
             val symbolTableIndex = if (placeToClassTable) module.numberOfClasses++ else -1
             val type = if (irClass.isExported())
-                Type.Public(localHash(name.toByteArray()), privateTypeIndex++, isFinal, isAbstract,
+                Type.Public(localHash(name.encodeToByteArray()), privateTypeIndex++, isFinal, isAbstract,
                         module, symbolTableIndex, irClass, takeName { name })
             else
                 Type.Private(privateTypeIndex++, isFinal, isAbstract,
@@ -653,7 +654,7 @@ internal object DataFlowIR {
             }
             val symbol = when {
                 it.isExternal || it.isBuiltInOperator -> {
-                    FunctionSymbol.External(localHash(name.toByteArray()), attributes, it, takeName { name }, it.isExported()).apply {
+                    FunctionSymbol.External(localHash(name.encodeToByteArray()), attributes, it, takeName { name }, it.isExported()).apply {
                         escapes  = it.escapes
                         pointsTo = it.pointsTo
                     }
@@ -671,7 +672,7 @@ internal object DataFlowIR {
                             && (it.isOverridableOrOverrides || bridgeTarget != null || function.isSpecial || !irClass.isFinalClass)
                     val symbolTableIndex = if (placeToFunctionsTable) module.numberOfFunctions++ else -1
                     val functionSymbol = if (it.isExported())
-                        FunctionSymbol.Public(localHash(name.toByteArray()), module, symbolTableIndex, attributes, it, bridgeTargetSymbol, takeName { name })
+                        FunctionSymbol.Public(localHash(name.encodeToByteArray()), module, symbolTableIndex, attributes, it, bridgeTargetSymbol, takeName { name })
                     else
                         FunctionSymbol.Private(privateFunIndex++, module, symbolTableIndex, attributes, it, bridgeTargetSymbol, takeName { name })
                     functionSymbol

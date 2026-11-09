@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.ir.util.properties
 import org.jetbrains.kotlin.ir.util.toIrConst
 import org.jetbrains.kotlin.platform.isJs
 import org.jetbrains.kotlin.util.OperatorNameConventions
+import kotlin.reflect.KClass
 
 class IrInterpreterEnvironment(
     val irBuiltIns: IrBuiltIns,
@@ -35,7 +36,7 @@ class IrInterpreterEnvironment(
     internal val irExceptions = mutableListOf<IrClass>()
     internal var mapOfEnums = mutableMapOf<IrSymbol, Complex>()
     internal var mapOfObjects = mutableMapOf<IrSymbol, Complex>()
-    internal var javaClassToIrClass = mutableMapOf<Class<*>, IrClass>()
+    internal var javaClassToIrClass = mutableMapOf<KClass<*>, IrClass>()
     private var functionCache = mutableMapOf<CacheFunctionSignature, IrFunctionSymbol>()
 
     internal val kTypeParameterClass by lazy { irBuiltIns.kClassClass.getIrClassOfReflectionFromList("typeParameters")!! }
@@ -101,7 +102,7 @@ class IrInterpreterEnvironment(
             is CharArray, is ShortArray, is IntArray, is LongArray, is FloatArray, is DoubleArray, is BooleanArray -> Primitive(value, irType)
             null -> Primitive.nullStateOfType(irType)
             else -> irType.classOrNull?.owner?.let { Wrapper(value, it, this) }
-                ?: Wrapper(value, this.javaClassToIrClass[value::class.java]!!, this)
+                ?: Wrapper(value, this.javaClassToIrClass[value::class]!!, this)
         }
     }
 

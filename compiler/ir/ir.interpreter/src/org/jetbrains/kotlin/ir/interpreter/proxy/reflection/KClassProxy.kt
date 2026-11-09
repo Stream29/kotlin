@@ -14,7 +14,8 @@ import org.jetbrains.kotlin.ir.interpreter.state.State
 import org.jetbrains.kotlin.ir.interpreter.state.isSubtypeOf
 import org.jetbrains.kotlin.ir.interpreter.state.reflection.KClassState
 import org.jetbrains.kotlin.ir.util.defaultType
-import kotlin.reflect.*
+import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 internal class KClassProxy(
     override val state: KClassState, override val callInterceptor: CallInterceptor
@@ -25,42 +26,42 @@ internal class KClassProxy(
         get() = if (!state.classReference.name.isSpecial) state.classReference.internalName() else null
 
     @Suppress("UNCHECKED_CAST")
-    override val constructors: Collection<KFunction<Proxy>>
+    val constructors: Collection<KFunction<Proxy>>
         get() = state.getConstructors(callInterceptor) as Collection<KFunction<Proxy>>
-    override val members: Collection<KCallable<*>>
+    val members: Collection<KCallable<*>>
         get() = state.getMembers(callInterceptor)
-    override val nestedClasses: Collection<KClass<*>>
+    val nestedClasses: Collection<KClass<*>>
         get() = TODO("Not yet implemented")
-    override val objectInstance: Proxy?
+    val objectInstance: Proxy?
         get() = TODO("Not yet implemented")
-    override val typeParameters: List<KTypeParameter>
+    val typeParameters: List<KTypeParameter>
         get() = state.getTypeParameters(callInterceptor)
-    override val supertypes: List<KType>
+    val supertypes: List<KType>
         get() = state.getSupertypes(callInterceptor)
-    override val sealedSubclasses: List<KClass<out Proxy>>
+    val sealedSubclasses: List<KClass<out Proxy>>
         get() = TODO("Not yet implemented")
-    override val annotations: List<Annotation>
+    val annotations: List<Annotation>
         get() = TODO("Not yet implemented")
 
-    override val visibility: KVisibility?
+    val visibility: KVisibility?
         get() = state.classReference.visibility.toKVisibility()
-    override val isFinal: Boolean
+    val isFinal: Boolean
         get() = state.classReference.modality == Modality.FINAL
-    override val isOpen: Boolean
+    val isOpen: Boolean
         get() = state.classReference.modality == Modality.OPEN
-    override val isAbstract: Boolean
+    val isAbstract: Boolean
         get() = state.classReference.modality == Modality.ABSTRACT
-    override val isSealed: Boolean
+    val isSealed: Boolean
         get() = state.classReference.modality == Modality.SEALED
-    override val isData: Boolean
+    val isData: Boolean
         get() = state.classReference.isData
-    override val isInner: Boolean
+    val isInner: Boolean
         get() = state.classReference.isInner
-    override val isCompanion: Boolean
+    val isCompanion: Boolean
         get() = state.classReference.isCompanion
-    override val isFun: Boolean
+    val isFun: Boolean
         get() = state.classReference.isFun
-    override val isValue: Boolean
+    val isValue: Boolean
         get() = state.classReference.isValue
 
     override fun isInstance(value: Any?): Boolean {

@@ -114,7 +114,7 @@ class KlibSyntheticAccessorGenerator(
 
         // This is a top-level declaration. Include the sanitized .kt file name to avoid potential clashes.
         check(parent is IrFile) {
-            "Unexpected type of package fragment for top-level declaration ${declaration.render()}: ${parent::class.java}, ${parent.render()}"
+            "Unexpected type of package fragment for top-level declaration ${declaration.render()}: ${parent::class}, ${parent.render()}"
         }
 
         contribute(TOP_LEVEL_DECLARATION_SUFFIX_MARKER + parent.packagePartClassName)
