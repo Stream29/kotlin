@@ -6,10 +6,10 @@ package org.jetbrains.kotlin.native.interop.gen.jvm
 
 import org.jetbrains.kotlin.config.KlibAbiCompatibilityLevel
 import org.jetbrains.kotlin.config.KotlinCompilerVersion
-import org.jetbrains.kotlin.konan.library.writer.includeBitcode
-import org.jetbrains.kotlin.konan.library.writer.includeNativeIncludedBinaries
-import org.jetbrains.kotlin.konan.library.writer.legacyNativeDependenciesInManifest
-import org.jetbrains.kotlin.konan.library.writer.legacyNativeShortNameInManifest
+import org.jetbrains.kotlin.native.interop.gen.klib.includeBitcode
+import org.jetbrains.kotlin.native.interop.gen.klib.includeNativeIncludedBinaries
+import org.jetbrains.kotlin.native.interop.gen.klib.legacyNativeDependenciesInManifest
+import org.jetbrains.kotlin.native.interop.gen.klib.legacyNativeShortNameInManifest
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.library.KLIB_PROPERTY_DEPENDS
 import org.jetbrains.kotlin.library.KlibFormat
@@ -20,9 +20,9 @@ import org.jetbrains.kotlin.library.impl.BuiltInsPlatform
 import org.jetbrains.kotlin.library.uniqueName
 import org.jetbrains.kotlin.library.writer.KlibWriter
 import org.jetbrains.kotlin.library.writer.includeMetadata
+import org.jetbrains.kotlin.konan.properties.Properties
+import org.jetbrains.kotlin.library.KlibPath as Path
 import org.jetbrains.kotlin.util.toCInteropKlibMetadataVersion
-import java.nio.file.Path
-import java.util.*
 
 fun createInteropLibrary(
         serializedMetadata: SerializedMetadata,

@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.native.interop.gen
 
+import org.jetbrains.kotlin.konan.host.matchesUnixGlob
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.native.interop.indexer.*
 
@@ -78,5 +79,4 @@ class HeaderExclusionPolicyImpl(
 }
 
 private fun String.matchesToGlob(glob: String): Boolean =
-        java.nio.file.FileSystems.getDefault()
-                .getPathMatcher("glob:$glob").matches(java.nio.file.Paths.get(this))
+        this.matchesUnixGlob(glob)

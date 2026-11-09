@@ -16,7 +16,7 @@
 
 package org.jetbrains.kotlin.native.interop.indexer
 
-import java.io.File
+import org.jetbrains.kotlin.konan.host.NativeFile as File
 
 class HeaderToIdMapper(sysRoot: String) {
     private val headerPathToId = mutableMapOf<String, HeaderId>()

@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.native.interop.indexer
 
-import java.io.File
+import org.jetbrains.kotlin.konan.host.NativeFile as File
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals

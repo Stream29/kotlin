@@ -9,9 +9,9 @@ import org.jetbrains.kotlin.native.interop.gen.jvm.prepareTool
 import org.jetbrains.kotlin.native.interop.indexer.NativeLibraryHeaders
 import org.jetbrains.kotlin.native.interop.indexer.getHeaderPaths
 import org.jetbrains.kotlin.native.interop.tool.CInteropArguments
-import org.jetbrains.kotlin.utils.mapToSetOrEmpty
-import java.io.File
-import kotlin.streams.toList
+import org.jetbrains.kotlin.konan.host.NativeFile as File
+import org.jetbrains.kotlin.konan.host.nameWithoutExtension
+import org.jetbrains.kotlin.konan.host.putIfAbsent
 
 fun defFileDependencies(args: Array<String>, runFromDaemon: Boolean) {
     val defFiles = mutableListOf<File>()
@@ -47,14 +47,14 @@ private fun makeDependencyAssignerForTarget(target: String, defFiles: List<File>
     val cinteropArguments = CInteropArguments()
     cinteropArguments.argParser.parse(arrayOf())
     val tool = prepareTool(target, KotlinPlatform.NATIVE, runFromDaemon, konanDataDir = cinteropArguments.konanDataDir)
-    val libraries = defFiles.parallelStream().map {
+    val libraries = defFiles.map {
         it to buildNativeLibrary(
                 tool,
                 DefFile(it, tool.target),
                 cinteropArguments,
                 ImportsImpl(emptyMap())
         ).getHeaderPaths()
-    }.toList().toMap()
+    }.toMap()
     return SingleTargetDependencyAssigner(libraries)
 }
 
@@ -62,7 +62,7 @@ private fun defFileDependencies(dependencyAssigner: DependencyAssigner) {
     val dependenciesExpander = DependenciesExpander()
 
     while (!dependencyAssigner.isDone()) {
-        val [defFile, directDependencies] = dependencyAssigner.getReady().entries.minByOrNull { it.key }!!
+        val [defFile, directDependencies] = dependencyAssigner.getReady().entries.minByOrNull { it.key.path }!!
         val expandedDependencies = dependenciesExpander.expand(defFile, directDependencies)
         dependencyAssigner.markDone(defFile)
         patchDepends(defFile, expandedDependencies.sorted())
@@ -190,7 +190,8 @@ private class DependenciesExpander {
     private val cache = mutableMapOf<String, Dependency>()
 
     fun expand(defFile: File, directDepends: Set<String>): Set<String> {
-        val dependency = Dependency(defFile, directDepends.mapToSetOrEmpty { cache.getValue(it) })
+        val directDepsSet = if (directDepends.isEmpty()) emptySet() else directDepends.mapTo(LinkedHashSet(directDepends.size)) { cache.getValue(it) }
+        val dependency = Dependency(defFile, directDepsSet)
         check(cache.put(dependency.name, dependency) == null)
         return dependency.allDependencies
     }

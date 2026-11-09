@@ -24,17 +24,13 @@ import clang.CXIdxEntityKind.CXIdxEntity_Struct
 import clang.CXIdxEntityKind.CXIdxEntity_Union
 import kotlinx.cinterop.*
 import org.jetbrains.kotlin.konan.exec.Command
-import org.jetbrains.kotlin.konan.target.Distribution
-import org.jetbrains.kotlin.konan.target.HostManager
-import org.jetbrains.kotlin.konan.target.PlatformManager
-import java.io.Closeable
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.security.DigestInputStream
-import java.security.MessageDigest
-import java.util.concurrent.ConcurrentHashMap
+import org.jetbrains.kotlin.konan.host.NativeFile as File
+import org.jetbrains.kotlin.konan.host.NativeFiles as Files
+import org.jetbrains.kotlin.konan.host.NativePath as Path
+import org.jetbrains.kotlin.konan.host.NativePaths as Paths
+import org.jetbrains.kotlin.konan.host.NativeCache
+import org.jetbrains.kotlin.konan.host.NativeSha256
+import org.jetbrains.kotlin.konan.host.environment
 
 val CValue<CXType>.kind: CXTypeKind get() = this.useContents { kind }
 
@@ -58,7 +54,6 @@ internal fun CValue<CXString>.convertAndDispose(): String {
     }
 }
 
-@JvmName("convertAndDisposeCString")
 internal fun CValue<CString>.convertAndDispose(): String? {
     try {
         return this.useContents { data }?.toKString()
@@ -68,7 +63,7 @@ internal fun CValue<CString>.convertAndDispose(): String? {
 }
 
 internal fun CPointer<CXStringSet>.convertAndDispose(): Set<String> = try {
-    (0 until this.pointed.Count).mapTo(mutableSetOf()) {
+    (0 until this.pointed.Count.toInt()).mapTo(mutableSetOf()) {
         clang_getCString(this.pointed.Strings!![it].readValue())!!.toKString()
     }
 } finally {
@@ -107,7 +102,7 @@ internal fun parseTranslationUnit(
         index: CXIndex,
         sourceFile: File,
         compilerArgs: List<String>,
-        options: Int
+        options: UInt
 ): CXTranslationUnit {
 
     memScoped {
@@ -117,7 +112,7 @@ internal fun parseTranslationUnit(
                 index,
                 sourceFile.absolutePath,
                 compilerArgs.toNativeStringArray(memScope), compilerArgs.size,
-                null, 0,
+                null, 0u,
                 options,
                 resultVar.ptr
         )
@@ -168,11 +163,9 @@ private fun reportParseTranslationUnitError(sourceFile: File, errorCode: CXError
 
 private fun tryGetClangInvocationResultMessage(compilerArgs: List<String>): String? = runCatching {
     // The code below is basically a quick hack, so let's use it only for tests so far:
-    val nativeHome = System.getProperty("kotlin.internal.native.test.nativeHome") ?: return null
-
-    val platform = PlatformManager(Distribution(nativeHome)).platform(HostManager.host)
-    val llvmHome = File(platform.absoluteLlvmHome)
-    val clang = llvmHome.resolve("bin/clang")
+    // Native tests supply the absolute, fingerprinted tool rather than discovering a JVM distribution.
+    val clang = File(environment("C1I_CLANG") ?: return null)
+    require(clang.path.startsWith("/")) { "C1I_CLANG must be absolute" }
 
     val command = listOf(clang.absolutePath) + compilerArgs
     val result = Command(command).getResult(withErrors = true)
@@ -187,7 +180,7 @@ private fun tryGetClangInvocationResultMessage(compilerArgs: List<String>): Stri
 
 internal fun Compilation.parse(
         index: CXIndex,
-        options: Int = 0,
+        options: UInt = 0u,
         diagnosticHandler: DiagnosticHandler? = null
 ): CXTranslationUnit {
     val arguments = this.compilerArgs.toMutableList()
@@ -248,7 +241,7 @@ private fun reportSerializedDiagnostics(
 
     try {
         val numDiagnostics = clang_getNumDiagnosticsInSet(diagnosticSet)
-        for (index in 0 until numDiagnostics) {
+        for (index in 0u until numDiagnostics) {
             val diagnostic = clang_getDiagnosticInSet(diagnosticSet, index) ?: continue
             try {
                 diagnosticHandler.report(convertDiagnostic(diagnostic))
@@ -270,7 +263,7 @@ internal data class Diagnostic(val severity: CXDiagnosticSeverity, val format: S
 
 internal fun CXTranslationUnit.getDiagnostics(): Sequence<Diagnostic> {
     val numDiagnostics = clang_getNumDiagnostics(this)
-    return (0 until numDiagnostics).asSequence()
+    return (0u until numDiagnostics).asSequence()
             .mapNotNull { index ->
                 val diagnostic = clang_getDiagnostic(this, index) ?: return@mapNotNull null
                 try {
@@ -307,14 +300,25 @@ internal fun CXTranslationUnit.ensureNoCompileErrors(): CXTranslationUnit {
 
 internal typealias CursorVisitor = (cursor: CValue<CXCursor>, parent: CValue<CXCursor>) -> CXChildVisitResult
 
+internal class CallbackState<T>(val callback: T) {
+    var failure: Throwable? = null
+    inline fun <R> invoke(fallback: R, block: (T) -> R): R {
+        if (failure != null) return fallback
+        return try { block(callback) } catch (e: Throwable) { failure = e; fallback }
+    }
+    fun rethrow() { failure?.let { throw it } }
+}
+
 fun visitChildren(parent: CValue<CXCursor>, visitor: CursorVisitor) {
-    val visitorStableRef = StableRef.create(visitor)
+    val state = CallbackState(visitor)
+    val visitorStableRef = StableRef.create(state)
     try {
         val clientData = visitorStableRef.asCPointer()
         clang_visitChildren(parent, staticCFunction { cursorIt, parentIt, clientDataIt ->
-            val visitorIt = clientDataIt!!.asStableRef<CursorVisitor>().get()
-            visitorIt(cursorIt, parentIt)
+            val stateIt = clientDataIt!!.asStableRef<CallbackState<CursorVisitor>>().get()
+            stateIt.invoke(CXChildVisitResult.CXChildVisit_Break) { it(cursorIt, parentIt) }
         }, clientData)
+        state.rethrow()
     } finally {
         visitorStableRef.dispose()
     }
@@ -326,13 +330,15 @@ internal fun visitChildren(translationUnit: CXTranslationUnit, visitor: CursorVi
 internal typealias MacroVisitor = (spelling: CPointer<ByteVar>?, location: CValue<CXSourceLocation>, file: ClangFile?) -> Unit
 
 internal fun visitObjectLikeMacroDefinitions(translationUnit: CXTranslationUnit, excludeSystemHeaders: Boolean, visitor: MacroVisitor) {
-    val visitorStableRef = StableRef.create(visitor)
+    val state = CallbackState(visitor)
+    val visitorStableRef = StableRef.create(state)
     try {
         val clientData = visitorStableRef.asCPointer()
         clang_visitObjectLikeMacroDefinitions(translationUnit, excludeSystemHeaders, staticCFunction { clientDataIt, spelling, location, file ->
-            val visitorIt = clientDataIt!!.asStableRef<MacroVisitor>().get()
-            visitorIt(spelling, location, file?.asClangFile())
+            val stateIt = clientDataIt!!.asStableRef<CallbackState<MacroVisitor>>().get()
+            stateIt.invoke(Unit) { it(spelling, location, file?.asClangFile()) }
         }, clientData)
+        state.rethrow()
     } finally {
         visitorStableRef.dispose()
     }
@@ -340,16 +346,20 @@ internal fun visitObjectLikeMacroDefinitions(translationUnit: CXTranslationUnit,
 
 internal fun getFields(type: CValue<CXType>): List<CValue<CXCursor>> {
     val result = mutableListOf<CValue<CXCursor>>()
-    val resultStableRef = StableRef.create(result)
+    val state = CallbackState(result)
+    val resultStableRef = StableRef.create(state)
     try {
         val clientData = resultStableRef.asCPointer()
 
         @Suppress("NAME_SHADOWING")
         clang_Type_visitFields(type, staticCFunction { cursor, clientData ->
-            val result = clientData!!.asStableRef<MutableList<CValue<CXCursor>>>().get()
-            result.add(cursor)
-            CXVisitorResult.CXVisit_Continue
+            val state = clientData!!.asStableRef<CallbackState<MutableList<CValue<CXCursor>>>>().get()
+            state.invoke(CXVisitorResult.CXVisit_Break) {
+                it.add(cursor)
+                CXVisitorResult.CXVisit_Continue
+            }
         }, clientData)
+        state.rethrow()
 
     } finally {
         resultStableRef.dispose()
@@ -381,7 +391,7 @@ internal fun CValue<CXCursor>.hasExpressionChild(): Boolean {
     var result = false
 
     visitChildren(this) { cursor, _ ->
-        if (clang_isExpression(cursor.kind) != 0) {
+        if (clang_isExpression(cursor.kind) != 0u) {
             result = true
             CXChildVisitResult.CXChildVisit_Break
         } else {
@@ -464,7 +474,7 @@ fun Compilation.precompileHeaders(): CompilationWithPCH = withIndex(excludeDecla
 
 internal fun Compilation.withPrecompiledHeader(translationUnit: CXTranslationUnit): CompilationWithPCH {
     val precompiledHeader = Files.createTempFile(null, ".pch").toFile().apply { this.deleteOnExit() }
-    val errorCode = clang_saveTranslationUnit(translationUnit, precompiledHeader.absolutePath, 0)
+    val errorCode = clang_saveTranslationUnit(translationUnit, precompiledHeader.absolutePath, 0u)
     if (errorCode != 0) {
         error(buildString {
             appendLine("""
@@ -499,9 +509,9 @@ internal fun CXTranslationUnit.getErrorLineNumbers(): Sequence<Int> =
             it.isError()
         }.map {
             memScoped {
-                val lineNumberVar = alloc<IntVar>()
+                val lineNumberVar = alloc<UIntVar>()
                 clang_getFileLocation(it.location, null, lineNumberVar.ptr, null, null)
-                lineNumberVar.value
+                lineNumberVar.value.toInt()
             }
         }
 
@@ -533,7 +543,7 @@ fun List<List<String>>.mapFragmentIsCompilable(originalLibrary: CompilationWithP
                     }
                 }
 
-                clang_reparseTranslationUnit(translationUnit, 0, null, CXTranslationUnit_DetailedPreprocessingRecord)
+                clang_reparseTranslationUnit(translationUnit, 0u, null, CXTranslationUnit_DetailedPreprocessingRecord)
                 val errorLineNumbers = translationUnit.getErrorLineNumbers().toSet()
 
                 // Retain only those fragments that contain compilation error locations:
@@ -583,34 +593,37 @@ internal interface Indexer {
     fun indexDeclaration(info: CXIdxDeclInfo) {}
 }
 
-internal fun indexTranslationUnit(index: CXIndex, translationUnit: CXTranslationUnit, options: Int, indexer: Indexer) {
-    val indexerStableRef = StableRef.create(indexer)
+internal fun indexTranslationUnit(index: CXIndex, translationUnit: CXTranslationUnit, options: UInt, indexer: Indexer) {
+    val state = CallbackState(indexer)
+    val indexerStableRef = StableRef.create(state)
     try {
         val clientData = indexerStableRef.asCPointer()
         memScoped {
             val indexerCallbacks = alloc<IndexerCallbacks>().apply {
-                abortQuery = null
+                abortQuery = staticCFunction { clientData, _ ->
+                    if (clientData!!.asStableRef<CallbackState<Indexer>>().get().failure == null) 0 else 1
+                }
                 diagnostic = null
                 enteredMainFile = staticCFunction { clientData, mainFile, _ ->
                     @Suppress("NAME_SHADOWING")
-                    val indexer = clientData!!.asStableRef<Indexer>().get()
-                    indexer.enteredMainFile(mainFile!!.asClangFile())
+                    val state = clientData!!.asStableRef<CallbackState<Indexer>>().get()
+                    state.invoke(Unit) { it.enteredMainFile(mainFile!!.asClangFile()) }
                     // We must ensure only interop types exist in function signature.
                     @Suppress("USELESS_CAST")
                     null as CXIdxClientFile?
                 }
                 ppIncludedFile = staticCFunction { clientData, info ->
                     @Suppress("NAME_SHADOWING")
-                    val indexer = clientData!!.asStableRef<Indexer>().get()
-                    indexer.ppIncludedFile(info!!.pointed)
+                    val state = clientData!!.asStableRef<CallbackState<Indexer>>().get()
+                    state.invoke(Unit) { it.ppIncludedFile(info!!.pointed) }
                     // We must ensure only interop types exist in function signature.
                     @Suppress("USELESS_CAST")
                     null as CXIdxClientFile?
                 }
                 importedASTFile = staticCFunction { clientData, info ->
                     @Suppress("NAME_SHADOWING")
-                    val indexer = clientData!!.asStableRef<Indexer>().get()
-                    indexer.importedASTFile(info!!.pointed)
+                    val state = clientData!!.asStableRef<CallbackState<Indexer>>().get()
+                    state.invoke(Unit) { it.importedASTFile(info!!.pointed) }
                     // We must ensure only interop types exist in function signature.
                     @Suppress("USELESS_CAST")
                     null as CXIdxClientFile?
@@ -618,8 +631,8 @@ internal fun indexTranslationUnit(index: CXIndex, translationUnit: CXTranslation
                 startedTranslationUnit = null
                 indexDeclaration = staticCFunction { clientData, info ->
                     @Suppress("NAME_SHADOWING")
-                    val nativeIndex = clientData!!.asStableRef<Indexer>().get()
-                    nativeIndex.indexDeclaration(info!!.pointed)
+                    val state = clientData!!.asStableRef<CallbackState<Indexer>>().get()
+                    state.invoke(Unit) { it.indexDeclaration(info!!.pointed) }
                 }
                 indexEntityReference = null
             }
@@ -627,8 +640,9 @@ internal fun indexTranslationUnit(index: CXIndex, translationUnit: CXTranslation
             val indexAction = clang_IndexAction_create(index)
             try {
                 val result = clang_indexTranslationUnit(indexAction, clientData,
-                        indexerCallbacks.ptr, sizeOf<IndexerCallbacks>().toInt(), options, translationUnit)
+                        indexerCallbacks.ptr, sizeOf<IndexerCallbacks>().toUInt(), options, translationUnit)
 
+                state.rethrow()
                 if (result != 0) {
                     throw Error("clang_indexTranslationUnit returned $result")
                 }
@@ -644,7 +658,7 @@ internal fun indexTranslationUnit(index: CXIndex, translationUnit: CXTranslation
 internal class ModulesMap(
         val compilation: Compilation,
         val translationUnit: CXTranslationUnit
-) : Closeable {
+) : AutoCloseable {
 
     private val modularCompilation: ModularCompilation
     private val index: CXIndex
@@ -895,7 +909,7 @@ private fun FilterHeadersOutput.filterHeadersByName(
     while (curUnitIndex < translationUnits.size) {
         val curUnit = translationUnits[curUnitIndex++]
 
-        indexTranslationUnit(index, curUnit, 0, object : Indexer {
+        indexTranslationUnit(index, curUnit, 0u, object : Indexer {
             override fun enteredMainFile(file: ClangFile) {
                 mainFiles += file
             }
@@ -979,7 +993,7 @@ private fun FilterHeadersOutput.filterHeadersByPredefined(
     // Note: suboptimal but simple.
     var curUnitIndex = 0
     while (curUnitIndex < translationUnits.size) {
-        indexTranslationUnit(index, translationUnits[curUnitIndex++], 0, object : Indexer {
+        indexTranslationUnit(index, translationUnits[curUnitIndex++], 0u, object : Indexer {
             override fun enteredMainFile(file: ClangFile) {
                 mainFiles += file
             }
@@ -1056,15 +1070,11 @@ fun ObjCProperty.replaces(other: ObjCProperty): Boolean =
         this.getter.replaces(other.getter)
 
 fun File.sha256(): String {
-    val digest = MessageDigest.getInstance("SHA-256")
-    DigestInputStream(this.inputStream(), digest).use { dis ->
-        val buffer = ByteArray(8192)
-        // Read all bytes:
-        while (dis.read(buffer, 0, buffer.size) != -1) {}
-    }
+    val digest = NativeSha256()
+    forEachBlock { buffer, count -> digest.update(buffer, count) }
     // Convert to hex:
     return digest.digest().joinToString("") {
-        Integer.toHexString((it.toInt() and 0xff) + 0x100).substring(1)
+        ((it.toInt() and 0xff) + 0x100).toString(16).substring(1)
     }
 }
 
@@ -1076,7 +1086,6 @@ internal fun CValue<CXSourceLocation>.getContainingFile(): ClangFile? = memScope
     fileVar.value?.asClangFile()
 }
 
-@JvmName("getFileContainingCursor")
 internal fun getContainingFile(cursor: CValue<CXCursor>): ClangFile? {
     return clang_getCursorLocation(cursor).getContainingFile()
 }
@@ -1087,7 +1096,7 @@ internal fun findDefinition(cursor: CValue<CXCursor>): CValue<CXCursor>? =
 internal val CXModule.name: String get() = clang_Module_getName(this).convertAndDispose()
 
 // TODO: this map doesn't get cleaned up but adds quite significant performance improvement.
-private val canonicalPaths = ConcurrentHashMap<String, String>()
+private val canonicalPaths = NativeCache<String, String>()
 internal val ClangFile.canonicalPath: String get() = canonicalPaths.getOrPut(this.path) { File(this.path).canonicalPath }
 
 
@@ -1112,7 +1121,7 @@ fun isObjCInterfaceDeclForward(cursor: CValue<CXCursor>): Boolean {
     return result
 }
 
-private fun isDeclForward(cursor: CValue<CXCursor>): Boolean = clang_isCursorDefinition(cursor) == 0
+private fun isDeclForward(cursor: CValue<CXCursor>): Boolean = clang_isCursorDefinition(cursor) == 0u
 fun isObjCProtocolDeclForward(cursor: CValue<CXCursor>): Boolean = isDeclForward(cursor)
 fun isStructDeclForward(cursor: CValue<CXCursor>): Boolean = isDeclForward(cursor)
 fun isEnumDeclForward(cursor: CValue<CXCursor>): Boolean = isDeclForward(cursor)
@@ -1120,18 +1129,18 @@ fun isEnumDeclForward(cursor: CValue<CXCursor>): Boolean = isDeclForward(cursor)
 fun getUsr(cursor: CValue<CXCursor>): String = clang_getCursorUSR(cursor).convertAndDispose()
 
 private fun createVfsOverlayFileContents(virtualPathToReal: Map<Path, Path>): ByteArray {
-    val overlay = clang_VirtualFileOverlay_create(0)
+    val overlay = clang_VirtualFileOverlay_create(0u)
 
     try {
         fun addFileMapping(realPath: Path, virtualPath: Path) {
             clang_VirtualFileOverlay_addFileMapping(
                     overlay,
-                    virtualPath = virtualPath.toAbsolutePath().toString(),
-                    realPath = realPath.toAbsolutePath().toString()
+                    virtualPath.toAbsolutePath().toString(),
+                    realPath.toAbsolutePath().toString()
             )
         }
 
-        virtualPathToReal.forEach { virtualPath, realPath ->
+        virtualPathToReal.forEach { (virtualPath, realPath) ->
             if (Files.isDirectory(realPath)) {
                 realPath.toFile().walkTopDown().forEach {
                     if (!it.isDirectory) {
@@ -1148,15 +1157,20 @@ private fun createVfsOverlayFileContents(virtualPathToReal: Map<Path, Path>): By
 
         return memScoped {
             val bufferVar = alloc<CPointerVar<ByteVar>>().apply { value = null }
-            val bufferSizeVar = alloc<IntVar>()
+            val bufferSizeVar = alloc<UIntVar>()
 
-            val res = clang_VirtualFileOverlay_writeToBuffer(overlay, 0, bufferVar.ptr, bufferSizeVar.ptr)
+            val res = clang_VirtualFileOverlay_writeToBuffer(overlay, 0u, bufferVar.ptr, bufferSizeVar.ptr)
             if (res != CXErrorCode.CXError_Success) {
                 // TODO: shall we free the buffer in this case?
                 error(res)
             }
 
-            bufferVar.value!!.readBytes(bufferSizeVar.value)
+            val buffer = bufferVar.value!!
+            try {
+                buffer.readBytes(bufferSizeVar.value.toInt())
+            } finally {
+                clang_free(buffer)
+            }
         }
     } finally {
         clang_VirtualFileOverlay_dispose(overlay)

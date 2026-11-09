@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.native.interop.gen
 import org.jetbrains.kotlin.native.interop.gen.jvm.KotlinPlatform
 import org.jetbrains.kotlin.native.interop.indexer.*
 import org.jetbrains.kotlin.utils.addIfNotNull
-import java.lang.IllegalStateException
 
 /**
  * Emits stubs and bridge functions as *.kt and *.c files.
@@ -630,7 +629,7 @@ class StubIrTextEmitter(
                 1 -> (value and 0xFF).toString()
                 2 -> (value and 0xFFFF).toString()
                 4 -> (value and 0xFFFFFFFF).toString()
-                8 -> java.lang.Long.toUnsignedString(value)
+                8 -> value.toULong().toString()
                 else -> return null
             }
 
@@ -643,11 +642,11 @@ class StubIrTextEmitter(
         return when (size) {
             4 -> {
                 val floatValue = value.toFloat()
-                val bits = java.lang.Float.floatToRawIntBits(floatValue)
+                val bits = floatValue.toRawBits()
                 "bitsToFloat($bits) /* == $floatValue */"
             }
             8 -> {
-                val bits = java.lang.Double.doubleToRawLongBits(value)
+                val bits = value.toRawBits()
                 "bitsToDouble($bits) /* == $value */"
             }
             else -> null

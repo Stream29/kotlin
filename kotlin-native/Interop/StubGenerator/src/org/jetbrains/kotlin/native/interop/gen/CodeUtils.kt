@@ -71,7 +71,7 @@ fun String.quoteAsKotlinLiteral(): KotlinExpression = buildString {
         when (c) {
             in charactersAllowedInKotlinStringLiterals -> append(c)
             '$' -> append("\\$")
-            else -> append("\\u" + "%04X".format(c.code))
+            else -> append("\\u" + c.code.toString(16).uppercase().padStart(4, '0'))
         }
     }
 

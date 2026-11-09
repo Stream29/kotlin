@@ -12,9 +12,9 @@ import org.jetbrains.kotlin.native.interop.gen.jvm.CCallMode
 import org.jetbrains.kotlin.native.interop.gen.jvm.GenerationMode
 import org.jetbrains.kotlin.native.interop.gen.jvm.InteropConfiguration
 import org.jetbrains.kotlin.native.interop.gen.jvm.KotlinPlatform
+import org.jetbrains.kotlin.konan.host.NativeFile as File
+import org.jetbrains.kotlin.konan.properties.Properties
 import org.jetbrains.kotlin.native.interop.indexer.*
-import java.io.File
-import java.util.*
 
 class StubIrContext(
         val log: (String) -> Unit,

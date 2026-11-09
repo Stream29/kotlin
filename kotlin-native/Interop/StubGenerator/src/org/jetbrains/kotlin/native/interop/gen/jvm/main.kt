@@ -44,15 +44,23 @@ import org.jetbrains.kotlin.name.isSubpackageOf
 import org.jetbrains.kotlin.native.interop.gen.*
 import org.jetbrains.kotlin.native.interop.indexer.*
 import org.jetbrains.kotlin.native.interop.tool.*
+import org.jetbrains.kotlin.konan.file.File as KlibFile
+import org.jetbrains.kotlin.konan.file.absolutePath
+import org.jetbrains.kotlin.konan.host.NativeFile as File
+import org.jetbrains.kotlin.konan.host.NativeFiles as Files
+import org.jetbrains.kotlin.konan.host.NativePath as Path
+import org.jetbrains.kotlin.konan.host.NativePaths as Paths
+import org.jetbrains.kotlin.konan.host.absolutePathString
+import org.jetbrains.kotlin.konan.host.environment
+import org.jetbrains.kotlin.konan.host.get
+import org.jetbrains.kotlin.konan.host.globToRegex
+import org.jetbrains.kotlin.konan.host.isAbsolute
+import org.jetbrains.kotlin.konan.host.nameWithoutExtension
+import org.jetbrains.kotlin.konan.properties.Properties
 import org.jetbrains.kotlin.util.removeSuffixIfPresent
 import org.jetbrains.kotlin.util.suffixIfNot
 import org.jetbrains.kotlin.util.toCInteropKlibMetadataVersion
 import org.jetbrains.kotlin.utils.addToStdlib.runUnless
-import java.io.File
-import java.nio.file.*
-import java.util.*
-import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
 
 data class InternalInteropOptions(val generated: String, val natives: String?, val manifest: String? = null,
                                   val cstubsName: String? = null)
@@ -145,12 +153,10 @@ private fun runCmd(command: Array<String>, verbose: Boolean = false, redirectInp
 }
 
 private fun Properties.storeProperties(file: File) {
-    file.outputStream().use {
-        this.store(it, null)
-    }
+    file.writeBytes(this.toByteArray())
 }
 
-private fun Properties.putAndRunOnReplace(key: Any, newValue: Any, beforeReplace: (Any, Any, Any) -> Unit) {
+private fun Properties.putAndRunOnReplace(key: String, newValue: String, beforeReplace: (String, String, String) -> Unit) {
     val oldValue = this[key]
     if (oldValue != null && oldValue != newValue) {
         beforeReplace(key, oldValue, newValue)
@@ -205,7 +211,7 @@ fun getCompilerFlagsForVfsOverlay(headerFilterPrefix: Array<String>, def: DefFil
         return emptyList()
     }
 
-    val virtualRoot = Paths.get(System.getProperty("java.io.tmpdir")).resolve("konanSystemInclude")
+    val virtualRoot = Paths.get(environment("TMPDIR") ?: "/tmp").resolve("konanSystemInclude")
 
     val virtualPathToReal = relativeToRoot.map { [relativePath, realRoot] ->
         virtualRoot.resolve(relativePath) to realRoot.resolve(relativePath)
@@ -219,8 +225,8 @@ fun getCompilerFlagsForVfsOverlay(headerFilterPrefix: Array<String>, def: DefFil
 private fun findFilesByGlobs(roots: List<Path>, includeGlobs: List<String>, excludeGlobs: List<String>): Map<Path, Path> {
     val relativeToRoot = mutableMapOf<Path, Path>()
 
-    val pathMatchers = includeGlobs.map { FileSystems.getDefault().getPathMatcher("glob:$it") }
-    val excludePathMatchers = excludeGlobs.map { FileSystems.getDefault().getPathMatcher("glob:$it") }
+    val pathMatchers = includeGlobs.map { globToRegex(it) }
+    val excludePathMatchers = excludeGlobs.map { globToRegex(it) }
 
     roots.reversed()
             .filter { path ->
@@ -231,11 +237,13 @@ private fun findFilesByGlobs(roots: List<Path>, includeGlobs: List<String>, excl
             }
             .forEach { root ->
                 // TODO: don't scan the entire tree, skip subdirectories according to globs.
-                Files.walk(root, FileVisitOption.FOLLOW_LINKS).forEach { path ->
+                root.toFile().walkTopDown().forEach { file ->
+                    val path = file.toPath()
                     val relativePath = root.relativize(path)
+                    val relativeStr = relativePath.toString()
                     val shouldInclude = !Files.isDirectory(path)
-                            && excludePathMatchers.all { !it.matches(relativePath) }
-                            && pathMatchers.any { it.matches(relativePath) }
+                            && excludePathMatchers.all { !it.matches(relativeStr) }
+                            && pathMatchers.any { it.matches(relativeStr) }
                     if (shouldInclude) {
                         relativeToRoot[relativePath] = root
                     }
@@ -387,7 +395,7 @@ private fun processCLib(
         val outKtFileCreator = {
             val outKtFileName = fqParts.last() + ".kt"
             val outKtFileRelative = (fqParts + outKtFileName).joinToString("/")
-            val file = File(ktGenRoot, outKtFileRelative)
+            val file = File(File(ktGenRoot), outKtFileRelative)
             file.parentFile.mkdirs()
             file
         }
@@ -448,7 +456,7 @@ private fun processCLib(
                         def.config.linkerOpts.toTypedArray() +
                                 tool.getDefaultCompilerOptsForLanguage(library.language) +
                                 additionalLinkerOpts
-                val outLib = File(nativeLibsDir, System.mapLibraryName(libName))
+                val outLib = File(File(nativeLibsDir), "${target.family.dynamicPrefix}$libName.${target.family.dynamicSuffix}")
                 val linkerCmd = arrayOf(linker,
                         outOFile.absolutePath, "-shared", "-o", outLib.absolutePath,
                         *linkerOpts)
@@ -462,7 +470,7 @@ private fun processCLib(
                 null
             }
             KotlinPlatform.NATIVE -> {
-                val outLib = File(nativeLibsDir, "$libName.bc")
+                val outLib = File(File(nativeLibsDir), "$libName.bc")
                 // Note that the output bitcode contains the source file path, which can lead to non-deterministc builds (see KT-54284).
                 // The source file is passed in via stdin to ensure the output library is deterministic.
                 val compilerCmd = arrayOf(compiler, *compilerArgs,
@@ -497,15 +505,15 @@ private fun processCLib(
 
             createInteropLibrary(
                     serializedMetadata = serializedMetadata,
-                    nativeBitcodeFiles = (compiledFiles + listOfNotNull(nativeOutputPath)).map(::Path),
+                    nativeBitcodeFiles = (compiledFiles + listOfNotNull(nativeOutputPath)).map(::KlibPath),
                     target = tool.target,
                     moduleName = moduleName,
-                    outputPath = Path(outputPath),
+                    outputPath = KlibPath(outputPath),
                     manifest = def.manifestAddendProperties,
                     dependencies = listOf(stdlib) + imports.requiredLibraries.toList(),
                     nopack = nopack,
                     shortName = cinteropArguments.shortModuleName,
-                    staticLibraries = resolveLibraries(staticLibraries, libraryPaths).map(::Path),
+                    staticLibraries = resolveLibraries(staticLibraries, libraryPaths).map(::KlibPath),
                     klibAbiCompatibilityLevel = cinteropArguments.klibAbiCompatibilityLevel,
             )
             return null
@@ -596,7 +604,7 @@ private fun loadLibraries(cinteropArguments: CInteropArguments, target: KonanTar
     val loadingResult = KlibLoader {
         libraryPaths(cinteropArguments.library)
         libraryProviders(
-                KlibNativeDistributionLibraryProvider(File(distribution.konanHome)) {
+                KlibNativeDistributionLibraryProvider(KlibFile(distribution.konanHome)) {
                     withStdlib()
                     runUnless(noDefaultLibs) { withPlatformLibs(target) }
                 }
