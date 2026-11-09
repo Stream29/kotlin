@@ -458,4 +458,4 @@ public fun ProtoBuf.Property.getPropertySetterFlags(): Int =
     if (hasSetterFlags()) setterFlags else getDefaultPropertyAccessorFlags(flags)
 
 internal fun getDefaultPropertyAccessorFlags(flags: Int): Int =
-    F.getAccessorFlags(F.HAS_ANNOTATIONS.get(flags), F.VISIBILITY.get(flags), F.MODALITY.get(flags), false, false, false)
+    F.getAccessorFlags(F.HAS_ANNOTATIONS.get(flags), F.VISIBILITY.get(flags)!!, F.MODALITY.get(flags)!!, false, false, false)

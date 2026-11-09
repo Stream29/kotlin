@@ -22,7 +22,7 @@ internal class EnumFlagDelegate<Node, E : Enum<E>>(
 ) {
     // Pre-built permutation ProtoEnum <> E to allow reordering of enum entries?
     // Concern: if new enum values are added to metadata proto, everything (including existing flags) will break
-    operator fun getValue(thisRef: Node, property: KProperty<*>): E = entries[protoSet.get(flags.get(thisRef)).number]
+    operator fun getValue(thisRef: Node, property: KProperty<*>): E = entries[protoSet.get(flags.get(thisRef))!!.number]
 
     operator fun setValue(thisRef: Node, property: KProperty<*>, value: E) {
         flags.set(thisRef, flagValues[value.ordinal] + flags.get(thisRef))

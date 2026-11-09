@@ -12,9 +12,10 @@ import org.jetbrains.kotlin.config.ApiVersion
 import org.jetbrains.kotlin.config.LanguageVersion
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
-import org.jetbrains.kotlin.descriptors.konan.isNativeStdlib
-import org.jetbrains.kotlin.konan.target.Distribution
+import org.jetbrains.kotlin.konan.file.absolutePath
+import org.jetbrains.kotlin.konan.file.resolve
 import org.jetbrains.kotlin.library.KotlinLibrary
+import org.jetbrains.kotlin.library.isNativeStdlib
 import org.jetbrains.kotlin.library.metadata.KlibMetadataFactories
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.utils.KotlinNativePaths
@@ -33,7 +34,7 @@ internal class ModuleDescriptorLoader(private val output: KlibToolOutput) {
         )
 
         val defaultModules = mutableListOf<ModuleDescriptorImpl>()
-        if (!module.isNativeStdlib()) {
+        if (!library.isNativeStdlib) {
             val stdlib = loadKlib(KotlinNativePaths.homePath.resolve("klib/common/stdlib").absolutePath, output) ?: return null
             defaultModules += KlibFactories.DefaultDeserializedDescriptorFactory.createDescriptor(
                     stdlib,

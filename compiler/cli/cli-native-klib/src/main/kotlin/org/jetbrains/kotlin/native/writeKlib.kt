@@ -26,9 +26,9 @@ import org.jetbrains.kotlin.library.uniqueName
 import org.jetbrains.kotlin.library.writer.KlibWriter
 import org.jetbrains.kotlin.library.writer.includeIr
 import org.jetbrains.kotlin.library.writer.includeMetadata
+import org.jetbrains.kotlin.konan.properties.Properties
+import org.jetbrains.kotlin.library.KlibPath as Path
 import org.jetbrains.kotlin.util.metadataVersion
-import java.util.Properties
-import kotlin.io.path.Path
 
 fun NativePhaseContext.writeKlib(input: KlibWriterInput) {
     val suffix = ".klib"
@@ -71,7 +71,7 @@ fun NativePhaseContext.writeKlib(input: KlibWriterInput) {
         val usedDependenciesFile = File(path)
         // We write out the absolute path instead of canonical here to avoid resolving symbolic links
         // as that can make it difficult to map the dependencies back to the command line arguments.
-        usedDependenciesFile.writeLines(linkDependencies.map { it.path.toAbsolutePath().toString() }.sorted())
+        usedDependenciesFile.writeText(linkDependencies.map { it.path.toAbsolutePath().toString() }.sorted().joinToString("\n"))
     }
 
     val nativeTargetsForManifest = config.nativeTargetsForManifest?.map { it.visibleName }

@@ -9,8 +9,8 @@ import org.jetbrains.kotlin.cli.bc.main as konancMain
 import org.jetbrains.kotlin.cli.klib.main as klibMain
 import org.jetbrains.kotlin.cli.bc.mainNoExitWithGradleRenderer as konancMainWithGradleRenderer
 import org.jetbrains.kotlin.cli.bc.mainNoExitWithXcodeRenderer as konancMainWithXcodeRenderer
-import org.jetbrains.kotlin.backend.konan.env.setEnv
 import org.jetbrains.kotlin.utils.usingNativeMemoryAllocator
+import platform.posix._putenv
 
 private fun mainImpl(args: Array<String>, runFromDaemon: Boolean, konancMain: (Array<String>) -> Unit) {
     val utilityName = args[0]
@@ -41,7 +41,7 @@ fun main(args: Array<String>) = mainImpl(args, false, ::konancMain)
 
 
 private fun setupClangEnv() {
-    setEnv("LIBCLANG_DISABLE_CRASH_RECOVERY", "1")
+    _putenv("LIBCLANG_DISABLE_CRASH_RECOVERY=1")
 }
 
 fun daemonMain(args: Array<String>) = inProcessMain(args, ::konancMainWithGradleRenderer)
@@ -53,4 +53,3 @@ private fun inProcessMain(args: Array<String>, konancMain: (Array<String>) -> Un
         mainImpl(args, true, konancMain)
     }
 }
-

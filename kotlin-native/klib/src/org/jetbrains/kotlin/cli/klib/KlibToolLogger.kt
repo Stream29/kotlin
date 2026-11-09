@@ -23,7 +23,6 @@ internal class KlibToolLogger(private val output: KlibToolOutput) : Logger, Mess
         output.logError(message)
     }
 
-    @Deprecated(Logger.FATAL_DEPRECATION_MESSAGE, ReplaceWith(Logger.FATAL_REPLACEMENT))
     override fun fatal(message: String) = throw IllegalStateException("error: $message")
 
     override fun report(severity: CompilerMessageSeverity, message: String, location: CompilerMessageSourceLocation?) {

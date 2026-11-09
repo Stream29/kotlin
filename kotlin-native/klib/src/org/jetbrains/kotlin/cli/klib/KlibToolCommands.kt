@@ -7,18 +7,23 @@ package org.jetbrains.kotlin.cli.klib
 
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.backend.common.DumpIrReferenceRenderingAsSignatureStrategy
+import org.jetbrains.kotlin.backend.common.IrBuiltInsForLinker
 import org.jetbrains.kotlin.backend.common.IrSignaturesExtractor
 import org.jetbrains.kotlin.backend.common.serialization.IrInterningService
 import org.jetbrains.kotlin.backend.common.serialization.IrModuleDeserializer
 import org.jetbrains.kotlin.backend.common.serialization.NonLinkingIrInlineFunctionDeserializer
+import org.jetbrains.kotlin.backend.common.serialization.signature.PublicIdSignatureComputer
 import org.jetbrains.kotlin.backend.konan.serialization.KonanIdSignaturer
 import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerDesc
 import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerIr
 import org.jetbrains.kotlin.cli.klib.KlibToolArgumentsParserResult.ParsedArguments
+import org.jetbrains.kotlin.ir.InternalSymbolFinderAPI
+import org.jetbrains.kotlin.ir.IrSyntheticProvider
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrModuleFragmentImpl
+import org.jetbrains.kotlin.ir.descriptors.IrBuiltinsPackageFragmentDescriptorImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrFileSymbolImpl
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.konan.library.components.bitcode
@@ -32,13 +37,10 @@ import org.jetbrains.kotlin.library.metadata.kotlinLibrary
 import org.jetbrains.kotlin.library.metadata.parseModuleHeader
 import org.jetbrains.kotlin.library.metadata.parsePackageFragment
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.psi2ir.descriptors.IrBuiltInsOverDescriptors
-import org.jetbrains.kotlin.psi2ir.generators.TypeTranslatorImpl
+import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.types.error.ErrorModuleDescriptor
 import org.jetbrains.kotlin.utils.Printer
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
-import java.util.*
-import kotlin.io.path.absolute
 import org.jetbrains.kotlin.metadata.ProtoBuf.PackageFragment as PackageFragmentProto
 
 internal sealed class KlibToolCommand(
@@ -98,8 +100,10 @@ internal class Info(output: KlibToolOutput, args: ParsedArguments) : KlibToolCom
             removeAll(stillRemainingEmptyPackageFQNs)
         }.sorted()
 
-        val manifestProperties: SortedMap<String, String> = args.library.manifestProperties.entries
-            .associateTo(sortedMapOf()) { it.key.toString() to it.value.toString() }
+        val manifestProperties: Map<String, String> = args.library.manifestProperties.entries
+            .map { it.key.toString() to it.value.toString() }
+            .sortedBy { it.first }
+            .toMap()
 
         output.appendLine("Full path: ${args.library.path.toRealPath()}")
         output.appendLine("Module name (metadata): ${metadataHeader.moduleName}")
@@ -147,7 +151,7 @@ internal class Info(output: KlibToolOutput, args: ParsedArguments) : KlibToolCom
 }
 
 internal class DumpIr(output: KlibToolOutput, args: ParsedArguments) : KlibToolCommand(output, args) {
-    @OptIn(ObsoleteDescriptorBasedAPI::class, K1Deprecation::class)
+    @OptIn(ObsoleteDescriptorBasedAPI::class, K1Deprecation::class, InternalSymbolFinderAPI::class)
     override fun execute() {
         if (!checkLibraryHasIr(args.library)) return
 
@@ -160,8 +164,14 @@ internal class DumpIr(output: KlibToolOutput, args: ParsedArguments) : KlibToolC
 
         val idSignaturer = KonanIdSignaturer(KonanManglerDesc)
         val symbolTable = SymbolTable(idSignaturer, IrFactoryImpl)
-        val typeTranslator = TypeTranslatorImpl(symbolTable, ModuleDescriptorLoader.languageVersionSettings, module)
-        val irBuiltIns = IrBuiltInsOverDescriptors(module.builtIns, typeTranslator, symbolTable)
+        IrSyntheticProvider(
+            packageFragmentDescriptor = IrBuiltinsPackageFragmentDescriptorImpl(
+                module,
+                StandardClassIds.BASE_INTERNAL_IR_PACKAGE,
+            ),
+            symbolTable = symbolTable,
+            signatureComputer = PublicIdSignatureComputer(KonanManglerIr)::computeSignature,
+        )
 
         val linker = KlibToolIrLinker(output, module, symbolTable)
         module.allDependencyModules.forEach {
@@ -169,7 +179,7 @@ internal class DumpIr(output: KlibToolOutput, args: ParsedArguments) : KlibToolC
         }
         val irFragment = linker.deserializeFullModule(module, args.library)
         linker.init(null)
-        linker.modulesWithReachableTopLevels.forEach(IrModuleDeserializer::deserializeReachableDeclarations)
+        linker.modulesWithReachableTopLevels.toList().forEach(IrModuleDeserializer::deserializeReachableDeclarations)
 
         val dumpOptions = DumpIrTreeOptions(
             printSignatures = true,
@@ -187,7 +197,7 @@ internal class DumpIr(output: KlibToolOutput, args: ParsedArguments) : KlibToolC
 }
 
 internal class DumpIrInlinableFunctions(output: KlibToolOutput, args: ParsedArguments) : KlibToolCommand(output, args) {
-    @OptIn(ObsoleteDescriptorBasedAPI::class, K1Deprecation::class)
+    @OptIn(ObsoleteDescriptorBasedAPI::class, K1Deprecation::class, InternalSymbolFinderAPI::class)
     override fun execute() {
         if (!checkLibraryHasIr(args.library)) return
 
@@ -206,8 +216,19 @@ internal class DumpIrInlinableFunctions(output: KlibToolOutput, args: ParsedArgu
 
         val idSignaturer = KonanIdSignaturer(KonanManglerDesc)
         val symbolTable = SymbolTable(idSignaturer, IrFactoryImpl)
-        val typeTranslator = TypeTranslatorImpl(symbolTable, ModuleDescriptorLoader.languageVersionSettings, module)
-        val irBuiltIns = IrBuiltInsOverDescriptors(module.builtIns, typeTranslator, symbolTable)
+        IrSyntheticProvider(
+            packageFragmentDescriptor = IrBuiltinsPackageFragmentDescriptorImpl(
+                module,
+                StandardClassIds.BASE_INTERNAL_IR_PACKAGE,
+            ),
+            symbolTable = symbolTable,
+            signatureComputer = PublicIdSignatureComputer(KonanManglerIr)::computeSignature,
+        )
+        val linker = KlibToolIrLinker(output, module, symbolTable)
+        module.allDependencyModules.forEach {
+            linker.deserializeOnlyHeaderModule(it, it.kotlinLibrary)
+        }
+        val irBuiltIns = IrBuiltInsForLinker(linker, ModuleDescriptorLoader.languageVersionSettings)
 
         val moduleDeserializer = NonLinkingIrInlineFunctionDeserializer.ModuleDeserializer(
                 inlinableFunctionsIr = inlinableFunctionsIr,
@@ -285,7 +306,7 @@ internal class DumpAbi(output: KlibToolOutput, args: ParsedArguments) : KlibTool
         }
 
         LibraryAbiRenderer.render(
-            libraryAbi = LibraryAbiReader.readAbiInfo(args.library.path.absolute().toFile()),
+            libraryAbi = LibraryAbiReader.readAbiInfo(args.library.path.toAbsolutePath().toFile()),
             output = output,
             settings = AbiRenderingSettings(
                 renderedSignatureVersion = abiSignatureVersion,

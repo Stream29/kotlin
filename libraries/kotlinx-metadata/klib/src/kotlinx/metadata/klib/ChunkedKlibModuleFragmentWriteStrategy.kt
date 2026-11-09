@@ -106,7 +106,7 @@ private sealed interface ClassifierBucket {
                     for (clazz in classes) {
                         val className = clazz.name
                         val topLevelClassName = if (!className.isLocalClassName()) className.substringBefore('.') else className
-                        groupedByTopLevelClassNames.computeIfAbsent(topLevelClassName) { mutableListOf() } += clazz
+                        groupedByTopLevelClassNames.getOrPut(topLevelClassName) { mutableListOf() } += clazz
                     }
 
                     groupedByTopLevelClassNames.values.asSequence().map(::Classes)

@@ -29,7 +29,7 @@ abstract class Kotlinp(protected val settings: Settings) {
                     '\r' -> append("\\r")
                     '\t' -> append("\\t")
                     quote -> append("\\").append(quote)
-                    else -> append(if (c.isISOControl()) "\\u%04x".format(c.code) else c)
+                    else -> append(if (c.isISOControl()) "\\u" + c.code.toString(16).padStart(4, '0') else c)
                 }
             }
         }

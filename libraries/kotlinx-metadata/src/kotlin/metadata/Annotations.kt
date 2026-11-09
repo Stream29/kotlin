@@ -68,7 +68,7 @@ public sealed class KmAnnotationArgument {
         // the final modifier prevents generation of data class-like .toString() in inheritors
         // Java reflection instead of Kotlin reflection to avoid (probably small) overhead of mapping Kotlin/Java names
         final override fun toString(): String =
-            "${this::class.java.simpleName}(${if (this is StringValue) "\"$value\"" else value.toString()})"
+            "${this::class.simpleName}(${if (this is StringValue) "\"$value\"" else value.toString()})"
     }
 
     // For all inheritors of LiteralValue: KDoc is automatically copied from base property `value`

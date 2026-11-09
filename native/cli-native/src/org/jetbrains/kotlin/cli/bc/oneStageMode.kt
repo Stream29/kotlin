@@ -5,15 +5,13 @@
 
 package org.jetbrains.kotlin.cli.bc
 
-import org.jetbrains.kotlin.cli.common.arguments.K2NativeCompilerArguments
-import org.jetbrains.kotlin.cli.common.arguments.copyOf
+import org.jetbrains.kotlin.cli.common.arguments.*
 import org.jetbrains.kotlin.cli.common.contentRoots
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.useFir
 import org.jetbrains.kotlin.konan.config.emitLazyObjcHeaderFile
 import org.jetbrains.kotlin.konan.config.konanIncludedLibraries
-import org.jetbrains.kotlin.konan.file.File
-import java.util.*
+import org.jetbrains.kotlin.konan.file.*
 
 internal fun isOneStageCompilation(arguments: K2NativeCompilerArguments): Boolean {
     val producingBinary = arguments.produce != "library"
@@ -49,8 +47,12 @@ internal fun adjustConfigurationForSecondStage(
     configuration.konanIncludedLibraries += listOf(intermediateKLib.absolutePath)
 }
 
-internal fun createIntermediateKlib(): File =
-    File(System.getProperty("java.io.tmpdir"), "${UUID.randomUUID()}.klib").also {
+internal fun createIntermediateKlib(): File {
+    val tempDir = createTempDir("konan-one-stage").also {
+        it.deleteOnExit()
+    }
+    return File(tempDir.canonicalPath, "stage1.klib").also {
         require(!it.exists) { "Collision writing intermediate KLib $it" }
         it.deleteOnExit()
     }
+}

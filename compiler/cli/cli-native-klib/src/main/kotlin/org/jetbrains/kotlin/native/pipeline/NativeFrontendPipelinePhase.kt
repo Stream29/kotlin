@@ -23,11 +23,11 @@ import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
 import org.jetbrains.kotlin.fir.pipeline.*
 import org.jetbrains.kotlin.fir.resolve.ImplicitIntegerCoercionModuleCapability
 import org.jetbrains.kotlin.konan.config.konanPrintFiles
+import org.jetbrains.kotlin.konan.file.absolutePath
 import org.jetbrains.kotlin.library.metadata.isCInteropLibrary
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.native.NativeFirstStagePhaseContext
 import org.jetbrains.kotlin.native.createFirstStageCompilationConfig
-import kotlin.io.path.absolutePathString
 
 object NativeFrontendPipelinePhase : PipelinePhase<ConfigurationPipelineArtifact, NativeFrontendArtifact>(
     name = "NativeFrontendPhase",
@@ -46,7 +46,12 @@ object NativeFrontendPipelinePhase : PipelinePhase<ConfigurationPipelineArtifact
             EnvironmentConfigFiles.NATIVE_CONFIG_FILES
         )
 
-        val firOutput = phaseContext.firFrontend(environment, configuration)
+        val app = com.intellij.openapi.application.ApplicationManager.getApplicationOrNull()
+        val firOutput = if (app != null && !app.isReadAccessAllowed) {
+            app.runReadAction { phaseContext.firFrontend(environment, configuration) }
+        } else {
+            phaseContext.firFrontend(environment, configuration)
+        }
         return NativeFrontendArtifact(
             firOutput,
             configuration = configuration,

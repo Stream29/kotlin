@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.cli.pipeline.PipelinePhase
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.konan.config.konanGeneratedHeaderKlibPath
 import org.jetbrains.kotlin.konan.file.File
+import com.intellij.platform.native.vfs.NativeVfsFileOps
 import org.jetbrains.kotlin.native.FirSerializerInput
 import org.jetbrains.kotlin.native.KlibWriterInput
 import org.jetbrains.kotlin.native.NativeFirstStagePhaseContext
@@ -42,7 +43,7 @@ object NativeIrSerializationPipelinePhase : PipelinePhase<NativeFir2IrArtifact, 
 
             // Don't overwrite the header klib with the full klib and stop compilation here.
             // By providing the same path for both regular output and header klib we can skip emitting the full klib.
-            if (File(outputKlibPath).canonicalPath == File(headerKlibPath).canonicalPath) {
+            if (NativeVfsFileOps.canonicalPath(File(outputKlibPath)) == NativeVfsFileOps.canonicalPath(File(headerKlibPath))) {
                 return null
             }
         }

@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.cli.report
 import org.jetbrains.kotlin.cli.reportLog
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.konan.config.*
-import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.library.defaultResolver
 import org.jetbrains.kotlin.konan.target.Distribution
 import org.jetbrains.kotlin.konan.target.KonanTarget
@@ -75,7 +75,7 @@ private class CompilerLoggerAdapter(
     override fun strongWarning(message: String) = configuration.report(CliDiagnostics.KONAN_ARGUMENT_STRONG_WARNING, message)
     override fun error(message: String) = configuration.report(CliDiagnostics.KONAN_ARGUMENT_ERROR, message)
 
-    @Deprecated(Logger.FATAL_DEPRECATION_MESSAGE, ReplaceWith(Logger.FATAL_REPLACEMENT))
+    @Deprecated("Use fatal(String) instead", ReplaceWith("fatal(message)"))
     override fun fatal(message: String): Nothing {
         configuration.report(CliDiagnostics.KONAN_COMPILATION_ERROR, message)
         @OptIn(MessageCollectorAccess::class)

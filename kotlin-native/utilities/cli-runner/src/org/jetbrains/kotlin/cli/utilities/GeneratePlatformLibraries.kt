@@ -6,25 +6,35 @@
 package org.jetbrains.kotlin.cli.utilities
 
 import org.jetbrains.kotlin.cli.bc.K2Native
-import org.jetbrains.kotlin.konan.file.File
-import java.util.concurrent.*
+import org.jetbrains.kotlin.konan.file.*
 import kotlinx.cli.*
 import org.jetbrains.kotlin.backend.konan.CachedLibraries
 import org.jetbrains.kotlin.backend.konan.OutputFiles
-import org.jetbrains.kotlin.backend.konan.files.renameAtomic
 import org.jetbrains.kotlin.konan.target.*
 import org.jetbrains.kotlin.utils.KotlinNativePaths
-import org.jetbrains.kotlin.konan.util.PlatformLibsInfo
 import org.jetbrains.kotlin.konan.util.visibleName
 import org.jetbrains.kotlin.native.interop.gen.jvm.parseKeyValuePairs
 import org.jetbrains.kotlin.native.interop.tool.SHORT_MODULE_NAME
-import java.io.PrintWriter
-import java.io.StringWriter
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.util.concurrent.atomic.AtomicInteger
+import kotlin.random.Random
 import kotlin.system.exitProcess
 import org.jetbrains.kotlin.utils.usingNativeMemoryAllocator
+import platform.posix.getpid
+import platform.posix.rename
+
+private object PlatformLibsInfo {
+    const val namePrefix = "org.jetbrains.kotlin.native.platform."
+}
+
+private fun File.deleteRecursively() {
+    toPath().deleteRecursively()
+}
+
+private fun File.forEachLine(action: (String) -> Unit) {
+    val text = readText()
+    if (text.isEmpty()) return
+    val lines = text.lines()
+    (if (lines.isNotEmpty() && lines.last().isEmpty()) lines.dropLast(1) else lines).forEach(action)
+}
 
 // TODO: We definitely need to unify logging in different parts of the compiler.
 private class Logger(val level: Level = Level.NORMAL) {
@@ -46,7 +56,7 @@ private class Logger(val level: Level = Level.NORMAL) {
 
 private fun Logger.logFailedLibraries(built: Map<DefFile, ProcessingStatus>) {
     log("Processing platform libraries finished with errors.")
-    built.forEach { [def, status] ->
+    built.forEach { (def, status) ->
         if (status is ProcessingStatus.FAIL) {
             log("    ${def.name}: ${status.error}")
         }
@@ -54,9 +64,7 @@ private fun Logger.logFailedLibraries(built: Map<DefFile, ProcessingStatus>) {
 }
 
 private fun Logger.logStackTrace(error: Throwable) {
-    val stringWriter = StringWriter()
-    error.printStackTrace(PrintWriter(stringWriter))
-    verbose(stringWriter.toString())
+    verbose(error.stackTraceToString())
 }
 
 private enum class CacheKind(val outputKind: CompilerOutputKind) {
@@ -204,12 +212,23 @@ private class DefFile(val name: String, val depends: MutableList<DefFile>) {
         get() = name
 }
 
+private fun renameAtomic(from: String, to: String, replaceExisting: Boolean): Boolean {
+    if (File(to).exists) {
+        if (!replaceExisting) return false
+        File(to).deleteRecursively()
+    }
+    return rename(from, to) == 0
+}
+
 private fun createTempDir(prefix: String, parent: File): File =
-        File(Files.createTempDirectory(Paths.get(parent.absolutePath), prefix).toString())
+        parent.child("$prefix${getpid()}-${Random.nextLong().toULong()}").also {
+            it.deleteRecursively()
+            it.mkdirs()
+        }
 
 private fun File.deleteAtomicallyIfPossible(tmpDirectory: File) {
     // Try to atomically delete the old directory.
-    val tmpToDelete = Files.createTempFile(Paths.get(tmpDirectory.absolutePath), null, null).toFile()
+    val tmpToDelete = tmpDirectory.child("delete-${getpid()}-${Random.nextLong().toULong()}")
     if (renameAtomic(this.absolutePath, tmpToDelete.absolutePath, replaceExisting = true)) {
         tmpToDelete.deleteRecursively()
     } else {
@@ -376,13 +395,6 @@ private fun generatePlatformLibraries(
     }
 
     val tmpDirectory = createTempDir("build-", outputDirectory)
-    // Delete the tmp directory in case of execution interruption.
-    val deleteTmpHook = Thread {
-        if (!saveTemps) {
-            tmpDirectory.deleteRecursively()
-        }
-    }
-    Runtime.getRuntime().addShutdownHook(deleteTmpHook)
 
     // Build dependencies graph.
     val defFiles = mutableMapOf<String, DefFile>()
@@ -404,46 +416,31 @@ private fun generatePlatformLibraries(
         }
     }
     val sorted = topoSort(defFiles.values.toList())
-    val numCores = Runtime.getRuntime().availableProcessors()
-    val executorPool = ThreadPoolExecutor(numCores, numCores,
-            10, TimeUnit.SECONDS, ArrayBlockingQueue(1000),
-            Executors.defaultThreadFactory(), RejectedExecutionHandler { r, _ ->
-        logger.log("Execution rejected: $r")
-        throw Error("Must not happen!")
-    })
-    val built = ConcurrentHashMap(sorted.associateWith<DefFile, ProcessingStatus> { ProcessingStatus.WAIT })
+    val built = sorted.associateWithTo(mutableMapOf<DefFile, ProcessingStatus>()) { ProcessingStatus.WAIT }
     // Now run interop tool on toposorted dependencies.
     val countTotal = sorted.size
-    val countProcessed = AtomicInteger(0)
+    var countProcessed = 0
     try {
         tmpDirectory.mkdirs()
         sorted.forEach { def ->
-            executorPool.execute {
-                // A bit ugly, we just block here until all dependencies are built.
-                while (def.depends.any { built[it] == ProcessingStatus.WAIT }) {
-                    Thread.sleep(100)
+            try {
+                if (def.depends.any { built[it] is ProcessingStatus.FAIL || built[it] is ProcessingStatus.FAILED_DEPENDENCIES }) {
+                    built[def] = ProcessingStatus.FAILED_DEPENDENCIES
+                    return@forEach
                 }
-                try {
-                    if (def.depends.any { built[it] is ProcessingStatus.FAIL }) {
-                        built[def] = ProcessingStatus.FAILED_DEPENDENCIES
-                        return@execute
-                    }
 
-                    logger.log("Processing ${def.name} (${countProcessed.incrementAndGet()}/$countTotal)...")
-                    generateLibrary(target, cinteropOptions, def, directories, tmpDirectory, rebuild, logger)
-                    if (cacheInfo != null) {
-                        buildCache(target, def, outputDirectory, cacheInfo, rebuild, logger, konanDataDir)
-                    }
-
-                    built[def] = ProcessingStatus.SUCCESS
-                } catch (e: Throwable) {
-                    built[def] = ProcessingStatus.FAIL(e)
-                    logger.logStackTrace(e)
+                logger.log("Processing ${def.name} (${++countProcessed}/$countTotal)...")
+                generateLibrary(target, cinteropOptions, def, directories, tmpDirectory, rebuild, logger)
+                if (cacheInfo != null) {
+                    buildCache(target, def, outputDirectory, cacheInfo, rebuild, logger, konanDataDir)
                 }
+
+                built[def] = ProcessingStatus.SUCCESS
+            } catch (e: Throwable) {
+                built[def] = ProcessingStatus.FAIL(e)
+                logger.logStackTrace(e)
             }
         }
-        executorPool.shutdown()
-        executorPool.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS)
 
         if (built.values.any { it != ProcessingStatus.SUCCESS }) {
             logger.logFailedLibraries(built)
@@ -454,6 +451,5 @@ private fun generatePlatformLibraries(
         if (!saveTemps) {
             tmpDirectory.deleteRecursively()
         }
-        Runtime.getRuntime().removeShutdownHook(deleteTmpHook)
     }
 }

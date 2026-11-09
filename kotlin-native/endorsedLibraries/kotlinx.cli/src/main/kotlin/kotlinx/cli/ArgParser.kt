@@ -7,7 +7,8 @@ package kotlinx.cli
 
 import kotlin.reflect.KProperty
 
-internal expect fun exitProcess(status: Int): Nothing
+// Native single-module adaptation: exitProcess is defined directly in kotlin-native/kotlinx/cli/Utils.kt
+// internal expect fun exitProcess(status: Int): Nothing
 
 /**
  * Queue of arguments descriptors.

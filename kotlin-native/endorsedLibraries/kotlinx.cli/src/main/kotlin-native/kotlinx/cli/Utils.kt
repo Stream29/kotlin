@@ -5,6 +5,6 @@
 
 package kotlinx.cli
 
-internal actual fun exitProcess(status: Int): Nothing {
+internal fun exitProcess(status: Int): Nothing {
     kotlin.system.exitProcess(0)
 }

@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.kotlinp.klib
 
 import kotlinx.metadata.klib.KlibModuleMetadata
 import kotlinx.metadata.klib.fqName
-import java.util.*
 import kotlin.metadata.*
 
 /**
@@ -21,9 +20,9 @@ class ExternalSignatureComputer(module: KlibModuleMetadata, getExternallyCompute
      * externally computed signatures and then looking up them using `Km*` entities as keys. I.e. no context needs to be maintained
      * while traversing the `Km*`-tree (like: what is the containing declaration of a particular [KmFunction]?).
      */
-    private val signatures = IdentityHashMap<Any, String>()
-    private val getterSignatures = IdentityHashMap<KmProperty, String>()
-    private val setterSignatures = IdentityHashMap<KmProperty, String>()
+    private val signatures = HashMap<Any, String?>()
+    private val getterSignatures = HashMap<KmProperty, String?>()
+    private val setterSignatures = HashMap<KmProperty, String?>()
 
     init {
         fun visitDeclarationContainer(containerNamePrefix: String, container: KmDeclarationContainer) {

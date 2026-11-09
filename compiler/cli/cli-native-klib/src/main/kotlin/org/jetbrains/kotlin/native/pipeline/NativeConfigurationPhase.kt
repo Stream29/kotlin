@@ -10,8 +10,7 @@ import org.jetbrains.kotlin.backend.common.linkage.partial.setupPartialLinkageCo
 import org.jetbrains.kotlin.backend.konan.NativeBackendDiagnostics
 import org.jetbrains.kotlin.cli.CliDiagnostics.KONAN_ARGUMENT_ERROR
 import org.jetbrains.kotlin.cli.CliDiagnostics.KONAN_ARGUMENT_STRONG_WARNING
-import org.jetbrains.kotlin.cli.common.arguments.K2NativeCompilerArguments
-import org.jetbrains.kotlin.cli.common.arguments.cliArgument
+import org.jetbrains.kotlin.cli.common.arguments.*
 import org.jetbrains.kotlin.cli.common.checkForUnexpectedKlibLibraries
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
 import org.jetbrains.kotlin.cli.common.createPhaseConfig
@@ -23,11 +22,15 @@ import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.ir.inline.diagnostics.IrInlinerErrors
 import org.jetbrains.kotlin.konan.config.*
 import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.file.toPath
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.metadata.deserialization.BinaryVersion
 import org.jetbrains.kotlin.metadata.deserialization.MetadataVersion
 import org.jetbrains.kotlin.platform.konan.NativePlatforms
+
+private val pathSeparator: String
+    get() = if (Platform.osFamily == OsFamily.WINDOWS) ";" else ":"
 
 /**
  * Configuration phase for native klib compilation pipeline.
@@ -70,10 +73,10 @@ object NativeKlibConfigurationUpdater : ConfigurationUpdater<K2NativeCompilerArg
         configuration: CompilerConfiguration,
         arguments: K2NativeCompilerArguments,
     ) {
-        val commonSources = arguments.commonSources.toSet().map { java.io.File(it).absoluteFile.normalize() }
+        val commonSources = arguments.commonSources.toSet().map { File(it).toPath().toAbsolutePath().normalize() }
         val hmppModuleStructure = configuration.get(CommonConfigurationKeys.HMPP_MODULE_STRUCTURE)
         arguments.freeArgs.forEach { path ->
-            val normalizedPath = java.io.File(path).absoluteFile.normalize()
+            val normalizedPath = File(path).toPath().toAbsolutePath().normalize()
             configuration.addKotlinSourceRoot(path, normalizedPath in commonSources, hmppModuleStructure?.getModuleNameForSource(path))
         }
 
@@ -81,13 +84,11 @@ object NativeKlibConfigurationUpdater : ConfigurationUpdater<K2NativeCompilerArg
         arguments.moduleName?.let { configuration.moduleName = it }
         arguments.kotlinHome?.let { configuration.konanHome = it }
         arguments.target?.let { configuration.konanTarget = it }
-        configuration.targetPlatform = configuration.konanTarget?.let {
-            NativePlatforms.nativePlatformByTargetNames(listOf(it))
-        } ?: NativePlatforms.unspecifiedNativePlatform
+        configuration.targetPlatform = NativePlatforms.unspecifiedNativePlatform
 
-        configuration.konanLibraries = arguments.libraries.toList()
+        configuration.konanLibraries = arguments.libraries?.split(pathSeparator, ",")?.filterNot(String::isEmpty).orEmpty()
         arguments.friendModules?.let {
-            configuration.konanFriendLibraries = it.split(File.pathSeparator).filterNot(String::isEmpty)
+            configuration.konanFriendLibraries = it.split(pathSeparator).filterNot(String::isEmpty)
 
             configuration.checkForUnexpectedKlibLibraries(
                 librariesToCheck = configuration.konanFriendLibraries,
@@ -112,7 +113,7 @@ object NativeKlibConfigurationUpdater : ConfigurationUpdater<K2NativeCompilerArg
         arguments.manifestFile?.let { configuration.konanManifestAddend = it }
         arguments.headerKlibPath?.let { configuration.konanGeneratedHeaderKlibPath = it }
         arguments.shortModuleName?.let { configuration.konanShortModuleName = it }
-        configuration.konanIncludedLibraries = arguments.includes.toList()
+        configuration.konanIncludedLibraries = arguments.includes?.split(pathSeparator, ",")?.filterNot(String::isEmpty).orEmpty()
 
         configuration.konanPrintIr = arguments.printIr
         configuration.konanPrintFiles = arguments.printFiles

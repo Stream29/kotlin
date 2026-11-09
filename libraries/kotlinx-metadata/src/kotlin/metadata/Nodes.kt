@@ -732,7 +732,7 @@ public class KmType internal constructor(
      */
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (this::class != other?.let { it::class }) return false
 
         other as KmType
 
@@ -849,7 +849,6 @@ public data class KmTypeProjection(var variance: KmVariance?, var type: KmType?)
          * Star projection (`*`).
          * For example, in `MutableMap<in String?, *>`, `*` is the star projection which is the second type argument of the type.
          */
-        @JvmField
         public val STAR: KmTypeProjection = KmTypeProjection(null, null)
     }
 }

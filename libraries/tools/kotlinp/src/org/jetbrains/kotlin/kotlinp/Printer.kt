@@ -20,10 +20,11 @@ abstract class Printer : Appendable {
         append(value.toString())
     }
 
-    override fun append(charSequence: CharSequence, start: Int, end: Int): Printer = append(charSequence.subSequence(start, end))
+    override fun append(charSequence: CharSequence?, start: Int, end: Int): Printer =
+        append((charSequence ?: "null").subSequence(start, end))
 
-    override fun append(charSequence: CharSequence): Printer {
-        for (ch in charSequence) append(ch)
+    override fun append(charSequence: CharSequence?): Printer {
+        for (ch in (charSequence ?: "null")) append(ch)
         return this
     }
 
