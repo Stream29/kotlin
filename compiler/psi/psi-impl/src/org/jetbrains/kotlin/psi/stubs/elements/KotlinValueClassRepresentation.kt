@@ -5,6 +5,16 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
+
+
+
+
+
+
+
+
+
+
 /**
  * This class is intended to provide all necessary information via stubs to
  * create [org.jetbrains.kotlin.descriptors.ValueClassRepresentation] during stub -> FIR

@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import org.jetbrains.kotlin.name.FqName
@@ -12,6 +13,8 @@ import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.stubs.KotlinFileStubKind
 import org.jetbrains.kotlin.psi.stubs.StubUtils.readFqName
 import kotlin.reflect.KProperty1
+
+
 
 @KtImplementationDetail
 internal sealed class KotlinFileStubKindImpl {

@@ -10,6 +10,8 @@ import org.jetbrains.kotlin.kdoc.psi.impl.KDocSection
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.kdoc.parser.KDocKnownTag
 
+
+
 // Don't implement KtElement (or it will be treated as statement)
 interface KDoc : PsiDocCommentBase, KDocElement {
     override fun getOwner(): KtDeclaration?

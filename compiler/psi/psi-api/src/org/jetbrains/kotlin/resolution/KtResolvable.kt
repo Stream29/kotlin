@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.resolution
 
 import org.jetbrains.kotlin.psi.KtExperimentalApi
 
+
+
 /**
  * A marker interface for all elements that can be resolved into a symbol in the Analysis API.
  *

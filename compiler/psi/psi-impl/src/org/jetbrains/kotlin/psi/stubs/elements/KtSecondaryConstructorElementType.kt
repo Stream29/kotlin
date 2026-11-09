@@ -4,6 +4,17 @@
  */
 package org.jetbrains.kotlin.psi.stubs.elements
 
+import org.jetbrains.kotlin.psi.isCallToThis
+import org.jetbrains.kotlin.psi.isDelegatedCallToThis
+import org.jetbrains.kotlin.psi.isExplicitDelegationCall
+import org.jetbrains.kotlin.psi.isImplicit
+
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -16,18 +27,20 @@ import org.jetbrains.kotlin.psi.stubs.KotlinConstructorStub
 import org.jetbrains.kotlin.psi.stubs.StubUtils.deserializeKdocText
 import org.jetbrains.kotlin.psi.stubs.StubUtils.serializeKdocText
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinSecondaryConstructorStubImpl
-import java.io.IOException
+import com.intellij.platform.native.NativeIOException as IOException
+
+
 
 class KtSecondaryConstructorElementType(@NonNls debugName: String) :
     KtStubElementType<KotlinSecondaryConstructorStubImpl, KtSecondaryConstructor>(
         /* debugName = */ debugName,
-        /* psiClass = */ KtSecondaryConstructor::class.java,
-        /* stubClass = */ KotlinConstructorStub::class.java,
+        /* psiClass = */ KtSecondaryConstructor::class,
+        /* stubClass = */ KotlinConstructorStub::class,
     ) {
 
     override fun createStub(
         psi: KtSecondaryConstructor,
-        parentStub: StubElement<*>,
+        parentStub: StubElement<*>?,
     ): KotlinSecondaryConstructorStubImpl {
         val hasBody = psi.hasBody()
         val isDelegatedCallToThis = psi.getDelegationCallOrNull()?.isCallToThis ?: true
@@ -57,7 +70,7 @@ class KtSecondaryConstructorElementType(@NonNls debugName: String) :
     }
 
     @Throws(IOException::class)
-    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>): KotlinSecondaryConstructorStubImpl{
+    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): KotlinSecondaryConstructorStubImpl{
         val name = dataStream.readName()
         val hasBody = dataStream.readBoolean()
         val isDelegatedCallToThis = dataStream.readBoolean()

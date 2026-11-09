@@ -17,19 +17,21 @@ import org.jetbrains.kotlin.psi.stubs.KotlinStubVersions
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinFileStubImpl
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinFileStubKindImpl
 
+
+
 @OptIn(KtImplementationDetail::class)
 object KtFileElementType : IStubFileElementType<KotlinFileStubImpl>(KtFileElementType.NAME, KotlinLanguage.INSTANCE) {
     internal const val NAME = "kotlin.FILE"
 
-    override fun getBuilder(): StubBuilder {
+    override val builder: StubBuilder get() {
         return KtFileStubBuilder()
     }
 
-    override fun getStubVersion(): Int {
+    override val stubVersion: Int get() {
         return KotlinStubVersions.SOURCE_STUB_VERSION
     }
 
-    override fun getExternalId(): String {
+    override val externalId: String get() {
         return NAME
     }
 
@@ -46,10 +48,14 @@ object KtFileElementType : IStubFileElementType<KotlinFileStubImpl>(KtFileElemen
         val project = psi.project
         val languageForParser = getLanguageForParser(psi)
         val builder = PsiBuilderFactory.getInstance().createBuilder(project, chameleon, null, languageForParser, chameleon.chars)
-        return KotlinParser.parse(builder, psi.containingFile).firstChildNode
+        return KotlinParser.parse(builder, psi.containingFile!!).firstChildNode
     }
 
-    override fun indexStub(stub: PsiFileStub<*>, sink: IndexSink) {
-        StubIndexService.getInstance().indexFile(stub as KotlinFileStubImpl, sink)
+    override fun indexStub(stub: KotlinFileStubImpl, sink: IndexSink) {
+        StubIndexService.getInstance().indexFile(stub, sink)
+    }
+
+    fun indexStub(stub: PsiFileStub<*>, sink: IndexSink) {
+        indexStub(stub as KotlinFileStubImpl, sink)
     }
 }

@@ -13,8 +13,10 @@ import org.jetbrains.kotlin.KtLightSourceElement
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.lexer.KtSingleValueToken
 import org.jetbrains.kotlin.lexer.KtTokens
-import org.jetbrains.kotlin.lexer.KtTokens.WHITE_SPACE
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.WHITE_SPACE
 import org.jetbrains.kotlin.util.getChildren
+
+
 
 open class LightTreePositioningStrategy {
     open fun markKtDiagnostic(element: KtSourceElement, diagnostic: KtDiagnostic): List<TextRange> {

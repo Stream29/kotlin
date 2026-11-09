@@ -5,6 +5,12 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.io.StringRef
 import org.jetbrains.kotlin.name.FqName
@@ -14,18 +20,22 @@ import org.jetbrains.kotlin.psi.stubs.KotlinParameterStub
 import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
+
+
 @OptIn(KtImplementationDetail::class)
 class KotlinParameterStubImpl(
     parent: StubElement<*>?,
     private val fqNameRef: StringRef?,
-    private val name: StringRef?,
+    name: StringRef?,
     override val isMutable: Boolean,
     override val hasValOrVar: Boolean,
     override val hasDefaultValue: Boolean,
     val functionTypeParameterName: String?,
 ) : KotlinStubBaseImpl<KtParameter>(parent, KtStubElementTypes.VALUE_PARAMETER), KotlinParameterStub {
+    private val nameRef = name
 
-    override fun getName(): String? = name?.string
+    override val name: String?
+    get() = nameRef?.string
 
     // val/var parameters from a primary constructor might have fqName
     override val fqName: FqName?
@@ -35,7 +45,7 @@ class KotlinParameterStubImpl(
     override fun copyInto(newParent: StubElement<*>?): KotlinParameterStubImpl = KotlinParameterStubImpl(
         parent = newParent,
         fqNameRef = fqNameRef,
-        name = name,
+        name = nameRef,
         isMutable = isMutable,
         hasValOrVar = hasValOrVar,
         hasDefaultValue = hasDefaultValue,
@@ -45,7 +55,7 @@ class KotlinParameterStubImpl(
     @KtImplementationDetail
     override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
         other is KotlinParameterStubImpl &&
-                other.name == name &&
+                other.nameRef == nameRef &&
                 other.fqNameRef == fqNameRef &&
                 other.isMutable == isMutable &&
                 other.hasValOrVar == hasValOrVar &&

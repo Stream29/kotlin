@@ -15,6 +15,8 @@ import org.jetbrains.kotlin.psi.psiUtil.ClassIdCalculator
 import org.jetbrains.kotlin.psi.psiUtil.isKtFile
 import org.jetbrains.kotlin.psi.stubs.KotlinTypeAliasStub
 
+
+
 /**
  * Represents a type alias declaration.
  *
@@ -48,5 +50,5 @@ class KtTypeAlias : KtTypeParameterListOwnerStub<KotlinTypeAliasStub>, KtNamedDe
         return ClassIdCalculator.calculateClassId(this)
     }
 
-    override fun getPresentation() = ItemPresentationProviders.getItemPresentation(this)
+    override val presentation get() = ItemPresentationProviders.getItemPresentation(this)
 }

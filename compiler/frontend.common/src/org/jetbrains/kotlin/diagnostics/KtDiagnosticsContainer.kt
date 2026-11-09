@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.diagnostics
 
 import org.jetbrains.kotlin.diagnostics.rendering.BaseDiagnosticRendererFactory
 
+
+
 abstract class KtDiagnosticsContainer {
     /**
      * !!!! Don't convert this function to property, as it might lead to cyclic initialization problems !!!!

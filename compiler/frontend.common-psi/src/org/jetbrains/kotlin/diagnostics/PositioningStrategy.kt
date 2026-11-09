@@ -14,6 +14,8 @@ import com.intellij.psi.PsiWhiteSpace
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 
+
+
 /**
  * Overriding `isValid` can lead to a loss of diagnostics in tests.
  *
@@ -49,7 +51,7 @@ fun markSingleElement(element: PsiElement): TextRange {
 }
 
 fun markNode(node: ASTNode): List<TextRange> {
-    return markElement(node.psi)
+    return markElement(node.psi!!)
 }
 
 fun markRange(range: TextRange): List<TextRange> {
@@ -92,4 +94,3 @@ fun hasSyntaxErrors(psiElement: PsiElement): Boolean {
     val children = psiElement.children
     return children.isNotEmpty() && hasSyntaxErrors(children.last())
 }
-

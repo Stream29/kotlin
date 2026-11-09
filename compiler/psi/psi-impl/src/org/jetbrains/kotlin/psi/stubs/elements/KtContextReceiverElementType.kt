@@ -13,10 +13,12 @@ import org.jetbrains.kotlin.psi.KtContextReceiver
 import org.jetbrains.kotlin.psi.stubs.KotlinContextReceiverStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinContextReceiverStubImpl
 
+
+
 class KtContextReceiverElementType(debugName: String) : KtStubElementType<KotlinContextReceiverStubImpl, KtContextReceiver>(
     debugName,
-    KtContextReceiver::class.java,
-    KotlinContextReceiverStub::class.java,
+    KtContextReceiver::class,
+    KotlinContextReceiverStub::class,
 ) {
     override fun createStub(
         element: KtContextReceiver,

@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.diagnostics.impl
 
+
 import org.jetbrains.kotlin.AbstractKtSourceElement
 import org.jetbrains.kotlin.KtSourceFile
 import org.jetbrains.kotlin.diagnostics.DiagnosticContext
@@ -12,6 +13,8 @@ import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.KtDiagnostic
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticWithSource
 import org.jetbrains.kotlin.diagnostics.PendingDiagnosticReporter
+
+
 
 class PendingDiagnosticsReporterImpl(private val delegate: DiagnosticReporter) : PendingDiagnosticReporter() {
     private val pendingDiagnosticsBySourceFile: MutableMap<KtSourceFile, MutableList<KtDiagnostic>> = mutableMapOf()

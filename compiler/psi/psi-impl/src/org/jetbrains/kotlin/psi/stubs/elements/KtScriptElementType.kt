@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
+import org.jetbrains.kotlin.psi.fqName
+
+
+
 import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
@@ -16,16 +20,18 @@ import org.jetbrains.kotlin.psi.KtScript
 import org.jetbrains.kotlin.psi.stubs.KotlinScriptStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinScriptStubImpl
 
+
+
 class KtScriptElementType(debugName: String) : KtStubElementType<KotlinScriptStubImpl, KtScript>(
     debugName,
-    KtScript::class.java,
-    KotlinScriptStub::class.java,
+    KtScript::class,
+    KotlinScriptStub::class,
 ) {
-    override fun createStub(psi: KtScript, parentStub: StubElement<out PsiElement>): KotlinScriptStubImpl {
+    override fun createStub(psi: KtScript, parentStub: StubElement<*>?): KotlinScriptStubImpl {
         @OptIn(KtExperimentalApi::class)
         return KotlinScriptStubImpl(
             parentStub,
-            StringRef.fromString(psi.fqName.asString()),
+            StringRef.fromString(psi.fqName.asString())!!,
             isReplSnippet = psi.isReplSnippet,
         )
     }
@@ -35,7 +41,7 @@ class KtScriptElementType(debugName: String) : KtStubElementType<KotlinScriptStu
         dataStream.writeBoolean(stub.isReplSnippet)
     }
 
-    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<PsiElement>): KotlinScriptStubImpl {
+    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): KotlinScriptStubImpl {
         val fqName = dataStream.readName()!!
         val isReplSnippet = dataStream.readBoolean()
         return KotlinScriptStubImpl(parentStub, fqName, isReplSnippet)

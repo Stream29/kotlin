@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.io.StringRef
 import org.jetbrains.kotlin.psi.KtEnumEntrySuperclassReferenceExpression
@@ -13,13 +17,15 @@ import org.jetbrains.kotlin.psi.stubs.KotlinEnumEntrySuperclassReferenceExpressi
 import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
+
+
 @OptIn(KtImplementationDetail::class)
 class KotlinEnumEntrySuperclassReferenceExpressionStubImpl(
     parent: StubElement<*>?,
     private val referencedNameRef: StringRef,
 ) : KotlinStubBaseImpl<KtEnumEntrySuperclassReferenceExpression>(parent, KtStubElementTypes.ENUM_ENTRY_SUPERCLASS_REFERENCE_EXPRESSION),
     KotlinEnumEntrySuperclassReferenceExpressionStub {
-    override val referencedName: String get() = referencedNameRef.string
+    override val referencedName: String get() = referencedNameRef.string!!
 
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinEnumEntrySuperclassReferenceExpressionStubImpl =

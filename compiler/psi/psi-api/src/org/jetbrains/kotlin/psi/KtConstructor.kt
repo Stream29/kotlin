@@ -16,6 +16,8 @@ import org.jetbrains.kotlin.psi.psiUtil.isLegacyContractPresentPsiCheck
 import org.jetbrains.kotlin.psi.stubs.KotlinConstructorStub
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementType
 
+
+
 abstract class KtConstructor<T : KtConstructor<T>> : KtDeclarationStub<KotlinConstructorStub<T>>, KtFunction {
     protected constructor(node: ASTNode) : super(node)
     protected constructor(
@@ -82,7 +84,8 @@ abstract class KtConstructor<T : KtConstructor<T>> : KtDeclarationStub<KotlinCon
 
     override fun getTypeParameters() = emptyList<KtTypeParameter>()
 
-    override fun getName(): String? = getContainingClassOrObject().name
+    override val name: String?
+    get() = getContainingClassOrObject().name
 
     override fun getNameAsSafeName() = KtPsiUtil.safeName(name)
 
@@ -90,14 +93,14 @@ abstract class KtConstructor<T : KtConstructor<T>> : KtDeclarationStub<KotlinCon
 
     override fun getNameAsName() = nameAsSafeName
 
-    override fun getNameIdentifier() = null
+    override val nameIdentifier: PsiElement? get() = null
 
-    override fun getIdentifyingElement(): PsiElement? = getConstructorKeyword()
+    override val identifyingElement: PsiElement? get() = getConstructorKeyword()
 
     @Throws(IncorrectOperationException::class)
     override fun setName(name: String): PsiElement = throw IncorrectOperationException("setName to constructor")
 
-    override fun getPresentation() = ItemPresentationProviders.getItemPresentation(this)
+    override val presentation get() = ItemPresentationProviders.getItemPresentation(this)
 
     open fun getConstructorKeyword(): PsiElement? = findChildByType(KtTokens.CONSTRUCTOR_KEYWORD)
 
@@ -113,13 +116,15 @@ abstract class KtConstructor<T : KtConstructor<T>> : KtDeclarationStub<KotlinCon
         return isLegacyContractPresentPsiCheck()
     }
 
-    override fun getTextOffset(): Int {
+    override val textOffset: Int
+    get() {
         return getConstructorKeyword()?.textOffset
             ?: valueParameterList?.textOffset
-            ?: super.getTextOffset()
+            ?: super<KtDeclarationStub>.textOffset
     }
 
-    override fun getUseScope(): SearchScope {
+    override val useScope: SearchScope
+    get() {
         return getContainingClassOrObject().useScope
     }
 }

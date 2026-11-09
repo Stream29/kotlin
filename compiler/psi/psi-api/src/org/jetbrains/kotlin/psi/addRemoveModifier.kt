@@ -7,9 +7,18 @@
 
 package org.jetbrains.kotlin.psi.addRemoveModifier
 
+
+
+
+
+
+
 import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
-import org.jetbrains.kotlin.lexer.KtTokens.*
 import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.MODIFIER_KEYWORDS_ARRAY
+
+
+
 
 @Deprecated(
     "Use setModifierList(newModifierList) instead",

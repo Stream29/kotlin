@@ -3,9 +3,13 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-@file:OptIn(SuspiciousFakeSourceCheck::class)
+@file:OptIn(SuspiciousFakeSourceCheck::class, kotlin.concurrent.atomics.ExperimentalAtomicApi::class)
 
 package org.jetbrains.kotlin
+
+
+
+
 
 import com.intellij.lang.LighterASTNode
 import com.intellij.lang.TreeBackedLighterAST
@@ -19,8 +23,9 @@ import com.intellij.util.diff.FlyweightCapableTreeStructure
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.util.OperatorNameConventions
 import org.jetbrains.kotlin.utils.getElementTextWithContext
-import java.util.Objects
-import java.util.concurrent.atomic.AtomicReferenceFieldUpdater
+import kotlin.concurrent.atomics.AtomicReference
+
+
 
 /**
  * The kind of a [KtSourceElement], used to distinguish different source elements backed by the same real source.
@@ -54,7 +59,7 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
      * For example, [EnumGeneratedDeclaration.ValuesFunction.ReturnType] has the full name
      * `EnumGeneratedDeclaration.ValuesFunction.ReturnType`.
      */
-    private val fullName: String = javaClass.name.substringAfter('$').replace('$', '.')
+    private val fullName: String = this::class.qualifiedName!!.substringAfter("KtFakeSourceElementKind.").replace('$', '.')
 
     override fun toString(): String = fullName
 
@@ -491,7 +496,7 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
                 this::class == other::class &&
                 generatedElementKind == other.generatedElementKind
 
-        override fun hashCode(): Int = Objects.hash(this::class, generatedElementKind)
+        override fun hashCode(): Int = 31 * (31 + this::class.hashCode()) + generatedElementKind.hashCode()
 
         override fun toString(): String = "${super.toString()}($generatedElementKind)"
     }
@@ -653,7 +658,7 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
      */
     class LambdaContextParameter(private val index: Int) : KtFakeSourceElementKind() {
         override fun equals(other: Any?): Boolean = this === other || other is LambdaContextParameter && index == other.index
-        override fun hashCode(): Int = Objects.hash(this::class, index.hashCode())
+        override fun hashCode(): Int = 31 * (31 + this::class.hashCode()) + index.hashCode()
         override fun toString(): String = "${super.toString()}($index)"
     }
 
@@ -805,7 +810,7 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
             override fun equals(other: Any?): Boolean =
                 this === other || other is BaseClassConstructorParameter && index == other.index
 
-            override fun hashCode(): Int = Objects.hash(this::class, index)
+            override fun hashCode(): Int = 31 * (31 + this::class.hashCode()) + index.hashCode()
 
             override fun toString(): String = "${super.toString()}($index)"
         }
@@ -817,7 +822,7 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
             override fun equals(other: Any?): Boolean =
                 this === other || other is ImplicitReceiver && index == other.index
 
-            override fun hashCode(): Int = Objects.hash(this::class, index)
+            override fun hashCode(): Int = 31 * (31 + this::class.hashCode()) + index.hashCode()
 
             override fun toString(): String = "${super.toString()}($index)"
         }
@@ -829,7 +834,7 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
             override fun equals(other: Any?): Boolean =
                 this === other || other is ProvidedProperty && index == other.index
 
-            override fun hashCode(): Int = Objects.hash(this::class, index)
+            override fun hashCode(): Int = 31 * (31 + this::class.hashCode()) + index.hashCode()
 
             override fun toString(): String = "${super.toString()}($index)"
         }
@@ -910,7 +915,7 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
             override fun equals(other: Any?): Boolean =
                 this === other || other is Custom && marker == other.marker
 
-            override fun hashCode(): Int = Objects.hash(this::class, marker)
+            override fun hashCode(): Int = 31 * (31 + this::class.hashCode()) + marker.hashCode()
 
             override fun toString(): String = "${super.toString()}($marker)"
         }
@@ -1050,55 +1055,35 @@ sealed class KtSourceElement : AbstractKtSourceElement() {
 // NB: in certain situations, psi.node could be null (see e.g. KT-44152)
 // Potentially exceptions can be provoked by elementType / lighterASTNode
 sealed class KtPsiSourceElement(val psi: PsiElement) : KtSourceElement() {
-    companion object {
-        @JvmStatic
-        private val lighterASTNodeUpdater = AtomicReferenceFieldUpdater.newUpdater(
-            KtPsiSourceElement::class.java,
-            LighterASTNode::class.java,
-            "_lighterASTNode"
-        )
-
-        @JvmStatic
-        private val treeStructureNodeUpdater = AtomicReferenceFieldUpdater.newUpdater(
-            KtPsiSourceElement::class.java,
-            FlyweightCapableTreeStructure::class.java,
-            "_treeStructure"
-        )
-    }
-
     override val elementType: IElementType?
         get() = psi.node?.elementType
 
     override val startOffset: Int
-        get() = psi.textRange.startOffset
+        get() = psi.textRange!!.startOffset
 
     override val endOffset: Int
-        get() = psi.textRange.endOffset
+        get() = psi.textRange!!.endOffset
 
-    @Volatile
-    private var _lighterASTNode: LighterASTNode? = null
+    private val _lighterASTNode = AtomicReference<LighterASTNode?>(null)
     final override val lighterASTNode: LighterASTNode
         get() {
-            _lighterASTNode?.let { return it }
-            lighterASTNodeUpdater.compareAndSet(
-                /* obj = */ this,
+            _lighterASTNode.load()?.let { return it }
+            _lighterASTNode.compareAndSet(
                 /* expect = */ null,
-                /* update = */ TreeBackedLighterAST.wrap(psi.node)
+                /* update = */ TreeBackedLighterAST.wrap(psi.node!!)
             )
-            return _lighterASTNode!!
+            return _lighterASTNode.load()!!
         }
 
-    @Volatile
-    private var _treeStructure: FlyweightCapableTreeStructure<LighterASTNode>? = null
+    private val _treeStructure = AtomicReference<FlyweightCapableTreeStructure<LighterASTNode>?>(null)
     final override val treeStructure: FlyweightCapableTreeStructure<LighterASTNode>
         get() {
-            _treeStructure?.let { return it }
-            treeStructureNodeUpdater.compareAndSet(
-                /* obj = */ this,
+            _treeStructure.load()?.let { return it }
+            _treeStructure.compareAndSet(
                 /* expect = */ null,
-                /* update = */ WrappedTreeStructure(psi.containingFile)
+                /* update = */ WrappedTreeStructure(psi.containingFile!!)
             )
-            return _treeStructure!!
+            return _treeStructure.load()!!
         }
 
     override fun getElementTextInContextForDebug(): String {
@@ -1106,19 +1091,19 @@ sealed class KtPsiSourceElement(val psi: PsiElement) : KtSourceElement() {
     }
 
     internal class WrappedTreeStructure(file: PsiFile) : FlyweightCapableTreeStructure<LighterASTNode> {
-        private val lighterAST = TreeBackedLighterAST(file.node)
+        private val lighterAST = TreeBackedLighterAST(file.node!!)
 
         fun unwrap(node: LighterASTNode) = lighterAST.unwrap(node)
 
         override fun toString(node: LighterASTNode): CharSequence = unwrap(node).text
 
-        override fun getRoot(): LighterASTNode = lighterAST.root
+        override val root: LighterASTNode get() = lighterAST.root
 
         override fun getParent(node: LighterASTNode): LighterASTNode? =
-            unwrap(node).psi.parent?.node?.let { TreeBackedLighterAST.wrap(it) }
+            unwrap(node).psi!!.parent?.node?.let { TreeBackedLighterAST.wrap(it) }
 
-        override fun getChildren(node: LighterASTNode, nodesRef: Ref<Array<LighterASTNode>>): Int {
-            val psi = unwrap(node).psi
+        override fun getChildren(node: LighterASTNode, nodesRef: Ref<Array<LighterASTNode?>>): Int {
+            val psi = unwrap(node).psi!!
             val children = mutableListOf<PsiElement>()
             var child = psi.firstChild
             while (child != null) {
@@ -1126,18 +1111,18 @@ sealed class KtPsiSourceElement(val psi: PsiElement) : KtSourceElement() {
                 child = child.nextSibling
             }
             if (children.isEmpty()) {
-                nodesRef.set(LighterASTNode.EMPTY_ARRAY)
+                nodesRef.set(emptyArray())
             } else {
-                nodesRef.set(children.map { TreeBackedLighterAST.wrap(it.node) }.toTypedArray())
+                nodesRef.set(Array<LighterASTNode?>(children.size) { TreeBackedLighterAST.wrap(children[it].node!!) })
             }
             return children.size
         }
 
-        override fun disposeChildren(p0: Array<out LighterASTNode>?, p1: Int) {
+        override fun disposeChildren(p0: Array<LighterASTNode?>?, p1: Int) {
         }
 
         override fun getStartOffset(node: LighterASTNode): Int {
-            return getStartOffset(unwrap(node).psi)
+            return getStartOffset(unwrap(node).psi!!)
         }
 
         private fun getStartOffset(element: PsiElement): Int {
@@ -1150,11 +1135,11 @@ sealed class KtPsiSourceElement(val psi: PsiElement) : KtSourceElement() {
                     return getStartOffset(child)
                 }
             }
-            return element.textRange.startOffset
+            return element.textRange!!.startOffset
         }
 
         override fun getEndOffset(node: LighterASTNode): Int {
-            return getEndOffset(unwrap(node).psi)
+            return getEndOffset(unwrap(node).psi!!)
         }
 
         private fun getEndOffset(element: PsiElement): Int {
@@ -1167,13 +1152,13 @@ sealed class KtPsiSourceElement(val psi: PsiElement) : KtSourceElement() {
                     return getEndOffset(child)
                 }
             }
-            return element.textRange.endOffset
+            return element.textRange!!.endOffset
         }
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other == null || this::class != other::class) return false
 
         other as KtPsiSourceElement
 
@@ -1217,7 +1202,7 @@ open class KtFakePsiSourceElement(
 ) : KtPsiSourceElement(psi) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other == null || this::class != other::class) return false
         if (!super.equals(other)) return false
 
         other as KtFakePsiSourceElement
@@ -1363,7 +1348,7 @@ class KtLightSourceElement(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other == null || this::class != other::class) return false
 
         other as KtLightSourceElement
 

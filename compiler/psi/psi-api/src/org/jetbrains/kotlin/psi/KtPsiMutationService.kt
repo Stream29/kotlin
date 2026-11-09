@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.kdoc.psi.impl.KDocSection
 import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
 import org.jetbrains.kotlin.name.FqName
 
+
+
 /**
  * Service responsible for Kotlin PSI mutation operations whose implementation is provided by the Kotlin plugin environment.
  */
@@ -359,9 +361,9 @@ interface KtPsiMutationService {
         /**
          * Returns the registered Kotlin PSI mutation service.
          */
-        @JvmStatic
+
         fun getInstance(): KtPsiMutationService =
-            ApplicationManager.getApplication().getService(KtPsiMutationService::class.java)
+            ApplicationManager.getApplication().getService(KtPsiMutationService::class)
                 ?: throw IllegalStateException("Cannot mutate Kotlin PSI because KtPsiMutationService is missing")
     }
 }

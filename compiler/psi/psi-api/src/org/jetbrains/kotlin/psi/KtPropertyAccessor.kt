@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.psiUtil.isLegacyContractPresentPsiCheck
 import org.jetbrains.kotlin.psi.stubs.KotlinPropertyAccessorStub
 
+
+
 /**
  * Represents a property getter or setter accessor.
  *
@@ -65,7 +67,7 @@ open class KtPropertyAccessor : KtDeclarationStub<KotlinPropertyAccessorStub>, K
             if (!it.hasBody) return null
         }
 
-        return findChildByClass(KtExpression::class.java)
+        return findChildByClass(KtExpression::class)
     }
 
     override fun getBodyBlockExpression(): KtBlockExpression? {
@@ -73,7 +75,7 @@ open class KtPropertyAccessor : KtDeclarationStub<KotlinPropertyAccessorStub>, K
             if (!(it.hasNoExpressionBody && it.hasBody)) return null
         }
 
-        return findChildByClass(KtExpression::class.java) as? KtBlockExpression
+        return findChildByClass(KtExpression::class) as? KtBlockExpression
     }
 
     override fun hasBlockBody(): Boolean {
@@ -107,7 +109,7 @@ open class KtPropertyAccessor : KtDeclarationStub<KotlinPropertyAccessorStub>, K
         get() = findChildByType(KtTokens.GET_KEYWORD) ?: findChildByType(KtTokens.SET_KEYWORD)!!
 
     override fun getInitializer(): KtExpression? =
-        PsiTreeUtil.getNextSiblingOfType(equalsToken, KtExpression::class.java)
+        PsiTreeUtil.getNextSiblingOfType(equalsToken, KtExpression::class)
 
     override fun hasInitializer(): Boolean =
         initializer != null
@@ -115,8 +117,9 @@ open class KtPropertyAccessor : KtDeclarationStub<KotlinPropertyAccessorStub>, K
     open val property: KtProperty
         get() = parent as KtProperty
 
-    override fun getTextOffset(): Int =
-        namePlaceholder.textRange.startOffset
+    override val textOffset: Int
+    get() =
+        namePlaceholder.textRange!!.startOffset
 
     @OptIn(KtImplementationDetail::class)
     override fun mayHaveContract(): Boolean {

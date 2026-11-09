@@ -11,6 +11,8 @@ import org.jetbrains.kotlin.KtStubBasedElementTypes
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.stubs.KotlinBackingFieldStub
 
+
+
 /**
  * Represents an explicit backing field declaration for a property.
  *
@@ -40,7 +42,7 @@ open class KtBackingField : KtDeclarationStub<KotlinBackingFieldStub>, KtModifie
         getStubOrPsiChild(KtStubBasedElementTypes.TYPE_REFERENCE)
 
     open val namePlaceholder: PsiElement
-        get() = fieldKeyword ?: node.psi
+        get() = fieldKeyword ?: node.psi!!
 
     override fun getInitializer(): KtExpression? {
         val stub = greenStub
@@ -48,7 +50,7 @@ open class KtBackingField : KtDeclarationStub<KotlinBackingFieldStub>, KtModifie
             return null
         }
 
-        return PsiTreeUtil.getNextSiblingOfType(equalsToken, KtExpression::class.java)
+        return PsiTreeUtil.getNextSiblingOfType(equalsToken, KtExpression::class)
     }
 
     override fun hasInitializer(): Boolean {
@@ -59,8 +61,9 @@ open class KtBackingField : KtDeclarationStub<KotlinBackingFieldStub>, KtModifie
         return getInitializer() != null
     }
 
-    override fun getTextOffset(): Int =
-        namePlaceholder.textRange.startOffset
+    override val textOffset: Int
+    get() =
+        namePlaceholder.textRange!!.startOffset
 
     open val fieldKeyword: PsiElement?
         get() = findChildByType(KtTokens.FIELD_KEYWORD)

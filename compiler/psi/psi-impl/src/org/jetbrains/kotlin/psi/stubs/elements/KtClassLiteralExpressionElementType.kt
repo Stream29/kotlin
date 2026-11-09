@@ -5,6 +5,12 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -13,11 +19,13 @@ import org.jetbrains.kotlin.psi.KtClassLiteralExpression
 import org.jetbrains.kotlin.psi.stubs.KotlinClassLiteralExpressionStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinClassLiteralExpressionStubImpl
 
+
+
 class KtClassLiteralExpressionElementType(@NonNls debugName: String) :
     KtStubElementType<KotlinClassLiteralExpressionStubImpl, KtClassLiteralExpression>(
         debugName,
-        KtClassLiteralExpression::class.java,
-        KotlinClassLiteralExpressionStub::class.java,
+        KtClassLiteralExpression::class,
+        KotlinClassLiteralExpressionStub::class,
     ) {
 
     override fun createStub(psi: KtClassLiteralExpression, parentStub: StubElement<*>?): KotlinClassLiteralExpressionStubImpl {

@@ -8,6 +8,8 @@ import com.intellij.lang.ASTNode
 import org.jetbrains.kotlin.KtStubBasedElementTypes
 import org.jetbrains.kotlin.psi.stubs.KotlinPlaceHolderStub
 
+
+
 /**
  * Represents a function call expression, including the callee and arguments.
  *
@@ -34,7 +36,7 @@ open class KtCallExpression : KtExpressionImplStub<KotlinPlaceHolderStub<KtCallE
 
     override fun getCalleeExpression(): KtExpression? {
         @Suppress("DEPRECATION") // KT-78356
-        return getStubOrPsiChild(KtStubBasedElementTypes.REFERENCE_EXPRESSION) ?: findChildByClass(KtExpression::class.java)
+        return getStubOrPsiChild(KtStubBasedElementTypes.REFERENCE_EXPRESSION) ?: findChildByClass(KtExpression::class)
     }
 
     override fun getValueArgumentList(): KtValueArgumentList? {

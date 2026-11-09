@@ -5,6 +5,33 @@
 
 package org.jetbrains.kotlin.diagnostics
 
+import org.jetbrains.kotlin.psi.annotations
+import org.jetbrains.kotlin.psi.defaultValue
+import org.jetbrains.kotlin.psi.elseKeyword
+import org.jetbrains.kotlin.psi.getter
+import org.jetbrains.kotlin.psi.ifKeyword
+import org.jetbrains.kotlin.psi.modifierList
+import org.jetbrains.kotlin.psi.operationReference
+import org.jetbrains.kotlin.psi.primaryConstructor
+import org.jetbrains.kotlin.psi.receiverTypeReference
+import org.jetbrains.kotlin.psi.referenceExpression
+import org.jetbrains.kotlin.psi.returnKeyword
+import org.jetbrains.kotlin.psi.rightParenthesis
+import org.jetbrains.kotlin.psi.setter
+import org.jetbrains.kotlin.psi.typeReference
+import org.jetbrains.kotlin.psi.valOrVarKeyword
+import org.jetbrains.kotlin.psi.valueParameterList
+import org.jetbrains.kotlin.psi.valueParameters
+import org.jetbrains.kotlin.psi.whenKeyword
+
+
+
+
+
+
+
+
+
 import com.intellij.lang.LighterASTNode
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.TextRange
@@ -15,11 +42,73 @@ import org.jetbrains.kotlin.ElementTypeUtils.isExpression
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.lexer.KtTokens
-import org.jetbrains.kotlin.lexer.KtTokens.*
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.ABSTRACT_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.ACTUAL_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.ALL_ASSIGNMENTS
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.AUGMENTED_ASSIGNMENTS
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.BY_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.CLASS_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.COLON
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.COLONCOLON
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.COMMA
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.COMPANION_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.CONSTRUCTOR_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.CONST_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.CONTEXT_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.CROSSINLINE_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.DATA_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.DOT
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.ELSE_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.ENUM_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.EQ
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.EXPECT_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.EXTERNAL_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.FIELD_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.FUN_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.GET_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.IDENTIFIER
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.IF_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.INFIX_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.INIT_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.INLINE_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.INNER_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.IN_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.LATEINIT_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.LPAR
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.MODALITY_MODIFIERS
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.MUL
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.NOINLINE_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.OBJECT_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.OPEN_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.OPERATOR_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.OUT_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.OVERRIDE_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.PRIVATE_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.QUALIFIED_ACCESS
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.QUEST
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.RBRACE
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.REIFIED_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.RETURN_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.RPAR
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.SAFE_ACCESS
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.SEALED_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.SET_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.SUSPEND_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.TAILREC_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.VALUE_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.VAL_VAR
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.VARARG_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.VAR_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.VISIBILITY_MODIFIERS
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.WHEN_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.WHITE_SPACE
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.WHITE_SPACE_OR_COMMENT_BIT_SET
 import org.jetbrains.kotlin.psi.stubs.elements.KtTokenSets
 import org.jetbrains.kotlin.resolve.source.getAssignmentLhsIfUnwrappable
 import org.jetbrains.kotlin.util.getChildren
 import org.jetbrains.kotlin.utils.addToStdlib.runUnless
+
+
 
 object LightTreePositioningStrategies {
     val DEFAULT = object : LightTreePositioningStrategy() {
@@ -1090,7 +1179,7 @@ object LightTreePositioningStrategies {
             while (child != null) {
                 child = getNullableChild(tree, child, ref)
                 prevQuest = quest
-                quest = ref.get().elementAtOrNull(1)
+                quest = ref.get()!!.elementAtOrNull(1)
                 if (lastQuest == null) {
                     lastQuest = quest
                 }
@@ -1104,7 +1193,7 @@ object LightTreePositioningStrategies {
             ref: Ref<Array<LighterASTNode?>>
         ): LighterASTNode? {
             tree.getChildren(node, ref)
-            val firstChild = ref.get().firstOrNull() ?: return null
+            val firstChild = ref.get()!!.firstOrNull() ?: return null
             return if (firstChild.tokenType != KtNodeTypes.NULLABLE_TYPE) null else firstChild
         }
     }
@@ -1293,7 +1382,7 @@ object LightTreePositioningStrategies {
             return buildList {
                 val childrenRef = Ref<Array<LighterASTNode?>>()
                 tree.getChildren(node, childrenRef)
-                for (child in childrenRef.get()) {
+                for (child in childrenRef.get()!!) {
                     if (child != null && child.tokenType == COMMA) {
                         add(markSingleElement(child, child, startOffset, endOffset, tree, node))
                     }
@@ -1764,7 +1853,7 @@ fun FlyweightCapableTreeStructure<LighterASTNode>.findLastDescendant(
     val nodes = childrenRef.get()
     return nodes?.lastOrNull { it != null && predicate(it) }
         ?: run {
-            for (child in nodes.reversed()) {
+            for (child in nodes!!.reversed()) {
                 val result = child?.let { findLastDescendant(it, predicate) }
                 if (result != null) {
                     return result
@@ -1850,7 +1939,7 @@ fun FlyweightCapableTreeStructure<LighterASTNode>.getAncestors(node: LighterASTN
     generateSequence(getParent(node)) { getParent(it) }
 
 private fun FlyweightCapableTreeStructure<LighterASTNode>.firstChild(node: LighterASTNode): LighterASTNode? {
-    val childrenRef = Ref<Array<LighterASTNode>>()
+    val childrenRef = Ref<Array<LighterASTNode?>>()
     getChildren(node, childrenRef)
     return childrenRef.get()?.firstOrNull()
 }
@@ -1858,7 +1947,7 @@ private fun FlyweightCapableTreeStructure<LighterASTNode>.firstChild(node: Light
 private fun FlyweightCapableTreeStructure<LighterASTNode>.lastChild(node: LighterASTNode): LighterASTNode? {
     val childrenRef = Ref<Array<LighterASTNode?>>()
     getChildren(node, childrenRef)
-    return childrenRef.get().lastOrNull { it != null }
+    return childrenRef.get()!!.lastOrNull { it != null }
 }
 
 private fun LighterASTNode.getParentIfTypeIs(

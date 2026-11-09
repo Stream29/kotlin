@@ -4,6 +4,18 @@
  */
 package org.jetbrains.kotlin.psi.stubs.elements
 
+import org.jetbrains.kotlin.psi.classId
+import org.jetbrains.kotlin.psi.entries
+import org.jetbrains.kotlin.psi.fqName
+import org.jetbrains.kotlin.psi.isInterface
+import org.jetbrains.kotlin.psi.isLocal
+import org.jetbrains.kotlin.psi.isTopLevel
+
+
+
+
+
+
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
@@ -22,24 +34,27 @@ import org.jetbrains.kotlin.psi.stubs.StubUtils.serializeKdocText
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinClassStubImpl
 import org.jetbrains.kotlin.psi.stubs.impl.Utils
 
+
+
 internal object KtClassElementType : KtStubElementType<KotlinClassStubImpl, KtClass>(
     /* debugName = */ "CLASS",
-    /* psiClass = */ KtClass::class.java,
-    /* stubClass = */ KotlinClassStub::class.java,
+    /* psiClass = */ KtClass::class,
+    /* stubClass = */ KotlinClassStub::class,
 ) {
     /**
      * All classes should have stubs since we want to index even local ones
      */
-    override fun shouldCreateStub(node: ASTNode?): Boolean = true
+    override fun shouldCreateStub(node: ASTNode): Boolean = true
 
-    override fun createStub(psi: KtClass, parentStub: StubElement<*>): KotlinClassStubImpl {
+    override fun createStub(psi: KtClass, parentStub: StubElement<*>?): KotlinClassStubImpl {
+        val parentStub = parentStub!!
         val fqName = psi.safeFqNameForLazyResolve()?.asString()
         val classId = createClassId(parentStub, psi)
-        val name = psi.getName()
+        val name = psi.name
         val superNames = psi.getSuperNames()
-        val isInterface = psi.isInterface()
-        val isLocal = psi.isLocal()
-        val isTopLevel = psi.isTopLevel()
+        val isInterface = psi.isInterface
+        val isLocal = psi.isLocal
+        val isTopLevel = psi.isTopLevel
         return KotlinClassStubImpl(
             parent = parentStub,
             qualifiedName = StringRef.fromString(fqName),
@@ -56,7 +71,7 @@ internal object KtClassElementType : KtStubElementType<KotlinClassStubImpl, KtCl
     }
 
     override fun serialize(stub: KotlinClassStubImpl, dataStream: StubOutputStream) {
-        dataStream.writeName(stub.getName())
+        dataStream.writeName(stub.name)
         dataStream.writeName(stub.fqName?.asString())
 
         serializeClassId(dataStream, stub.classId)
@@ -90,9 +105,10 @@ internal object KtClassElementType : KtStubElementType<KotlinClassStubImpl, KtCl
         val kdocText = dataStream.deserializeKdocText()
 
         val superCount = dataStream.readVarInt()
-        val superNames = StringRef.createArray(superCount)
+        @Suppress("UNCHECKED_CAST")
+        val superNames = StringRef.createArray(superCount) as Array<StringRef>
         for (i in 0..<superCount) {
-            superNames[i] = dataStream.readName()
+            superNames[i] = dataStream.readName()!!
         }
 
         val representationOrdinal = dataStream.readVarInt()

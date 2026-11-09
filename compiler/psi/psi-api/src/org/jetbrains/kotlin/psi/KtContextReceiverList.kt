@@ -8,6 +8,8 @@ package org.jetbrains.kotlin.psi
 import com.intellij.lang.ASTNode
 import org.jetbrains.kotlin.psi.stubs.KotlinPlaceHolderStub
 
+
+
 /**
  * Represents a list of context receivers declared on a function, property, or class.
  *

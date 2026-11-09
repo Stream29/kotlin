@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.psi
 
+
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.KtStubBasedElementTypes
@@ -12,6 +13,8 @@ import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.stubs.KotlinPlaceHolderStub
 import org.jetbrains.kotlin.psi.stubs.elements.KtTokenSets
 import org.jetbrains.kotlin.resolution.KtResolvable
+
+
 
 /**
  * Represents a type reference.

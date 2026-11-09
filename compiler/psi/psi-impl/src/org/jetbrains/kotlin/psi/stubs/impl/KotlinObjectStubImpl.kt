@@ -5,6 +5,14 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+import org.jetbrains.kotlin.psi.classId
+import org.jetbrains.kotlin.psi.fqName
+import org.jetbrains.kotlin.psi.isLocal
+import org.jetbrains.kotlin.psi.isObjectLiteral
+import org.jetbrains.kotlin.psi.isTopLevel
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.io.StringRef
 import org.jetbrains.kotlin.name.ClassId
@@ -15,10 +23,12 @@ import org.jetbrains.kotlin.psi.stubs.KotlinObjectStub
 import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
+
+
 @OptIn(KtImplementationDetail::class)
 class KotlinObjectStubImpl(
     parent: StubElement<*>?,
-    private val name: StringRef?,
+    name: StringRef?,
     override val fqName: FqName?,
     override val classId: ClassId?,
     private val superNameRefs: Array<StringRef>,
@@ -27,14 +37,16 @@ class KotlinObjectStubImpl(
     override val isObjectLiteral: Boolean,
     override val kdocText: String?
 ) : KotlinStubBaseImpl<KtObjectDeclaration>(parent, KtStubElementTypes.OBJECT_DECLARATION), KotlinObjectStub {
-    override fun getName(): String? = name?.string
+    private val nameRef = name
+    override val name: String?
+    get() = nameRef?.string
     override val superNames: List<String>
-        get() = superNameRefs.map(StringRef::getString)
+        get() = superNameRefs.map { it.string!! }
 
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinObjectStubImpl = KotlinObjectStubImpl(
         parent = newParent,
-        name = name,
+        name = nameRef,
         fqName = fqName,
         classId = classId,
         superNameRefs = superNameRefs,
@@ -47,7 +59,7 @@ class KotlinObjectStubImpl(
     @KtImplementationDetail
     override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
         other is KotlinObjectStubImpl &&
-                other.name == name &&
+                other.nameRef == nameRef &&
                 other.fqName == fqName &&
                 other.classId == classId &&
                 other.isTopLevel == isTopLevel &&

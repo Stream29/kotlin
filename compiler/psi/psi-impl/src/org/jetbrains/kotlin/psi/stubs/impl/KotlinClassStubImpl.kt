@@ -5,6 +5,16 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+import org.jetbrains.kotlin.psi.classId
+import org.jetbrains.kotlin.psi.isInterface
+import org.jetbrains.kotlin.psi.isLocal
+import org.jetbrains.kotlin.psi.isTopLevel
+import org.jetbrains.kotlin.psi.qualifiedName
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.io.StringRef
 import org.jetbrains.kotlin.name.ClassId
@@ -16,12 +26,14 @@ import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KotlinValueClassRepresentation
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
+
+
 @OptIn(KtImplementationDetail::class)
 class KotlinClassStubImpl(
     parent: StubElement<*>?,
     private val qualifiedName: StringRef?,
     override val classId: ClassId?,
-    private val name: StringRef?,
+    name: StringRef?,
     private val superNameRefs: Array<StringRef>,
     override val isInterface: Boolean,
     override val isClsStubCompiledToJvmDefaultImplementation: Boolean,
@@ -33,20 +45,22 @@ class KotlinClassStubImpl(
     parent = parent,
     elementType = KtStubElementTypes.CLASS,
 ), KotlinClassStub {
+    private val nameRef = name
     override val fqName: FqName?
         get() = qualifiedName?.string?.let(::FqName)
 
-    override fun getName(): String? = StringRef.toString(name)
+    override val name: String?
+    get() = StringRef.toString(nameRef)
 
     override val superNames: List<String>
-        get() = superNameRefs.map(StringRef::toString)
+        get() = superNameRefs.map { it.toString() }
 
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinClassStubImpl = KotlinClassStubImpl(
         parent = newParent,
         qualifiedName = qualifiedName,
         classId = classId,
-        name = name,
+        name = nameRef,
         superNameRefs = superNameRefs,
         isInterface = isInterface,
         isClsStubCompiledToJvmDefaultImplementation = isClsStubCompiledToJvmDefaultImplementation,
@@ -59,7 +73,7 @@ class KotlinClassStubImpl(
     @KtImplementationDetail
     override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
         other is KotlinClassStubImpl &&
-                other.name == name &&
+                other.nameRef == nameRef &&
                 other.classId == classId &&
                 other.isClsStubCompiledToJvmDefaultImplementation == isClsStubCompiledToJvmDefaultImplementation &&
                 other.isLocal == isLocal &&

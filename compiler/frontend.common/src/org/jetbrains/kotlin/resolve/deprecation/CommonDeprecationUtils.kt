@@ -11,6 +11,8 @@ import org.jetbrains.kotlin.config.MavenComparableVersion
 import org.jetbrains.kotlin.metadata.ProtoBuf
 import org.jetbrains.kotlin.metadata.deserialization.VersionRequirement
 
+
+
 fun VersionRequirement.isFulfilled(languageVersionSettings: LanguageVersionSettings): Boolean {
     val requiredVersion = createVersion(version.asString())
 
@@ -23,7 +25,7 @@ fun VersionRequirement.isFulfilled(languageVersionSettings: LanguageVersionSetti
             KotlinCompilerVersion.getVersion()?.substringBefore('-')?.let(::createVersion)
     }
 
-    return currentVersion == null || currentVersion >= requiredVersion
+    return currentVersion == null || currentVersion >= requiredVersion!!
 }
 
 private fun createVersion(version: String): MavenComparableVersion? = try {

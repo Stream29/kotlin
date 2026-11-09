@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
+
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
@@ -14,11 +15,13 @@ import org.jetbrains.kotlin.psi.KtDestructuringDeclaration
 import org.jetbrains.kotlin.psi.stubs.KotlinDestructuringDeclarationStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinDestructuringDeclarationStubImpl
 
+
+
 internal object KtDestructuringDeclarationElementType :
     KtStubElementType<KotlinDestructuringDeclarationStubImpl, KtDestructuringDeclaration>(
         /* debugName = */ "DESTRUCTURING_DECLARATION",
-        /* psiClass = */ KtDestructuringDeclaration::class.java,
-        /* stubClass = */ KotlinDestructuringDeclarationStub::class.java,
+        /* psiClass = */ KtDestructuringDeclaration::class,
+        /* stubClass = */ KotlinDestructuringDeclarationStub::class,
     ) {
     override fun shouldCreateStub(node: ASTNode): Boolean {
         val parent = node.treeParent

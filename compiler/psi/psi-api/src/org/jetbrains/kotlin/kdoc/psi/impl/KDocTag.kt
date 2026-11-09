@@ -16,6 +16,12 @@
 
 package org.jetbrains.kotlin.kdoc.psi.impl
 
+
+
+
+
+
+
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiElement
@@ -23,6 +29,8 @@ import com.intellij.psi.TokenType
 import org.jetbrains.kotlin.kdoc.lexer.KDocTokens
 import org.jetbrains.kotlin.kdoc.parser.KDocElementTypes
 import org.jetbrains.kotlin.kdoc.parser.KDocKnownTag
+
+
 
 open class KDocTag(node: ASTNode) : KDocElementImpl(node) {
 
@@ -32,7 +40,8 @@ open class KDocTag(node: ASTNode) : KDocElementImpl(node) {
      * @return tag name or null if this tag represents the default section of a doc comment
      * or the code has a syntax error.
      */
-    override fun getName(): String? {
+    override val name: String?
+    get() {
         val tagName: PsiElement? = findChildByType(KDocTokens.TAG_NAME)
         if (tagName != null) {
             return tagName.text.substring(1)

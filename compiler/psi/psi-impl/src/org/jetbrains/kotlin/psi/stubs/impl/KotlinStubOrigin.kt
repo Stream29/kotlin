@@ -5,15 +5,20 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+
+
+
+
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
+
+
 
 sealed class KotlinStubOrigin {
     companion object {
         private const val FACADE_KIND = 1
         private const val MULTI_FILE_FACADE_KIND = 2
 
-        @JvmStatic
         fun serialize(origin: KotlinStubOrigin?, dataStream: StubOutputStream) {
             if (origin == null) {
                 dataStream.writeVarInt(0)
@@ -23,7 +28,6 @@ sealed class KotlinStubOrigin {
             }
         }
 
-        @JvmStatic
         fun deserialize(dataStream: StubInputStream): KotlinStubOrigin? {
             return when (dataStream.readVarInt()) {
                 FACADE_KIND -> Facade.deserializeContent(dataStream)
@@ -42,7 +46,7 @@ sealed class KotlinStubOrigin {
         val jvmClassName: String?
     ) : KotlinStubOrigin() {
         companion object {
-            @JvmStatic
+
             internal fun deserializeContent(dataStream: StubInputStream): Facade? {
                 val className = dataStream.readNameString() ?: return null
                 val jvmClassName = dataStream.readNameString()
@@ -63,7 +67,7 @@ sealed class KotlinStubOrigin {
         val facadeClassName: String // Internal name of the facade class
     ) : KotlinStubOrigin() {
         companion object {
-            @JvmStatic
+
             internal fun deserializeContent(dataStream: StubInputStream): MultiFileFacade? {
                 val classId = dataStream.readNameString() ?: return null
                 val facadeClassId = dataStream.readNameString() ?: return null

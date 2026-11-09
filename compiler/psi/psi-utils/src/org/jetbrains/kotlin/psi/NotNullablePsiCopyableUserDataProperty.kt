@@ -9,6 +9,8 @@ import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import kotlin.reflect.KProperty
 
+
+
 class NotNullablePsiCopyableUserDataProperty<in R : PsiElement, T : Any>(val key: Key<T>, val defaultValue: T) {
     operator fun getValue(thisRef: R, property: KProperty<*>) = thisRef.getCopyableUserData(key) ?: defaultValue
 

@@ -4,6 +4,12 @@
  */
 package org.jetbrains.kotlin.psi.stubs.impl
 
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import org.jetbrains.kotlin.contracts.description.KtContractDescriptionElement
 import org.jetbrains.kotlin.psi.KtImplementationDetail
@@ -11,6 +17,8 @@ import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.stubs.KotlinPropertyAccessorStub
 import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
+
+
 
 @OptIn(KtImplementationDetail::class)
 class KotlinPropertyAccessorStubImpl(

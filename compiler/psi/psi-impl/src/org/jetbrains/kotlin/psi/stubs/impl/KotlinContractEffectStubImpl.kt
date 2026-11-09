@@ -5,6 +5,18 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+import org.jetbrains.kotlin.psi.condition
+import org.jetbrains.kotlin.psi.entries
+import org.jetbrains.kotlin.psi.isNegated
+import org.jetbrains.kotlin.psi.left
+import org.jetbrains.kotlin.psi.right
+
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -16,6 +28,8 @@ import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 import org.jetbrains.kotlin.psi.stubs.elements.deserializeTypeBean
 import org.jetbrains.kotlin.psi.stubs.elements.serializeTypeBean
+
+
 
 @OptIn(KtImplementationDetail::class)
 class KotlinContractEffectStubImpl(parent: StubElement<*>?) : KotlinPlaceHolderStubImpl<KtContractEffect>(

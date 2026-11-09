@@ -16,6 +16,12 @@
 
 package org.jetbrains.kotlin.parsing
 
+
+
+
+
+
+
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.lang.LanguageParserDefinitions
@@ -43,22 +49,24 @@ import org.jetbrains.kotlin.psi.KtWhenEntry
 import org.jetbrains.kotlin.psi.psiUtil.getNonStrictParentOfType
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementType
 
+
+
 /**
  * Creates [org.jetbrains.kotlin.psi.KtCommonFile] when java psi is not available e.g. on JB Client.
  * Otherwise, normal [KotlinParserDefinition] should be used.
  */
 open class KotlinCommonParserDefinition : ParserDefinition {
-    override fun createLexer(project: Project): Lexer = KotlinLexer()
+    override fun createLexer(project: Project?): Lexer = KotlinLexer()
 
-    override fun createParser(project: Project): PsiParser = KotlinParser(project)
+    override fun createParser(project: Project?): PsiParser = KotlinParser(project)
 
-    override fun getFileNodeType(): IFileElementType = KtNodeTypes.FILE
+    override val fileNodeType: IFileElementType get() = KtNodeTypes.FILE
 
-    override fun getWhitespaceTokens(): TokenSet = KtTokens.WHITESPACES
+    override val whitespaceTokens: TokenSet get() = KtTokens.WHITESPACES
 
-    override fun getCommentTokens(): TokenSet = KtTokens.COMMENTS
+    override val commentTokens: TokenSet get() = KtTokens.COMMENTS
 
-    override fun getStringLiteralElements(): TokenSet = KtTokens.STRINGS
+    override val stringLiteralElements: TokenSet get() = KtTokens.STRINGS
 
     override fun createElement(astNode: ASTNode): PsiElement {
         val elementType = astNode.elementType
@@ -91,9 +99,9 @@ open class KotlinCommonParserDefinition : ParserDefinition {
         if (leftTokenType is KtKeywordToken && rightTokenType is KtKeywordToken) return MUST
 
         // When entry from a new line
-        val rightWhenEntry = right.psi.getNonStrictParentOfType<KtWhenEntry>()
+        val rightWhenEntry = right.psi!!.getNonStrictParentOfType<KtWhenEntry>()
         if (rightWhenEntry != null) {
-            val leftWhenEntry = left.psi.getNonStrictParentOfType<KtWhenEntry>()
+            val leftWhenEntry = left.psi!!.getNonStrictParentOfType<KtWhenEntry>()
             if (leftWhenEntry != null && leftWhenEntry != rightWhenEntry && leftTokenType != KtTokens.SEMICOLON) {
                 return MUST_LINE_BREAK
             }
@@ -115,10 +123,8 @@ open class KotlinParserDefinition : KotlinCommonParserDefinition() {
 
     companion object {
 
-        @JvmField
         val STD_SCRIPT_SUFFIX = "kts"
 
-        @JvmField
         val STD_SCRIPT_EXT = "." + STD_SCRIPT_SUFFIX
 
         val instance: KotlinParserDefinition

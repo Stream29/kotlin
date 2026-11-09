@@ -21,12 +21,48 @@ import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.psi.KtCodeFragment.Companion.IMPORT_SEPARATOR
 import org.jetbrains.kotlin.psi.psiUtil.getElementTextWithContext
 
-abstract class KtCodeFragment(
-    viewProvider: FileViewProvider,
-    imports: String?, // Should be separated by KtCodeFragment.IMPORT_SEPARATOR
-    elementType: IElementType,
-    private val context: PsiElement?
-) : KtFile(viewProvider, false), KtCodeFragmentBase {
+
+
+abstract class KtCodeFragment : KtFile, KtCodeFragmentBase {
+
+    private var originalContext: PsiElement?
+    private var fragmentViewProvider: SingleRootFileViewProvider
+    private var importDirectiveStrings: LinkedHashSet<String>
+    private var fakeContextForJavaFileDelegate: Lazy<PsiElement?>
+    private val fakeContextForJavaFile: PsiElement? get() = fakeContextForJavaFileDelegate.value
+    private var forcedResolveScopeValue: GlobalSearchScope?
+    private var thisTypeValue: PsiType?
+    private var superTypeValue: PsiType?
+    private var exceptionHandlerValue: JavaCodeFragment.ExceptionHandler?
+
+    constructor(viewProvider: FileViewProvider, imports: String?, elementType: IElementType, context: PsiElement?) :
+        super(viewProvider, false) {
+        originalContext = context
+        fragmentViewProvider = super.viewProvider as SingleRootFileViewProvider
+        importDirectiveStrings = LinkedHashSet()
+        fakeContextForJavaFileDelegate = lazy { getCopyableUserData(FAKE_CONTEXT_FOR_JAVA_FILE)?.invoke() }
+        @Suppress("LeakingThis")
+        fragmentViewProvider.forceCachedPsi(this)
+        init(TokenType.CODE_FRAGMENT, elementType)
+        if (imports != null) appendImports(imports)
+        forcedResolveScopeValue = null
+        thisTypeValue = null
+        superTypeValue = null
+        exceptionHandlerValue = null
+    }
+
+    protected fun copyKtCodeFragmentStateTo(clone: KtCodeFragment) {
+        copyKtCommonFileStateTo(clone)
+        clone.originalContext = originalContext
+        clone.fragmentViewProvider = fragmentViewProvider
+        clone.importDirectiveStrings = importDirectiveStrings
+        clone.fakeContextForJavaFileDelegate = fakeContextForJavaFileDelegate
+        clone.forcedResolveScopeValue = forcedResolveScopeValue
+        clone.thisTypeValue = thisTypeValue
+        clone.superTypeValue = superTypeValue
+        clone.exceptionHandlerValue = exceptionHandlerValue
+    }
+
     constructor(
         project: Project,
         name: String,
@@ -41,56 +77,42 @@ abstract class KtCodeFragment(
         context,
     )
 
-    private var viewProvider = super.getViewProvider() as SingleRootFileViewProvider
-    private var importDirectiveStrings = LinkedHashSet<String>()
 
-    private val fakeContextForJavaFile: PsiElement? by lazy {
-        this.getCopyableUserData(FAKE_CONTEXT_FOR_JAVA_FILE)?.invoke()
-    }
 
-    init {
-        @Suppress("LeakingThis")
-        getViewProvider().forceCachedPsi(this)
-        init(TokenType.CODE_FRAGMENT, elementType)
 
-        if (imports != null) {
-            appendImports(imports)
-        }
-    }
+
 
     final override fun init(elementType: IElementType, contentElementType: IElementType?) {
         super.init(elementType, contentElementType)
     }
 
-    private var resolveScope: GlobalSearchScope? = null
-    private var thisType: PsiType? = null
-    private var superType: PsiType? = null
-    private var exceptionHandler: JavaCodeFragment.ExceptionHandler? = null
 
     abstract fun getContentElement(): KtElement?
 
     override fun forceResolveScope(scope: GlobalSearchScope?) {
-        resolveScope = scope
+        forcedResolveScopeValue = scope
     }
 
-    override fun getForcedResolveScope() = resolveScope
+    override fun getForcedResolveScope() = forcedResolveScopeValue
 
-    override fun isPhysical() = viewProvider.isEventSystemEnabled
+    override val isPhysical: Boolean get() = fragmentViewProvider.isEventSystemEnabled
 
-    override fun isValid() = true
+    override val isValid: Boolean get() = true
 
-    override fun getContext(): PsiElement? {
+    override val context: PsiElement?
+    get() {
         if (fakeContextForJavaFile != null) return fakeContextForJavaFile
-        if (context != null && context !is KtElement) {
-            val logInfoForContextElement = (context as? PsiFile)?.virtualFile?.path ?: context.getElementTextWithContext()
+        val originalContext = this.originalContext
+        if (originalContext != null && originalContext !is KtElement) {
+            val logInfoForContextElement = (originalContext as? PsiFile)?.virtualFile?.path ?: originalContext.getElementTextWithContext()
             LOG.warn("CodeFragment with non-kotlin context should have fakeContextForJavaFile set: \noriginalContext = $logInfoForContextElement")
             return null
         }
 
-        return context
+        return originalContext
     }
 
-    override fun getResolveScope() = context?.resolveScope ?: super.getResolveScope()
+    override val resolveScope: GlobalSearchScope get() = originalContext?.resolveScope ?: super.resolveScope
 
     override fun clone(): KtCodeFragment {
         val elementClone = calcTreeElement().clone() as FileElement
@@ -98,27 +120,27 @@ abstract class KtCodeFragment(
         return (cloneImpl(elementClone) as KtCodeFragment).apply {
             myOriginalFile = this@KtCodeFragment
             importDirectiveStrings = LinkedHashSet(this@KtCodeFragment.importDirectiveStrings)
-            viewProvider = SingleRootFileViewProvider(
+            fragmentViewProvider = SingleRootFileViewProvider(
                 PsiManager.getInstance(project),
                 LightVirtualFile(name, KotlinFileType.INSTANCE, text),
                 false
             )
-            viewProvider.forceCachedPsi(this)
+            fragmentViewProvider.forceCachedPsi(this)
         }
     }
 
-    final override fun getViewProvider() = viewProvider
+    final override val viewProvider: SingleRootFileViewProvider get() = fragmentViewProvider
 
-    override fun getThisType() = thisType
+    override fun getThisType() = thisTypeValue
 
     override fun setThisType(psiType: PsiType?) {
-        thisType = psiType
+        thisTypeValue = psiType
     }
 
-    override fun getSuperType() = superType
+    override fun getSuperType() = superTypeValue
 
     override fun setSuperType(superType: PsiType?) {
-        this.superType = superType
+        this.superTypeValue = superType
     }
 
     override fun importsToString(): String {
@@ -126,7 +148,7 @@ abstract class KtCodeFragment(
     }
 
     override fun addImportsFromString(imports: String?) {
-        val notifyChanged = viewProvider.isEventSystemEnabled && project !is MockProject
+        val notifyChanged = fragmentViewProvider.isEventSystemEnabled && project !is MockProject
 
         if (imports != null && appendImports(imports)) {
             if (notifyChanged) {
@@ -178,8 +200,9 @@ abstract class KtCodeFragment(
     }
 
     fun importsAsImportList(): KtImportList? {
-        if (importDirectiveStrings.isNotEmpty() && context != null) {
-            val ktPsiFactory = KtPsiFactory.contextual(context)
+        val originalContext = this.originalContext
+        if (importDirectiveStrings.isNotEmpty() && originalContext != null) {
+            val ktPsiFactory = KtPsiFactory.contextual(originalContext)
             val fileText = importDirectiveStrings.joinToString("\n")
             return ktPsiFactory.createFile("imports_for_codeFragment.kt", fileText).importList
         }
@@ -201,17 +224,17 @@ abstract class KtCodeFragment(
     override fun getVisibilityChecker(): VisibilityChecker = VisibilityChecker.EVERYTHING_VISIBLE
 
     override fun setExceptionHandler(checker: JavaCodeFragment.ExceptionHandler?) {
-        exceptionHandler = checker
+        exceptionHandlerValue = checker
     }
 
-    override fun getExceptionHandler() = exceptionHandler
+    override fun getExceptionHandler() = exceptionHandlerValue
 
     fun getContextContainingFile(): KtFile? {
         return getOriginalContext()?.takeIf { it.isValid }?.containingKtFile
     }
 
     fun getOriginalContext(): KtElement? {
-        val contextElement = getContext() as? KtElement
+        val contextElement = originalContext as? KtElement
         val contextFile = contextElement?.containingFile as? KtFile
         if (contextFile is KtCodeFragment) {
             return contextFile.getOriginalContext()
@@ -224,7 +247,7 @@ abstract class KtCodeFragment(
 
         @KtImplementationDetail
         val IMPORT_MODIFICATION: Topic<KotlinCodeFragmentImportModificationListener> =
-            Topic(KotlinCodeFragmentImportModificationListener::class.java, Topic.BroadcastDirection.TO_CHILDREN, true)
+            Topic(KotlinCodeFragmentImportModificationListener::class, Topic.BroadcastDirection.TO_CHILDREN, true)
 
         val FAKE_CONTEXT_FOR_JAVA_FILE: Key<Function0<KtElement>> = Key.create("FAKE_CONTEXT_FOR_JAVA_FILE")
 
@@ -236,7 +259,7 @@ abstract class KtCodeFragment(
             )
         }
 
-        private val LOG = Logger.getInstance(KtCodeFragment::class.java)
+        private val LOG = Logger.getInstance(KtCodeFragment::class)
     }
 }
 

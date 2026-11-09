@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.cli.common.config
 
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
+import org.jetbrains.kotlin.cli.common.CONTENT_ROOTS
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
 interface ContentRoot
@@ -15,7 +16,6 @@ interface ContentRoot
  */
 data class KotlinSourceRoot(val path: String, val isCommon: Boolean, val hmppModuleName: String?): ContentRoot
 
-@JvmOverloads
 fun CompilerConfiguration.addKotlinSourceRoot(path: String, isCommon: Boolean = false, hmppModuleName: String? = null) {
     add(CLIConfigurationKeys.CONTENT_ROOTS, KotlinSourceRoot(path, isCommon, hmppModuleName))
 }

@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.psi
 
 import com.intellij.openapi.util.Key
 
+
+
 /**
  * Returns true if this file is a part of the common module in a multi-platform project.
  * This setting only makes sense in the compiler, not in the IDE where sources from common modules are analyzed as common

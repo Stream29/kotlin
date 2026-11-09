@@ -1,0 +1,34 @@
+/*
+ * Copyright 2010-2026 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
+ */
+
+package org.jetbrains.kotlin.psi
+
+import com.intellij.lang.ASTNode
+import org.jetbrains.kotlin.lexer.KtTokens
+import org.jetbrains.kotlin.resolution.KtResolvableCall
+
+
+
+open class KtPropertyDelegate : KtElementImpl, KtResolvableCall {
+constructor(node: ASTNode) : super(node) {
+
+
+}
+
+open fun getExpression(): KtExpression? {
+
+return findChildByClass(KtExpression ::class)
+}
+
+override fun <R,D> accept(visitor: KtVisitor<R,D>, data: D): R {
+
+return visitor.visitPropertyDelegate(this,data)
+}
+
+open fun getByKeywordNode(): ASTNode {
+
+return node.findChildByType(KtTokens.BY_KEYWORD)!!
+}
+}

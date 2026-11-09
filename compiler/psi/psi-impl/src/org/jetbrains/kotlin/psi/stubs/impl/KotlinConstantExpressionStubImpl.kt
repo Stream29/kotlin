@@ -14,6 +14,8 @@ import org.jetbrains.kotlin.psi.stubs.KotlinConstantExpressionStub
 import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.utils.toConstantExpressionElementType
 
+
+
 @OptIn(KtImplementationDetail::class)
 class KotlinConstantExpressionStubImpl(
     parent: StubElement<*>?,
@@ -23,7 +25,7 @@ class KotlinConstantExpressionStubImpl(
     parent = parent,
     elementType = kind.toConstantExpressionElementType(),
 ), KotlinConstantExpressionStub {
-    override val value: String get() = valueRef.string
+    override val value: String get() = valueRef.string!!
 
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinConstantExpressionStubImpl = KotlinConstantExpressionStubImpl(

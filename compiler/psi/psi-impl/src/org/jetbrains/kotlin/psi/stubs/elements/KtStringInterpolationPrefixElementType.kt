@@ -13,16 +13,18 @@ import org.jetbrains.kotlin.psi.KtStringInterpolationPrefix
 import org.jetbrains.kotlin.psi.stubs.KotlinStringInterpolationPrefixStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinStringInterpolationPrefixStubImpl
 
+
+
 class KtStringInterpolationPrefixElementType(debugName: String) :
     KtStubElementType<KotlinStringInterpolationPrefixStubImpl, KtStringInterpolationPrefix>(
         debugName,
-        KtStringInterpolationPrefix::class.java,
-        KotlinStringInterpolationPrefixStub::class.java,
+        KtStringInterpolationPrefix::class,
+        KotlinStringInterpolationPrefixStub::class,
     ) {
 
     override fun createStub(
         psi: KtStringInterpolationPrefix,
-        parentStub: StubElement<out PsiElement?>?,
+        parentStub: StubElement<out PsiElement>?,
     ): KotlinStringInterpolationPrefixStubImpl = KotlinStringInterpolationPrefixStubImpl(
         parent = parentStub,
         dollarSignCount = psi.interpolationPrefixElement?.textLength ?: 0,

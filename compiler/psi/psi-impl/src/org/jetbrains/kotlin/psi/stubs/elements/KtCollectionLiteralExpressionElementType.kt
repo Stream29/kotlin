@@ -5,6 +5,14 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
+import org.jetbrains.kotlin.psi.innerExpressions
+
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -13,11 +21,13 @@ import org.jetbrains.kotlin.psi.KtCollectionLiteralExpression
 import org.jetbrains.kotlin.psi.stubs.KotlinCollectionLiteralExpressionStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinCollectionLiteralExpressionStubImpl
 
+
+
 class KtCollectionLiteralExpressionElementType(@NonNls debugName: String) :
     KtStubElementType<KotlinCollectionLiteralExpressionStubImpl, KtCollectionLiteralExpression>(
         debugName,
-        KtCollectionLiteralExpression::class.java,
-        KotlinCollectionLiteralExpressionStub::class.java,
+        KtCollectionLiteralExpression::class,
+        KotlinCollectionLiteralExpressionStub::class,
     ) {
     override fun serialize(stub: KotlinCollectionLiteralExpressionStubImpl, dataStream: StubOutputStream) {
         dataStream.writeVarInt(stub.innerExpressionCount)

@@ -5,13 +5,22 @@
 
 package org.jetbrains.kotlin.psi.utils
 
-import com.google.common.collect.ImmutableBiMap
+
+import org.jetbrains.kotlin.util.NativeCollections as Collections
+import org.jetbrains.kotlin.util.NativeImmutableBiMap as ImmutableBiMap
+
+
+
+
+
+
 import org.jetbrains.kotlin.lexer.KtSingleValueToken
 import org.jetbrains.kotlin.lexer.KtToken
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.util.OperatorNameConventions
-import java.util.*
+
+
 
 object OperatorTokens {
     // If you add new unary, binary or assignment operators, add it to OperatorConventionNames as well
@@ -23,10 +32,8 @@ object OperatorTokens {
         .put(KtTokens.EXCL, OperatorNameConventions.NOT)
         .build()
 
-    @JvmField
     val UNARY_OPERATION_NAMES: Map<KtSingleValueToken, Name> = UNARY_OPERATIONS
 
-    @JvmField
     val UNARY_OPERATION_TOKENS: Map<Name, KtSingleValueToken> = UNARY_OPERATIONS.inverse()
 
     private val BINARY_OPERATIONS = ImmutableBiMap.builder<KtSingleValueToken, Name>()
@@ -39,13 +46,10 @@ object OperatorTokens {
         .put(KtTokens.RANGE_UNTIL, OperatorNameConventions.RANGE_UNTIL)
         .build()
 
-    @JvmField
     val BINARY_OPERATION_NAMES: Map<KtSingleValueToken, Name> = BINARY_OPERATIONS
 
-    @JvmField
     val BINARY_OPERATION_TOKENS: Map<Name, KtSingleValueToken> = BINARY_OPERATIONS.inverse()
 
-    @JvmField
     val INCREMENT_OPERATIONS: Set<KtSingleValueToken> = Collections.unmodifiableSet(
         setOf(
             KtTokens.PLUSPLUS,
@@ -53,7 +57,6 @@ object OperatorTokens {
         )
     )
 
-    @JvmField
     val COMPARISON_OPERATIONS: Set<KtSingleValueToken> = Collections.unmodifiableSet(
         setOf(
             KtTokens.LT,
@@ -63,7 +66,6 @@ object OperatorTokens {
         )
     )
 
-    @JvmField
     val EQUALS_OPERATIONS: Set<KtSingleValueToken> = Collections.unmodifiableSet(
         setOf(
             KtTokens.EQEQ,
@@ -71,7 +73,6 @@ object OperatorTokens {
         )
     )
 
-    @JvmField
     val IDENTITY_EQUALS_OPERATIONS: Set<KtSingleValueToken> = Collections.unmodifiableSet(
         setOf(
             KtTokens.EQEQEQ,
@@ -79,7 +80,6 @@ object OperatorTokens {
         )
     )
 
-    @JvmField
     val IN_OPERATIONS: Set<KtSingleValueToken> = Collections.unmodifiableSet(
         setOf(
             KtTokens.IN_KEYWORD,
@@ -95,10 +95,8 @@ object OperatorTokens {
         .put(KtTokens.MINUSEQ, OperatorNameConventions.MINUS_ASSIGN)
         .build()
 
-    @JvmField
     val ASSIGNMENT_OPERATION_NAMES: Map<KtSingleValueToken, Name> = ASSIGNMENT_OPERATIONS
 
-    @JvmField
     val ASSIGNMENT_OPERATION_TOKENS: Map<Name, KtSingleValueToken> = ASSIGNMENT_OPERATIONS.inverse()
 
     private val ASSIGNMENT_OPERATION_COUNTERPARTS = ImmutableBiMap.builder<KtSingleValueToken, KtSingleValueToken>()
@@ -109,13 +107,10 @@ object OperatorTokens {
         .put(KtTokens.MINUSEQ, KtTokens.MINUS)
         .build()
 
-    @JvmField
     val OPERATIONS_FOR_ASSIGNMENTS: Map<KtSingleValueToken, KtSingleValueToken> = ASSIGNMENT_OPERATION_COUNTERPARTS
 
-    @JvmField
     val ASSIGNMENTS_FOR_OPERATIONS: Map<KtSingleValueToken, KtSingleValueToken> = ASSIGNMENT_OPERATION_COUNTERPARTS.inverse()
 
-    @JvmField
     val CONVENTION_NAMES: Set<Name> = Collections.unmodifiableSet(
         buildSet {
             addAll(
@@ -141,13 +136,10 @@ object OperatorTokens {
         }
     )
 
-
-    @JvmStatic
     fun operationName(token: KtToken): Name? {
         return operationName(token, unaryOperations = true, binaryOperations = true)
     }
 
-    @JvmStatic
     fun operationName(token: KtToken, unaryOperations: Boolean, binaryOperations: Boolean): Name? {
         if (binaryOperations) {
             BINARY_OPERATION_NAMES[token]?.let { return it }
@@ -174,7 +166,6 @@ object OperatorTokens {
         return null
     }
 
-    @JvmStatic
     fun operationToken(name: Name): KtToken? {
         if (!isConventionName(name)) {
             return null
@@ -185,7 +176,6 @@ object OperatorTokens {
             ?: ASSIGNMENT_OPERATIONS.inverse()[name]
     }
 
-    @JvmStatic
     fun isConventionName(name: Name): Boolean {
         return CONVENTION_NAMES.contains(name)
                 || OperatorNameConventions.COMPONENT_REGEX.matches(name.asString())

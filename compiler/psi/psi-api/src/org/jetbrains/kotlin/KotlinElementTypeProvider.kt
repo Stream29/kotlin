@@ -5,6 +5,12 @@
 
 package org.jetbrains.kotlin
 
+
+
+
+
+
+
 import com.intellij.psi.impl.source.tree.ICodeFragmentElementType
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.IFileElementType
@@ -13,23 +19,14 @@ import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.stubs.*
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementType
 
+
+
 @KtImplementationDetail
 interface KotlinElementTypeProvider {
     @KtImplementationDetail
     companion object {
-        private const val IMPL = "org.jetbrains.kotlin.psi.impl.KotlinElementTypeProviderImpl"
-
-        @JvmStatic
         val instance: KotlinElementTypeProvider by lazy(LazyThreadSafetyMode.PUBLICATION) {
-            try {
-                // This is certainly very hacky.
-                // However, IJ services cannot be used here as the platform disallows using services from class initializers.
-                // In the future, KT-77985 might eliminate the need for this provider.
-                val implClass = Class.forName(IMPL)
-                implClass.getDeclaredField("INSTANCE").get(null) as KotlinElementTypeProvider
-            } catch (e: ClassNotFoundException) {
-                throw IllegalStateException("KotlinElementTypeProvider implementation not found: $IMPL", e)
-            }
+            org.jetbrains.kotlin.psi.impl.KotlinElementTypeProviderImpl
         }
     }
 

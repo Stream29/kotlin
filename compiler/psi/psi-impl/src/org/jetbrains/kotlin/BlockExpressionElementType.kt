@@ -12,14 +12,16 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.tree.ICompositeElementType
 import com.intellij.psi.tree.IErrorCounterReparseableElementType
 import com.intellij.psi.tree.TokenSet
-import org.jetbrains.kotlin.KtNodeTypes.BLOCK_CODE_FRAGMENT
-import org.jetbrains.kotlin.KtNodeTypes.FUNCTION_LITERAL
-import org.jetbrains.kotlin.KtNodeTypes.SCRIPT
+import org.jetbrains.kotlin.KtNodeTypes.Companion.BLOCK_CODE_FRAGMENT
+import org.jetbrains.kotlin.KtNodeTypes.Companion.FUNCTION_LITERAL
+import org.jetbrains.kotlin.KtNodeTypes.Companion.SCRIPT
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.lexer.KotlinLexer
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.parsing.KotlinParser
 import org.jetbrains.kotlin.psi.KtBlockExpression
+
+
 
 class BlockExpressionElementType : IErrorCounterReparseableElementType("BLOCK", KotlinLanguage.INSTANCE), ICompositeElementType {
 
@@ -37,12 +39,12 @@ class BlockExpressionElementType : IErrorCounterReparseableElementType("BLOCK", 
         ElementTypeUtils.getKotlinBlockImbalanceCount(seq)
 
     override fun parseContents(chameleon: ASTNode): ASTNode {
-        val project = chameleon.psi.project
+        val project = chameleon.psi!!.project
         val builder = PsiBuilderFactory.getInstance().createBuilder(
             project, chameleon, null, KotlinLanguage.INSTANCE, chameleon.chars
         )
 
-        return KotlinParser.parseBlockExpression(builder).firstChildNode
+        return KotlinParser.parseBlockExpression(builder).firstChildNode!!
     }
 
     companion object {

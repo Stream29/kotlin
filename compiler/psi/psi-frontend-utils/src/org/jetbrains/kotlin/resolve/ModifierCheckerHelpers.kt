@@ -5,12 +5,53 @@
 
 package org.jetbrains.kotlin.resolve
 
+
+import org.jetbrains.kotlin.utils.addToStdlib.EnumSet
+
+
+
+
+
+
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.annotations.KotlinTarget
 import org.jetbrains.kotlin.lexer.KtKeywordToken
-import org.jetbrains.kotlin.lexer.KtTokens.*
-import java.util.*
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.ABSTRACT_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.ACTUAL_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.ANNOTATION_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.COMPANION_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.CONST_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.CROSSINLINE_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.DATA_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.ENUM_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.EXPECT_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.EXTERNAL_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.FINAL_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.FUN_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.INFIX_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.INLINE_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.INNER_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.INTERNAL_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.IN_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.LATEINIT_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.NOINLINE_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.OBJECT_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.OPEN_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.OPERATOR_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.OUT_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.OVERRIDE_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.PRIVATE_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.PROTECTED_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.PUBLIC_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.REIFIED_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.SEALED_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.SUSPEND_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.TAILREC_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.VALUE_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.VARARG_KEYWORD
+
+
 
 enum class Compatibility {
     // modifier pair is compatible: ok (default)

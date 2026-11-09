@@ -13,6 +13,8 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.NameUtils
 import org.jetbrains.kotlin.psi.stubs.KotlinScriptStub
 
+
+
 /**
  * Represents a Kotlin script file containing top-level statements and declarations.
  * 
@@ -60,13 +62,14 @@ open class KtScript : KtNamedDeclarationStub<KotlinScriptStub>, KtDeclarationCon
             null
         }
 
-    override fun getName(): String = fqName.shortName().asString()
+    override val name: String
+    get() = fqName.shortName().asString()
 
     val blockExpression: KtBlockExpression
-        get() = findNotNullChildByClass(KtBlockExpression::class.java)
+        get() = findNotNullChildByClass(KtBlockExpression::class)
 
     override fun getDeclarations(): List<KtDeclaration> {
-        return PsiTreeUtil.getChildrenOfTypeAsList(this.blockExpression, KtDeclaration::class.java)
+        return PsiTreeUtil.getChildrenOfTypeAsList(this.blockExpression, KtDeclaration::class)
     }
 
     override fun <R, D> accept(visitor: KtVisitor<R, D>, data: D): R {

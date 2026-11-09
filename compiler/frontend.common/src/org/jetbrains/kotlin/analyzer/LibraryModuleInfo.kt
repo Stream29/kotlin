@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.analyzer
 
 import org.jetbrains.kotlin.platform.TargetPlatform
 
+
+
 interface LibraryModuleInfo : ModuleInfo {
     override val platform: TargetPlatform
 

@@ -5,6 +5,14 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
+import org.jetbrains.kotlin.psi.entries
+
+
+
+
+
+
+
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
@@ -19,11 +27,13 @@ import org.jetbrains.kotlin.psi.stubs.impl.KotlinConstantExpressionStubImpl
 import org.jetbrains.kotlin.psi.utils.toConstantExpressionElementType
 import org.jetbrains.kotlin.psi.utils.toConstantValueKind
 
+
+
 class KtConstantExpressionElementType(@NonNls debugName: String) :
     KtStubElementType<KotlinConstantExpressionStubImpl, KtConstantExpression>(
         debugName,
-        KtConstantExpression::class.java,
-        KotlinConstantExpressionStub::class.java,
+        KtConstantExpression::class,
+        KotlinConstantExpressionStub::class,
     ) {
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
@@ -43,7 +53,7 @@ class KtConstantExpressionElementType(@NonNls debugName: String) :
         return KotlinConstantExpressionStubImpl(
             parentStub,
             elementType.toConstantValueKind(),
-            StringRef.fromString(value)
+            StringRef.fromString(value)!!
         )
     }
 
@@ -54,7 +64,7 @@ class KtConstantExpressionElementType(@NonNls debugName: String) :
 
     override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): KotlinConstantExpressionStubImpl {
         val kindOrdinal = dataStream.readVarInt()
-        val value = dataStream.readName() ?: StringRef.fromString("")
+        val value = dataStream.readName() ?: StringRef.fromString("")!!
 
         val valueKind = ConstantValueKind.entries[kindOrdinal]
 

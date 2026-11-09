@@ -9,6 +9,8 @@ import com.intellij.lang.ASTNode
 import org.jetbrains.kotlin.KtStubBasedElementTypes
 import org.jetbrains.kotlin.psi.stubs.KotlinPlaceHolderStub
 
+
+
 /**
  * Represents the list of contract effects in a contract block.
  *

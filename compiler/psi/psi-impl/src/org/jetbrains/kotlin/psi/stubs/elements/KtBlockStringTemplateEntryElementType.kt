@@ -5,6 +5,12 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -15,11 +21,13 @@ import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.stubs.KotlinBlockStringTemplateEntryStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinBlockStringTemplateEntryStubImpl
 
+
+
 class KtBlockStringTemplateEntryElementType(@NonNls debugName: String) :
     KtStubElementType<KotlinBlockStringTemplateEntryStubImpl, KtBlockStringTemplateEntry>(
         debugName,
-        KtBlockStringTemplateEntry::class.java,
-        KotlinBlockStringTemplateEntryStub::class.java,
+        KtBlockStringTemplateEntry::class,
+        KotlinBlockStringTemplateEntryStub::class,
     ) {
 
     override fun createStub(

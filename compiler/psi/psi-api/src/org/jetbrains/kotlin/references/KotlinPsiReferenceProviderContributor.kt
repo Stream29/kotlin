@@ -8,6 +8,8 @@ package org.jetbrains.kotlin.references
 import com.intellij.psi.PsiReference
 import org.jetbrains.kotlin.psi.KtElement
 
+
+
 /**
  * Extension-point contributor for Kotlin PSI reference providers.
  *
@@ -36,7 +38,7 @@ interface KotlinPsiReferenceProviderContributor<T : KtElement> {
      * The base PSI class this contributor applies to. A contributor is
      * considered applicable to an element if `elementClass.isAssignableFrom(element.javaClass)`
      */
-    val elementClass: Class<out T>
+    val elementClass: kotlin.reflect.KClass<out T>
 
     /** The function that produces references for elements of [elementClass] */
     val referenceProvider: ReferenceProvider<T>

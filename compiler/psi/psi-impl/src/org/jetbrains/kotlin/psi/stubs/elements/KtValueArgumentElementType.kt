@@ -13,14 +13,16 @@ import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.stubs.KotlinValueArgumentStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinValueArgumentStubImpl
 
-class KtValueArgumentElementType<T : KtValueArgument>(debugName: String, psiClass: Class<T>) :
+
+
+class KtValueArgumentElementType<T : KtValueArgument>(debugName: String, psiClass: kotlin.reflect.KClass<T>) :
     KtStubElementType<KotlinValueArgumentStubImpl<T>, T>(
         debugName,
         psiClass,
-        KotlinValueArgumentStub::class.java,
+        KotlinValueArgumentStub::class,
     ) {
 
-    override fun createStub(psi: T, parentStub: StubElement<out PsiElement>?): KotlinValueArgumentStubImpl<T> {
+    override fun createStub(psi: T, parentStub: StubElement<*>?): KotlinValueArgumentStubImpl<T> {
         return KotlinValueArgumentStubImpl(parentStub, this, psi.isSpread)
     }
 
@@ -28,7 +30,7 @@ class KtValueArgumentElementType<T : KtValueArgument>(debugName: String, psiClas
         dataStream.writeBoolean(stub.isSpread)
     }
 
-    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<PsiElement>?): KotlinValueArgumentStubImpl<T> {
+    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): KotlinValueArgumentStubImpl<T> {
         val isSpread = dataStream.readBoolean()
         return KotlinValueArgumentStubImpl(parentStub, this, isSpread)
     }

@@ -18,7 +18,9 @@ package org.jetbrains.kotlin.psi
 
 import com.intellij.lang.ASTNode
 
+
+
 class KtContainerNodeForControlStructureBody(node: ASTNode) : KtContainerNode(node) {
     val expression: KtExpression?
-        get() = findChildByClass<KtExpression>(KtExpression::class.java)
+        get() = findChildByClass<KtExpression>(KtExpression::class)
 }

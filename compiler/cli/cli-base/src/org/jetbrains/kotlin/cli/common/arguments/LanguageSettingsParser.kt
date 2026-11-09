@@ -59,14 +59,14 @@ object LanguageSettingsParser {
     }
 }
 
+private var testOnlyLanguageFeaturesAllowedFlag: Boolean = false
+
 fun allowTestsOnlyLanguageFeatures() {
-    System.setProperty("kotlinc.test.allow.testonly.language.features", "true")
+    testOnlyLanguageFeaturesAllowedFlag = true
 }
 
-private val areTestOnlyLanguageFeaturesAllowed: Boolean by lazy {
-    // Use system property because test infra in K/N uses an "isolated" classloader
-    System.getProperty("kotlinc.test.allow.testonly.language.features")?.toBoolean() == true
-}
+private val areTestOnlyLanguageFeaturesAllowed: Boolean
+    get() = testOnlyLanguageFeaturesAllowedFlag
 
 data class ManualLanguageFeatureSetting(
     val languageFeature: LanguageFeature,

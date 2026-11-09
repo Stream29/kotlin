@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.psi
 
 import com.intellij.lang.ASTNode
 
+
+
 /**
  * Represents a guard condition in a `when` entry using the `if` keyword.
  *
@@ -20,5 +22,5 @@ import com.intellij.lang.ASTNode
  * ```
  */
 class KtWhenEntryGuard(node: ASTNode) : KtElementImpl(node) {
-    fun getExpression(): KtExpression? = findChildByClass(KtExpression::class.java)
+    fun getExpression(): KtExpression? = findChildByClass(KtExpression::class)
 }

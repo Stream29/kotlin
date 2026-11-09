@@ -10,14 +10,16 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.resolution.KtResolvable
 
+
+
 @OptIn(KtExperimentalApi::class)
 interface KtDoubleColonExpression : KtExpression, KtResolvable {
     val receiverExpression: KtExpression?
-        get() = node.firstChildNode.psi as? KtExpression
+        get() = node!!.firstChildNode!!.psi as? KtExpression
 
     val hasQuestionMarks: Boolean
         get() {
-            for (element in generateSequence(node.firstChildNode, ASTNode::getTreeNext)) {
+            for (element in generateSequence(node!!.firstChildNode, ASTNode::treeNext)) {
                 when (element.elementType) {
                     KtTokens.QUEST -> return true
                     KtTokens.COLONCOLON -> return false

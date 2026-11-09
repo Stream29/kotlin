@@ -5,8 +5,16 @@
 
 package org.jetbrains.kotlin.resolve.calls.util
 
+
+
+
+
+
+
 import com.intellij.psi.StubBasedPsiElement
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
+
+
 
 /**
  * val lambda = fun(x: Int, _: String, `_`: Double) = 1

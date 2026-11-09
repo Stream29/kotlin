@@ -5,6 +5,15 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+import org.jetbrains.kotlin.psi.fqName
+import org.jetbrains.kotlin.psi.isTopLevel
+
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.io.StringRef
 import org.jetbrains.kotlin.contracts.description.KtContractDescriptionElement
@@ -14,6 +23,8 @@ import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.stubs.KotlinFunctionStub
 import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
+
+
 
 @OptIn(KtImplementationDetail::class)
 class KotlinFunctionStubImpl(
@@ -36,7 +47,8 @@ class KotlinFunctionStubImpl(
         }
     }
 
-    override fun getName(): String? = StringRef.toString(nameRef)
+    override val name: String?
+    get() = StringRef.toString(nameRef)
 
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinFunctionStubImpl = KotlinFunctionStubImpl(

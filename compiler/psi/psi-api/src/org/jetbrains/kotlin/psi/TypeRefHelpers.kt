@@ -24,6 +24,8 @@ import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.siblings
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 
+
+
 fun getTypeReference(declaration: KtCallableDeclaration): KtTypeReference? {
     return declaration.firstChild!!.siblings(forward = true)
         .dropWhile { it.node!!.elementType != KtTokens.COLON }

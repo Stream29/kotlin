@@ -5,6 +5,12 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -13,14 +19,16 @@ import org.jetbrains.kotlin.psi.KtElementImplStub
 import org.jetbrains.kotlin.psi.stubs.KotlinPlaceHolderWithTextStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinPlaceHolderWithTextStubImpl
 
-class KtPlaceHolderWithTextStubElementType<T : KtElementImplStub<*>>(@NonNls debugName: String, psiClass: Class<T>) :
+
+
+class KtPlaceHolderWithTextStubElementType<T : KtElementImplStub<*>>(@NonNls debugName: String, psiClass: kotlin.reflect.KClass<T>) :
     KtStubElementType<KotlinPlaceHolderWithTextStubImpl<T>, T>(
         debugName,
         psiClass,
-        KotlinPlaceHolderWithTextStub::class.java,
+        KotlinPlaceHolderWithTextStub::class,
     ) {
 
-    override fun createStub(psi: T, parentStub: StubElement<*>): KotlinPlaceHolderWithTextStubImpl<T> {
+    override fun createStub(psi: T, parentStub: StubElement<*>?): KotlinPlaceHolderWithTextStubImpl<T> {
         return KotlinPlaceHolderWithTextStubImpl(parentStub, this, psi.text)
     }
 
@@ -28,7 +36,7 @@ class KtPlaceHolderWithTextStubElementType<T : KtElementImplStub<*>>(@NonNls deb
         dataStream.writeUTFFast(stub.text)
     }
 
-    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>): KotlinPlaceHolderWithTextStubImpl<T> {
+    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): KotlinPlaceHolderWithTextStubImpl<T> {
         val text = dataStream.readUTFFast()
         return KotlinPlaceHolderWithTextStubImpl(parentStub, this, text)
     }

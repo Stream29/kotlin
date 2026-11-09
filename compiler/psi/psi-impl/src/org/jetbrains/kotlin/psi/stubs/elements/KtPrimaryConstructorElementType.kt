@@ -4,6 +4,12 @@
  */
 package org.jetbrains.kotlin.psi.stubs.elements
 
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -14,18 +20,20 @@ import org.jetbrains.kotlin.psi.stubs.KotlinConstructorStub
 import org.jetbrains.kotlin.psi.stubs.StubUtils.deserializeKdocText
 import org.jetbrains.kotlin.psi.stubs.StubUtils.serializeKdocText
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinPrimaryConstructorStubImpl
-import java.io.IOException
+import com.intellij.platform.native.NativeIOException as IOException
+
+
 
 class KtPrimaryConstructorElementType(@NonNls debugName: String) :
     KtStubElementType<KotlinPrimaryConstructorStubImpl, KtPrimaryConstructor>(
         /* debugName = */ debugName,
-        /* psiClass = */ KtPrimaryConstructor::class.java,
-        /* stubClass = */ KotlinConstructorStub::class.java,
+        /* psiClass = */ KtPrimaryConstructor::class,
+        /* stubClass = */ KotlinConstructorStub::class,
     ) {
 
     override fun createStub(
         psi: KtPrimaryConstructor,
-        parentStub: StubElement<*>,
+        parentStub: StubElement<*>?,
     ): KotlinPrimaryConstructorStubImpl = KotlinPrimaryConstructorStubImpl(
         parent = parentStub,
         containingClassName = StringRef.fromString(psi.name),
@@ -39,7 +47,7 @@ class KtPrimaryConstructorElementType(@NonNls debugName: String) :
     }
 
     @Throws(IOException::class)
-    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>): KotlinPrimaryConstructorStubImpl {
+    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): KotlinPrimaryConstructorStubImpl {
         val name = dataStream.readName()
         val kdocText = dataStream.deserializeKdocText()
         return KotlinPrimaryConstructorStubImpl(

@@ -9,6 +9,8 @@ import com.intellij.lang.ASTNode
 import org.jetbrains.kotlin.KtStubBasedElementTypes
 import org.jetbrains.kotlin.psi.stubs.KotlinValueArgumentStub
 
+
+
 /**
  * Represents a trailing lambda argument passed outside of parentheses.
  *

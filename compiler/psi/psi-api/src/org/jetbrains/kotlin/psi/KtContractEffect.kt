@@ -10,6 +10,8 @@ import org.jetbrains.kotlin.KtStubBasedElementTypes
 import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
 import org.jetbrains.kotlin.psi.stubs.KotlinContractEffectStub
 
+
+
 /**
  * Represents a single effect declaration inside a contract block.
  *

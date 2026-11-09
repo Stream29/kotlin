@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.psi
 
 import com.intellij.lang.ASTNode
 
+
+
 /**
  * Represents a reference to a label in a labeled expression, such as `@main` in `return@main`.
  *

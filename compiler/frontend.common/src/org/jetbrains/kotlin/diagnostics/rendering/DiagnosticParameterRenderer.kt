@@ -16,6 +16,10 @@
 
 package org.jetbrains.kotlin.diagnostics.rendering
 
+
+
+
+
 interface DiagnosticParameterRenderer<in O> {
     fun render(obj: O, renderingContext: RenderingContext): String
 }

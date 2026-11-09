@@ -3,6 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+@file:OptIn(kotlin.native.internal.InternalForKotlinNative::class)
+
 package org.jetbrains.kotlin.psi
 
 import com.intellij.openapi.project.Project
@@ -23,8 +26,8 @@ import org.jetbrains.kotlin.psi.psiUtil.isIdentifier
 import org.jetbrains.kotlin.resolve.ImportPath
 import org.jetbrains.kotlin.utils.checkWithAttachment
 
-@JvmOverloads
-@JvmName("KtPsiFactory")
+
+
 @Suppress("unused")
 @Deprecated(
     "Use 'KtPsiFactory' constructor instead",
@@ -33,8 +36,6 @@ import org.jetbrains.kotlin.utils.checkWithAttachment
 )
 fun KtPsiFactory(project: Project?, markGenerated: Boolean = true): KtPsiFactory = KtPsiFactory(project!!, markGenerated)
 
-@JvmOverloads
-@JvmName("KtPsiFactory")
 @Suppress("unused")
 @Deprecated(
     "Use 'KtPsiFactory' constructor instead",
@@ -62,22 +63,19 @@ class KtPsiFactory private constructor(
     private val eventSystemEnabled: Boolean,
 ) {
     companion object {
-        @JvmStatic
-        @JvmOverloads
+
+
         fun contextual(context: PsiElement, markGenerated: Boolean = true, eventSystemEnabled: Boolean = false): KtPsiFactory {
             return KtPsiFactory(context.project, markGenerated, context, eventSystemEnabled)
         }
     }
 
-    @JvmOverloads
     constructor(project: Project, markGenerated: Boolean = true) :
             this(project, markGenerated, context = null, eventSystemEnabled = false)
 
     constructor(project: Project, markGenerated: Boolean = true, eventSystemEnabled: Boolean) :
             this(project, markGenerated, context = null, eventSystemEnabled = eventSystemEnabled)
 
-
-    @JvmOverloads
     @Deprecated("Use 'KtPsiFactory(project, markGenerated)' or 'KtPsiFactory.contextual(context, markGenerated)' instead")
     constructor(element: KtElement, markGenerated: Boolean = true) : this(element.project, markGenerated, context = null, eventSystemEnabled = false)
 
@@ -409,7 +407,7 @@ class KtPsiFactory private constructor(
         return createClass("$text interface x").modifierList!!
     }
 
-    fun createEmptyModifierList() = createModifierList(KtTokens.PRIVATE_KEYWORD).apply { firstChild.delete() }
+    fun createEmptyModifierList() = createModifierList(KtTokens.PRIVATE_KEYWORD).apply { firstChild!!.delete() }
 
     fun createModifier(modifier: KtModifierKeywordToken): PsiElement {
         return createModifierList(modifier.value).getModifier(modifier)!!
@@ -468,7 +466,7 @@ class KtPsiFactory private constructor(
 
     fun createWhenEntry(@NonNls entryText: String): KtWhenEntry {
         val function = createFunction("fun foo() { when(12) { $entryText } }")
-        val whenEntry = PsiTreeUtil.findChildOfType(function, KtWhenEntry::class.java)
+        val whenEntry = PsiTreeUtil.findChildOfType(function, KtWhenEntry::class)
 
         assert(whenEntry != null) { "Couldn't generate when entry" }
         assert(entryText == whenEntry!!.text) { "Generate when entry text differs from the given text" }
@@ -996,8 +994,13 @@ class KtPsiFactory private constructor(
         return BlockWrapper(block, expression)
     }
 
-    private class BlockWrapper(fakeBlockExpression: KtBlockExpression, private val expression: KtExpression) :
+    private class BlockWrapper(fakeBlockExpression: KtBlockExpression, private var expression: KtExpression) :
         KtBlockExpression(fakeBlockExpression.text), KtPsiUtil.KtExpressionWrapper {
+        protected override fun createUnlinkedClone(): BlockWrapper =
+            kotlin.native.internal.createUninitializedInstance<BlockWrapper>().also {
+                copyLazyStateTo(it)
+                it.expression = expression
+            }
 
         override fun getStatements(): List<KtExpression> {
             return listOf(expression)
@@ -1007,12 +1010,14 @@ class KtPsiFactory private constructor(
             return expression
         }
 
-        override fun getParent(): PsiElement = expression.parent
+        override val parent: PsiElement
+        get() = expression.parent!!
 
         override fun getPsiOrParent(): KtElement = expression.psiOrParent
 
         override fun getContainingKtFile() = expression.containingKtFile
 
-        override fun getContainingFile(): PsiFile = expression.containingFile
+        override val containingFile: PsiFile
+        get() = expression.containingFile!!
     }
 }

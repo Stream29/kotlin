@@ -5,10 +5,17 @@
 
 package org.jetbrains.kotlin
 
+
+
+
+
+
+
 import com.intellij.lang.LighterASTNode
 import com.intellij.psi.tree.IErrorCounterReparseableElementType
 import com.intellij.util.diff.FlyweightCapableTreeStructure
-import org.jetbrains.kotlin.KtNodeTypes.*
+import org.jetbrains.kotlin.KtNodeTypes.Companion.LAMBDA_EXPRESSION
+import org.jetbrains.kotlin.KtNodeTypes.Companion.OPERATION_REFERENCE
 import org.jetbrains.kotlin.lexer.KotlinLexer
 import org.jetbrains.kotlin.lexer.KtToken
 import org.jetbrains.kotlin.lexer.KtTokens
@@ -19,8 +26,10 @@ import org.jetbrains.kotlin.psi.stubs.elements.KtStringTemplateExpressionElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementType
 import org.jetbrains.kotlin.util.getSingleChildOrNull
 
+
+
 object ElementTypeUtils {
-    @JvmStatic
+
     fun getKotlinBlockImbalanceCount(seq: CharSequence): Int {
         val lexer = KotlinLexer()
 

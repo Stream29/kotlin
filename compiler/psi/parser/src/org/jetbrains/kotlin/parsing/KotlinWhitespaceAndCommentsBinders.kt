@@ -16,10 +16,13 @@
 
 package org.jetbrains.kotlin.parsing
 
+
 import com.intellij.lang.WhitespacesAndCommentsBinder
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.kotlin.lexer.KtTokens
+
+
 
 object PrecedingCommentsBinder : WhitespacesAndCommentsBinder {
     override fun getEdgePosition(
@@ -106,10 +109,8 @@ private class AllCommentsBinder(val isTrailing: Boolean) : WhitespacesAndComment
     }
 }
 
-@JvmField
 val PRECEDING_ALL_COMMENTS_BINDER: WhitespacesAndCommentsBinder = AllCommentsBinder(false)
 
-@JvmField
 val TRAILING_ALL_COMMENTS_BINDER: WhitespacesAndCommentsBinder = AllCommentsBinder(true)
 
 object DoNotBindAnything : WhitespacesAndCommentsBinder {
@@ -140,8 +141,6 @@ class BindAll(val isTrailing: Boolean) : WhitespacesAndCommentsBinder {
     }
 }
 
-@JvmField
 val PRECEDING_ALL_BINDER: WhitespacesAndCommentsBinder = BindAll(false)
 
-@JvmField
 val TRAILING_ALL_BINDER: WhitespacesAndCommentsBinder = BindAll(true)

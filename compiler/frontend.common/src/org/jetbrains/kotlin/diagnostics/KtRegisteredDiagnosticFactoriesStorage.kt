@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.diagnostics
 
 import org.jetbrains.kotlin.diagnostics.rendering.BaseDiagnosticRendererFactory
 
+
+
 /**
  * Contains all diagnostic factories that could be used in the current compilation
  */

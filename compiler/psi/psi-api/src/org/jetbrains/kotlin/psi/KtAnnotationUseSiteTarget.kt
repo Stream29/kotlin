@@ -11,6 +11,8 @@ import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.stubs.KotlinAnnotationUseSiteTargetStub
 
+
+
 /**
  * Represents an annotation use-site target that specifies where the annotation should be applied.
  *
@@ -40,7 +42,7 @@ class KtAnnotationUseSiteTarget : KtElementImplStub<KotlinAnnotationUseSiteTarge
             }
         }
 
-        val node = firstChild.node
+        val node = firstChild!!.node!!
         return when (node.elementType) {
             KtTokens.ALL_KEYWORD -> AnnotationUseSiteTarget.ALL
             KtTokens.FIELD_KEYWORD -> AnnotationUseSiteTarget.FIELD

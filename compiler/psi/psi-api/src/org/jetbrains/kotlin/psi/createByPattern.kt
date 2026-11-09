@@ -23,7 +23,6 @@ import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.impl.source.codeStyle.CodeEditUtil
 import org.jetbrains.annotations.NonNls
-import org.jetbrains.annotations.TestOnly
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.render
@@ -31,6 +30,8 @@ import org.jetbrains.kotlin.psi.psiUtil.PsiChildRange
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.parentsWithSelf
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
+
+
 
 fun KtPsiFactory.createExpressionByPattern(@NonNls pattern: String, @NonNls vararg args: Any, reformat: Boolean = true): KtExpression =
     createByPattern(pattern, *args, reformat = reformat) { createExpression(it) }
@@ -53,18 +54,18 @@ fun KtPsiFactory.createDestructuringDeclarationByPattern(
     reformat: Boolean = true
 ): KtDestructuringDeclaration = createByPattern(pattern, *args, reformat = reformat) { createDestructuringDeclaration(it) }
 
-private abstract class ArgumentType<T : Any>(val klass: Class<T>)
+private abstract class ArgumentType<T : Any>(val klass: kotlin.reflect.KClass<T>)
 
-private class PlainTextArgumentType<T : Any>(klass: Class<T>, val toPlainText: (T) -> String) : ArgumentType<T>(klass)
+private class PlainTextArgumentType<T : Any>(klass: kotlin.reflect.KClass<T>, val toPlainText: (T) -> String) : ArgumentType<T>(klass)
 
 private abstract class PsiElementPlaceholderArgumentType<T : Any, TPlaceholder : PsiElement>(
-    klass: Class<T>,
-    val placeholderClass: Class<TPlaceholder>
+    klass: kotlin.reflect.KClass<T>,
+    val placeholderClass: kotlin.reflect.KClass<TPlaceholder>
 ) : ArgumentType<T>(klass) {
     abstract fun replacePlaceholderElement(placeholder: TPlaceholder, argument: T, reformat: Boolean): PsiChildRange
 }
 
-private class PsiElementArgumentType<T : PsiElement>(klass: Class<T>) : PsiElementPlaceholderArgumentType<T, T>(klass, klass) {
+private class PsiElementArgumentType<T : PsiElement>(klass: kotlin.reflect.KClass<T>) : PsiElementPlaceholderArgumentType<T, T>(klass, klass) {
     @OptIn(KtNonPublicApi::class)
     override fun replacePlaceholderElement(placeholder: T, argument: T, reformat: Boolean): PsiChildRange {
         var result = if (placeholder is KtExpressionImplStub<*>) {
@@ -82,20 +83,20 @@ private class PsiElementArgumentType<T : PsiElement>(klass: Class<T>) : PsiEleme
 }
 
 private object PsiChildRangeArgumentType :
-    PsiElementPlaceholderArgumentType<PsiChildRange, KtElement>(PsiChildRange::class.java, KtElement::class.java) {
+    PsiElementPlaceholderArgumentType<PsiChildRange, KtElement>(PsiChildRange::class, KtElement::class) {
     override fun replacePlaceholderElement(placeholder: KtElement, argument: PsiChildRange, reformat: Boolean): PsiChildRange {
         val project = placeholder.project
 
         return if (!argument.isEmpty) {
-            val first = placeholder.parent.addRangeBefore(argument.first!!, argument.last!!, placeholder)
+            val first = placeholder.parent!!.addRangeBefore(argument.first!!, argument.last!!, placeholder)
             val last = placeholder.prevSibling
             placeholder.delete()
 
             if (reformat) {
                 val codeStyleManager = CodeStyleManager.getInstance(project)
-                codeStyleManager.reformatNewlyAddedElement(first.node.treeParent, first.node)
+                codeStyleManager.reformatNewlyAddedElement(first!!.node!!.treeParent!!, first.node!!)
                 if (last != first) {
-                    codeStyleManager.reformatNewlyAddedElement(last.node.treeParent, last.node)
+                    codeStyleManager.reformatNewlyAddedElement(last!!.node!!.treeParent!!, last.node!!)
                 }
             }
             PsiChildRange(first, last)
@@ -107,10 +108,10 @@ private object PsiChildRangeArgumentType :
 }
 
 private val SUPPORTED_ARGUMENT_TYPES = listOf(
-    PsiElementArgumentType(KtExpression::class.java),
-    PsiElementArgumentType(KtTypeReference::class.java),
-    PlainTextArgumentType(String::class.java, toPlainText = { it }),
-    PlainTextArgumentType(Name::class.java, toPlainText = Name::render),
+    PsiElementArgumentType(KtExpression::class),
+    PsiElementArgumentType(KtTypeReference::class),
+    PlainTextArgumentType(String::class, toPlainText = { it }),
+    PlainTextArgumentType(Name::class, toPlainText = Name::render),
     PsiChildRangeArgumentType
 )
 
@@ -123,8 +124,8 @@ fun <TElement : KtElement> createByPattern(
     val argumentTypes = args.map { arg ->
         SUPPORTED_ARGUMENT_TYPES.firstOrNull { it.klass.isInstance(arg) }
             ?: throw IllegalArgumentException(
-                "Unsupported argument type: ${arg::class.java}, should be one of: " +
-                        SUPPORTED_ARGUMENT_TYPES.joinToString { it.klass.simpleName }
+                "Unsupported argument type: ${arg::class}, should be one of: " +
+                        SUPPORTED_ARGUMENT_TYPES.joinToString { it.klass.simpleName!! }
             )
     }
 
@@ -159,7 +160,7 @@ fun <TElement : KtElement> createByPattern(
         for ((val range, val _ = text) in placeholders) {
             val token = resultElement.findElementAt(range.startOffset)!!
             for (element in token.parentsWithSelf) {
-                val elementRange = element.textRange.shiftRight(-start)
+                val elementRange = element.textRange!!.shiftRight(-start)
                 if (elementRange == range && expectedElementType.isInstance(element)) {
                     val pointer = pointerManager.createSmartPsiElementPointer(element)
                     pointers[pointer] = n
@@ -227,7 +228,7 @@ fun <TElement : KtElement> createByPattern(
     }
 
     if (reformat)
-        codeStyleManager.adjustLineIndent(resultElement.containingFile, resultElement.textRange)
+        codeStyleManager.adjustLineIndent(resultElement.containingFile!!, resultElement.textRange)
 
     @Suppress("UNCHECKED_CAST")
     return resultElement as TElement
@@ -359,7 +360,7 @@ class BuilderByPattern<TElement> {
     }
 
     fun create(factory: (String, Array<out Any>) -> TElement): TElement {
-        return factory(patternBuilder.toString(), arguments.toArray())
+        return factory(patternBuilder.toString(), arguments.toTypedArray())
     }
 }
 

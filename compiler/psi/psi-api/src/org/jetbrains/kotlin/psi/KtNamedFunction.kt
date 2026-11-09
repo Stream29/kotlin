@@ -17,6 +17,8 @@ import org.jetbrains.kotlin.psi.psiUtil.isLegacyContractPresentPsiCheck
 import org.jetbrains.kotlin.psi.stubs.KotlinFunctionStub
 import org.jetbrains.kotlin.psi.typeRefHelpers.getTypeReference
 
+
+
 /**
  * Represents a named function declaration.
  *
@@ -64,12 +66,13 @@ open class KtNamedFunction : KtTypeParameterListOwnerStub<KotlinFunctionStub>, K
         findChildByType(KtTokens.EQ)
 
     override fun getInitializer(): KtExpression? =
-        PsiTreeUtil.getNextSiblingOfType(/* sibling = */ equalsToken, /* aClass = */ KtExpression::class.java)
+        PsiTreeUtil.getNextSiblingOfType(/* sibling = */ equalsToken, /* aClass = */ KtExpression::class)
 
     override fun hasInitializer(): Boolean =
         initializer != null
 
-    override fun getPresentation(): ItemPresentation? =
+    override val presentation: ItemPresentation?
+    get() =
         ItemPresentationProviders.getItemPresentation(/* element = */ this)
 
     override fun getValueParameterList(): KtParameterList? =
@@ -85,7 +88,7 @@ open class KtNamedFunction : KtTypeParameterListOwnerStub<KotlinFunctionStub>, K
             return null
         }
 
-        return findChildByClass(KtExpression::class.java)
+        return findChildByClass(KtExpression::class)
     }
 
     override fun getBodyBlockExpression(): KtBlockExpression? {
@@ -96,7 +99,7 @@ open class KtNamedFunction : KtTypeParameterListOwnerStub<KotlinFunctionStub>, K
             }
         }
 
-        return findChildByClass(KtExpression::class.java) as? KtBlockExpression
+        return findChildByClass(KtExpression::class) as? KtBlockExpression
     }
 
     override fun hasBody(): Boolean {
@@ -121,7 +124,7 @@ open class KtNamedFunction : KtTypeParameterListOwnerStub<KotlinFunctionStub>, K
         get() {
             var child = firstChild
             while (child != null) {
-                val tt = child.node.elementType
+                val tt = child.node!!.elementType
                 if (tt == KtTokens.LPAR || tt == KtTokens.COLON) break
                 if (child is KtTypeReference) {
                     return child

@@ -5,6 +5,12 @@
 
 package org.jetbrains.kotlin.psi.impl
 
+
+
+
+
+
+
 import com.intellij.lang.ASTNode
 import com.intellij.lang.PsiBuilderFactory
 import com.intellij.psi.impl.source.tree.ICodeFragmentElementType
@@ -24,6 +30,8 @@ import org.jetbrains.kotlin.psi.stubs.*
 import org.jetbrains.kotlin.psi.stubs.elements.KtFileElementType
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementType
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
+
+
 
 @KtImplementationDetail
 @Suppress("unused") // Initiated via reflection in 'KotlinElementTypeProvider'
@@ -298,8 +306,8 @@ object KotlinElementTypeProviderImpl : KotlinElementTypeProvider {
     override val kdocType: ILazyParseableElementType =
         object : ILazyParseableElementType("KDoc", KotlinLanguage.INSTANCE) {
             override fun parseContents(chameleon: ASTNode): ASTNode? {
-                val parentElement = chameleon.treeParent.psi
-                val project = parentElement.project
+                val parentElement = chameleon.treeParent!!.psi
+                val project = parentElement!!.project
                 val builder = PsiBuilderFactory.getInstance().createBuilder(project, chameleon, KDocLexer(), language, chameleon.text)
                 val parser = KDocParser()
                 return parser.parse(this, builder).firstChildNode

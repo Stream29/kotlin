@@ -5,6 +5,12 @@
 
 package org.jetbrains.kotlin.util
 
+
+
+
+
+
+
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.LanguageVersion
@@ -12,9 +18,10 @@ import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.config.metadataVersion
 import org.jetbrains.kotlin.metadata.deserialization.BinaryVersion
 import org.jetbrains.kotlin.metadata.deserialization.MetadataVersion
-import java.util.*
 
-private val LANGUAGE_TO_METADATA_VERSION = EnumMap<LanguageVersion, MetadataVersion>(LanguageVersion::class.java).apply {
+
+
+private val LANGUAGE_TO_METADATA_VERSION = mutableMapOf<LanguageVersion, MetadataVersion>().apply {
     val oldMetadataVersion = MetadataVersion(1, 1, 18)
     this[LanguageVersion.KOTLIN_1_0] = oldMetadataVersion
     this[LanguageVersion.KOTLIN_1_1] = oldMetadataVersion

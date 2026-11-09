@@ -5,11 +5,20 @@
 
 package org.jetbrains.kotlin.lang
 
+
+import org.jetbrains.kotlin.util.NativeCollections as Collections
+
+
+
+
+
+
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import org.jetbrains.kotlin.lexer.KtToken
 import org.jetbrains.kotlin.lexer.KtTokens
-import java.util.*
+
+
 
 enum class BinaryOperationPrecedence(val higherPriority: BinaryOperationPrecedence?, vararg val tokens: KtToken) {
     AS(null, KtTokens.AS_KEYWORD, KtTokens.AS_SAFE),
@@ -36,11 +45,10 @@ enum class BinaryOperationPrecedence(val higherPriority: BinaryOperationPreceden
          * It's used for fast lookup over binary precedences by a provided token.
          * It works with O(1) complexity in a given use-site instead of O(N) where N is a number of binary precedences (currently 12).
          */
-        @JvmField
+
         val TOKEN_TO_BINARY_PRECEDENCE_MAP_WITH_SOFT_IDENTIFIERS: Map<KtToken, BinaryOperationPrecedence> =
             getTokensToBinaryPrecedenceMap(includeSoftIdentifiers = true)
 
-        @JvmField
         val TOKEN_TO_BINARY_PRECEDENCE_MAP: Map<KtToken, BinaryOperationPrecedence> =
             getTokensToBinaryPrecedenceMap(includeSoftIdentifiers = false)
 
@@ -63,7 +71,7 @@ enum class BinaryOperationPrecedence(val higherPriority: BinaryOperationPreceden
                     if (type === KtTokens.IDENTIFIER && includeSoftIdentifiers) {
                         // Soft keywords work as identifiers (it's actual for INFIX functions).
                         // However, they are being remapped to IDENTIFIER during parsing.
-                        for (softKeyword in KtTokens.SOFT_KEYWORDS.getTypes()) {
+                        for (softKeyword in KtTokens.SOFT_KEYWORDS.types) {
                             register(softKeyword, entry)
                         }
                     }

@@ -7,5 +7,7 @@ package org.jetbrains.kotlin.psi.stubs.elements
 
 import org.jetbrains.kotlin.psi.KtContractEffectList
 
+
+
 class KtContractEffectListElementType(debugName: String) :
-    KtPlaceHolderStubElementType<KtContractEffectList>(debugName, KtContractEffectList::class.java)
+    KtPlaceHolderStubElementType<KtContractEffectList>(debugName, KtContractEffectList::class)

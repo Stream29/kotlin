@@ -14,6 +14,8 @@ import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import org.jetbrains.kotlin.psi.stubs.KotlinImportAliasStub
 
+
+
 /**
  * Represents an import alias that provides an alternative name for an imported declaration.
  *
@@ -38,14 +40,16 @@ class KtImportAlias : KtElementImplStub<KotlinImportAliasStub>, PsiNameIdentifie
     val importDirective: KtImportDirective?
         get() = parent as? KtImportDirective
 
-    override fun getName(): String? = greenStub?.getName() ?: nameIdentifier?.text
+    override val name: String?
+    get() = greenStub?.name ?: nameIdentifier?.text
 
     @OptIn(KtNonPublicApi::class)
     override fun setName(name: String): PsiElement = KtPsiMutationService.getInstance().setImportAliasName(this, name)
 
-    override fun getNameIdentifier(): PsiElement? = findChildByType(KtTokens.IDENTIFIER)
+    override val nameIdentifier: PsiElement?
+    get() = findChildByType(KtTokens.IDENTIFIER)
 
-    override fun getTextOffset() = nameIdentifier?.textOffset ?: startOffset
+    override val textOffset: Int get() = nameIdentifier?.textOffset ?: startOffset
 
-    override fun getUseScope() = LocalSearchScope(containingFile)
+    override val useScope: LocalSearchScope get() = LocalSearchScope(containingFile!!)
 }

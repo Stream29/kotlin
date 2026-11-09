@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.psi.stubs.KotlinPlaceHolderStub
 import org.jetbrains.kotlin.utils.exceptions.logErrorWithAttachment
 import org.jetbrains.kotlin.utils.exceptions.withPsiEntry
 
+
+
 /**
  * Represents a dot-qualified expression for member/extention access.
  *
@@ -58,9 +60,9 @@ class KtDotQualifiedExpression : KtExpressionImplStub<KotlinPlaceHolderStub<KtDo
     }
 
     private fun getChildExpressionsByStub(stub: KotlinPlaceHolderStub<KtDotQualifiedExpression>): List<KtExpression>? {
-        if (stub.getParentStubOfType(KtImportDirective::class.java) == null &&
-            stub.getParentStubOfType(KtPackageDirective::class.java) == null &&
-            stub.getParentStubOfType(KtValueArgument::class.java) == null
+        if (stub.getParentStubOfType(KtImportDirective::class) == null &&
+            stub.getParentStubOfType(KtPackageDirective::class) == null &&
+            stub.getParentStubOfType(KtValueArgument::class) == null
         ) {
             LOG.error(
                 "KtDotQualifiedExpression should only have stubs inside import, argument or package directives.\n" +
@@ -80,6 +82,6 @@ class KtDotQualifiedExpression : KtExpressionImplStub<KotlinPlaceHolderStub<KtDo
     }
 
     companion object {
-        private val LOG = Logger.getInstance(KtDotQualifiedExpression::class.java)
+        private val LOG = Logger.getInstance(KtDotQualifiedExpression::class)
     }
 }

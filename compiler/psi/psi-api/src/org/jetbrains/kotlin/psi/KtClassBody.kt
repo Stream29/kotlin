@@ -14,6 +14,8 @@ import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.stubs.KotlinPlaceHolderStub
 import org.jetbrains.kotlin.psi.stubs.elements.KtTokenSets
 
+
+
 /**
  * Represents the body of a class or object declaration enclosed in curly braces.
  *
@@ -29,23 +31,33 @@ import org.jetbrains.kotlin.psi.stubs.elements.KtTokenSets
  * ```
  */
 class KtClassBody : KtElementImplStub<KotlinPlaceHolderStub<KtClassBody>>, KtDeclarationContainer {
-    private val lBraceTokenSet = TokenSet.create(KtTokens.LBRACE)
-    private val rBraceTokenSet = TokenSet.create(KtTokens.RBRACE)
+    private var lBraceTokenSet = TokenSet.create(KtTokens.LBRACE)
+    private var rBraceTokenSet = TokenSet.create(KtTokens.RBRACE)
+
+    protected override fun copyKotlinPsiStateTo(clone: com.intellij.psi.impl.PsiElementBase) {
+        super.copyKotlinPsiStateTo(clone)
+        val target = clone as KtClassBody
+        target.lBraceTokenSet = lBraceTokenSet
+        target.rBraceTokenSet = rBraceTokenSet
+    }
 
     constructor(node: ASTNode) : super(node)
 
     constructor(stub: KotlinPlaceHolderStub<KtClassBody>) : super(stub, KtStubBasedElementTypes.CLASS_BODY)
 
-    override fun getDeclarations() = stub?.getChildrenByType(KtFile.FILE_DECLARATION_TYPES, KtDeclaration.ARRAY_FACTORY)?.toList()
-        ?: PsiTreeUtil.getChildrenOfTypeAsList(this, KtDeclaration::class.java)
+    @Suppress("UNCHECKED_CAST")
+    override fun getDeclarations(): List<KtDeclaration> =
+        (stub?.getChildrenByType(KtFile.FILE_DECLARATION_TYPES, KtDeclaration.ARRAY_FACTORY)?.toList() as List<KtDeclaration>?)
+        ?: PsiTreeUtil.getChildrenOfTypeAsList(this, KtDeclaration::class)
 
     /**
      * The list of all declarations and companion blocks.
      */
     @KtExperimentalApi
+    @Suppress("UNCHECKED_CAST")
     val declarationsAndCompanionBlocks: List<PsiElement>
-        get() = stub?.getChildrenByType(KtTokenSets.DECLARATION_AND_COMPANION_BLOCK_TYPES, PsiElement.ARRAY_FACTORY)?.toList()
-            ?: PsiTreeUtil.getChildrenOfAnyType(this, KtDeclaration::class.java, KtCompanionBlock::class.java)
+        get() = (stub?.getChildrenByType(KtTokenSets.DECLARATION_AND_COMPANION_BLOCK_TYPES, PsiElement.ARRAY_FACTORY)?.toList() as List<PsiElement>?)
+            ?: PsiTreeUtil.getChildrenOfAnyType(this, KtDeclaration::class, KtCompanionBlock::class)
 
     override fun <R, D> accept(visitor: KtVisitor<R, D>, data: D) = visitor.visitClassBody(this, data)
 

@@ -5,6 +5,12 @@
 
 package org.jetbrains.kotlin.kdoc.psi.impl
 
+
+
+
+
+
+
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import org.jetbrains.kotlin.kdoc.psi.api.KDoc
@@ -15,6 +21,8 @@ import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 import org.jetbrains.kotlin.resolution.KtResolvable
+
+
 
 /**
  * A single part of a qualified name in the tag subject or link.

@@ -5,6 +5,14 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
+import org.jetbrains.kotlin.psi.referencedName
+
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -14,11 +22,13 @@ import org.jetbrains.kotlin.psi.KtEnumEntrySuperclassReferenceExpression
 import org.jetbrains.kotlin.psi.stubs.KotlinEnumEntrySuperclassReferenceExpressionStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinEnumEntrySuperclassReferenceExpressionStubImpl
 
+
+
 class KtEnumEntrySuperClassReferenceExpressionElementType(@NonNls debugName: String) :
     KtStubElementType<KotlinEnumEntrySuperclassReferenceExpressionStubImpl, KtEnumEntrySuperclassReferenceExpression>(
         debugName,
-        KtEnumEntrySuperclassReferenceExpression::class.java,
-        KotlinEnumEntrySuperclassReferenceExpressionStub::class.java,
+        KtEnumEntrySuperclassReferenceExpression::class,
+        KotlinEnumEntrySuperclassReferenceExpressionStub::class,
     ) {
 
     override fun createStub(
@@ -26,7 +36,7 @@ class KtEnumEntrySuperClassReferenceExpressionElementType(@NonNls debugName: Str
         parentStub: StubElement<*>?,
     ): KotlinEnumEntrySuperclassReferenceExpressionStubImpl = KotlinEnumEntrySuperclassReferenceExpressionStubImpl(
         parent = parentStub,
-        referencedNameRef = StringRef.fromString(psi.getReferencedName()),
+        referencedNameRef = StringRef.fromString(psi.referencedName)!!,
     )
 
     override fun serialize(stub: KotlinEnumEntrySuperclassReferenceExpressionStubImpl, dataStream: StubOutputStream) {

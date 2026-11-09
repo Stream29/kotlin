@@ -10,6 +10,8 @@ import com.intellij.openapi.components.serviceOrNull
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 
+
+
 /**
  * TODO: the service has to be dropped in the context of KT-86150
  */

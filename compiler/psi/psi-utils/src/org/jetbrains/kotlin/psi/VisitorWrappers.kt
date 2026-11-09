@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlin.psi
 
+
+
+
+
 fun classOrObjectVisitor(block: (KtClassOrObject) -> Unit) =
     object : KtVisitorVoid() {
         override fun visitClassOrObject(classOrObject: KtClassOrObject) {

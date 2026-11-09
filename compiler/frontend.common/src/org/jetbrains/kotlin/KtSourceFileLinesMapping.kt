@@ -5,9 +5,12 @@
 
 package org.jetbrains.kotlin
 
+
 import com.intellij.openapi.editor.Document
 import com.intellij.psi.PsiFile
-import java.io.InputStreamReader
+import org.jetbrains.kotlin.SourceFileReader as InputStreamReader
+
+
 
 interface KtSourceFileLinesMapping {
     fun getLineStartOffset(line: Int): Int
@@ -54,7 +57,7 @@ open class KtSourceFileLinesMappingFromLineStartOffsets(
     }
 
     override fun getLineByOffset(offset: Int): Int {
-        val index = lineStartOffsets.binarySearch(offset)
+        val index = lineStartOffsets.asList().binarySearch(offset)
         return if (index >= 0) index else -index - 2
     }
 

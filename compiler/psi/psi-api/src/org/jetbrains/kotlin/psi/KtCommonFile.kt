@@ -3,7 +3,18 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+@file:OptIn(kotlin.native.internal.InternalForKotlinNative::class)
+
 package org.jetbrains.kotlin.psi
+
+import kotlin.concurrent.Volatile
+
+
+
+
+
+
 
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.lang.ASTNode
@@ -25,6 +36,8 @@ import org.jetbrains.kotlin.psi.stubs.KotlinFileStubKind
 import org.jetbrains.kotlin.psi.stubs.KotlinImportDirectiveStub
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementType
 
+
+
 /**
  * This class represents kotlin psi file, independently of java psi (no [PsiClassOwner] super).
  * It can be created by [org.jetbrains.kotlin.parsing.KotlinCommonParserDefinition], if java psi is not available e.g., on JB Client.
@@ -32,12 +45,34 @@ import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementType
  * It's not supposed to be used directly, use [PsiFile] or if you need to check instanceof, check its' file type or language instead.
  */
 @Deprecated("Don't use directly, use file.getFileType() instead")
-open class KtCommonFile(viewProvider: FileViewProvider, val isCompiled: Boolean) :
-    PsiFileBase(viewProvider, KotlinLanguage.INSTANCE),
+open class KtCommonFile :
+    PsiFileBase,
     KtDeclarationContainer,
     KtAnnotated,
     KtElement,
     PsiNamedElement {
+
+    private var compiledValue: Boolean
+    val isCompiled: Boolean get() = compiledValue
+
+    constructor(viewProvider: FileViewProvider, isCompiled: Boolean) :
+        super(viewProvider, KotlinLanguage.INSTANCE) {
+        compiledValue = isCompiled
+    }
+
+    protected fun copyKtCommonFileStateTo(clone: KtCommonFile) {
+        copyPsiFileBaseStateTo(clone)
+        clone.compiledValue = compiledValue
+        clone.isScript = isScript
+        clone.hasTopLevelCallables = hasTopLevelCallables
+        clone.pathCached = pathCached
+        clone.hasImportAlias = hasImportAlias
+    }
+
+    override fun createUnlinkedFileClone(): KtCommonFile {
+        check(this::class == KtCommonFile::class) { "Concrete Kotlin file subtype needs its own clone allocation hook" }
+        return kotlin.native.internal.createUninitializedInstance<KtCommonFile>().also { copyKtCommonFileStateTo(it) }
+    }
 
     @Volatile
     private var isScript: Boolean? = null
@@ -49,7 +84,7 @@ open class KtCommonFile(viewProvider: FileViewProvider, val isCompiled: Boolean)
     private var pathCached: String? = null
 
     open val importList: KtImportList?
-        get() = findChildByTypeOrClass(KtStubBasedElementTypes.IMPORT_LIST, KtImportList::class.java)
+        get() = findChildByTypeOrClass(KtStubBasedElementTypes.IMPORT_LIST, KtImportList::class)
 
     @Volatile
     private var hasImportAlias: Boolean? = null
@@ -64,7 +99,7 @@ open class KtCommonFile(viewProvider: FileViewProvider, val isCompiled: Boolean)
     }
 
     protected open val importLists: List<KtImportList>
-        get() = findChildrenByTypeOrClass(KtStubBasedElementTypes.IMPORT_LIST, KtImportList::class.java).asList()
+        get() = findChildrenByTypeOrClass(KtStubBasedElementTypes.IMPORT_LIST, KtImportList::class).asList()
 
     val fileAnnotationList: KtFileAnnotationList?
         get() = findChildBeforeFirstDeclarationInclusiveByType(KtStubBasedElementTypes.FILE_ANNOTATION_LIST)
@@ -107,7 +142,7 @@ open class KtCommonFile(viewProvider: FileViewProvider, val isCompiled: Boolean)
         get(): String {
             pathCached?.let { return it }
 
-            return virtualFile.path.also {
+            return virtualFile!!.path.also {
                 pathCached = it
             }
         }
@@ -119,11 +154,12 @@ open class KtCommonFile(viewProvider: FileViewProvider, val isCompiled: Boolean)
     /**
      * @return modifier lists that do not belong to any declaration due to incomplete code or syntax errors
      */
+    @Suppress("UNCHECKED_CAST")
     val danglingModifierLists: Array<out KtModifierList>
-        get() = greenStub?.getChildrenByType(
+        get() = (greenStub?.getChildrenByType(
             KtStubBasedElementTypes.MODIFIER_LIST,
             KtStubBasedElementTypes.MODIFIER_LIST.arrayFactory
-        ) ?: findChildrenByClass(KtModifierList::class.java)
+        ) as Array<out KtModifierList>?) ?: findChildrenByClass(KtModifierList::class)
 
     /**
      * @return annotations that do not belong to any declaration due to incomplete code or syntax errors
@@ -131,7 +167,8 @@ open class KtCommonFile(viewProvider: FileViewProvider, val isCompiled: Boolean)
     val danglingAnnotations: List<KtAnnotationEntry>
         get() = danglingModifierLists.flatMap { obj: KtModifierList -> obj.annotationEntries }
 
-    override fun getFileType(): FileType = KotlinFileType.INSTANCE
+    override val fileType: FileType
+    get() = KotlinFileType.INSTANCE
 
     override fun toString(): String = "KtFile: $name"
 
@@ -139,9 +176,10 @@ open class KtCommonFile(viewProvider: FileViewProvider, val isCompiled: Boolean)
     @KtImplementationDetail
     open val customStubBuilder: StubBuilder? get() = null
 
+    @Suppress("UNCHECKED_CAST")
     override fun getDeclarations(): List<KtDeclaration> {
-        return greenStub?.getChildrenByType(KtFile.FILE_DECLARATION_TYPES, KtDeclaration.ARRAY_FACTORY)?.toList()
-            ?: PsiTreeUtil.getChildrenOfTypeAsList(this, KtDeclaration::class.java)
+        return (greenStub?.getChildrenByType(KtFile.FILE_DECLARATION_TYPES, KtDeclaration.ARRAY_FACTORY)?.toList() as List<KtDeclaration>?)
+            ?: PsiTreeUtil.getChildrenOfTypeAsList(this, KtDeclaration::class)
     }
 
     /**
@@ -200,7 +238,7 @@ open class KtCommonFile(viewProvider: FileViewProvider, val isCompiled: Boolean)
 
     fun <S : StubElement<P>, P : KtElementImplStub<S>> findChildByTypeOrClass(
         elementType: KtStubElementType<out S, P>,
-        elementClass: Class<P>
+        elementClass: kotlin.reflect.KClass<P>
     ): P? {
         val stub = greenStub
         if (stub != null) {
@@ -211,14 +249,15 @@ open class KtCommonFile(viewProvider: FileViewProvider, val isCompiled: Boolean)
         return findChildByClass(elementClass)
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun <T : KtElementImplStub<out StubElement<*>>> findChildrenByTypeOrClass(
         elementType: KtStubElementType<*, T>,
-        elementClass: Class<T>
+        elementClass: kotlin.reflect.KClass<T>
     ): Array<out T> {
         val stub = greenStub
         if (stub != null) {
             val arrayFactory: ArrayFactory<T> = elementType.arrayFactory
-            return stub.getChildrenByType(elementType, arrayFactory)
+            return stub.getChildrenByType(elementType, arrayFactory) as Array<out T>
         }
         return findChildrenByClass(elementClass)
     }
@@ -244,12 +283,13 @@ open class KtCommonFile(viewProvider: FileViewProvider, val isCompiled: Boolean)
         return importDirectives.find { it.importedName == name }?.importedFqName?.pathSegments()?.last()
     }
 
-    override fun getStub(): KotlinFileStub? = super.getStub()?.let { it as KotlinFileStub }
+    override val stub: KotlinFileStub?
+        get() = super.stub?.let { it as KotlinFileStub }
 
-    protected open val greenStub: KotlinFileStub?
+    override val greenStub: KotlinFileStub?
         get() =
             @Suppress("DEPRECATION") // KT-78356
-            super.getGreenStub()?.let { it as KotlinFileStub }
+            super.greenStub?.let { it as KotlinFileStub }
 
     override fun clearCaches() {
         @Suppress("RemoveExplicitSuperQualifier")
@@ -293,7 +333,7 @@ open class KtCommonFile(viewProvider: FileViewProvider, val isCompiled: Boolean)
 
     override fun getContainingKtFile(): KtFile = this as KtFile
 
-    override fun <D> acceptChildren(visitor: KtVisitor<Void, D>, data: D) {
+    override fun <D> acceptChildren(visitor: KtVisitor<Nothing?, D>, data: D) {
         KtPsiUtil.visitChildren(this, visitor, data)
     }
 
@@ -308,7 +348,6 @@ open class KtCommonFile(viewProvider: FileViewProvider, val isCompiled: Boolean)
         fileAnnotationList?.annotationEntries ?: emptyList()
 
     @OptIn(KtNonPublicApi::class)
-    @Throws(IncorrectOperationException::class)
     override fun setName(name: String): PsiElement = KtPsiMutationService.getInstance().setCommonFileName(this, name)
 
     override fun getPsiOrParent(): KtElement = this

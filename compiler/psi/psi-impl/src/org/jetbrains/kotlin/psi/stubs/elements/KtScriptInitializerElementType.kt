@@ -8,8 +8,10 @@ package org.jetbrains.kotlin.psi.stubs.elements
 import com.intellij.lang.ASTNode
 import org.jetbrains.kotlin.psi.KtScriptInitializer
 
+
+
 object KtScriptInitializerElementType : KtPlaceHolderStubElementType<KtScriptInitializer>(
-    "SCRIPT_INITIALIZER", KtScriptInitializer::class.java,
+    "SCRIPT_INITIALIZER", KtScriptInitializer::class,
 ) {
     override fun shouldCreateStub(node: ASTNode): Boolean = true
 }

@@ -4,6 +4,7 @@
  */
 package org.jetbrains.kotlin.psi.stubs.elements
 
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -15,10 +16,12 @@ import org.jetbrains.kotlin.psi.stubs.StubUtils.readContract
 import org.jetbrains.kotlin.psi.stubs.StubUtils.writeContract
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinPropertyAccessorStubImpl
 
+
+
 internal object KtPropertyAccessorElementType : KtStubElementType<KotlinPropertyAccessorStubImpl, KtPropertyAccessor>(
     "PROPERTY_ACCESSOR",
-    KtPropertyAccessor::class.java,
-    KotlinPropertyAccessorStub::class.java,
+    KtPropertyAccessor::class,
+    KotlinPropertyAccessorStub::class,
 ) {
     @OptIn(KtImplementationDetail::class)
     override fun createStub(psi: KtPropertyAccessor, parentStub: StubElement<*>?): KotlinPropertyAccessorStubImpl {

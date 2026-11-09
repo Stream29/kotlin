@@ -14,6 +14,8 @@ import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 import org.jetbrains.kotlin.utils.exceptions.errorWithAttachment
 import org.jetbrains.kotlin.utils.exceptions.withPsiEntry
 
+
+
 /**
  * Represents a qualified expression, which accesses a member or extension
  * on a receiver using the `.` or `?.` operator.
@@ -58,11 +60,11 @@ interface KtQualifiedExpression : KtExpression, KtResolvableCall {
 
     val operationTokenNode: ASTNode
         get() = operationTokenNodeOrNull ?: error(
-            "No operation node for ${node.elementType}. Children: ${children.contentToString()}"
+            "No operation node for ${node!!.elementType}. Children: ${children.contentToString()}"
         )
 
     private val operationTokenNodeOrNull: ASTNode?
-        get() = node.findChildByType(KtTokens.OPERATIONS)
+        get() = node!!.findChildByType(KtTokens.OPERATIONS)
 
     val operationSign: KtSingleValueToken
         get() = operationTokenNode.elementType as KtSingleValueToken

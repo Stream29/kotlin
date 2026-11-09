@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.io.StringRef
 import org.jetbrains.kotlin.name.FqName
@@ -14,14 +17,17 @@ import org.jetbrains.kotlin.psi.stubs.KotlinScriptStub
 import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
+
+
 @OptIn(KtImplementationDetail::class)
 class KotlinScriptStubImpl(
     parent: StubElement<*>?,
     private val fqNameRef: StringRef,
     override val isReplSnippet: Boolean,
 ) : KotlinStubBaseImpl<KtScript>(parent, KtStubElementTypes.SCRIPT), KotlinScriptStub {
-    override fun getName(): String = fqName.shortName().asString()
-    override val fqName: FqName get() = FqName(fqNameRef.string)
+    override val name: String
+    get() = fqName.shortName().asString()
+    override val fqName: FqName get() = FqName(fqNameRef.string!!)
 
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinScriptStubImpl = KotlinScriptStubImpl(

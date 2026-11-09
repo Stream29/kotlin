@@ -5,27 +5,40 @@
 
 package org.jetbrains.kotlin.psi.psiUtil
 
+
+
+
+
+
+
 import com.intellij.psi.AbstractElementManipulator
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import com.intellij.openapi.util.TextRange
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import com.intellij.openapi.util.text.StringUtil
-import kotlin.jvm.java
 import kotlin.text.substring
+
+
 
 class StringTemplateExpressionManipulator : AbstractElementManipulator<KtStringTemplateExpression>() {
     override fun handleContentChange(
         element: KtStringTemplateExpression,
         range: TextRange,
+        newContent: String?
+    ): KtStringTemplateExpression? = handleContentChange(element, range, newContent!!)
+
+    fun handleContentChange(
+        element: KtStringTemplateExpression,
+        range: TextRange,
         newContent: String
     ): KtStringTemplateExpression? {
         val node = element.node
-        val content = if (node.firstChildNode.textLength == 1) StringUtil.escapeStringCharacters(newContent) else newContent
+        val content = if (node.firstChildNode!!.textLength == 1) StringUtil.escapeStringCharacters(newContent) else newContent
         val oldText = node.text
         val newText = oldText.substring(0, range.startOffset) + content + oldText.substring(range.endOffset)
         val expression = KtPsiFactory(element.project).createExpression(newText)
-        node.replaceAllChildrenToChildrenOf(expression.node)
-        return node.getPsi(KtStringTemplateExpression::class.java)
+        node.replaceAllChildrenToChildrenOf(expression.node!!)
+        return node.getPsi(KtStringTemplateExpression::class)
     }
 
     override fun getRangeInElement(element: KtStringTemplateExpression): TextRange {

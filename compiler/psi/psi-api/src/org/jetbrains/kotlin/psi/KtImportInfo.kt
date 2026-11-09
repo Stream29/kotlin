@@ -8,6 +8,8 @@ package org.jetbrains.kotlin.psi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
+
+
 interface KtImportInfo {
     sealed class ImportContent {
         class ExpressionBased(val expression: KtExpression) : ImportContent()
@@ -29,7 +31,7 @@ interface KtImportInfo {
         aliasName?.let { return it }
         val importContent = importContent
         return when (importContent) {
-            is ImportContent.ExpressionBased -> KtPsiUtil.getLastReference(importContent.expression)?.getReferencedName()
+            is ImportContent.ExpressionBased -> KtPsiUtil.getLastReference(importContent.expression)?.referencedName
             is ImportContent.FqNameBased -> importContent.fqName.takeUnless(FqName::isRoot)?.shortName()?.asString()
             null -> null
         }

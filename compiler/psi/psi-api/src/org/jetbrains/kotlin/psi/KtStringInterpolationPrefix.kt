@@ -11,6 +11,8 @@ import org.jetbrains.kotlin.KtStubBasedElementTypes
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.stubs.KotlinStringInterpolationPrefixStub
 
+
+
 /**
  * Represents the multi-dollar interpolation prefix for string templates.
  *
@@ -54,7 +56,8 @@ class KtStringInterpolationPrefix : KtElementImplStub<KotlinStringInterpolationP
             }
         }
 
-    override fun getText(): String = interpolationPrefix
+    override val text: String
+    get() = interpolationPrefix
 
     /**
      * The [PsiElement] which represent [KtTokens.INTERPOLATION_PREFIX].

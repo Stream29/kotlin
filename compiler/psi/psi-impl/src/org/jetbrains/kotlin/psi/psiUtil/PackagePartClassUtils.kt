@@ -11,19 +11,19 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.NameUtils
 import org.jetbrains.kotlin.psi.KtFile
 
+
+
 /**
  * Partial copy of org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
  */
 internal object PackagePartClassUtils {
     private const val PART_CLASS_NAME_SUFFIX = "Kt"
 
-    @JvmStatic
     fun getPackagePartFqName(packageFqName: FqName, file: KtFile): FqName {
         val partClassName = getFilePartShortName(file)
         return packageFqName.child(Name.identifier(partClassName))
     }
 
-    @JvmStatic
     fun getFilePartShortName(file: KtFile): String {
         val fileName = file.name
         val nameWithoutExtension = FileUtil.getNameWithoutExtension(fileName)

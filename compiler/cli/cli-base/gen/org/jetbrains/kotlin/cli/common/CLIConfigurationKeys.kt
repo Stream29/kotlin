@@ -7,12 +7,7 @@
 
 package org.jetbrains.kotlin.cli.common
 
-/*
- * This file was generated automatically
- * DO NOT MODIFY IT MANUALLY
- */
-
-import java.io.File
+import nativekotlin.host.files.NativeFile as File
 import org.jetbrains.kotlin.cli.common.config.ContentRoot
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.cli.common.modules.ModuleChunk
@@ -20,81 +15,101 @@ import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.config.MessageCollectorAccess
-import org.jetbrains.kotlin.diagnostics.impl.BaseDiagnosticsCollector
 import org.jetbrains.kotlin.utils.KotlinPaths
 
-object CLIConfigurationKeys {
-    // Roots, including dependencies and own sources.
-    @JvmField
+internal object CLIExtraConfigurationKeys {
     val CONTENT_ROOTS = CompilerConfigurationKey.create<List<ContentRoot>>("CONTENT_ROOTS")
 
-    // Used by kotest, Realm, Dokka, KSP compiler plugins.
-    @Deprecated(
-        "Please use CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY instead",
-        ReplaceWith("CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY", "org.jetbrains.kotlin.config.CommonConfigurationKeys"),
-        DeprecationLevel.ERROR,
-    )
-    @JvmField
-    @MessageCollectorAccess
+    @OptIn(MessageCollectorAccess::class)
     val MESSAGE_COLLECTOR_KEY = CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY
 
-    // Used by compiler plugins to access delegated message collector in GroupingMessageCollector.
-    @JvmField
     val ORIGINAL_MESSAGE_COLLECTOR_KEY = CompilerConfigurationKey.create<MessageCollector>("ORIGINAL_MESSAGE_COLLECTOR_KEY")
 
-    @JvmField
-    val DIAGNOSTICS_COLLECTOR = CompilerConfigurationKey.create<BaseDiagnosticsCollector>("DIAGNOSTICS_COLLECTOR")
-
-    @JvmField
     val RENDER_DIAGNOSTIC_INTERNAL_NAME = CompilerConfigurationKey.create<Boolean>("RENDER_DIAGNOSTIC_INTERNAL_NAME")
 
-    @JvmField
     val TREAT_WARNINGS_AS_ERRORS = CompilerConfigurationKey.create<Boolean>("TREAT_WARNINGS_AS_ERRORS")
 
-    @JvmField
     val ALLOW_KOTLIN_PACKAGE = CompilerConfigurationKey.create<Boolean>("ALLOW_KOTLIN_PACKAGE")
 
-    // See K2MetadataCompilerArguments.
-    @JvmField
     val METADATA_DESTINATION_DIRECTORY = CompilerConfigurationKey.create<File>("METADATA_DESTINATION_DIRECTORY")
 
-    // Path to the Kotlin compiler jar in the Kotlin plugin. Used in FIR IDE uast tests.
-    @JvmField
     val PATH_TO_KOTLIN_COMPILER_JAR = CompilerConfigurationKey.create<File>("PATH_TO_KOTLIN_COMPILER_JAR")
 
-    @JvmField
     val PRINT_VERSION = CompilerConfigurationKey.create<Boolean>("PRINT_VERSION")
 
-    @JvmField
     val SCRIPT_MODE = CompilerConfigurationKey.create<Boolean>("SCRIPT_MODE")
 
-    // Runs Kotlin REPL (deprecated).
-    @JvmField
     val REPL_MODE = CompilerConfigurationKey.create<Boolean>("REPL_MODE")
 
-    @JvmField
     val KOTLIN_PATHS = CompilerConfigurationKey.create<KotlinPaths>("KOTLIN_PATHS")
 
-    @JvmField
     val ALLOW_NO_SOURCE_FILES = CompilerConfigurationKey.create<Boolean>("ALLOW_NO_SOURCE_FILES")
 
-    @JvmField
     val MODULE_CHUNK = CompilerConfigurationKey.create<ModuleChunk>("MODULE_CHUNK")
 
-    @JvmField
     val BUILD_FILE = CompilerConfigurationKey.create<File>("BUILD_FILE")
 
-    @JvmField
     val FREE_ARGS_FOR_SCRIPT = CompilerConfigurationKey.create<List<String>>("FREE_ARGS_FOR_SCRIPT")
 
-    @JvmField
     val DEFAULT_EXTENSION_FOR_SCRIPTS = CompilerConfigurationKey.create<String>("DEFAULT_EXTENSION_FOR_SCRIPTS")
-
-    // Defines what kind of application environment should be created. Should be set to `true` only in tests
-    @JvmField
-    val TEST_ENVIRONMENT = CompilerConfigurationKey.create<Boolean>("TEST_ENVIRONMENT")
-
 }
+
+val CLIConfigurationKeys.CONTENT_ROOTS: CompilerConfigurationKey<List<ContentRoot>>
+    get() = CLIExtraConfigurationKeys.CONTENT_ROOTS
+
+@Deprecated(
+    "Please use CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY instead",
+    ReplaceWith("CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY", "org.jetbrains.kotlin.config.CommonConfigurationKeys"),
+    DeprecationLevel.ERROR,
+)
+@MessageCollectorAccess
+val CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY: CompilerConfigurationKey<MessageCollector>
+    get() = CLIExtraConfigurationKeys.MESSAGE_COLLECTOR_KEY
+
+val CLIConfigurationKeys.ORIGINAL_MESSAGE_COLLECTOR_KEY: CompilerConfigurationKey<MessageCollector>
+    get() = CLIExtraConfigurationKeys.ORIGINAL_MESSAGE_COLLECTOR_KEY
+
+val CLIConfigurationKeys.RENDER_DIAGNOSTIC_INTERNAL_NAME: CompilerConfigurationKey<Boolean>
+    get() = CLIExtraConfigurationKeys.RENDER_DIAGNOSTIC_INTERNAL_NAME
+
+val CLIConfigurationKeys.TREAT_WARNINGS_AS_ERRORS: CompilerConfigurationKey<Boolean>
+    get() = CLIExtraConfigurationKeys.TREAT_WARNINGS_AS_ERRORS
+
+val CLIConfigurationKeys.ALLOW_KOTLIN_PACKAGE: CompilerConfigurationKey<Boolean>
+    get() = CLIExtraConfigurationKeys.ALLOW_KOTLIN_PACKAGE
+
+val CLIConfigurationKeys.METADATA_DESTINATION_DIRECTORY: CompilerConfigurationKey<File>
+    get() = CLIExtraConfigurationKeys.METADATA_DESTINATION_DIRECTORY
+
+val CLIConfigurationKeys.PATH_TO_KOTLIN_COMPILER_JAR: CompilerConfigurationKey<File>
+    get() = CLIExtraConfigurationKeys.PATH_TO_KOTLIN_COMPILER_JAR
+
+val CLIConfigurationKeys.PRINT_VERSION: CompilerConfigurationKey<Boolean>
+    get() = CLIExtraConfigurationKeys.PRINT_VERSION
+
+val CLIConfigurationKeys.SCRIPT_MODE: CompilerConfigurationKey<Boolean>
+    get() = CLIExtraConfigurationKeys.SCRIPT_MODE
+
+val CLIConfigurationKeys.REPL_MODE: CompilerConfigurationKey<Boolean>
+    get() = CLIExtraConfigurationKeys.REPL_MODE
+
+val CLIConfigurationKeys.KOTLIN_PATHS: CompilerConfigurationKey<KotlinPaths>
+    get() = CLIExtraConfigurationKeys.KOTLIN_PATHS
+
+val CLIConfigurationKeys.ALLOW_NO_SOURCE_FILES: CompilerConfigurationKey<Boolean>
+    get() = CLIExtraConfigurationKeys.ALLOW_NO_SOURCE_FILES
+
+val CLIConfigurationKeys.MODULE_CHUNK: CompilerConfigurationKey<ModuleChunk>
+    get() = CLIExtraConfigurationKeys.MODULE_CHUNK
+
+val CLIConfigurationKeys.BUILD_FILE: CompilerConfigurationKey<File>
+    get() = CLIExtraConfigurationKeys.BUILD_FILE
+
+val CLIConfigurationKeys.FREE_ARGS_FOR_SCRIPT: CompilerConfigurationKey<List<String>>
+    get() = CLIExtraConfigurationKeys.FREE_ARGS_FOR_SCRIPT
+
+val CLIConfigurationKeys.DEFAULT_EXTENSION_FOR_SCRIPTS: CompilerConfigurationKey<String>
+    get() = CLIExtraConfigurationKeys.DEFAULT_EXTENSION_FOR_SCRIPTS
 
 var CompilerConfiguration.contentRoots: List<ContentRoot>
     get() = getList(CLIConfigurationKeys.CONTENT_ROOTS)
@@ -103,10 +118,6 @@ var CompilerConfiguration.contentRoots: List<ContentRoot>
 var CompilerConfiguration.originalMessageCollectorKey: MessageCollector?
     get() = get(CLIConfigurationKeys.ORIGINAL_MESSAGE_COLLECTOR_KEY)
     set(value) { put(CLIConfigurationKeys.ORIGINAL_MESSAGE_COLLECTOR_KEY, requireNotNull(value) { "nullable values are not allowed" }) }
-
-var CompilerConfiguration.diagnosticsCollector: BaseDiagnosticsCollector
-    get() = getOrDefault(CLIConfigurationKeys.DIAGNOSTICS_COLLECTOR) { error("diagnostic collector is not initialized") }
-    set(value) { put(CLIConfigurationKeys.DIAGNOSTICS_COLLECTOR, value) }
 
 var CompilerConfiguration.renderDiagnosticInternalName: Boolean
     get() = getBoolean(CLIConfigurationKeys.RENDER_DIAGNOSTIC_INTERNAL_NAME)
@@ -163,8 +174,3 @@ var CompilerConfiguration.freeArgsForScript: List<String>
 var CompilerConfiguration.defaultExtensionForScripts: String?
     get() = get(CLIConfigurationKeys.DEFAULT_EXTENSION_FOR_SCRIPTS)
     set(value) { putIfNotNull(CLIConfigurationKeys.DEFAULT_EXTENSION_FOR_SCRIPTS, value) }
-
-var CompilerConfiguration.testEnvironment: Boolean
-    get() = getBoolean(CLIConfigurationKeys.TEST_ENVIRONMENT)
-    set(value) { put(CLIConfigurationKeys.TEST_ENVIRONMENT, value) }
-

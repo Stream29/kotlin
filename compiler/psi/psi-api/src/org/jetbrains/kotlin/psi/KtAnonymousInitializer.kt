@@ -13,6 +13,8 @@ import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.psi.stubs.KotlinPlaceHolderStub
 import org.jetbrains.kotlin.utils.sure
 
+
+
 interface KtAnonymousInitializer : KtDeclaration, KtStatementExpression {
     val containingDeclaration: KtDeclaration
     val body: KtExpression?
@@ -41,7 +43,7 @@ class KtClassInitializer : KtDeclarationStub<KotlinPlaceHolderStub<KtClassInitia
     override fun <R, D> accept(visitor: KtVisitor<R, D>, data: D): R = visitor.visitClassInitializer(this, data)
 
     override val body: KtExpression?
-        get() = findChildByClass(KtExpression::class.java)
+        get() = findChildByClass(KtExpression::class)
 
     val openBraceNode: PsiElement?
         get() = (body as? KtBlockExpression)?.lBrace
@@ -70,7 +72,7 @@ class KtScriptInitializer : KtDeclarationStub<KotlinPlaceHolderStub<KtScriptInit
     constructor(stub: KotlinPlaceHolderStub<KtScriptInitializer>) : super(stub, KtStubBasedElementTypes.SCRIPT_INITIALIZER)
 
     override val body: KtExpression?
-        get() = findChildByClass(KtExpression::class.java)
+        get() = findChildByClass(KtExpression::class)
 
     override val containingDeclaration: KtScript
         get() = getParentOfType<KtScript>(true).sure { "Should only be present in script" }

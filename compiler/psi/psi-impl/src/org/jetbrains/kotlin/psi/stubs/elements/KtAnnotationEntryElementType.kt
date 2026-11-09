@@ -4,6 +4,15 @@
  */
 package org.jetbrains.kotlin.psi.stubs.elements
 
+import org.jetbrains.kotlin.psi.arguments
+import org.jetbrains.kotlin.psi.valueArguments
+
+
+
+
+
+
+
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
@@ -18,13 +27,15 @@ import org.jetbrains.kotlin.psi.stubs.impl.KotlinAnnotationEntryStubImpl
 import org.jetbrains.kotlin.psi.stubs.impl.deserializeConstantValue
 import org.jetbrains.kotlin.psi.stubs.impl.serializeConstantValue
 
+
+
 internal object KtAnnotationEntryElementType : KtStubElementType<KotlinAnnotationEntryStubImpl, KtAnnotationEntry>(
     "ANNOTATION_ENTRY",
-    KtAnnotationEntry::class.java,
-    KotlinAnnotationEntryStub::class.java,
+    KtAnnotationEntry::class,
+    KotlinAnnotationEntryStub::class,
 ) {
     override fun createStub(psi: KtAnnotationEntry, parentStub: StubElement<*>?): KotlinAnnotationEntryStubImpl {
-        val shortName = psi.getShortName()
+        val shortName = psi.shortName
         val resultName = shortName?.asString()
         val valueArgumentList = psi.getValueArgumentList()
         val hasValueArguments = valueArgumentList != null && !valueArgumentList.arguments.isEmpty()

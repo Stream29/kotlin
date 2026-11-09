@@ -10,10 +10,13 @@ import com.intellij.psi.PsiFile
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.SourceFile
 
+
+
 interface PsiSourceElement : SourceElement {
     val psi: PsiElement?
 
-    override fun getContainingFile(): SourceFile = psi?.containingFile?.let(::PsiSourceFile) ?: SourceFile.NO_SOURCE_FILE
+    override val containingFile: SourceFile
+    get() = psi?.containingFile?.let(::PsiSourceFile) ?: SourceFile.NO_SOURCE_FILE
 }
 
 class PsiSourceFile(val psiFile: PsiFile) : SourceFile {
@@ -21,9 +24,11 @@ class PsiSourceFile(val psiFile: PsiFile) : SourceFile {
 
     override fun hashCode(): Int = psiFile.hashCode()
 
-    override fun toString(): String = psiFile.virtualFile.path
+    override fun toString(): String = psiFile.virtualFile!!.path
 
     override fun getName(): String? = psiFile.virtualFile?.name
 }
 
 fun SourceElement.getPsi(): PsiElement? = (this as? PsiSourceElement)?.psi
+
+val SourceElement.psi: PsiElement? get() = getPsi()

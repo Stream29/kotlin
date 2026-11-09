@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.psi.stubs.KotlinClassLiteralExpressionStub
 import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
+
+
 @OptIn(KtImplementationDetail::class)
 class KotlinClassLiteralExpressionStubImpl(
     parent: StubElement<*>?,

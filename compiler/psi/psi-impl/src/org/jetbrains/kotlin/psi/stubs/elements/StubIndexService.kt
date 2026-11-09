@@ -9,6 +9,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.psi.stubs.IndexSink
 import org.jetbrains.kotlin.psi.stubs.*
 
+
+
 open class StubIndexService protected constructor() {
     open fun indexFile(stub: KotlinFileStub, sink: IndexSink) {
     }
@@ -38,9 +40,9 @@ open class StubIndexService protected constructor() {
     }
 
     companion object {
-        @JvmStatic
+
         fun getInstance(): StubIndexService {
-            return ApplicationManager.getApplication().getService(StubIndexService::class.java) ?: NO_INDEX
+            return ApplicationManager.getApplication().getService(StubIndexService::class) ?: NO_INDEX
         }
 
         private val NO_INDEX = StubIndexService()

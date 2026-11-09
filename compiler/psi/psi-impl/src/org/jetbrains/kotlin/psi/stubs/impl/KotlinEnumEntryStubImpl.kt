@@ -5,6 +5,13 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+import org.jetbrains.kotlin.psi.isLocal
+import org.jetbrains.kotlin.psi.qualifiedName
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.io.StringRef
 import org.jetbrains.kotlin.name.ClassId
@@ -16,16 +23,19 @@ import org.jetbrains.kotlin.psi.stubs.KotlinClassStub
 import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
+
+
 @OptIn(KtImplementationDetail::class)
 class KotlinEnumEntryStubImpl(
     parent: StubElement<*>?,
     private val qualifiedName: StringRef?,
-    private val name: StringRef?,
+    name: StringRef?,
     override val isLocal: Boolean,
 ) : KotlinStubBaseImpl<KtClass>(
     parent = parent,
     elementType = KtStubElementTypes.ENUM_ENTRY,
 ), KotlinClassStub {
+    private val nameRef = name
     override val isClsStubCompiledToJvmDefaultImplementation: Boolean
         get() = false
 
@@ -41,7 +51,8 @@ class KotlinEnumEntryStubImpl(
     override val fqName: FqName?
         get() = qualifiedName?.string?.let(::FqName)
 
-    override fun getName(): String? = name?.string
+    override val name: String?
+    get() = nameRef?.string
 
     override val superNames: List<String>
         get() {
@@ -62,7 +73,7 @@ class KotlinEnumEntryStubImpl(
     override fun copyInto(newParent: StubElement<*>?): KotlinEnumEntryStubImpl = KotlinEnumEntryStubImpl(
         parent = newParent,
         qualifiedName = qualifiedName,
-        name = name,
+        name = nameRef,
         isLocal = isLocal,
     )
 
@@ -70,7 +81,7 @@ class KotlinEnumEntryStubImpl(
     override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
         other is KotlinEnumEntryStubImpl &&
                 other.isLocal == isLocal &&
-                other.name == name &&
+                other.nameRef == nameRef &&
                 other.qualifiedName == qualifiedName &&
                 other.kdocText == kdocText
 }

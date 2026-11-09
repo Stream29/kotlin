@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+@file:OptIn(kotlin.native.internal.InternalForKotlinNative::class)
+
 package org.jetbrains.kotlin.psi
 
 import com.intellij.openapi.project.Project
@@ -21,11 +24,13 @@ import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.KtNodeTypes
 
-class KtBlockCodeFragment(
-    viewProvider: FileViewProvider,
-    imports: String?, // Should be separated by KtCodeFragment.IMPORT_SEPARATOR
-    context: PsiElement?
-) : KtCodeFragment(viewProvider, imports, KtNodeTypes.BLOCK_CODE_FRAGMENT, context) {
+
+
+class KtBlockCodeFragment : KtCodeFragment {
+    constructor(viewProvider: FileViewProvider, imports: String?, context: PsiElement?) : super(viewProvider, imports, KtNodeTypes.BLOCK_CODE_FRAGMENT, context)
+    override fun createUnlinkedFileClone(): KtBlockCodeFragment =
+        kotlin.native.internal.createUninitializedInstance<KtBlockCodeFragment>().also { copyKtCodeFragmentStateTo(it) }
+
 
     constructor(
         project: Project,
@@ -39,6 +44,6 @@ class KtBlockCodeFragment(
         context,
     )
 
-    override fun getContentElement() = findChildByClass(KtBlockExpression::class.java)
+    override fun getContentElement() = findChildByClass(KtBlockExpression::class)
             ?: throw IllegalStateException("Block expression should be parsed for BlockCodeFragment")
 }

@@ -14,15 +14,17 @@ import org.jetbrains.kotlin.psi.KtAnnotationUseSiteTarget
 import org.jetbrains.kotlin.psi.stubs.KotlinAnnotationUseSiteTargetStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinAnnotationUseSiteTargetStubImpl
 
+
+
 class KtAnnotationUseSiteTargetElementType(debugName: String) :
     KtStubElementType<KotlinAnnotationUseSiteTargetStubImpl, KtAnnotationUseSiteTarget>(
         debugName,
-        KtAnnotationUseSiteTarget::class.java,
-        KotlinAnnotationUseSiteTargetStub::class.java,
+        KtAnnotationUseSiteTarget::class,
+        KotlinAnnotationUseSiteTargetStub::class,
     ) {
     override fun createStub(
         psi: KtAnnotationUseSiteTarget,
-        parentStub: StubElement<out PsiElement>,
+        parentStub: StubElement<*>?,
     ): KotlinAnnotationUseSiteTargetStubImpl {
         val useSiteTarget = psi.getAnnotationUseSiteTarget().name
         return KotlinAnnotationUseSiteTargetStubImpl(parentStub, StringRef.fromString(useSiteTarget)!!)
@@ -32,7 +34,7 @@ class KtAnnotationUseSiteTargetElementType(debugName: String) :
         dataStream.writeName(stub.useSiteTarget)
     }
 
-    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<PsiElement>): KotlinAnnotationUseSiteTargetStubImpl {
+    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): KotlinAnnotationUseSiteTargetStubImpl {
         val useSiteTarget = dataStream.readName()
         return KotlinAnnotationUseSiteTargetStubImpl(parentStub, useSiteTarget!!)
     }

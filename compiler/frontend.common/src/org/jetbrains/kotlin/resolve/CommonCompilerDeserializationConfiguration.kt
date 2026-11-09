@@ -13,6 +13,8 @@ import org.jetbrains.kotlin.metadata.deserialization.MetadataVersion
 import org.jetbrains.kotlin.serialization.deserialization.DeserializationConfiguration
 import org.jetbrains.kotlin.util.toMetadataVersion
 
+
+
 class CommonCompilerDeserializationConfiguration(
     val languageVersionSettings: LanguageVersionSettings,
 ) : DeserializationConfiguration {

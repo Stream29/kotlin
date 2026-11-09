@@ -8,6 +8,8 @@ package org.jetbrains.kotlin.diagnostics
 import com.intellij.openapi.util.TextRange
 import org.jetbrains.kotlin.AbstractKtSourceElement
 
+
+
 open class OffsetsOnlyPositioningStrategy : AbstractSourceElementPositioningStrategy() {
     open fun markKtDiagnostic(element: AbstractKtSourceElement, diagnostic: KtDiagnostic): List<TextRange> {
         return mark(element.startOffset, element.endOffset)

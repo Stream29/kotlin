@@ -7,6 +7,8 @@
 
 package org.jetbrains.kotlin.psi
 
+import kotlin.concurrent.Volatile
+
 import com.intellij.lang.ASTNode
 import com.intellij.navigation.ItemPresentation
 import com.intellij.navigation.ItemPresentationProviders
@@ -19,6 +21,8 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.psi.psiUtil.ClassIdCalculator
 import org.jetbrains.kotlin.psi.psiUtil.isKtFile
 import org.jetbrains.kotlin.psi.stubs.KotlinClassOrObjectStub
+
+
 
 abstract class KtClassOrObject :
     KtTypeParameterListOwnerStub<KotlinClassOrObjectStub<out KtClassOrObject>>, KtDeclarationContainer, KtNamedDeclaration,
@@ -109,7 +113,8 @@ abstract class KtClassOrObject :
 
     override fun getDeclarations(): List<KtDeclaration> = getBody()?.declarations.orEmpty()
 
-    override fun getPresentation(): ItemPresentation? = ItemPresentationProviders.getItemPresentation(this)
+    override val presentation: ItemPresentation?
+    get() = ItemPresentationProviders.getItemPresentation(this)
 
     override fun getPrimaryConstructor(): KtPrimaryConstructor? =
         @Suppress("DEPRECATION") // KT-78356
@@ -140,9 +145,16 @@ abstract class KtClassOrObject :
     val companionBlocks: List<KtCompanionBlock>
         get() = body?.companionBlocks.orEmpty()
 
-    private val classInterfaceObjectTokenSet = TokenSet.create(
+    private var classInterfaceObjectTokenSet = TokenSet.create(
         KtTokens.CLASS_KEYWORD, KtTokens.INTERFACE_KEYWORD, KtTokens.OBJECT_KEYWORD
     )
+
+    protected override fun copyKotlinPsiStateTo(clone: com.intellij.psi.impl.PsiElementBase) {
+        super.copyKotlinPsiStateTo(clone)
+        val target = clone as KtClassOrObject
+        target.isLocal = isLocal
+        target.classInterfaceObjectTokenSet = classInterfaceObjectTokenSet
+    }
 
     override fun delete() {
         KtPsiMutationService.getInstance().deleteClassOrObject(this)
@@ -160,7 +172,7 @@ abstract class KtClassOrObject :
                 // Consider different instances of local classes non-equivalent
                 !isLocal() &&
                 !another.isLocal() &&
-                getClassId() == another.getClassId()
+                classId == another.classId
 
     override fun getContextReceivers(): List<KtContextReceiver> =
         modifierList?.contextParameterList?.contextReceivers().orEmpty()

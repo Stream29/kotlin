@@ -5,6 +5,12 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
+import org.jetbrains.kotlin.psi.classId
+import org.jetbrains.kotlin.psi.fqName
+import org.jetbrains.kotlin.psi.isTopLevel
+
+
+
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
@@ -16,14 +22,17 @@ import org.jetbrains.kotlin.psi.stubs.KotlinTypeAliasStub
 import org.jetbrains.kotlin.psi.stubs.StubUtils
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinTypeAliasStubImpl
 
-class KtTypeAliasElementType(debugName: String) :
-    KtStubElementType<KotlinTypeAliasStubImpl, KtTypeAlias>(debugName, KtTypeAlias::class.java, KotlinTypeAliasStub::class.java) {
 
-    override fun createStub(psi: KtTypeAlias, parentStub: StubElement<*>): KotlinTypeAliasStubImpl {
+
+class KtTypeAliasElementType(debugName: String) :
+    KtStubElementType<KotlinTypeAliasStubImpl, KtTypeAlias>(debugName, KtTypeAlias::class, KotlinTypeAliasStub::class) {
+
+    override fun createStub(psi: KtTypeAlias, parentStub: StubElement<*>?): KotlinTypeAliasStubImpl {
+        val parentStub = parentStub!!
         val name = StringRef.fromString(psi.name)
         val fqName = StringRef.fromString(psi.safeFqNameForLazyResolve()?.asString())
         val classId = StubUtils.createClassId(parentStub, psi)
-        val isTopLevel = psi.isTopLevel()
+        val isTopLevel = psi.isTopLevel
         return KotlinTypeAliasStubImpl(parentStub, name, fqName, classId, isTopLevel)
     }
 

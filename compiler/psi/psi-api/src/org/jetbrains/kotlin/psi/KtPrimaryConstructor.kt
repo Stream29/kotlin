@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.KtStubBasedElementTypes
 import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
 import org.jetbrains.kotlin.psi.stubs.KotlinConstructorStub
 
+
+
 /**
  * Represents a primary constructor explicitly declared in a class header.
  *

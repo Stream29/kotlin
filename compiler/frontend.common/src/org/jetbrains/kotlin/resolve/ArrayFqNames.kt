@@ -10,6 +10,8 @@ import org.jetbrains.kotlin.builtins.StandardNames.FqNames
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
+
+
 object ArrayFqNames {
     val PRIMITIVE_TYPE_TO_ARRAY: Map<PrimitiveType, Name> = hashMapOf(
         PrimitiveType.BOOLEAN to Name.identifier("booleanArrayOf"),
@@ -37,6 +39,5 @@ object ArrayFqNames {
     val ARRAY_CALL_NAMES: Set<Name> =
         setOf(ARRAY_OF_FUNCTION, EMPTY_ARRAY) + PRIMITIVE_TYPE_TO_ARRAY.values.toSet() + UNSIGNED_TYPE_TO_ARRAY.values.toSet()
 
-    @JvmField
     val ARRAY_CALL_FQ_NAMES: Set<FqName> = ARRAY_CALL_NAMES.map { FqName("kotlin." + it.identifier) }.toSet()
 }

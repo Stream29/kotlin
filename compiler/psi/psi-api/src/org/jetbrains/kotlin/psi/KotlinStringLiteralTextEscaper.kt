@@ -18,16 +18,17 @@ package org.jetbrains.kotlin.psi
 
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.LiteralTextEscaper
-import it.unimi.dsi.fastutil.ints.IntArrayList
 import org.jetbrains.kotlin.psi.psiUtil.getContentRange
 import org.jetbrains.kotlin.psi.psiUtil.isSingleQuoted
 import kotlin.math.min
+
+
 
 class KotlinStringLiteralTextEscaper(host: KtStringTemplateExpression) : LiteralTextEscaper<KtStringTemplateExpression>(host) {
     private var sourceOffsets: IntArray? = null
 
     override fun decode(rangeInsideHost: TextRange, outChars: StringBuilder): Boolean {
-        val sourceOffsetsList = IntArrayList()
+        val sourceOffsetsList = ArrayList<Int>()
         var sourceOffset = 0
 
         for (child in myHost.entries) {
@@ -52,7 +53,7 @@ class KotlinStringLiteralTextEscaper(host: KtStringTemplateExpression) : Literal
                     repeat(unescaped.length) {
                         sourceOffsetsList.add(sourceOffset)
                     }
-                    sourceOffset += child.getTextLength()
+                    sourceOffset += child.textLength
                 }
                 else -> {
                     val textRange = rangeInsideHost.intersection(childRange)!!.shiftRight(-childRange.startOffset)
@@ -74,11 +75,11 @@ class KotlinStringLiteralTextEscaper(host: KtStringTemplateExpression) : Literal
         return min(offsets[offsetInDecoded], rangeInsideHost.length) + rangeInsideHost.startOffset
     }
 
-    override fun getRelevantTextRange(): TextRange {
+    override val relevantTextRange: TextRange get() {
         return myHost.getContentRange()
     }
 
-    override fun isOneLine(): Boolean {
+    override val isOneLine: Boolean get() {
         return myHost.isSingleQuoted()
     }
 }

@@ -13,6 +13,8 @@ import org.jetbrains.kotlin.psi.stubs.KotlinContextReceiverStub
 import org.jetbrains.kotlin.utils.exceptions.requireWithAttachment
 import org.jetbrains.kotlin.utils.exceptions.withPsiEntry
 
+
+
 /**
  * Represents a single context receiver in a context receiver list.
  *
@@ -35,12 +37,12 @@ class KtContextReceiver : KtElementImplStub<KotlinContextReceiverStub> {
     }
 
     fun targetLabel(): KtSimpleNameExpression? =
-        findChildByType<KtContainerNode?>(KtNodeTypes.LABEL_QUALIFIER)
+        findChildByType<KtContainerNode>(KtNodeTypes.LABEL_QUALIFIER)
             ?.findChildByType(KtNodeTypes.LABEL)
 
     fun labelName(): String? {
         stub?.let { return it.label }
-        return targetLabel()?.getReferencedName()
+        return targetLabel()?.referencedName
     }
 
     fun labelNameAsName(): Name? {

@@ -16,6 +16,12 @@
 
 package org.jetbrains.kotlin.cfg
 
+
+
+
+
+
+
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
@@ -25,7 +31,8 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtPsiUtil
-import java.util.*
+
+
 
 interface UnreachableCode {
     val elements: Set<KtElement>
@@ -46,7 +53,7 @@ interface UnreachableCode {
                     if (isNotEmpty()) this
                     // Specific case like condition in when:
                     // element is dead but its only child is alive and has the same text range
-                    else listOf(element.textRange.endOffset.let { TextRange(it, it) })
+                    else listOf(element.textRange!!.endOffset.let { TextRange(it, it) })
                 }
             } else {
                 listOf(element.textRange!!)

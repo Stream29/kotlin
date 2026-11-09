@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.psi.stubs.KotlinFunctionTypeStub
 import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
+
+
 /**
  * @param abbreviatedType The type alias application from which this type was originally expanded. It can be used to render or navigate to
  *  the original type alias instead of the expanded type.

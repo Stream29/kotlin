@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.kdoc.parser
 
+
 import com.intellij.lang.ASTNode
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiBuilderFactory
@@ -24,14 +25,16 @@ import com.intellij.psi.tree.IElementType
 import org.jetbrains.kotlin.lexer.KotlinLexer
 import org.jetbrains.kotlin.lexer.KtTokens
 
+
+
 /**
  * Parses the contents of a Markdown link in KDoc. Uses the standard Kotlin lexer.
  */
 class KDocLinkParser : PsiParser {
     companion object {
-        @JvmStatic
+
         fun parseMarkdownLink(root: IElementType, chameleon: ASTNode): ASTNode {
-            val parentElement = chameleon.treeParent.psi
+            val parentElement = chameleon.treeParent!!.psi!!
             val project = parentElement.project
             val builder = PsiBuilderFactory.getInstance().createBuilder(
                 project,
@@ -42,7 +45,7 @@ class KDocLinkParser : PsiParser {
             )
             val parser = KDocLinkParser()
 
-            return parser.parse(root, builder).firstChildNode
+            return parser.parse(root, builder).firstChildNode!!
         }
     }
 

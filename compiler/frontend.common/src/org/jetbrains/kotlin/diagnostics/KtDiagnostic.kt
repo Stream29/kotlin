@@ -15,6 +15,8 @@ import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSourceLocation
 import org.jetbrains.kotlin.utils.exceptions.requireWithAttachment
 import org.jetbrains.kotlin.utils.exceptions.withPsiEntry
 
+
+
 // ------------------------------ diagnostics ------------------------------
 
 sealed class KtDiagnostic {
@@ -104,7 +106,7 @@ interface KtPsiDiagnostic : DiagnosticMarker {
         get() = element.psi
 
     val psiFile: PsiFile
-        get() = psiElement.containingFile
+        get() = psiElement.containingFile!!
 }
 
 private const val CHECK_PSI_CONSISTENCY_IN_DIAGNOSTICS = true

@@ -5,11 +5,19 @@
 
 package org.jetbrains.kotlin.psi.psiUtil
 
+
+
+
+
+
+
 import com.intellij.psi.PsiErrorElement
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.name.*
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.utils.*
+
+
 
 internal object ClassIdCalculator {
     fun calculateClassId(declaration: KtClassLikeDeclaration): ClassId? {

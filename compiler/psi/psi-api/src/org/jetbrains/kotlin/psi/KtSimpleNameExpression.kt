@@ -22,6 +22,8 @@ import com.intellij.psi.tree.IElementType
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.Name
 
+
+
 interface KtSimpleNameExpression : KtReferenceExpression {
 
     fun getReferencedName(): String
@@ -55,7 +57,7 @@ abstract class KtSimpleNameExpressionImpl(node: ASTNode) : KtExpressionImpl(node
         }
 
         fun getReferencedNameAsNameImpl(expresssion: KtSimpleNameExpression): Name {
-            val name = expresssion.getReferencedName()
+            val name = expresssion.referencedName
             return Name.identifier(name)
         }
 

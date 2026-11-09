@@ -10,22 +10,25 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.kotlin.psi.psiUtil.parentSubstitute
 
+
+
 abstract class KtExpressionImpl(node: ASTNode) : KtElementImpl(node), KtExpression {
 
     override fun <R, D> accept(visitor: KtVisitor<R, D>, data: D) = visitor.visitExpression(this, data)
 
     protected fun findExpressionUnder(type: IElementType): KtExpression? {
         val containerNode = findChildByType<KtContainerNode>(type) ?: return null
-        return containerNode.findChildByClass<KtExpression>(KtExpression::class.java)
+        return containerNode.findChildByClass<KtExpression>(KtExpression::class)
     }
 
     @OptIn(KtNonPublicApi::class)
     override fun replace(newElement: PsiElement): PsiElement =
-        KtPsiMutationService.getInstance().replaceExpression(this, newElement, true) { super.replace(it) }
+        KtPsiMutationService.getInstance().replaceExpression(this, newElement, true) { super<KtElementImpl>.replace(it) }
 
     // HasPlatformType is used to preserve the flexible type to not break source compatibility
     @Suppress("DEPRECATION", "HasPlatformType")
-    override fun getParent() = parentSubstitute ?: super.getParent()
+    override val parent: PsiElement?
+        get() = parentSubstitute ?: super<KtElementImpl>.parent
 
     companion object {
         @Deprecated(

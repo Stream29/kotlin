@@ -15,6 +15,8 @@ import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 import org.jetbrains.kotlin.psi.stubs.KotlinEnumEntrySuperclassReferenceExpressionStub
 import org.jetbrains.kotlin.resolution.KtResolvableCall
 
+
+
 /**
  * Represents a synthetic reference to the enum class constructor in an enum entry initializer.
  *

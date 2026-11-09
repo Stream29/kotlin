@@ -5,6 +5,49 @@
 
 package org.jetbrains.kotlin.psi.psiUtil
 
+import org.jetbrains.kotlin.psi.annotationEntries
+import org.jetbrains.kotlin.psi.arguments
+import org.jetbrains.kotlin.psi.baseExpression
+import org.jetbrains.kotlin.psi.bodyBlockExpression
+import org.jetbrains.kotlin.psi.callableReference
+import org.jetbrains.kotlin.psi.calleeExpression
+import org.jetbrains.kotlin.psi.classId
+import org.jetbrains.kotlin.psi.constructorReferenceExpression
+import org.jetbrains.kotlin.psi.contextParameters
+import org.jetbrains.kotlin.psi.declarations
+import org.jetbrains.kotlin.psi.entries
+import org.jetbrains.kotlin.psi.firstStatement
+import org.jetbrains.kotlin.psi.fqName
+import org.jetbrains.kotlin.psi.importedReference
+import org.jetbrains.kotlin.psi.innerType
+import org.jetbrains.kotlin.psi.isLocal
+import org.jetbrains.kotlin.psi.isObjectLiteral
+import org.jetbrains.kotlin.psi.lBrace
+import org.jetbrains.kotlin.psi.left
+import org.jetbrains.kotlin.psi.operationReference
+import org.jetbrains.kotlin.psi.operationToken
+import org.jetbrains.kotlin.psi.parameters
+import org.jetbrains.kotlin.psi.qualifiedName
+import org.jetbrains.kotlin.psi.qualifier
+import org.jetbrains.kotlin.psi.rBrace
+import org.jetbrains.kotlin.psi.receiverTypeReference
+import org.jetbrains.kotlin.psi.referenceExpression
+import org.jetbrains.kotlin.psi.referencedName
+import org.jetbrains.kotlin.psi.right
+import org.jetbrains.kotlin.psi.statements
+import org.jetbrains.kotlin.psi.superTypeListEntries
+import org.jetbrains.kotlin.psi.typeAsUserType
+import org.jetbrains.kotlin.psi.typeReference
+
+
+
+
+
+
+
+
+
+
 import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.TextRange
@@ -16,7 +59,10 @@ import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.lexer.KtKeywordToken
 import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
 import org.jetbrains.kotlin.lexer.KtTokens
-import org.jetbrains.kotlin.lexer.KtTokens.MODALITY_MODIFIERS
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.MODALITY_MODIFIERS
+import org.jetbrains.kotlin.lexer.lexerCharCount
+import org.jetbrains.kotlin.lexer.lexerCodePointAt
+import nativekotlin.host.text.jdkCharacterType
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -24,7 +70,8 @@ import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.stubs.KotlinClassOrObjectStub
 import org.jetbrains.kotlin.psi.utils.OperatorTokens
-import java.util.*
+
+
 
 // NOTE: in this file we collect only Kotlin-specific methods working with PSI and not modifying it
 
@@ -170,7 +217,7 @@ fun KtBlockExpression.contentRange(): PsiChildRange {
 
 // ----------- Inheritance -----------------------------------------------------------------------------------------------------------------
 
-fun KtClass.isAbstract(): Boolean = isInterface() || hasModifier(KtTokens.ABSTRACT_KEYWORD)
+fun KtClass.isAbstract(): Boolean = isInterface || hasModifier(KtTokens.ABSTRACT_KEYWORD)
 
 /**
  * Returns the list of unqualified names that are indexed as the superclass names of this class. For the names that might be imported
@@ -188,7 +235,7 @@ fun StubBasedPsiElementBase<out KotlinClassOrObjectStub<out KtClassOrObject>>.ge
         }
     }
 
-    require(this is KtClassOrObject) { "it should be ${KtClassOrObject::class} but it is a ${this::class.java.name}" }
+    require(this is KtClassOrObject) { "it should be ${KtClassOrObject::class} but it is a ${this::class.qualifiedName}" }
 
     val stub = greenStub
     if (stub != null) {
@@ -196,7 +243,7 @@ fun StubBasedPsiElementBase<out KotlinClassOrObjectStub<out KtClassOrObject>>.ge
     }
 
     val specifiers = this.superTypeListEntries
-    if (specifiers.isEmpty()) return Collections.emptyList()
+    if (specifiers.isEmpty()) return emptyList()
 
     val result = ArrayList<String>()
     for (specifier in specifiers) {
@@ -372,6 +419,8 @@ fun KtElement.isContextualDeclaration(): Boolean {
 
 fun KtClassOrObject.isObjectLiteral(): Boolean = this is KtObjectDeclaration && isObjectLiteral()
 
+val KtClassOrObject.isObjectLiteral: Boolean get() = isObjectLiteral()
+
 //TODO: strange method, and not only Kotlin specific (also Java)
 fun PsiElement.parameterIndex(): Int {
     val parent = parent
@@ -391,12 +440,12 @@ fun KtModifierListOwner.isProtected(): Boolean = hasModifier(KtTokens.PROTECTED_
 
 fun KtSimpleNameExpression.isImportDirectiveExpression(): Boolean {
     val parent = parent
-    return parent is KtImportDirective || parent.parent is KtImportDirective
+    return parent is KtImportDirective || parent!!.parent is KtImportDirective
 }
 
 fun KtSimpleNameExpression.isPackageDirectiveExpression(): Boolean {
     val parent = parent
-    return parent is KtPackageDirective || parent.parent is KtPackageDirective
+    return parent is KtPackageDirective || parent!!.parent is KtPackageDirective
 }
 
 fun KtExpression.isInImportDirective(): Boolean {
@@ -431,7 +480,7 @@ fun KtStringTemplateExpression.getContentRange(): TextRange {
         interpolationPrefixOrOpenQuote.elementType == KtNodeTypes.STRING_INTERPOLATION_PREFIX && secondNode.elementType == KtTokens.OPEN_QUOTE
     }
     val start = interpolationPrefixOrOpenQuote.textLength + (openQuoteAfterPrefixOrNull?.textLength ?: 0)
-    val lastChild = node.lastChildNode
+    val lastChild = node.lastChildNode!!
     val length = textLength
     return TextRange(start, if (lastChild.elementType == KtTokens.CLOSING_QUOTE) length - lastChild.textLength else length)
 }
@@ -468,10 +517,10 @@ val KtStringTemplateExpression.plainContent: String
 fun KtStringTemplateExpression.isSingleQuoted(): Boolean =
     node.findChildByType(KtTokens.OPEN_QUOTE)?.textLength == 1
 
-val KtNamedDeclaration.isPrivateNestedClassOrObject: Boolean get() = this is KtClassOrObject && isPrivate() && !isTopLevel()
+val KtNamedDeclaration.isPrivateNestedClassOrObject: Boolean get() = this is KtClassOrObject && isPrivate() && !isTopLevel
 
 fun KtNamedDeclaration.getValueParameters(): List<KtParameter> {
-    return getValueParameterList()?.parameters ?: Collections.emptyList()
+    return getValueParameterList()?.parameters ?: emptyList()
 }
 
 fun KtNamedDeclaration.getValueParameterList(): KtParameterList? {
@@ -601,7 +650,7 @@ val KtBlockExpression.containingScript: KtScript?
 val KtDeclaration.containingClassId: ClassId?
     get() {
         containingClassOrObject?.let {
-            return it.getClassId()
+            return it.classId
         }
 
         val script = containingScript?.takeIf(KtScript::isReplSnippet) ?: return null
@@ -806,17 +855,18 @@ fun String?.isIdentifier(): Boolean {
     var index = 0
 
     while (index < length) {
-        val codePoint = codePointAt(index)
+        val codePoint = lexerCodePointAt(this, index)
+        val characterType = jdkCharacterType(codePoint)
 
         val isValid = (codePoint == '_'.code)
-                || Character.isLetter(codePoint)
-                || (index > 0 && Character.isDigit(codePoint))
+                || characterType in 1..5
+                || (index > 0 && characterType == 9)
 
         if (!isValid) {
             return false
         }
 
-        index += Character.charCount(codePoint)
+        index += lexerCharCount(codePoint)
     }
 
     return true
@@ -881,16 +931,16 @@ fun getTrailingCommaByClosingElement(closingElement: PsiElement?): PsiElement? {
     val elementBeforeClosingElement =
         closingElement?.getPrevSiblingIgnoringWhitespaceAndComments() ?: return null
 
-    return elementBeforeClosingElement.run { if (node.elementType == KtTokens.COMMA) this else null }
+    return elementBeforeClosingElement.run { if (node!!.elementType == KtTokens.COMMA) this else null }
 }
 
 fun getTrailingCommaByElementsList(elementList: PsiElement?): PsiElement? {
     val lastChild = elementList?.lastChild?.let { if (it !is PsiComment) it else it.getPrevSiblingIgnoringWhitespaceAndComments() }
-    return lastChild?.takeIf { it.node.elementType == KtTokens.COMMA }
+    return lastChild?.takeIf { it.node!!.elementType == KtTokens.COMMA }
 }
 
 val KtNameReferenceExpression.isUnderscoreInBackticks
-    get() = getReferencedName() == "`_`"
+    get() = referencedName == "`_`"
 
 tailrec fun KtTypeElement.unwrapNullability(): KtTypeElement? {
     return when (this) {
@@ -913,7 +963,7 @@ fun getImportedSimpleNameByImportAlias(file: KtFile, aliasName: String): String?
         reference = reference.selectorExpression
     }
     if (reference is KtSimpleNameExpression) {
-        return reference.getReferencedName()
+        return reference.referencedName
     }
 
     return null

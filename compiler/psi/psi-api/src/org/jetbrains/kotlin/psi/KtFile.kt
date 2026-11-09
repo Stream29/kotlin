@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+@file:OptIn(kotlin.native.internal.InternalForKotlinNative::class)
+
 package org.jetbrains.kotlin.psi
 
 import com.intellij.psi.FileViewProvider
@@ -23,10 +26,19 @@ import com.intellij.psi.tree.TokenSet
 import org.jetbrains.kotlin.KtStubBasedElementTypes
 import org.jetbrains.kotlin.psi.stubs.elements.KtTokenSets
 
-open class KtFile(viewProvider: FileViewProvider, isCompiled: Boolean) : @Suppress("DEPRECATION") KtCommonFile(viewProvider, isCompiled),
+
+
+open class KtFile : @Suppress("DEPRECATION") KtCommonFile,
     PsiClassOwner {
+    constructor(viewProvider: FileViewProvider, isCompiled: Boolean) : super(viewProvider, isCompiled)
+
+    override fun createUnlinkedFileClone(): KtFile {
+        check(this::class == KtFile::class) { "Concrete Kotlin file subtype needs its own clone allocation hook" }
+        return kotlin.native.internal.createUninitializedInstance<KtFile>().also { copyKtCommonFileStateTo(it) }
+    }
+
     override fun getClasses(): Array<PsiClass> {
-        val fileClassProvider = project.getService(KtFileClassProvider::class.java)
+        val fileClassProvider = project.getService(KtFileClassProvider::class)
         return fileClassProvider?.getFileClasses(this) ?: PsiClass.EMPTY_ARRAY
     }
 
@@ -45,4 +57,3 @@ open class KtFile(viewProvider: FileViewProvider, isCompiled: Boolean) : @Suppre
         val FILE_DECLARATION_TYPES = TokenSet.orSet(KtTokenSets.DECLARATION_TYPES, TokenSet.create(KtStubBasedElementTypes.SCRIPT))
     }
 }
-

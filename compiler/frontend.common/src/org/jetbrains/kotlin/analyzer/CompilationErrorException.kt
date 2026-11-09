@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlin.analyzer
 
+
+
+
+
 class CompilationErrorException : RuntimeException {
     constructor() : super()
     constructor(message: String) : super(message)

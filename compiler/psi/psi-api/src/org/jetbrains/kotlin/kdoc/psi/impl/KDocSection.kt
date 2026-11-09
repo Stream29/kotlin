@@ -16,6 +16,12 @@
 
 package org.jetbrains.kotlin.kdoc.psi.impl
 
+
+
+
+
+
+
 import com.intellij.lang.ASTNode
 import com.intellij.psi.ContributedReferenceHost
 import com.intellij.psi.LiteralTextEscaper
@@ -25,6 +31,8 @@ import org.jetbrains.kotlin.psi.KotlinReferenceProvidersService
 import org.jetbrains.kotlin.psi.KtNonPublicApi
 import org.jetbrains.kotlin.psi.KtPsiMutationService
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
+
+
 
 /**
  * The part of a doc comment which describes a single class, method or property
@@ -37,7 +45,8 @@ class KDocSection(node: ASTNode) : KDocTag(node), ContributedReferenceHost, PsiL
      * Returns the name of the section (the name of the doc tag introducing the section,
      * or null for the default section).
      */
-    override fun getName(): String? =
+    override val name: String?
+    get() =
         (firstChild as? KDocTag)?.name
 
     override fun getSubjectName(): String? =
@@ -52,15 +61,17 @@ class KDocSection(node: ASTNode) : KDocTag(node), ContributedReferenceHost, PsiL
 
     fun findTagByName(name: String): KDocTag? = findTagsByName(name).firstOrNull()
 
-    override fun getReference(): PsiReference? {
+    override val reference: PsiReference?
+    get() {
         return references.firstOrNull()
     }
 
-    override fun getReferences(): Array<out PsiReference?> {
+    override val references: Array<PsiReference>
+    get() {
         return KotlinReferenceProvidersService.getReferencesFromProviders(this)
     }
 
-    override fun isValidHost(): Boolean = true
+    override val isValidHost: Boolean get() = true
 
     @OptIn(KtNonPublicApi::class)
     override fun updateText(text: String): PsiLanguageInjectionHost =

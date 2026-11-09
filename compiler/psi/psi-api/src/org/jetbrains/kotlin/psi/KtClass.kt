@@ -13,6 +13,8 @@ import org.jetbrains.kotlin.KtStubBasedElementTypes
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.stubs.KotlinClassStub
 
+
+
 /**
  * Represents a class or interface declaration.
  *
@@ -27,7 +29,12 @@ import org.jetbrains.kotlin.psi.stubs.KotlinClassStub
  * ```
  */
 open class KtClass : KtClassOrObject {
-    private val classInterfaceTokenSet = TokenSet.create(KtTokens.CLASS_KEYWORD, KtTokens.INTERFACE_KEYWORD)
+    private var classInterfaceTokenSet = TokenSet.create(KtTokens.CLASS_KEYWORD, KtTokens.INTERFACE_KEYWORD)
+
+    protected override fun copyKotlinPsiStateTo(clone: com.intellij.psi.impl.PsiElementBase) {
+        super.copyKotlinPsiStateTo(clone)
+        (clone as KtClass).classInterfaceTokenSet = classInterfaceTokenSet
+    }
 
     constructor(node: ASTNode) : super(node)
     constructor(stub: KotlinClassStub) : super(stub, KtStubBasedElementTypes.CLASS)

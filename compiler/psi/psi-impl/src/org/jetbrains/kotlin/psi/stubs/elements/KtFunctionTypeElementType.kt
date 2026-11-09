@@ -5,6 +5,12 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -13,10 +19,12 @@ import org.jetbrains.kotlin.psi.KtFunctionType
 import org.jetbrains.kotlin.psi.stubs.KotlinFunctionTypeStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinFunctionTypeStubImpl
 
+
+
 class KtFunctionTypeElementType(@NonNls debugName: String) : KtStubElementType<KotlinFunctionTypeStubImpl, KtFunctionType>(
     debugName,
-    KtFunctionType::class.java,
-    KotlinFunctionTypeStub::class.java,
+    KtFunctionType::class,
+    KotlinFunctionTypeStub::class,
 ) {
     override fun createStub(psi: KtFunctionType, parentStub: StubElement<*>?): KotlinFunctionTypeStubImpl =
         KotlinFunctionTypeStubImpl(

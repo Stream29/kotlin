@@ -7,6 +7,12 @@
 
 package org.jetbrains.kotlin.psi.stubs
 
+
+
+
+
+
+
 import com.intellij.psi.stubs.NamedStub
 import com.intellij.psi.stubs.PsiFileStub
 import com.intellij.psi.stubs.StubElement
@@ -14,6 +20,8 @@ import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.*
+
+
 
 /** Base interface for all Kotlin stubs */
 @KtImplementationDetail

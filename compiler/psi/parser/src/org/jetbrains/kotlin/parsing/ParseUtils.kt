@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.parsing
 
+
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.psi.utils.hasIllegallyPositionedUnderscore
@@ -13,6 +14,8 @@ import org.jetbrains.kotlin.psi.utils.hasUnsignedLongNumericLiteralSuffix
 import org.jetbrains.kotlin.psi.utils.hasUnsignedNumericLiteralSuffix
 import org.jetbrains.kotlin.psi.utils.parseBooleanLiteral
 import org.jetbrains.kotlin.psi.utils.parseNumericLiteral
+
+
 
 fun hasIllegalUnderscore(text: String, elementType: IElementType): Boolean {
     return when {

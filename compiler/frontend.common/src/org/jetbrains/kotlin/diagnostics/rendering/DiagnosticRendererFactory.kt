@@ -9,6 +9,8 @@ import org.jetbrains.kotlin.diagnostics.KtDiagnostic
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactoryToRendererMap
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticRenderer
 
+
+
 fun interface DiagnosticRendererFactory {
     operator fun invoke(diagnostic: KtDiagnostic): KtDiagnosticRenderer?
 }

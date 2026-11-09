@@ -11,10 +11,14 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import org.jetbrains.kotlin.KtStubBasedElementTypes
 import org.jetbrains.kotlin.lexer.KtTokens
-import org.jetbrains.kotlin.lexer.KtTokens.*
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.IDENTIFIER
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.SUPER_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.THIS_KEYWORD
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.stubs.KotlinNameReferenceExpressionStub
 import org.jetbrains.kotlin.resolution.KtResolvableCall
+
+
 
 /**
  * Represents a simple name reference to a variable, function, or type.

@@ -21,7 +21,6 @@ import org.jetbrains.kotlin.diagnostics.impl.DiagnosticsCollectorImpl
  *
  * If [diagnosticsCollector] is not provided, a new [DiagnosticsCollectorImpl] is created.
  */
-@JvmOverloads
 fun CompilerConfiguration.Companion.create(
     diagnosticsCollector: BaseDiagnosticsCollector? = null,
     messageCollector: MessageCollector? = null,

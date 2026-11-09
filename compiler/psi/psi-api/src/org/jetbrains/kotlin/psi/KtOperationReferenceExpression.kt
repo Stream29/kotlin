@@ -15,6 +15,8 @@ import org.jetbrains.kotlin.psi.stubs.elements.KtTokenSets
 import org.jetbrains.kotlin.psi.utils.OperatorTokens
 import org.jetbrains.kotlin.resolution.KtResolvableCall
 
+
+
 /**
  * Represents an operator symbol in an expression.
  *
@@ -82,7 +84,7 @@ class KtOperationReferenceExpression(node: ASTNode) : KtSimpleNameExpressionImpl
         }.toTypedArray())
     }
 
-    override fun getReferencedNameElement() = findChildByType<PsiElement?>(OPERATION_TOKENS) ?: this
+    override fun getReferencedNameElement() = findChildByType<PsiElement>(OPERATION_TOKENS) ?: this
 
     val operationSignTokenType: KtSingleValueToken?
         get() = (firstChild as? TreeElement)?.elementType as? KtSingleValueToken

@@ -8,6 +8,8 @@ package org.jetbrains.kotlin.load.kotlin
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.kotlin.serialization.deserialization.KotlinMetadataFinder
 
+
+
 interface MetadataFinderFactory {
     fun create(scope: GlobalSearchScope): KotlinMetadataFinder
 }

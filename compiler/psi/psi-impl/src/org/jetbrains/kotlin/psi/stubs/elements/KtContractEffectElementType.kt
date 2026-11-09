@@ -13,16 +13,18 @@ import org.jetbrains.kotlin.psi.KtContractEffect
 import org.jetbrains.kotlin.psi.stubs.KotlinContractEffectStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinContractEffectStubImpl
 
-class KtContractEffectElementType(debugName: String, psiClass: Class<KtContractEffect>) :
+
+
+class KtContractEffectElementType(debugName: String, psiClass: kotlin.reflect.KClass<KtContractEffect>) :
     KtStubElementType<KotlinContractEffectStubImpl, KtContractEffect>(
         debugName,
         psiClass,
-        KotlinContractEffectStub::class.java,
+        KotlinContractEffectStub::class,
     ) {
     override fun serialize(stub: KotlinContractEffectStubImpl, dataStream: StubOutputStream) {
     }
 
-    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<PsiElement>?): KotlinContractEffectStubImpl {
+    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): KotlinContractEffectStubImpl {
         return KotlinContractEffectStubImpl(parentStub)
     }
 

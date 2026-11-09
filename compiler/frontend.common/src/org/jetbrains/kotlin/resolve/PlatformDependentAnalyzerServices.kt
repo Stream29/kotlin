@@ -8,6 +8,8 @@ package org.jetbrains.kotlin.resolve
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 
+
+
 abstract class PlatformDependentAnalyzerServices {
     @K1Deprecation
     abstract val platformConfigurator: PlatformConfigurator

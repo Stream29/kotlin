@@ -13,6 +13,8 @@ import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.psi.stubs.KotlinObjectStub
 
+
+
 /**
  * Represents an object declaration, including companion objects and named objects.
  *
@@ -33,10 +35,11 @@ class KtObjectDeclaration : KtClassOrObject {
     private val _stub: KotlinObjectStub?
         get() = greenStub as? KotlinObjectStub
 
-    override fun getName(): String? {
-        super.getName()?.let { return it }
+    override val name: String?
+    get() {
+        super.name?.let { return it }
 
-        if (isCompanion() && !isTopLevel()) {
+        if (isCompanion() && !isTopLevel) {
             //NOTE: a hack in PSI that simplifies writing frontend code
             return SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT.toString()
         }
@@ -49,8 +52,9 @@ class KtObjectDeclaration : KtClassOrObject {
 
     fun isCompanion(): Boolean = hasModifier(KtTokens.COMPANION_KEYWORD)
 
-    override fun getTextOffset(): Int = nameIdentifier?.textRange?.startOffset
-        ?: getObjectKeyword()!!.textRange.startOffset
+    override val textOffset: Int
+    get() = nameIdentifier?.textRange?.startOffset
+        ?: getObjectKeyword()!!.textRange!!.startOffset
 
     override fun <R, D> accept(visitor: KtVisitor<R, D>, data: D): R {
         return visitor.visitObjectDeclaration(this, data)
@@ -60,7 +64,7 @@ class KtObjectDeclaration : KtClassOrObject {
 
     fun getObjectKeyword(): PsiElement? = findChildByType(KtTokens.OBJECT_KEYWORD)
 
-    override fun getIdentifyingElement(): PsiElement? = getObjectKeyword()
+    override val identifyingElement: PsiElement? get() = getObjectKeyword()
 
     override fun getCompanionObjects(): List<KtObjectDeclaration> = emptyList()
 }

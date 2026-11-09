@@ -5,8 +5,16 @@
 
 package org.jetbrains.kotlin.diagnostics.rendering
 
+
+
+
+
+
+
 import org.jetbrains.kotlin.diagnostics.DiagnosticBaseContext
 import org.jetbrains.kotlin.diagnostics.DiagnosticContext
+
+
 
 @RequiresOptIn("Legacy API for K1 that doesn't pass a DiagnosticBaseContext. Mustn't be used with K2.")
 annotation class LegacyRenderingContextApi
@@ -41,7 +49,7 @@ sealed class RenderingContext {
     }
 
     companion object {
-        @JvmStatic
+
         @LegacyRenderingContextApi
         fun of(vararg objectsToRender: Any?): RenderingContext {
             return Impl(objectsToRender.toList())

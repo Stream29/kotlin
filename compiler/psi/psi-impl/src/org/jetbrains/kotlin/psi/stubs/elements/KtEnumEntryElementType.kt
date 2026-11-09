@@ -5,6 +5,11 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
+import org.jetbrains.kotlin.psi.fqName
+import org.jetbrains.kotlin.psi.isLocal
+
+
+
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
@@ -15,15 +20,17 @@ import org.jetbrains.kotlin.psi.psiUtil.safeFqNameForLazyResolve
 import org.jetbrains.kotlin.psi.stubs.KotlinClassStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinEnumEntryStubImpl
 
+
+
 internal object KtEnumEntryElementType : KtStubElementType<KotlinEnumEntryStubImpl, KtEnumEntry>(
     "ENUM_ENTRY",
-    KtEnumEntry::class.java,
-    KotlinClassStub::class.java,
+    KtEnumEntry::class,
+    KotlinClassStub::class,
 ) {
-    override fun createStub(psi: KtEnumEntry, parentStub: StubElement<*>): KotlinEnumEntryStubImpl {
+    override fun createStub(psi: KtEnumEntry, parentStub: StubElement<*>?): KotlinEnumEntryStubImpl {
         val fqName = psi.safeFqNameForLazyResolve()?.asString()
-        val name = psi.getName()
-        val isLocal = psi.isLocal()
+        val name = psi.name
+        val isLocal = psi.isLocal
         return KotlinEnumEntryStubImpl(
             parent = parentStub,
             qualifiedName = StringRef.fromString(fqName),
@@ -34,7 +41,7 @@ internal object KtEnumEntryElementType : KtStubElementType<KotlinEnumEntryStubIm
 
     override fun serialize(stub: KotlinEnumEntryStubImpl, dataStream: StubOutputStream) {
         dataStream.writeName(stub.fqName?.asString())
-        dataStream.writeName(stub.getName())
+        dataStream.writeName(stub.name)
         dataStream.writeBoolean(stub.isLocal)
     }
 

@@ -12,8 +12,10 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.stubs.*
 import org.jetbrains.kotlin.psi.stubs.elements.KtFileElementType
-import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes.IMPORT_LIST
+import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes.Companion.IMPORT_LIST
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
+
+
 
 @OptIn(KtImplementationDetail::class)
 class KotlinFileStubImpl @KtImplementationDetail internal constructor(
@@ -29,7 +31,7 @@ class KotlinFileStubImpl @KtImplementationDetail internal constructor(
     val facadeFqName: FqName?
         get() = (kind as? KotlinFileStubKind.WithPackage.Facade)?.facadeFqName
 
-    override fun getType(): KtFileElementType = KtFileElementType
+    override val type: KtFileElementType get() = KtFileElementType
 
     override fun toString(): String = "${STUB_TO_STRING_PREFIX}FILE[kind=$kind]"
 

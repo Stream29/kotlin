@@ -16,6 +16,10 @@
 
 package org.jetbrains.kotlin.psi
 
+
+
+
+
 fun KtExpression.unpackFunctionLiteral(allowParentheses: Boolean = false): KtLambdaExpression? {
     return when (this) {
         is KtLambdaExpression -> this
