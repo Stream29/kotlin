@@ -50,7 +50,7 @@ internal fun lexerOffsetByCodePoints(text: CharSequence, index: Int, codePointOf
 
 internal fun lexerIsWhitespace(char: Char): Boolean {
     val code = char.code
-    if (code in 9..13 || code in 28..31) return true
+    if (code < 128) return code == 32 || code in 9..13 || code in 28..31
     return when (jdkCharacterType(code)) {
         12 -> code != 0xA0 && code != 0x2007 && code != 0x202F
         13, 14 -> true
