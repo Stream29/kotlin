@@ -168,7 +168,8 @@ internal class PartiallyLinkedIrTreePatcher(
         private inline fun <T : IrElement> T.withRemovalInContext(context: DeclarationTransformerContext, action: T.() -> Unit): T {
             stack.addFirst(context)
             action()
-            assert(stack.removeFirst() === context)
+            val removedContext = stack.removeFirst()
+            assert(removedContext === context)
 
             context.performRemoval()
 
@@ -1169,7 +1170,10 @@ internal class PartiallyLinkedIrTreePatcher(
             return try {
                 block(newContext)
             } finally {
-                if (newContext !== oldContext) assert(stack.removeFirst() == newContext)
+                if (newContext !== oldContext) {
+                    val removedContext = stack.removeFirst()
+                    assert(removedContext == newContext)
+                }
             }
         }
 

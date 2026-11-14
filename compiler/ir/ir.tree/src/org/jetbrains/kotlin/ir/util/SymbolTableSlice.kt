@@ -51,7 +51,8 @@ abstract class SymbolTableSlice<Key, SymbolOwner, Symbol>(val lock: IrLock)
         synchronized(lock) {
             return get(key) ?: run {
                 val new = orElse()
-                assert(unboundSymbols.add(new)) { "Symbol for ${new.signature} was already referenced" }
+                val added = unboundSymbols.add(new)
+                assert(added) { "Symbol for ${new.signature} was already referenced" }
                 set(key, new)
                 new
             }
