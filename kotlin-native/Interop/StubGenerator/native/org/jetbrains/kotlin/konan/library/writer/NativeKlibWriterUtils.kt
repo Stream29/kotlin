@@ -3,11 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.konan.library.writer
+package org.jetbrains.kotlin.native.interop.gen.klib
 
 import org.jetbrains.kotlin.io.propertyList
-import org.jetbrains.kotlin.konan.library.impl.KlibBitcodeComponentWriterImpl
-import org.jetbrains.kotlin.konan.library.impl.KlibNativeIncludedBinariesComponentWriterImpl
+import org.jetbrains.kotlin.native.interop.gen.klib.KlibBitcodeComponentWriterImpl
+import org.jetbrains.kotlin.native.interop.gen.klib.KlibNativeIncludedBinariesComponentWriterImpl
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.library.KLIB_PROPERTY_DEPENDS
 import org.jetbrains.kotlin.library.KLIB_PROPERTY_SHORT_NAME

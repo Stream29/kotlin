@@ -3,12 +3,12 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.konan.library.components
+package org.jetbrains.kotlin.native.interop.gen.klib
 
-import org.jetbrains.kotlin.konan.library.components.KlibBitcodeConstants.KLIB_BITCODE_FOLDER_NAME
-import org.jetbrains.kotlin.konan.library.components.KlibNativeIncludedBinariesConstants.KLIB_NATIVE_INCLUDED_BINARIES_FOLDER_NAME
-import org.jetbrains.kotlin.konan.library.impl.KlibBitcodeComponentImpl
-import org.jetbrains.kotlin.konan.library.impl.KlibNativeIncludedBinariesComponentImpl
+import org.jetbrains.kotlin.native.interop.gen.klib.KlibBitcodeConstants.KLIB_BITCODE_FOLDER_NAME
+import org.jetbrains.kotlin.native.interop.gen.klib.KlibNativeIncludedBinariesConstants.KLIB_NATIVE_INCLUDED_BINARIES_FOLDER_NAME
+import org.jetbrains.kotlin.native.interop.gen.klib.KlibBitcodeComponentImpl
+import org.jetbrains.kotlin.native.interop.gen.klib.KlibNativeIncludedBinariesComponentImpl
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.library.Klib
 import org.jetbrains.kotlin.library.KlibComponent
