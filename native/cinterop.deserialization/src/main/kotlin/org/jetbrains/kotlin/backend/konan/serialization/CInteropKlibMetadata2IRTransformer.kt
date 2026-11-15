@@ -477,7 +477,7 @@ class CInteropKlibMetadata2IRTransformer(
     }
 
     private fun deserializeTypeParameters(kmParameters: List<KmTypeParameter>): Map<Int, IrTypeParameter> {
-        val kmToIrParam = kmParameters.withIndex().associate { [index, kmParameter] ->
+        val kmToIrParam = kmParameters.withIndex().associate { (index, kmParameter) ->
             kmParameter to IrFactoryImpl.createTypeParameter(
                 startOffset = UNDEFINED_OFFSET,
                 endOffset = UNDEFINED_OFFSET,
@@ -491,7 +491,7 @@ class CInteropKlibMetadata2IRTransformer(
         }
 
         val typeParamsById = kmToIrParam.mapKeys { it.key.id }
-        for ([kmParameter, irParameter] in kmToIrParam) {
+        for ((kmParameter, irParameter) in kmToIrParam) {
             irParameter.superTypes = kmParameter.upperBounds.map { it.toIrType(typeParamsById) }
         }
 
@@ -687,27 +687,28 @@ class CInteropKlibMetadata2IRTransformer(
     /** Used to track the declarations that were deserialized during conversion from kotlinx-metadata to IR. */
     open class DeclarationTracker {
         /** The cache of the deserialized declarations. */
+        private val _deserializedDeclarations = mutableMapOf<IdSignature, IrDeclaration>()
         val deserializedDeclarations: Map<IdSignature, IrDeclaration>
-            field = mutableMapOf<IdSignature, IrDeclaration>()
+            get() = _deserializedDeclarations
 
         open fun onNewClass(clazz: IrClass) {
-            deserializedDeclarations[clazz.symbol.signature!!] = clazz
+            _deserializedDeclarations[clazz.symbol.signature!!] = clazz
         }
 
         fun onNewEnumEntry(enumEntry: IrEnumEntry) {
-            deserializedDeclarations[enumEntry.symbol.signature!!] = enumEntry
+            _deserializedDeclarations[enumEntry.symbol.signature!!] = enumEntry
         }
 
         fun onNewFunction(function: IrSimpleFunction) {
-            deserializedDeclarations[function.symbol.signature!!] = function
+            _deserializedDeclarations[function.symbol.signature!!] = function
         }
 
         fun onNewProperty(property: IrProperty) {
-            deserializedDeclarations[property.symbol.signature!!] = property
+            _deserializedDeclarations[property.symbol.signature!!] = property
         }
 
         fun onNewClassConstructor(constructor: IrConstructor) {
-            deserializedDeclarations[constructor.symbol.signature!!] = constructor
+            _deserializedDeclarations[constructor.symbol.signature!!] = constructor
         }
     }
 

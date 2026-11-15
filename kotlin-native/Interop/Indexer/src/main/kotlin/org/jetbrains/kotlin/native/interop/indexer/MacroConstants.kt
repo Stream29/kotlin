@@ -18,8 +18,8 @@ package org.jetbrains.kotlin.native.interop.indexer
 
 import clang.*
 import kotlinx.cinterop.*
-import java.io.File
-import java.util.stream.Collectors
+import org.jetbrains.kotlin.konan.host.NativeFile as File
+import org.jetbrains.kotlin.konan.host.nativeParallelMap
 
 val predefinedMacros = setOf("__DATE__", "__TIME__", "__TIMESTAMP__", "__FILE__", "__FILE_NAME__", "__BASE_FILE__", "__LINE__")
 
@@ -185,7 +185,7 @@ private fun reparseWithCodeSnippets(library: CompilationWithPCH,
             codeSnippetLines.forEach { writer.appendLine(it) }
         }
     }
-    clang_reparseTranslationUnit(translationUnit, 0, null, CXTranslationUnit_DetailedPreprocessingRecord)
+    clang_reparseTranslationUnit(translationUnit, 0u, null, CXTranslationUnit_DetailedPreprocessingRecord)
 }
 
 /**
@@ -212,7 +212,7 @@ private fun processCodeSnippet(
                 CXChildVisitResult.CXChildVisit_Recurse
             }
 
-            state == VisitorState.EXPECT_VARIABLE_VALUE && clang_isExpression(kind) != 0 -> {
+            state == VisitorState.EXPECT_VARIABLE_VALUE && clang_isExpression(kind) != 0u -> {
                 typeOrNull = typeConverter(clang_getCursorType(cursor))
                 state = VisitorState.EXPECT_END
                 CXChildVisitResult.CXChildVisit_Continue
@@ -349,9 +349,7 @@ private fun collectMacroNamesLibclangext(
     }
 
     val result = if (parallelize && translationUnits.size > 1) {
-        translationUnits.parallelStream()
-                .flatMap { processTranslationUnit(it).stream() }
-                .collect(Collectors.toSet())
+        translationUnits.nativeParallelMap { processTranslationUnit(it) }.flatten().toSet()
     } else {
         translationUnits.asSequence()
                 .flatMap { processTranslationUnit(it) }
@@ -363,7 +361,7 @@ private fun collectMacroNamesLibclangext(
 
 private fun canMacroBeConstant(cursor: CValue<CXCursor>): Boolean {
 
-    if (clang_Cursor_isMacroFunctionLike(cursor) != 0) {
+    if (clang_Cursor_isMacroFunctionLike(cursor) != 0u) {
         return false
     }
 

@@ -5,34 +5,38 @@
 
 package org.jetbrains.kotlin.native.interop.indexer
 
-import kotlinx.cinterop.JvmCInteropCallbacks
-import org.jetbrains.kotlin.utils.NativeMemoryAllocator
-import java.io.File
+import org.jetbrains.kotlin.konan.host.NativeFile as File
+import org.jetbrains.kotlin.konan.host.environment
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
 open class IndexerTests {
-    init {
-        System.load(System.getProperty("kotlin.native.llvm.libclang"))
+    companion object {
+        private val temporaryDirectories = mutableSetOf<File>()
     }
 
     @BeforeTest
     fun init() {
-        NativeMemoryAllocator.init()
-        JvmCInteropCallbacks.init()
+        check(temporaryDirectories.isEmpty()) { "Previous test did not dispose its temporary directories" }
     }
 
     @AfterTest
     fun dispose() {
-        JvmCInteropCallbacks.dispose()
-        NativeMemoryAllocator.dispose()
+        try {
+            temporaryDirectories.forEach {
+                check(!it.exists() || it.deleteRecursively()) { "Cannot remove test directory $it" }
+            }
+        } finally {
+            temporaryDirectories.clear()
+        }
     }
 
     class TempFiles(name: String) {
-        private val tempRootDir = System.getProperty("kotlin.native.interop.indexer.temp") ?: System.getProperty("java.io.tmpdir") ?: "."
+        private val tempRootDir = environment("TMPDIR") ?: "."
 
-        val directory: File = File(tempRootDir, name).canonicalFile.also {
-            it.mkdirs()
+        val directory: File = File(File(tempRootDir), name).canonicalFile.also {
+            check(it.mkdirs()) { "Cannot create test directory $it" }
+            temporaryDirectories.add(it)
         }
 
         fun file(relativePath: String, contents: String): File = File(directory, relativePath).canonicalFile.apply {

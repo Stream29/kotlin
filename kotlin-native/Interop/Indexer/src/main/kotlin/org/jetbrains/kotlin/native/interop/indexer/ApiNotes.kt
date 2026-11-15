@@ -5,13 +5,7 @@
 
 package org.jetbrains.kotlin.native.interop.indexer
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.json.JsonMapper
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import java.io.File
+import org.jetbrains.kotlin.konan.host.NativeFile as File
 
 /**
  * `SwiftName` refinements extracted from Clang API notes (`*.apinotes`) files.
@@ -86,19 +80,13 @@ class ApiNotes private constructor(
             val classes = mutableMapOf<String, Context>()
             val protocols = mutableMapOf<String, Context>()
             for (file in files) {
-                val module = runCatching { mapper.readValue<ApiNotesModule>(file) }.getOrNull() ?: continue
+                val module = runCatching { parseApiNotesModule(file.readText()) }.getOrNull() ?: continue
                 module.classes.forEach { classes.putContext(it) }
                 module.protocols.forEach { protocols.putContext(it) }
             }
 
             return ApiNotes(classes, protocols)
         }
-
-        private val mapper = JsonMapper.builder(YAMLFactory())
-                .propertyNamingStrategy(PropertyNamingStrategies.UPPER_CAMEL_CASE)
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .build()
-                .registerKotlinModule()
 
         private fun MutableMap<String, Context>.putContext(raw: ApiNotesContext) {
             val instanceMethods = mutableMapOf<String, Method>()
@@ -129,11 +117,6 @@ class ApiNotes private constructor(
     }
 }
 
-// The data classes below map only the subset of the API notes schema we consume. Unknown keys (SwiftBridge,
-// Nullability, Availability, SwiftVersions, Functions, Globals, Enumerators, Tags, Typedefs, ...) are ignored
-// via the mapper's disabled FAIL_ON_UNKNOWN_PROPERTIES.
-
-/** `MethodKind`/`PropertyKind` in API notes. `PropertyKind` may be absent, meaning "both". */
 private enum class EntityKind { Class, Instance }
 
 private data class ApiNotesModule(
@@ -159,3 +142,277 @@ private data class ApiNotesProperty(
         val propertyKind: EntityKind? = null,
         val swiftName: String? = null,
 )
+
+private sealed class YamlNode {
+    data class MapNode(val entries: Map<String, YamlNode>) : YamlNode()
+    data class ListNode(val items: List<YamlNode>) : YamlNode()
+    data class ScalarNode(val value: String?) : YamlNode()
+}
+
+private class YamlLine(val indent: Int, val content: String)
+
+private fun parseApiNotesModule(yamlText: String): ApiNotesModule {
+    val lines = preprocessYamlLines(yamlText)
+    if (lines.isEmpty()) return ApiNotesModule()
+    val root = YamlParser(lines).parseNode(lines[0].indent) as? YamlNode.MapNode ?: return ApiNotesModule()
+    return ApiNotesModule(
+            classes = root.list("Classes").mapNotNull(::toApiNotesContext),
+            protocols = root.list("Protocols").mapNotNull(::toApiNotesContext),
+    )
+}
+
+private fun toApiNotesContext(node: YamlNode): ApiNotesContext? {
+    val map = node as? YamlNode.MapNode ?: return null
+    val name = map.scalar("Name") ?: return null
+    val methods = map.list("Methods").mapNotNull { mNode ->
+        val m = mNode as? YamlNode.MapNode ?: return@mapNotNull null
+        val selector = m.scalar("Selector") ?: return@mapNotNull null
+        val kindStr = m.scalar("MethodKind") ?: return@mapNotNull null
+        val kind = parseEntityKind(kindStr) ?: return@mapNotNull null
+        ApiNotesMethod(selector = selector, methodKind = kind, swiftName = m.scalar("SwiftName"))
+    }
+    val properties = map.list("Properties").mapNotNull { pNode ->
+        val p = pNode as? YamlNode.MapNode ?: return@mapNotNull null
+        val propName = p.scalar("Name") ?: return@mapNotNull null
+        val kind = p.scalar("PropertyKind")?.let { parseEntityKind(it) ?: return@mapNotNull null }
+        ApiNotesProperty(name = propName, propertyKind = kind, swiftName = p.scalar("SwiftName"))
+    }
+    return ApiNotesContext(
+            name = name,
+            swiftName = map.scalar("SwiftName"),
+            methods = methods,
+            properties = properties,
+    )
+}
+
+private fun parseEntityKind(value: String): EntityKind? = when (value) {
+    "Class" -> EntityKind.Class
+    "Instance" -> EntityKind.Instance
+    else -> null
+}
+
+private fun YamlNode.MapNode.scalar(key: String): String? =
+        (entries[key] as? YamlNode.ScalarNode)?.value
+
+private fun YamlNode.MapNode.list(key: String): List<YamlNode> =
+        (entries[key] as? YamlNode.ListNode)?.items.orEmpty()
+
+private fun preprocessYamlLines(text: String): List<YamlLine> {
+    val result = mutableListOf<YamlLine>()
+    for (rawLine in text.lineSequence()) {
+        val stripped = stripYamlComment(rawLine).trimEnd()
+        val trimmed = stripped.trimStart()
+        if (trimmed.isEmpty()) continue
+        if (trimmed == "---" || trimmed == "...") continue
+        val indent = stripped.length - trimmed.length
+        result += YamlLine(indent, trimmed)
+    }
+    return result
+}
+
+private fun stripYamlComment(line: String): String {
+    var inSingle = false
+    var inDouble = false
+    var i = 0
+    while (i < line.length) {
+        val c = line[i]
+        when {
+            inSingle -> {
+                if (c == '\'' && i + 1 < line.length && line[i + 1] == '\'') {
+                    i += 2
+                    continue
+                } else if (c == '\'') {
+                    inSingle = false
+                }
+            }
+            inDouble -> {
+                if (c == '\\' && i + 1 < line.length) {
+                    i += 2
+                    continue
+                } else if (c == '"') {
+                    inDouble = false
+                }
+            }
+            else -> {
+                when (c) {
+                    '\'' -> inSingle = true
+                    '"' -> inDouble = true
+                    '#' -> if (i == 0 || line[i - 1].isWhitespace()) return line.substring(0, i)
+                }
+            }
+        }
+        i++
+    }
+    return line
+}
+
+private fun splitYamlKeyValue(content: String): Pair<String, String>? {
+    var inSingle = false
+    var inDouble = false
+    var i = 0
+    while (i < content.length) {
+        val c = content[i]
+        when {
+            inSingle -> {
+                if (c == '\'' && i + 1 < content.length && content[i + 1] == '\'') {
+                    i += 2
+                    continue
+                } else if (c == '\'') {
+                    inSingle = false
+                }
+            }
+            inDouble -> {
+                if (c == '\\' && i + 1 < content.length) {
+                    i += 2
+                    continue
+                } else if (c == '"') {
+                    inDouble = false
+                }
+            }
+            else -> {
+                if (c == '\'') inSingle = true
+                else if (c == '"') inDouble = true
+                else if (c == ':' && (i + 1 == content.length || content[i + 1].isWhitespace())) {
+                    val key = unquoteYamlScalar(content.substring(0, i).trim()) ?: ""
+                    val rest = content.substring(i + 1).trim()
+                    return key to rest
+                }
+            }
+        }
+        i++
+    }
+    return null
+}
+
+private fun unquoteYamlScalar(raw: String): String? {
+    if (raw.isEmpty() || raw == "null" || raw == "~") return null
+    if (raw.length >= 2 && raw.startsWith('\'') && raw.endsWith('\'')) {
+        return raw.substring(1, raw.length - 1).replace("''", "'")
+    }
+    if (raw.length >= 2 && raw.startsWith('"') && raw.endsWith('"')) {
+        val sb = StringBuilder()
+        var i = 1
+        while (i < raw.length - 1) {
+            val c = raw[i]
+            if (c == '\\' && i + 1 < raw.length - 1) {
+                i++
+                when (val esc = raw[i]) {
+                    'n' -> sb.append('\n')
+                    'r' -> sb.append('\r')
+                    't' -> sb.append('\t')
+                    '"' -> sb.append('"')
+                    '\\' -> sb.append('\\')
+                    else -> sb.append(esc)
+                }
+            } else {
+                sb.append(c)
+            }
+            i++
+        }
+        return sb.toString()
+    }
+    return raw
+}
+
+private class YamlParser(private val lines: List<YamlLine>) {
+    private var index = 0
+
+    fun parseNode(expectedIndent: Int): YamlNode {
+        if (index >= lines.size) return YamlNode.ScalarNode(null)
+        val line = lines[index]
+        if (line.indent < expectedIndent) return YamlNode.ScalarNode(null)
+        return if (line.content == "-" || line.content.startsWith("- ")) {
+            parseList(line.indent)
+        } else if (splitYamlKeyValue(line.content) != null) {
+            parseMap(line.indent)
+        } else {
+            index++
+            parseInlineValue(line.content)
+        }
+    }
+
+    private fun parseList(listIndent: Int): YamlNode.ListNode {
+        val items = mutableListOf<YamlNode>()
+        while (index < lines.size) {
+            val line = lines[index]
+            if (line.indent < listIndent) break
+            if (line.indent > listIndent) {
+                // Unexpected over-indented line; skip safely
+                index++
+                continue
+            }
+            if (line.content != "-" && !line.content.startsWith("- ")) break
+            val afterDash = if (line.content == "-") "" else line.content.substring(2).trimStart()
+            if (afterDash.isEmpty()) {
+                index++
+                if (index < lines.size && lines[index].indent > listIndent) {
+                    items += parseNode(lines[index].indent)
+                } else {
+                    items += YamlNode.ScalarNode(null)
+                }
+            } else {
+                val kv = splitYamlKeyValue(afterDash)
+                if (kv != null) {
+                    val itemBaseIndent = line.indent + (line.content.length - afterDash.length)
+                    val mapEntries = linkedMapOf<String, YamlNode>()
+                    index++
+                    mapEntries[kv.first] = resolveValueAfterColon(kv.second, itemBaseIndent)
+                    if (index < lines.size && lines[index].indent >= itemBaseIndent) {
+                        val restMap = parseMapEntries(lines[index].indent)
+                        mapEntries.putAll(restMap)
+                    }
+                    items += YamlNode.MapNode(mapEntries)
+                } else {
+                    index++
+                    items += parseInlineValue(afterDash)
+                }
+            }
+        }
+        return YamlNode.ListNode(items)
+    }
+
+    private fun parseMap(mapIndent: Int): YamlNode.MapNode =
+            YamlNode.MapNode(parseMapEntries(mapIndent))
+
+    private fun parseMapEntries(mapIndent: Int): Map<String, YamlNode> {
+        val entries = linkedMapOf<String, YamlNode>()
+        while (index < lines.size) {
+            val line = lines[index]
+            if (line.indent < mapIndent) break
+            if (line.indent > mapIndent) {
+                index++
+                continue
+            }
+            if (line.content == "-" || line.content.startsWith("- ")) break
+            val kv = splitYamlKeyValue(line.content) ?: run {
+                index++
+                continue
+            }
+            index++
+            entries[kv.first] = resolveValueAfterColon(kv.second, mapIndent)
+        }
+        return entries
+    }
+
+    private fun resolveValueAfterColon(rest: String, keyIndent: Int): YamlNode {
+        if (rest.isNotEmpty()) {
+            return parseInlineValue(rest)
+        }
+        if (index < lines.size) {
+            val next = lines[index]
+            if (next.indent > keyIndent) {
+                return parseNode(next.indent)
+            }
+            if (next.indent == keyIndent && (next.content == "-" || next.content.startsWith("- "))) {
+                return parseList(next.indent)
+            }
+        }
+        return YamlNode.ScalarNode(null)
+    }
+
+    private fun parseInlineValue(raw: String): YamlNode = when (raw) {
+        "[]" -> YamlNode.ListNode(emptyList())
+        "{}" -> YamlNode.MapNode(emptyMap())
+        else -> YamlNode.ScalarNode(unquoteYamlScalar(raw))
+    }
+}

@@ -56,7 +56,7 @@ class IdSignaturesExtractorFromCInteropKlib(private val library: KotlinLibrary) 
     }
 
     override fun extractAllPublicSignatures(): ExtractedSignatures {
-        val [allReferencedClasses: Set<ClassId>, metadataModule] = readMetadataModule(
+        val (allReferencedClasses, metadataModule) = readMetadataModule(
             loadOnlyTopLevelReferencedClassIds = false
         )
 
@@ -72,7 +72,7 @@ class IdSignaturesExtractorFromCInteropKlib(private val library: KotlinLibrary) 
         )
 
         // We have to deserialize each top-level class with all its members/nested classes to get the full set of signatures:
-        for ([classId, clazz] in allDeclaredClasses) {
+        for ((classId, clazz) in allDeclaredClasses) {
             if (!classId.isNestedClass) {
                 transformer.transformTopLevelClass(clazz)
             }
@@ -92,7 +92,7 @@ class IdSignaturesExtractorFromCInteropKlib(private val library: KotlinLibrary) 
 
         // Exclude any private declarations, such as private constructors which happen in C-interop KLIBs.
         val onlyPublicDeclaredSignatures = allDeclaredSignatures
-            .mapNotNullTo(hashSetOf()) { [signature, deserializedDeclaration] ->
+            .mapNotNullTo(hashSetOf()) { (signature, deserializedDeclaration) ->
                 signature.takeIf {
                     deserializedDeclaration !is IrDeclarationWithVisibility || deserializedDeclaration.isNonPrivate
                 }
@@ -105,7 +105,7 @@ class IdSignaturesExtractorFromCInteropKlib(private val library: KotlinLibrary) 
     }
 
     override fun extractOnlyTopLevelPublicSignatures(): ExtractedSignatures {
-        val [onlyTopLevelReferencedClasses, metadataModule] = readMetadataModule(
+        val (onlyTopLevelReferencedClasses, metadataModule) = readMetadataModule(
             loadOnlyTopLevelReferencedClassIds = true
         )
 
@@ -216,8 +216,9 @@ class IdSignaturesExtractorFromCInteropKlib(private val library: KotlinLibrary) 
         private val loadOnlyTopLevelReferencedClassIds: Boolean
     ) : KlibModuleFragmentReadStrategy, KlibModuleFragmentWriteStrategy {
 
+        private val _referencedClassIds = hashSetOf<ClassId>()
         val referencedClassIds: Set<ClassId>
-            field = hashSetOf()
+            get() = _referencedClassIds
 
         override fun processType(type: KmType) {
             processReferencedClassName((type.classifier as? KmClassifier.Class)?.name ?: return)
@@ -251,7 +252,7 @@ class IdSignaturesExtractorFromCInteropKlib(private val library: KotlinLibrary) 
             val classId = ClassId.fromString(className)
 
             if (!loadOnlyTopLevelReferencedClassIds || !classId.isNestedClass) {
-                referencedClassIds += classId
+                _referencedClassIds += classId
             }
         }
     }

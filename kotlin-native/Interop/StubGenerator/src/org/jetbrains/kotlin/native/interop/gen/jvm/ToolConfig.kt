@@ -17,6 +17,7 @@
 package  org.jetbrains.kotlin.native.interop.tool
 
 import kotlinx.cinterop.loadKonanLibrary
+import org.jetbrains.kotlin.konan.file.absolutePath
 import org.jetbrains.kotlin.konan.target.*
 import org.jetbrains.kotlin.utils.KotlinNativePaths
 import org.jetbrains.kotlin.konan.target.AbstractToolConfig
@@ -48,10 +49,7 @@ class ToolConfig(
             else emptyList()
 
     override fun loadLibclang() {
-        System.load(libclang)
-        // Note: later, in `clangKt.loadLibrary`, `clangstubs` will also be attempted to load from `KotlinNativePaths.homePath`
-        // However, that second load will be skipped.
-        // The load in `clangKt.loadLibrary` is needed in other usecases, via `clangKt.<clinit>`, before invocation of `clang_...()` funs
+        // On Native, libclang is linked into the executable directly.
         loadKonanLibrary("clangstubs", konanHome)
     }
 }

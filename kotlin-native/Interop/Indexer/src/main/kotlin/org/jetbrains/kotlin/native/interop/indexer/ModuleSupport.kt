@@ -2,8 +2,7 @@ package org.jetbrains.kotlin.native.interop.indexer
 
 import clang.*
 import kotlinx.cinterop.readValue
-import java.nio.file.Files
-import java.util.LinkedList
+import org.jetbrains.kotlin.konan.host.NativeFiles as Files
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.plus
@@ -83,7 +82,7 @@ private fun ModularCompilation.parseModules(index: CXIndex, modules: List<String
 
 private fun CXTranslationUnit.importedASTFiles(index: CXIndex): Set<String> {
     val result = linkedSetOf<String>()
-    indexTranslationUnit(index, this, 0, object : Indexer {
+    indexTranslationUnit(index, this, 0u, object : Indexer {
         override fun importedASTFile(info: CXIdxImportedASTFileInfo) {
             result += info.getFile()!!.canonicalPath
         }
@@ -158,7 +157,7 @@ internal fun <T, R> roundRobinTake(
         input: Map<T, List<R>>,
         outputLimit: Int,
 ): Map<T, List<R>> {
-    val keysQueue = LinkedList(input.keys)
+    val keysQueue = input.keys.toMutableList()
     var totalTakenElementsCount = 0
     val output = LinkedHashMap<T, MutableList<R>>()
     var iterator = keysQueue.listIterator()
@@ -190,7 +189,7 @@ private fun getModulesHeaders(
     val result = mutableSetOf<ClangFile>()
     val errors = mutableListOf<Throwable>()
 
-    indexTranslationUnit(index, translationUnit, 0, object : Indexer {
+    indexTranslationUnit(index, translationUnit, 0u, object : Indexer {
         override fun importedASTFile(info: CXIdxImportedASTFileInfo) {
             val isModuleImport = info.isImplicit == 0
             if (isModuleImport && !areModulesEnabled) {

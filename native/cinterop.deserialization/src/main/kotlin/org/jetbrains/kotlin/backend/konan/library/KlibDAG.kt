@@ -5,22 +5,16 @@
 
 package org.jetbrains.kotlin.backend.konan.library
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.runBlocking
 import org.jetbrains.kotlin.backend.common.IdSignaturesExtractor
 import org.jetbrains.kotlin.backend.common.IdSignaturesExtractorFromKlibWithIndices
 import org.jetbrains.kotlin.backend.common.IdSignaturesExtractorFromRegularKlib
 import org.jetbrains.kotlin.backend.konan.serialization.IdSignaturesExtractorFromCInteropKlib
-import org.jetbrains.kotlin.io.ZipFileSystemInPlaceAccessor
 import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.konan.library.SerializedKlibDAG
 import org.jetbrains.kotlin.library.KLIB_PROPERTY_PACKAGE
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.components.ir
 import org.jetbrains.kotlin.library.isNativeStdlib
-import org.jetbrains.kotlin.library.loader.KlibLoader
 import org.jetbrains.kotlin.library.metadata.isCInteropLibrary
 import org.jetbrains.kotlin.library.packageFqName
 import org.jetbrains.kotlin.name.FqName
@@ -28,10 +22,7 @@ import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.utils.DFS
 import org.jetbrains.kotlin.utils.mapToSetOrEmpty
-import java.nio.file.Path
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.pathString
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 /**
  * The representation of a DAG of [KotlinLibrary] dependencies computed without the involvement of IR linker.
@@ -98,7 +89,7 @@ fun SerializedKlibDAG.deserialize(librariesUsedInCurrentCompilation: Collection<
 
     val dagUnderConstruction: Map<KotlinLibrary, KlibDAGNodeImpl> = librariesUsedInCurrentCompilation.associateWith(::KlibDAGNodeImpl)
 
-    for ([libraryPath: Path, directDependencyPaths: Set<Path>] in dag.entries) {
+    for ((libraryPath, directDependencyPaths) in dag.entries) {
         val library = pathToLibrary[libraryPath] ?: run {
             // The library in serialized DAG is not present among libraries used in the current compilation.
             // So, we can skip it. It won't appear in the resulting DAG for the current compilation, and that's OK.
@@ -200,10 +191,10 @@ private class KlibDAGBuilderImpl(
     private val contributedPackageToNode: MutableMap<FqName, MutableSet<KlibDAGNodeImpl>> = hashMapOf()
 
     // Index: declared signature -> KLIB.
-    private val declaredSignatureToNode: ConcurrentHashMap<IdSignature, KlibDAGNodeImpl> = ConcurrentHashMap()
+    private val declaredSignatureToNode: MutableMap<IdSignature, KlibDAGNodeImpl> = hashMapOf()
 
     // Index: KLIB -> imported signatures.
-    private val nodeToImportedSignatures: ConcurrentHashMap<KlibDAGNodeImpl, Set<IdSignature>> = ConcurrentHashMap()
+    private val nodeToImportedSignatures: MutableMap<KlibDAGNodeImpl, Set<IdSignature>> = hashMapOf()
 
     fun build(): KlibDAG {
         // Optimization: Stdlib is a dependency for each library. We don't need to extract signatures from it.
@@ -222,29 +213,8 @@ private class KlibDAGBuilderImpl(
             }
         }
 
-        // Populate signature indices for all these libraries in parallel: signature extraction is expensive,
-        // and populateSignatureIndicesForLibrary only writes to the  ConcurrentHashMap indices for distinct nodes,
-        // so the calls are safe to run concurrently.
-        runBlocking {
-            // We need to re-load ZIP'ped libraries with `ZipFileSystemInPlaceAccessor` because otherwise multithreaded access
-            // could lead to unexpected concurrency issues. See KT-89764.
-            val [zippedLibraries, unzippedLibraries] = librariesToPopulateSignatureIndices.partition { it.canonicalPath.isRegularFile() }
-            val zippedLibrariesByCanonicalPath = zippedLibraries.associateBy { it.canonicalPath }
-
-            val reloadedZippedLibraries = KlibLoader {
-                libraryPaths(zippedLibraries.map { it.canonicalPath.pathString })
-                zipFileSystemAccessor(ZipFileSystemInPlaceAccessor)
-            }.load().librariesStdlibFirst
-
-            // TODO(KT-89764): Do not reload libraries here, iterate over `librariesToPopulateSignatureIndices` libraries list instead.
-            (reloadedZippedLibraries + unzippedLibraries).map { library ->
-                async(Dispatchers.Default) {
-                    populateSignatureIndicesForLibrary(
-                        library = library,
-                        originalLibrary = zippedLibrariesByCanonicalPath[library.canonicalPath] ?: library,
-                    )
-                }
-            }.awaitAll()
+        for (library in librariesToPopulateSignatureIndices) {
+            populateSignatureIndicesForLibrary(library = library, originalLibrary = library)
         }
 
         // Maintain the set of really used DAG nodes and their statuses.
@@ -266,7 +236,7 @@ private class KlibDAGBuilderImpl(
             fun recordDependency(dependencyNode: KlibDAGNodeImpl) {
                 // Make sure that the found node is in the set of used nodes.
                 // If the found node is new, schedule it for processing on next iterations of the loop.
-                usedNodes.putIfAbsent(dependencyNode, State.SCHEDULED_FOR_PROCESSING)
+                if (dependencyNode !in usedNodes) usedNodes[dependencyNode] = State.SCHEDULED_FOR_PROCESSING
 
                 // Record it as a dependency.
                 node.targets += dependencyNode
@@ -360,7 +330,7 @@ private class KlibDAGBuilderImpl(
         // Note: We are intentionally extracting only signatures of top-level declarations. It's an optimization.
         // We can always deduce the signature of a top-level class from a signature of any member or an inner/nested class.
         // In case there are numerous members or inner/nested classes, this helps us to reduce the amount of the computational work.
-        val [declaredSignatures, importedSignatures] = library.getSignatureExtractor().extractOnlyTopLevelPublicSignatures()
+        val (declaredSignatures, importedSignatures) = library.getSignatureExtractor().extractOnlyTopLevelPublicSignatures()
 
         for (signature in declaredSignatures) {
             // Note: It might happen that there are clashing signatures coming from different libraries.

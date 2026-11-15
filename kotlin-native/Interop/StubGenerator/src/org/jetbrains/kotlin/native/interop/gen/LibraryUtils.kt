@@ -16,13 +16,11 @@
 
 package org.jetbrains.kotlin.native.interop.gen
 
-import kotlin.io.path.Path
-import kotlin.io.path.exists
+import org.jetbrains.kotlin.library.Path
 
 internal fun resolveLibraries(staticLibraries: List<String>, libraryPaths: List<String>): List<String> {
     val result = mutableListOf<String>()
     staticLibraries.forEach { library ->
-        
         val resolution = libraryPaths.map { "$it/$library" }.find { Path(it).exists() }
 
         if (resolution != null) {
@@ -34,11 +32,11 @@ internal fun resolveLibraries(staticLibraries: List<String>, libraryPaths: List<
     return result
 }
 
-internal fun argsToCompiler(staticLibraries: Array<String>, libraryPaths: Array<String>) = argsToCompiler(staticLibraries.toList(), libraryPaths.toList())
+internal fun argsToCompiler(staticLibraries: Array<String>, libraryPaths: Array<String>) =
+    argsToCompiler(staticLibraries.toList(), libraryPaths.toList())
 
-internal fun argsToCompiler(staticLibraries: List<String>, libraryPaths: List<String>) = 
+internal fun argsToCompiler(staticLibraries: List<String>, libraryPaths: List<String>) =
     resolveLibraries(staticLibraries, libraryPaths)
         .map { it -> listOf("-include-binary", it) }
         .flatten()
         .toTypedArray()
-
