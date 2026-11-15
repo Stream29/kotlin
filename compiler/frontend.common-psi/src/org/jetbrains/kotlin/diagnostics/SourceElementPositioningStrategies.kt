@@ -5,6 +5,16 @@
 
 package org.jetbrains.kotlin.diagnostics
 
+
+
+
+
+
+
+
+
+
+
 object SourceElementPositioningStrategies {
     val DEFAULT = SourceElementPositioningStrategy(
         LightTreePositioningStrategies.DEFAULT,

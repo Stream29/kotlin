@@ -5,6 +5,12 @@
 
 package org.jetbrains.kotlin.kdoc.psi.impl
 
+
+
+
+
+
+
 import com.intellij.lang.ASTNode
 import com.intellij.psi.ContributedReferenceHost
 import com.intellij.psi.LiteralTextEscaper
@@ -17,6 +23,8 @@ import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.KtPsiMutationService
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
+
+
 
 /**
  * The part of a doc comment which describes a single class, method or property
@@ -32,7 +40,8 @@ class KDocSection : KDocTag, ContributedReferenceHost, PsiLanguageInjectionHost 
      * Returns the name of the section (the name of the doc tag introducing the section,
      * or null for the default section).
      */
-    override fun getName(): String? =
+    override val name: String?
+    get() =
         (firstChild as? KDocTag)?.name
 
     override fun getSubjectName(): String? =
@@ -54,21 +63,23 @@ class KDocSection : KDocTag, ContributedReferenceHost, PsiLanguageInjectionHost 
      */
     fun findTagByName(name: String): KDocTag? = findTagsByName(name).firstOrNull()
 
-    override fun getReference(): PsiReference? {
+    override val reference: PsiReference?
+    get() {
         return references.firstOrNull()
     }
 
-    override fun getReferences(): Array<out PsiReference?> {
+    override val references: Array<PsiReference>
+    get() {
         return KotlinReferenceProvidersService.getReferencesFromProviders(this)
     }
 
-    override fun isValidHost(): Boolean = true
+    override val isValidHost: Boolean get() = true
 
     @OptIn(KtIdeApi::class)
     override fun updateText(text: String): PsiLanguageInjectionHost {
         KtPsiMutationService.getInstanceOrNull()?.let { return it.updateKDocSectionText(this, text) }
         val comment = KtPsiFactory(project).createComment("/**\n$text\n*/")
-        return PsiTreeUtil.findChildOfType(comment, KDocSection::class.java) ?: this
+        return PsiTreeUtil.findChildOfType(comment, KDocSection::class) ?: this
     }
 
     override fun createLiteralTextEscaper(): LiteralTextEscaper<out PsiLanguageInjectionHost> =

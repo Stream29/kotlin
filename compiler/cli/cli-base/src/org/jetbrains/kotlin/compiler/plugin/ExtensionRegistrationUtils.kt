@@ -7,33 +7,35 @@ package org.jetbrains.kotlin.compiler.plugin
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import org.jetbrains.annotations.TestOnly
 import org.jetbrains.kotlin.cli.extensionsStorage
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
 fun CompilerPluginRegistrar.ExtensionStorage.registerInProject(
     project: Project,
-    errorMessage: (Any) -> String = { "Error while registering ${it.javaClass.name} "}
+    errorMessage: (Any) -> String = { "Error while registering ${it::class.qualifiedName ?: it::class.simpleName ?: "Extension"} "}
 ) {
     for ([extensionPoint, extensions] in registeredExtensions) {
         for (extension in extensions) {
             @Suppress("UNCHECKED_CAST")
             try {
                 val platformExtensionPoint = project.extensionArea.getExtensionPointIfRegistered<Any>(extensionPoint.name) ?: continue
-                if (platformExtensionPoint.extensions.any { it.javaClass == extension.javaClass }) continue
+                if (platformExtensionPoint.extensions.any { it::class == extension::class }) continue
                 platformExtensionPoint.registerExtension(extension, project)
-            } catch (e: AbstractMethodError) {
+            } catch (e: Error) {
                 throw IllegalStateException(errorMessage(extension), e)
             }
         }
     }
     for (disposable in disposables) {
-        Disposer.register(project) { disposable.dispose() }
+        Disposer.register(project, object : com.intellij.openapi.Disposable {
+            override fun dispose() {
+                disposable.dispose()
+            }
+        })
     }
 }
 
-@TestOnly
 fun registerExtensionsForTest(
     project: Project,
     configuration: CompilerConfiguration,

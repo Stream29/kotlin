@@ -11,7 +11,8 @@ import com.intellij.psi.PsiLanguageInjectionHost
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocSection
 import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
 import org.jetbrains.kotlin.name.FqName
-import java.util.function.Consumer
+
+
 
 /**
  * Service responsible for Kotlin PSI mutation operations whose implementation is provided by the Kotlin plugin environment.
@@ -370,16 +371,15 @@ interface KtPsiMutationService {
          *
          * @throws IllegalStateException if the service is not registered.
          */
-        @JvmStatic
+
         fun getInstance(): KtPsiMutationService =
             getInstanceOrNull() ?: throw IllegalStateException("Cannot mutate Kotlin PSI because KtPsiMutationService is missing")
 
         /**
          * Returns the registered Kotlin PSI mutation service, or `null` if the environment does not provide one.
          */
-        @JvmStatic
         fun getInstanceOrNull(): KtPsiMutationService? =
-            ApplicationManager.getApplication().getService(KtPsiMutationService::class.java)
+            ApplicationManager.getApplication().getService(KtPsiMutationService::class)
     }
 }
 
@@ -387,10 +387,10 @@ interface KtPsiMutationService {
  * Deletes [element] with [deletion] when [KtPsiMutationService] is registered, or performs the plain platform deletion otherwise.
  */
 @OptIn(KtIdeApi::class)
-internal fun deleteWithMutationService(element: KtElement, deletion: Consumer<KtPsiMutationService>) {
+internal fun deleteWithMutationService(element: KtElement, deletion: (KtPsiMutationService) -> Unit) {
     val mutationService = KtPsiMutationService.getInstanceOrNull()
     if (mutationService != null) {
-        deletion.accept(mutationService)
+        deletion(mutationService)
     } else {
         element.rawDelete()
     }

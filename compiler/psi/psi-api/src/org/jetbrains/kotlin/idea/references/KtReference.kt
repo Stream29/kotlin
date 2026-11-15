@@ -5,16 +5,24 @@
 
 package org.jetbrains.kotlin.idea.references
 
+
+
+
+
+
+
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
 
+
+
 @SubclassOptInRequired(KtImplementationDetail::class)
 interface KtReference : PsiPolyVariantReference {
     val resolver: ResolveCache.PolyVariantResolver<KtReference>
 
-    override fun getElement(): KtElement
+    override val element: KtElement
 
     /**
      * Exhaustive collection of names that this reference may resolve to, or an empty collection if it cannot be predicted.

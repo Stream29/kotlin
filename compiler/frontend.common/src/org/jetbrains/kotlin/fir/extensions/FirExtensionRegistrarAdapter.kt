@@ -5,7 +5,15 @@
 
 package org.jetbrains.kotlin.fir.extensions
 
+
+
+
+
+
+
 import org.jetbrains.kotlin.extensions.ExtensionPointDescriptor
+
+
 
 /*
  * This is needed to prevent ClassNotFoundExceptions in IDE plugin built on FE 1.0
@@ -21,6 +29,6 @@ import org.jetbrains.kotlin.extensions.ExtensionPointDescriptor
 abstract class FirExtensionRegistrarAdapter {
     companion object : ExtensionPointDescriptor<FirExtensionRegistrarAdapter>(
         name = "org.jetbrains.kotlin.fir.extensions.firExtensionRegistrar",
-        extensionClass = FirExtensionRegistrarAdapter::class.java,
+        extensionClass = FirExtensionRegistrarAdapter::class,
     )
 }

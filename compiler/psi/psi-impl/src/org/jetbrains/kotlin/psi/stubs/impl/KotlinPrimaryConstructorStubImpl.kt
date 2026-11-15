@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.io.StringRef
 import org.jetbrains.kotlin.KtNodeTypes
@@ -22,7 +25,8 @@ class KotlinPrimaryConstructorStubImpl(
 ) : KotlinStubBaseImpl<KtPrimaryConstructor>(parent, KtNodeTypes.PRIMARY_CONSTRUCTOR),
     KotlinConstructorStub<KtPrimaryConstructor> {
     override val fqName: FqName? get() = null
-    override fun getName(): String? = StringRef.toString(containingClassName)
+    override val name: String?
+    get() = StringRef.toString(containingClassName)
     override val isTopLevel: Boolean get() = false
     override val isExtension: Boolean get() = false
     override val mayHaveContract: Boolean get() = false

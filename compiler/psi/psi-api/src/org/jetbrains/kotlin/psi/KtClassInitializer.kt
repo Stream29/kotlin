@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.psi
 
+import org.jetbrains.kotlin.psi.lBrace
+
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.KtNodeTypes
@@ -39,7 +41,7 @@ class KtClassInitializer : KtDeclarationStub<KotlinPlaceHolderStub<KtClassInitia
     override fun <R, D> accept(visitor: KtVisitor<R, D>, data: D): R = visitor.visitClassInitializer(this, data)
 
     override val body: KtExpression?
-        get() = findChildByClass(KtExpression::class.java)
+        get() = findChildByClass(KtExpression::class)
 
     /**
      * The opening brace of the `init` block's body, or `null` if the body is not a block.
@@ -59,7 +61,6 @@ class KtClassInitializer : KtDeclarationStub<KotlinPlaceHolderStub<KtClassInitia
 
     companion object {
         /** A shared empty array, which can be reused to avoid unnecessary allocations. */
-        @JvmField
         val EMPTY_ARRAY: Array<KtClassInitializer> = emptyArray()
     }
 }

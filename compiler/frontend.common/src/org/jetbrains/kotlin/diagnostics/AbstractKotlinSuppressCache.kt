@@ -5,7 +5,14 @@
 
 package org.jetbrains.kotlin.diagnostics
 
-import com.google.common.collect.ImmutableSet
+
+import org.jetbrains.kotlin.util.NativeImmutableSet as ImmutableSet
+
+
+
+
+
+
 import com.intellij.util.containers.ContainerUtil
 
 abstract class AbstractKotlinSuppressCache<Element : Any> {

@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+
 import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.ObjectStubBase
 import com.intellij.psi.stubs.StubElement
@@ -15,7 +16,7 @@ import org.jetbrains.kotlin.utils.exceptions.checkWithAttachment
 
 internal object Utils {
     fun wrapStrings(names: List<String>): Array<StringRef> = if (names.isEmpty())
-        StringRef.EMPTY_ARRAY
+        StringRef.EMPTY_ARRAY as Array<StringRef>
     else
         Array(names.size) { i -> StringRef.fromString(names[i])!! }
 }

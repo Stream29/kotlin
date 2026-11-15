@@ -4,6 +4,7 @@
  */
 package org.jetbrains.kotlin.parsing
 
+
 import com.intellij.lang.LighterASTNode
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiBuilderFactory
@@ -16,6 +17,8 @@ import org.jetbrains.kotlin.KtSourceFile
 import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.lexer.KotlinLexer
 import org.jetbrains.kotlin.psi.KtImplementationDetail
+
+
 
 object KotlinLightParser {
     fun buildLightTree(

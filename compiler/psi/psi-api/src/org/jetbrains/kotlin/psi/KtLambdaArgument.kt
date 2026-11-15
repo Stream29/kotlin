@@ -9,6 +9,8 @@ import com.intellij.lang.ASTNode
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.psi.stubs.KotlinValueArgumentStub
 
+
+
 /**
  * Represents a trailing lambda argument passed outside of parentheses.
  *
@@ -31,7 +33,6 @@ class KtLambdaArgument : KtValueArgument, LambdaArgument {
 
     companion object {
         /** A shared empty array, which can be reused to avoid unnecessary allocations. */
-        @JvmField
         val EMPTY_ARRAY: Array<KtLambdaArgument> = emptyArray()
     }
 }

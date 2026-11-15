@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.psi.stubs.factories
 
+import org.jetbrains.kotlin.psi.*
+
 import com.intellij.psi.stubs.*
 import org.jetbrains.kotlin.psi.stubs.elements.KtFileElementType
 import org.jetbrains.kotlin.psi.stubs.elements.StubIndexService
@@ -12,7 +14,7 @@ import org.jetbrains.kotlin.psi.stubs.impl.KotlinFileStubImpl
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinFileStubKindImpl
 
 internal object KtFileStubSerializer : StubSerializer<KotlinFileStubImpl> {
-    override fun getExternalId(): String = KtFileElementType.NAME
+    override val externalId: String get() = KtFileElementType.NAME
 
     override fun serialize(stub: KotlinFileStubImpl, dataStream: StubOutputStream) {
         KotlinFileStubKindImpl.serialize(stub.kind, dataStream)

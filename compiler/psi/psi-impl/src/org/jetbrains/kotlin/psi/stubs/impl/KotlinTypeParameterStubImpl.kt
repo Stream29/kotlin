@@ -17,9 +17,10 @@ import org.jetbrains.kotlin.psi.stubs.KotlinTypeParameterStub
 @KtImplementationDetail
 class KotlinTypeParameterStubImpl(
     parent: StubElement<*>?,
-    private val name: StringRef?,
+    name: StringRef?,
 ) : KotlinStubBaseImpl<KtTypeParameter>(parent, KtNodeTypes.TYPE_PARAMETER), KotlinTypeParameterStub {
-    override fun getName(): String? = StringRef.toString(name)
+    private val nameRef = name
+    override val name: String? get() = StringRef.toString(nameRef)
 
     // type parameters don't have FqNames
     override val fqName: FqName? get() = null
@@ -27,11 +28,11 @@ class KotlinTypeParameterStubImpl(
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinTypeParameterStubImpl = KotlinTypeParameterStubImpl(
         parent = newParent,
-        name = name,
+        name = nameRef,
     )
 
     @KtImplementationDetail
     override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
         other is KotlinTypeParameterStubImpl &&
-                other.name == name
+                other.nameRef == nameRef
 }

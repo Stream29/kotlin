@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.psi.stubs.factories
 
+import org.jetbrains.kotlin.psi.*
+
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
@@ -45,7 +47,7 @@ internal object KtParameterStubSerializingElementFactory :
     )
 
     override fun serialize(stub: KotlinParameterStubImpl, dataStream: StubOutputStream) {
-        dataStream.writeName(stub.getName())
+        dataStream.writeName(stub.name)
         dataStream.writeBoolean(stub.isMutable)
         dataStream.writeBoolean(stub.hasValOrVar)
         dataStream.writeBoolean(stub.hasDefaultValue)

@@ -16,7 +16,10 @@
 
 package org.jetbrains.kotlin.kdoc.parser
 
+
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toUpperCaseAsciiOnly
+
+
 
 enum class KDocKnownTag(val isReferenceRequired: Boolean, val isSectionStart: Boolean) {
     AUTHOR(false, false),

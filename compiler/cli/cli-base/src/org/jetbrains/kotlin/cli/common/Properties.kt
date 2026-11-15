@@ -16,20 +16,32 @@
 
 package org.jetbrains.kotlin.cli.common
 
-/**
- * @param alwaysDirectAccess Gradle has a list of properties that can be read without declaring, see https://github.com/gradle/gradle/blob/f191a61cec61afe308f2b45184cb303d32706a6f/subprojects/configuration-cache/src/main/kotlin/org/gradle/configurationcache/SystemPropertyAccessListener.kt#L32
- */
+private val nativeSystemProperties = mutableMapOf<String, String>(
+    "os.name" to when (Platform.osFamily) {
+        OsFamily.LINUX -> "Linux"
+        OsFamily.MACOSX -> "Mac OS X"
+        OsFamily.WINDOWS -> "Windows"
+        else -> Platform.osFamily.name
+    },
+    "java.io.tmpdir" to "/tmp",
+    "user.home" to "/root",
+    "java.specification.version" to "21",
+    "java.home" to "",
+    "java.class.path" to "",
+)
+
+private fun defaultGetSystemProperty(key: String): String? = nativeSystemProperties[key]
+
+private fun defaultSetSystemProperty(key: String, value: String): String? = nativeSystemProperties.put(key, value)
+
+private fun defaultClearSystemProperty(key: String): String? = nativeSystemProperties.remove(key)
+
 enum class CompilerSystemProperties(val property: String, val alwaysDirectAccess: Boolean = false) {
     COMPILE_DAEMON_ENABLED_PROPERTY("kotlin.daemon.enabled"),
     COMPILE_DAEMON_JVM_OPTIONS_PROPERTY("kotlin.daemon.jvm.options"),
     COMPILE_DAEMON_OPTIONS_PROPERTY("kotlin.daemon.options"),
     COMPILE_DAEMON_CLIENT_OPTIONS_PROPERTY("kotlin.daemon.client.options"),
     COMPILE_DAEMON_CLIENT_ALIVE_PATH_PROPERTY("kotlin.daemon.client.alive.path"),
-
-    /**
-     * Configures logging to a specific file overriding any other logging configuration.
-     * The main purpose of this property is our internal testing.
-     */
     COMPILE_DAEMON_LOG_PATH_PROPERTY("kotlin.daemon.log.path"),
     COMPILE_DAEMON_REPORT_PERF_PROPERTY("kotlin.daemon.perf"),
     COMPILE_DAEMON_VERBOSE_REPORT_PROPERTY("kotlin.daemon.verbose"),
@@ -38,37 +50,13 @@ enum class CompilerSystemProperties(val property: String, val alwaysDirectAccess
     DAEMON_RMI_SOCKET_BACKLOG_SIZE_PROPERTY("kotlin.daemon.socket.backlog.size"),
     DAEMON_RMI_SOCKET_CONNECT_ATTEMPTS_PROPERTY("kotlin.daemon.socket.connect.attempts"),
     DAEMON_RMI_SOCKET_CONNECT_INTERVAL_PROPERTY("kotlin.daemon.socket.connect.interval"),
-
-    /**
-     * Only specify that property if you want to avoid multiple initializations/disposals of KotlinCoreApplicationEnvironment
-     *
-     * **If not specified**, KotlinCoreApplicationEnvironment **WILL dispose** after all concurrent compilations finish,
-     * and will be re-initialized when starting new compilation
-     *
-     * If specified, KotlinCoreApplicationEnvironment will **NOT dispose** after all concurrent compilations finished
-     * and will be pinned with hard-reference
-     * **THIS LEAKS MEMORY**
-     * */
     KOTLIN_COMPILER_ENVIRONMENT_KEEPALIVE_PROPERTY("kotlin.environment.keepalive"),
     COMPILE_DAEMON_CUSTOM_RUN_FILES_PATH_FOR_TESTS("kotlin.daemon.custom.run.files.path.for.tests"),
-
-    /**
-     * Represents a system property used to introduce a wait period before starting a compilation
-     * when executing tests.
-     * This property can be used for synchronization with external processes or conditions.
-     *
-     * The property key is `kotlin.daemon.wait.before.compilation.for.tests`,
-     * and its value determines if the compilation should wait for either 5 seconds or a file named "daemon-test-start"
-     * in the daemon's run directory.
-     *
-     * Typically, this is used in the context of tests where a wait period can ensure
-     * required preconditions are met before starting the compilation process.
-     */
     COMPILE_WAIT_BEFORE_COMPILATION_FOR_TESTS("kotlin.daemon.wait.before.compilation.for.tests"),
     COMPILE_DAEMON_ENVIRONMENT_VARIABLES_FOR_TESTS("kotlin.daemon.environment.variables.for.tests"),
     KOTLIN_COLORS_ENABLED_PROPERTY("kotlin.colors.enabled"),
     LANGUAGE_VERSION_SETTINGS("kotlin.language.settings"),
-    COMPILE_DAEMON_INITIATOR_MARKER_FILE("kotlin.daemon.initiator.marker.file"), // TODO: possibly remove this property after KT-72161
+    COMPILE_DAEMON_INITIATOR_MARKER_FILE("kotlin.daemon.initiator.marker.file"),
 
     OS_NAME("os.name", alwaysDirectAccess = true),
     TMP_DIR("java.io.tmpdir"),
@@ -85,16 +73,16 @@ enum class CompilerSystemProperties(val property: String, val alwaysDirectAccess
 
     var value: String?
         get() {
-            return getProperFunction(systemPropertyGetter, System::getProperty)(property)
+            return getProperFunction(systemPropertyGetter, ::defaultGetSystemProperty)(property)
         }
         set(value) {
-            getProperFunction(systemPropertySetter, System::setProperty)(property, value!!)
+            getProperFunction(systemPropertySetter, ::defaultSetSystemProperty)(property, value!!)
         }
 
     val safeValue
         get() = value ?: error("No value for $property system property")
 
-    fun clear(): String? = getProperFunction(systemPropertyCleaner, System::clearProperty)(property)
+    fun clear(): String? = getProperFunction(systemPropertyCleaner, ::defaultClearSystemProperty)(property)
 
     companion object {
         var systemPropertyGetter: ((String) -> String?)? = null

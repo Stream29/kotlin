@@ -5,6 +5,16 @@
 
 package org.jetbrains.kotlin.psi.stubs
 
+
+
+
+
+
+
+
+
+
+
 object KotlinStubVersions {
     /**
      * Source stub version should be increased if stub format (org.jetbrains.kotlin.psi.stubs.impl) is changed

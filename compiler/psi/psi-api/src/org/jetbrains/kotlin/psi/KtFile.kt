@@ -3,6 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+@file:OptIn(kotlin.native.internal.InternalForKotlinNative::class)
+
 package org.jetbrains.kotlin.psi
 
 import com.intellij.psi.FileViewProvider
@@ -12,24 +15,16 @@ import com.intellij.psi.tree.TokenSet
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.psi.stubs.elements.KtTokenSets
 
-/**
- * The root of the PSI tree for a Kotlin source or script file.
- *
- * A [KtFile] holds the file's package directive, imports, and top-level declarations (see [KtCommonFile] for that shared structure). On top
- * of that, it implements the platform's [PsiClassOwner], so it can expose the file's Kotlin declarations to Java-facing tooling as
- * [PsiClass]es (for example, the file facade class and top-level class declarations).
- *
- * Obtain the containing file of any [KtElement] via [KtPureElement.getContainingKtFile].
- */
 @SubclassOptInRequired(KtImplementationDetail::class)
 open class KtFile(viewProvider: FileViewProvider, isCompiled: Boolean) : @Suppress("DEPRECATION") KtCommonFile(viewProvider, isCompiled),
     PsiClassOwner {
-    /**
-     * Returns the Java classes of this file, such as the file facade class and any top-level class declarations, or an empty array if none
-     * are available. The classes are provided by the platform via [KtFileClassProvider].
-     */
+    override fun createUnlinkedFileClone(): KtFile {
+        check(this::class == KtFile::class) { "Concrete Kotlin file subtype needs its own clone allocation hook" }
+        return kotlin.native.internal.createUninitializedInstance<KtFile>().also { copyKtCommonFileStateTo(it) }
+    }
+
     override fun getClasses(): Array<PsiClass> {
-        val fileClassProvider = project.getService(KtFileClassProvider::class.java)
+        val fileClassProvider = project.getService(KtFileClassProvider::class)
         return fileClassProvider?.getFileClasses(this) ?: PsiClass.EMPTY_ARRAY
     }
 

@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.psi.stubs.factories
 
+import org.jetbrains.kotlin.psi.*
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -78,7 +80,7 @@ internal object KtOperationReferenceExpressionStubSerializingElementFactory :
         parentStub: StubElement<*>?,
     ): KotlinOperationReferenceExpressionStubImpl {
         val referencedNameRef = dataStream.readName()!!
-        val operationToken = decodeOperationToken(dataStream.readVarInt(), referencedNameRef.string)
+        val operationToken = decodeOperationToken(dataStream.readVarInt(), referencedNameRef.string!!)
 
         return KotlinOperationReferenceExpressionStubImpl(
             parent = parentStub,

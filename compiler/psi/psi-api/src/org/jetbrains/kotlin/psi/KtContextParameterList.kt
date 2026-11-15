@@ -9,6 +9,8 @@ import com.intellij.lang.ASTNode
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.psi.stubs.KotlinPlaceHolderStub
 
+
+
 /**
  * The class representing a context parameter list in a declaration or functional type.
  *
@@ -101,7 +103,6 @@ abstract class KtContextParameterList : KtElementImplStub<KotlinPlaceHolderStub<
 
     companion object {
         /** A shared empty array, which can be reused to avoid unnecessary allocations. */
-        @JvmField
         val EMPTY_ARRAY: Array<KtContextParameterList> = emptyArray()
     }
 }

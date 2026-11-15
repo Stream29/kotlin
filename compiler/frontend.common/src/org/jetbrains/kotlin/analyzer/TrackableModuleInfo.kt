@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.analyzer
 
 import com.intellij.openapi.util.ModificationTracker
 
+
+
 interface TrackableModuleInfo : ModuleInfo {
     fun createModificationTracker(): ModificationTracker
 }

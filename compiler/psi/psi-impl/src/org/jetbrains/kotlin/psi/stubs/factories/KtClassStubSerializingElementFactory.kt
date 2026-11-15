@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.psi.stubs.factories
 
+import org.jetbrains.kotlin.psi.*
+
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
@@ -41,7 +43,7 @@ internal object KtClassStubSerializingElementFactory :
     override fun createStub(psi: KtClass, parentStub: StubElement<*>?): KotlinClassStubImpl {
         val fqName = psi.safeFqNameForLazyResolve()?.asString()
         val classId = parentStub?.let { createClassId(it, psi) }
-        val name = psi.getName()
+        val name = psi.name
         val superNames = psi.getSuperNames()
         val isInterface = psi.isInterface()
         val isTopLevel = psi.isTopLevel()
@@ -60,7 +62,7 @@ internal object KtClassStubSerializingElementFactory :
     }
 
     override fun serialize(stub: KotlinClassStubImpl, dataStream: StubOutputStream) {
-        dataStream.writeName(stub.getName())
+        dataStream.writeName(stub.name)
         dataStream.writeName(stub.fqName?.asString())
 
         serializeClassId(dataStream, stub.classId)
@@ -91,10 +93,7 @@ internal object KtClassStubSerializingElementFactory :
         val kdocText = dataStream.deserializeKdocText()
 
         val superCount = dataStream.readVarInt()
-        val superNames = StringRef.createArray(superCount)
-        for (i in 0..<superCount) {
-            superNames[i] = dataStream.readName()
-        }
+        val superNames = Array(superCount) { dataStream.readName()!! }
 
         val valueClassRepresentation = deserializeValueClassRepresentation(dataStream)
 

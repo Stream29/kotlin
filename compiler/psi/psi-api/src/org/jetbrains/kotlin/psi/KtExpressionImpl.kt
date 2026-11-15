@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.psi
 
+import org.jetbrains.kotlin.psi.psiUtil.parentSubstitute
+
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
@@ -24,7 +26,7 @@ abstract class KtExpressionImpl : KtElementImpl, KtExpression {
 
     protected fun findExpressionUnder(type: IElementType): KtExpression? {
         val containerNode = findChildByType<KtContainerNode>(type) ?: return null
-        return containerNode.findChildByClass<KtExpression>(KtExpression::class.java)
+        return containerNode.findChildByClass<KtExpression>(KtExpression::class)
     }
 
     /**
@@ -40,6 +42,10 @@ abstract class KtExpressionImpl : KtElementImpl, KtExpression {
         val mutationService = KtPsiMutationService.getInstanceOrNull() ?: return super.replace(newElement)
         return mutationService.replaceExpression(this, newElement, true) { super.replace(it) }
     }
+
+    @Suppress("DEPRECATION", "HasPlatformType")
+    override val parent: PsiElement?
+        get() = parentSubstitute ?: super<KtElementImpl>.parent
 
     companion object {
         @Deprecated(

@@ -67,7 +67,7 @@ open class KtPropertyAccessor : KtDeclarationStub<KotlinPropertyAccessorStub>, K
      */
     open val parameterList: KtParameterList?
         get() =
-            getStubOrPsiChild(KtNodeTypes.VALUE_PARAMETER_LIST, KtParameterList::class.java)
+            getStubOrPsiChild(KtNodeTypes.VALUE_PARAMETER_LIST, KtParameterList::class)
 
     /**
      * The single parameter of a setter (the new value), or `null` for a getter or when it is absent.
@@ -83,10 +83,10 @@ open class KtPropertyAccessor : KtDeclarationStub<KotlinPropertyAccessorStub>, K
         if (stub != null) {
             if (!stub.hasBody) return null
 
-            expressionFromStub?.let { return it }
+            getExpressionFromStub()?.let { return it }
         }
 
-        return findChildByClass(KtExpression::class.java)
+        return findChildByClass(KtExpression::class)
     }
 
     override fun getBodyBlockExpression(): KtBlockExpression? {
@@ -94,7 +94,7 @@ open class KtPropertyAccessor : KtDeclarationStub<KotlinPropertyAccessorStub>, K
             if (!(it.hasNoExpressionBody && it.hasBody)) return null
         }
 
-        return findChildByClass(KtExpression::class.java) as? KtBlockExpression
+        return findChildByClass(KtExpression::class) as? KtBlockExpression
     }
 
     override fun hasBlockBody(): Boolean {
@@ -115,13 +115,13 @@ open class KtPropertyAccessor : KtDeclarationStub<KotlinPropertyAccessorStub>, K
         findChildByType(KtTokens.EQ)
 
     override fun getContractDescription(): KtContractEffectList? =
-        getStubOrPsiChild(KtNodeTypes.CONTRACT_EFFECT_LIST, KtContractEffectList::class.java)
+        getStubOrPsiChild(KtNodeTypes.CONTRACT_EFFECT_LIST, KtContractEffectList::class)
 
     /** Always `true`: an accessor's return type is always known (it is the property's type). */
     override fun hasDeclaredReturnType(): Boolean = true
 
     override fun getTypeReference(): KtTypeReference? =
-        getStubOrPsiChild(KtNodeTypes.TYPE_REFERENCE, KtTypeReference::class.java)
+        getStubOrPsiChild(KtNodeTypes.TYPE_REFERENCE, KtTypeReference::class)
 
     /**
      * The `get` or `set` keyword, which stands in for the accessor's name (an accessor has no name of its own).
@@ -130,7 +130,7 @@ open class KtPropertyAccessor : KtDeclarationStub<KotlinPropertyAccessorStub>, K
         get() = findChildByType(KtTokens.GET_KEYWORD) ?: findChildByType(KtTokens.SET_KEYWORD)!!
 
     override fun getInitializer(): KtExpression? =
-        PsiTreeUtil.getNextSiblingOfType(equalsToken, KtExpression::class.java)
+        PsiTreeUtil.getNextSiblingOfType(equalsToken, KtExpression::class)
 
     override fun hasInitializer(): Boolean =
         initializer != null
@@ -141,8 +141,8 @@ open class KtPropertyAccessor : KtDeclarationStub<KotlinPropertyAccessorStub>, K
     open val property: KtProperty
         get() = parent as KtProperty
 
-    override fun getTextOffset(): Int =
-        namePlaceholder.textRange.startOffset
+    override val textOffset: Int
+        get() = namePlaceholder.textRange!!.startOffset
 
     @OptIn(KtImplementationDetail::class)
     override fun mayHaveContract(): Boolean {
@@ -181,7 +181,6 @@ open class KtPropertyAccessor : KtDeclarationStub<KotlinPropertyAccessorStub>, K
 
     companion object {
         /** A shared empty array, which can be reused to avoid unnecessary allocations. */
-        @JvmField
         val EMPTY_ARRAY: Array<KtPropertyAccessor> = emptyArray()
     }
 }

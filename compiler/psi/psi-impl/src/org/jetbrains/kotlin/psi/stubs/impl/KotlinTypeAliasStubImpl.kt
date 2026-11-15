@@ -18,13 +18,14 @@ import org.jetbrains.kotlin.psi.stubs.KotlinTypeAliasStub
 @KtImplementationDetail
 class KotlinTypeAliasStubImpl(
     parent: StubElement<*>?,
-    private val name: StringRef?,
+    name: StringRef?,
     private val qualifiedName: StringRef?,
     override val classId: ClassId?,
     override val isTopLevel: Boolean,
 ) : KotlinStubBaseImpl<KtTypeAlias>(parent, KtNodeTypes.TYPEALIAS), KotlinTypeAliasStub {
-    override fun getName(): String? =
-        StringRef.toString(name)
+    private val nameRef = name
+    override val name: String?
+        get() = StringRef.toString(nameRef)
 
     override val fqName: FqName?
         get() = StringRef.toString(qualifiedName)?.let(::FqName)
@@ -32,7 +33,7 @@ class KotlinTypeAliasStubImpl(
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinTypeAliasStubImpl = KotlinTypeAliasStubImpl(
         parent = newParent,
-        name = name,
+        name = nameRef,
         qualifiedName = qualifiedName,
         classId = classId,
         isTopLevel = isTopLevel,
@@ -41,7 +42,7 @@ class KotlinTypeAliasStubImpl(
     @KtImplementationDetail
     override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
         other is KotlinTypeAliasStubImpl &&
-                other.name == name &&
+                other.nameRef == nameRef &&
                 other.qualifiedName == qualifiedName &&
                 other.isTopLevel == isTopLevel &&
                 other.classId == classId

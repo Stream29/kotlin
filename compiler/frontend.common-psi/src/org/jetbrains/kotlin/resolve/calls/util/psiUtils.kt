@@ -5,7 +5,17 @@
 
 package org.jetbrains.kotlin.resolve.calls.util
 
+import org.jetbrains.kotlin.psi.calleeExpression
+import org.jetbrains.kotlin.psi.operationReference
+
+
+
+
+
+
 import org.jetbrains.kotlin.psi.*
+
+
 
 fun KtElement?.getCalleeExpressionIfAny(): KtExpression? =
     when (val element = if (this is KtExpression) KtPsiUtil.deparenthesize(this) else this) {

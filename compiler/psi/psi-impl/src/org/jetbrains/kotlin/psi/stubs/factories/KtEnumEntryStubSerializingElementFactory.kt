@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.psi.stubs.factories
 
+import org.jetbrains.kotlin.psi.*
+
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
@@ -26,7 +28,7 @@ internal object KtEnumEntryStubSerializingElementFactory :
 
     override fun createStub(psi: KtClass, parentStub: StubElement<*>?): KotlinEnumEntryStubImpl {
         val fqName = psi.safeFqNameForLazyResolve()?.asString()
-        val name = psi.getName()
+        val name = psi.name
         return KotlinEnumEntryStubImpl(
             parent = parentStub,
             qualifiedName = StringRef.fromString(fqName),
@@ -36,7 +38,7 @@ internal object KtEnumEntryStubSerializingElementFactory :
 
     override fun serialize(stub: KotlinEnumEntryStubImpl, dataStream: StubOutputStream) {
         dataStream.writeName(stub.fqName?.asString())
-        dataStream.writeName(stub.getName())
+        dataStream.writeName(stub.name)
     }
 
     override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): KotlinEnumEntryStubImpl {

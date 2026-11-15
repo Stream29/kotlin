@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlin.psi
 
+
+
+
+
 /**
  * Functions and classes annotated with [KtPsiInconsistencyHandling] are not intended for general-purpose use, but for working with possibly
  * inconsistent PSI. The specific circumstances need to be described in the documentation of the annotated function/class.

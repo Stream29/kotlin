@@ -7,6 +7,8 @@
 
 package org.jetbrains.kotlin.psi
 
+import kotlin.concurrent.Volatile
+
 import com.intellij.lang.ASTNode
 import com.intellij.navigation.ItemPresentation
 import com.intellij.navigation.ItemPresentationProviders
@@ -57,7 +59,7 @@ abstract class KtClassOrObject :
      * Returns the supertype list (the types after the `:`), or `null` if this declaration has no explicit supertypes.
      */
     fun getSuperTypeList(): KtSuperTypeList? =
-        getStubOrPsiChild(KtNodeTypes.SUPER_TYPE_LIST, KtSuperTypeList::class.java)
+        getStubOrPsiChild(KtNodeTypes.SUPER_TYPE_LIST, KtSuperTypeList::class)
 
     override fun getSuperTypeListEntries(): List<KtSuperTypeListEntry> = getSuperTypeList()?.entries.orEmpty()
 
@@ -84,7 +86,7 @@ abstract class KtClassOrObject :
     fun getAnonymousInitializers(): List<KtAnonymousInitializer> = getBody()?.anonymousInitializers.orEmpty()
 
     override fun getBody(): KtClassBody? =
-        getStubOrPsiChild(KtNodeTypes.CLASS_BODY, KtClassBody::class.java)
+        getStubOrPsiChild(KtNodeTypes.CLASS_BODY, KtClassBody::class)
 
     @Deprecated(
         message = "Use addMemberDeclaration(declaration) instead",
@@ -157,10 +159,11 @@ abstract class KtClassOrObject :
 
     override fun getDeclarations(): List<KtDeclaration> = getBody()?.declarations.orEmpty()
 
-    override fun getPresentation(): ItemPresentation? = ItemPresentationProviders.getItemPresentation(this)
+    override val presentation: ItemPresentation?
+    get() = ItemPresentationProviders.getItemPresentation(this)
 
     override fun getPrimaryConstructor(): KtPrimaryConstructor? =
-        getStubOrPsiChild(KtNodeTypes.PRIMARY_CONSTRUCTOR, KtPrimaryConstructor::class.java)
+        getStubOrPsiChild(KtNodeTypes.PRIMARY_CONSTRUCTOR, KtPrimaryConstructor::class)
 
     override fun getPrimaryConstructorModifierList(): KtModifierList? = primaryConstructor?.modifierList
 
@@ -200,9 +203,16 @@ abstract class KtClassOrObject :
     val companionBlocks: List<KtCompanionBlock>
         get() = body?.companionBlocks.orEmpty()
 
-    private val classInterfaceObjectTokenSet = TokenSet.create(
+    private var classInterfaceObjectTokenSet = TokenSet.create(
         KtTokens.CLASS_KEYWORD, KtTokens.INTERFACE_KEYWORD, KtTokens.OBJECT_KEYWORD
     )
+
+    protected override fun copyKotlinPsiStateTo(clone: com.intellij.psi.impl.PsiElementBase) {
+        super.copyKotlinPsiStateTo(clone)
+        val target = clone as KtClassOrObject
+        target.isLocal = isLocal
+        target.classInterfaceObjectTokenSet = classInterfaceObjectTokenSet
+    }
 
     /**
      * Deletes this class or object.
@@ -227,7 +237,7 @@ abstract class KtClassOrObject :
                 // Consider different instances of local classes non-equivalent
                 !isLocal() &&
                 !another.isLocal() &&
-                getClassId() == another.getClassId()
+                classId == another.classId
 
     override fun getContextReceivers(): List<KtContextReceiver> =
         modifierList?.contextParameterList?.contextReceivers().orEmpty()

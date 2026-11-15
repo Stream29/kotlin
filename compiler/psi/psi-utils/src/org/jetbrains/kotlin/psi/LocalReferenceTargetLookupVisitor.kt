@@ -167,7 +167,7 @@ private class LocalReferenceTargetLookupVisitor(val element: KtSimpleNameExpress
 
     private fun shouldStopBeforeProcessing(element: KtElement): Boolean =
         element is KtClassOrObject && lastDirectionIs(LastDirection.PARENT)
-                || element is KtFile || (element.parent is KtBlockExpression && element.parent.parent is KtScript)
+                || element is KtFile || (element.parent.let { it is KtBlockExpression && it.parent is KtScript })
                 || element is KtAnonymousInitializer
 
     /**

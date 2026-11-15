@@ -20,11 +20,11 @@ open class KotlinPlaceHolderStubImpl<T : KtElementImplStub<*>>(
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinPlaceHolderStubImpl<T> = KotlinPlaceHolderStubImpl(
         parent = newParent,
-        elementType = elementType,
+        elementType = elementType!!,
     )
 
     @KtImplementationDetail
     override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
-        other.javaClass == javaClass &&
+        other::class == this::class &&
                 other.elementType == elementType
 }

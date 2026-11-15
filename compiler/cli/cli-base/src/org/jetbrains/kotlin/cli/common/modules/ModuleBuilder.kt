@@ -18,7 +18,6 @@ package org.jetbrains.kotlin.cli.common.modules
 
 import org.jetbrains.kotlin.modules.JavaRootPath
 import org.jetbrains.kotlin.modules.Module
-import java.util.*
 
 class ModuleBuilder(
     private val name: String,

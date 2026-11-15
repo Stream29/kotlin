@@ -16,6 +16,13 @@
 
 package org.jetbrains.kotlin.resolve
 
+import org.jetbrains.kotlin.psi.statements
+
+
+
+
+
+
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtPsiUtil
@@ -35,7 +42,6 @@ open class StatementFilter {
         /**
          * A [StatementFilter] that applies no filtering (keeps every statement).
          */
-        @JvmField
         val NONE = object : StatementFilter() {
             override fun toString() = "NONE"
         }

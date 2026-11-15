@@ -13,6 +13,8 @@ import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
 import org.jetbrains.kotlin.psi.stubs.KotlinConstructorStub
 
+
+
 /**
  * Represents a secondary constructor declared in the class body.
  *
@@ -42,7 +44,7 @@ class KtSecondaryConstructor : KtConstructor<KtSecondaryConstructor> {
             if (!it.hasBody) return null
         }
 
-        return findChildByClass(KtBlockExpression::class.java)
+        return findChildByClass(KtBlockExpression::class)
     }
 
     override fun getConstructorKeyword() = notNullChild<PsiElement>(super.getConstructorKeyword())
@@ -51,12 +53,12 @@ class KtSecondaryConstructor : KtConstructor<KtSecondaryConstructor> {
      * Returns the delegation call to another constructor (`: this(...)` / `: super(...)`). A delegation call is always present in the tree,
      * even when implicit (see [KtConstructorDelegationCall.isImplicit]); use [getDelegationCallOrNull] to tolerate incomplete code.
      */
-    fun getDelegationCall(): KtConstructorDelegationCall = findNotNullChildByClass(KtConstructorDelegationCall::class.java)
+    fun getDelegationCall(): KtConstructorDelegationCall = findNotNullChildByClass(KtConstructorDelegationCall::class)
 
     /**
      * Returns the delegation call, or `null` if it is absent in incomplete code.
      */
-    fun getDelegationCallOrNull(): KtConstructorDelegationCall? = findChildByClass(KtConstructorDelegationCall::class.java)
+    fun getDelegationCallOrNull(): KtConstructorDelegationCall? = findChildByClass(KtConstructorDelegationCall::class)
 
     /**
      * Returns `true` if the delegation call is implicit, that is, not written in the source.
@@ -76,7 +78,6 @@ class KtSecondaryConstructor : KtConstructor<KtSecondaryConstructor> {
 
     companion object {
         /** A shared empty array, which can be reused to avoid unnecessary allocations. */
-        @JvmField
         val EMPTY_ARRAY: Array<KtSecondaryConstructor> = emptyArray()
     }
 }

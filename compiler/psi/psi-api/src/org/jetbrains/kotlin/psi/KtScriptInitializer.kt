@@ -31,7 +31,7 @@ class KtScriptInitializer : KtDeclarationStub<KotlinPlaceHolderStub<KtScriptInit
     constructor(stub: KotlinPlaceHolderStub<KtScriptInitializer>) : super(stub, KtNodeTypes.SCRIPT_INITIALIZER)
 
     override val body: KtExpression?
-        get() = findChildByClass(KtExpression::class.java)
+        get() = findChildByClass(KtExpression::class)
 
     /** The [KtScript] that contains this top-level script initializer. */
     override val containingDeclaration: KtScript

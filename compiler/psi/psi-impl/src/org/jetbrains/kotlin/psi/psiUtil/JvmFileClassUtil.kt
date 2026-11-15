@@ -5,9 +5,24 @@
 
 package org.jetbrains.kotlin.psi.psiUtil
 
+import org.jetbrains.kotlin.psi.annotationEntries
+import org.jetbrains.kotlin.psi.calleeExpression
+import org.jetbrains.kotlin.psi.constructorReferenceExpression
+import org.jetbrains.kotlin.psi.entries
+import org.jetbrains.kotlin.psi.referencedName
+import org.jetbrains.kotlin.psi.valueArguments
+
+
+
+
+
+
+
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
+
+
 
 /**
  * Partial copy of org.jetbrains.kotlin.fileClasses.JvmFileClassUtil
@@ -58,7 +73,7 @@ internal object JvmFileClassUtil {
 
     private fun findAnnotationEntryOnFileNoResolve(file: KtFile, shortName: String): KtAnnotationEntry? =
         file.fileAnnotationList?.annotationEntries?.firstOrNull {
-            it.calleeExpression?.constructorReferenceExpression?.getReferencedName() == shortName
+            it.calleeExpression?.constructorReferenceExpression?.referencedName == shortName
         }
 
     private fun getLiteralStringFromAnnotation(annotation: KtAnnotationEntry): String? {

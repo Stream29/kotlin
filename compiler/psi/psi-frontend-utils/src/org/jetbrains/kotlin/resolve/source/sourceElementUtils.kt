@@ -5,12 +5,13 @@
 
 package org.jetbrains.kotlin.resolve.source
 
+
 import com.intellij.lang.LighterASTNode
 import com.intellij.psi.util.elementType
 import com.intellij.util.diff.FlyweightCapableTreeStructure
 import org.jetbrains.kotlin.KtLightSourceElement
-import org.jetbrains.kotlin.KtNodeTypes.PREFIX_EXPRESSION
-import org.jetbrains.kotlin.KtNodeTypes.DOT_QUALIFIED_EXPRESSION
+import org.jetbrains.kotlin.KtNodeTypes.Companion.PREFIX_EXPRESSION
+import org.jetbrains.kotlin.KtNodeTypes.Companion.DOT_QUALIFIED_EXPRESSION
 import org.jetbrains.kotlin.KtPsiSourceElement
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.psi
@@ -18,6 +19,8 @@ import org.jetbrains.kotlin.psi.psiUtil.UNWRAPPABLE_TOKEN_TYPES
 import org.jetbrains.kotlin.psi.psiUtil.getAssignmentLhsIfUnwrappable
 import org.jetbrains.kotlin.psi.psiUtil.getExplicitReceiverOfDotQualified
 import org.jetbrains.kotlin.util.getChildren
+
+
 
 /**
  * This function should only be called for a source element corresponding to

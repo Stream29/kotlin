@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.psi.stubs.factories
 
+import org.jetbrains.kotlin.psi.*
+
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
@@ -21,7 +23,7 @@ internal abstract class KtStubSerializingElementFactory<Stub : StubElement<Psi>,
     protected val type: IElementType,
 ) : StubSerializingElementFactory<Stub, Psi> {
 
-    final override fun getExternalId(): String = "kotlin.$type"
+    final override val externalId: String get() = "kotlin.$type"
 
     override fun indexStub(stub: Stub, sink: IndexSink) {
         // do not force inheritors to implement this method
@@ -31,7 +33,7 @@ internal abstract class KtStubSerializingElementFactory<Stub : StubElement<Psi>,
      * An element is stubbed only if its parent is stubbed as well.
      */
     override fun shouldCreateStub(node: ASTNode): Boolean {
-        val parent = node.treeParent
+        val parent = node.treeParent ?: return false
         val parentType = parent.elementType
         if (parentType is IFileElementType) {
             return true

@@ -22,6 +22,8 @@ import org.jetbrains.kotlin.lexer.KtToken
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.psiUtil.siblings
 
+
+
 @Deprecated(
     message = "Moved to the IntelliJ Kotlin plugin",
     replaceWith = ReplaceWith("EditCommaSeparatedListHelper", "org.jetbrains.kotlin.idea.base.psi.EditCommaSeparatedListHelper"),
@@ -37,7 +39,6 @@ object EditCommaSeparatedListHelper {
         level = DeprecationLevel.ERROR,
     )
     @Suppress("DEPRECATION_ERROR")
-    @JvmOverloads
     fun <TItem : KtElement> addItem(list: KtElement, allItems: List<TItem>, item: TItem, prefix: KtToken = KtTokens.LPAR): TItem {
         return addItemBefore(list, allItems, item, null, prefix)
     }
@@ -51,7 +52,7 @@ object EditCommaSeparatedListHelper {
         level = DeprecationLevel.ERROR,
     )
     @Suppress("UNCHECKED_CAST")
-    @JvmOverloads
+
     fun <TItem : KtElement> addItemAfter(
         list: KtElement,
         allItems: List<TItem>,
@@ -87,7 +88,6 @@ object EditCommaSeparatedListHelper {
         level = DeprecationLevel.ERROR,
     )
     @Suppress("DEPRECATION_ERROR")
-    @JvmOverloads
     fun <TItem : KtElement> addItemBefore(
         list: KtElement,
         allItems: List<TItem>,

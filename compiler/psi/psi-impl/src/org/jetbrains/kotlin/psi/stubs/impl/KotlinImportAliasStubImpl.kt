@@ -15,18 +15,19 @@ import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 
 internal class KotlinImportAliasStubImpl(
     parent: StubElement<*>?,
-    private val name: StringRef?,
+    name: StringRef?,
 ) : KotlinStubBaseImpl<KtImportAlias>(parent, KtNodeTypes.IMPORT_ALIAS), KotlinImportAliasStub {
-    override fun getName(): String? = StringRef.toString(name)
+    private val nameRef = name
+    override val name: String? get() = StringRef.toString(nameRef)
 
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinImportAliasStubImpl = KotlinImportAliasStubImpl(
         parent = newParent,
-        name = name
+        name = nameRef
     )
 
     @KtImplementationDetail
     override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
         other is KotlinImportAliasStubImpl &&
-                other.name == name
+                other.nameRef == nameRef
 }

@@ -8,9 +8,11 @@ package org.jetbrains.kotlin
 import com.intellij.openapi.util.io.FileUtilRt
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
-import java.io.ByteArrayInputStream
-import java.io.File
-import java.io.InputStream
+import org.jetbrains.kotlin.serialization.deserialization.ByteArrayInputStream
+import org.jetbrains.kotlin.serialization.deserialization.InputStream
+import nativekotlin.host.files.NativeFile as File
+
+
 
 interface KtSourceFile {
     val name: String
@@ -33,7 +35,7 @@ class KtPsiSourceFile(val psiFile: PsiFile) : KtSourceFile {
     override val extension: String
         get() = psiFile.virtualFile?.extension ?: ""
 
-    override fun getContentsAsStream(): InputStream = psiFile.virtualFile.inputStream
+    override fun getContentsAsStream(): InputStream = psiFile.virtualFile!!.inputStream
 
     override fun equals(other: Any?): Boolean {
         return this === other || (other as? KtPsiSourceFile)?.psiFile == psiFile
@@ -73,7 +75,7 @@ class KtIoFileSourceFile(val file: File) : KtSourceFile {
     override val extension: String
         get() = file.extension
 
-    override fun getContentsAsStream(): InputStream = file.inputStream()
+    override fun getContentsAsStream(): InputStream = ByteArrayInputStream(file.readBytes())
 
     override fun equals(other: Any?): Boolean {
         return this === other || (other as? KtIoFileSourceFile)?.file == file
@@ -92,7 +94,7 @@ class KtInMemoryTextSourceFile(
     override val extension: String
         get() = ""
 
-    override fun getContentsAsStream(): InputStream = ByteArrayInputStream(text.toString().toByteArray())
+    override fun getContentsAsStream(): InputStream = ByteArrayInputStream(text.toString().encodeToByteArray())
 
     override fun equals(other: Any?): Boolean {
         return this === other || (other is KtInMemoryTextSourceFile && other.text == text && other.name == name && other.path == path)

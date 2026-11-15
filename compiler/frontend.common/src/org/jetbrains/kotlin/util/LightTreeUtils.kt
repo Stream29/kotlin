@@ -5,21 +5,24 @@
 
 package org.jetbrains.kotlin.util
 
+
 import com.intellij.lang.LighterASTNode
 import com.intellij.openapi.util.Ref
 import com.intellij.util.diff.FlyweightCapableTreeStructure
+
+
 
 fun LighterASTNode.getChildren(tree: FlyweightCapableTreeStructure<LighterASTNode>): List<LighterASTNode> {
     val children = Ref<Array<LighterASTNode?>>()
     val count = tree.getChildren(this, children)
     @Suppress("UNCHECKED_CAST")
-    return if (count > 0) children.get().take(count) as List<LighterASTNode> else emptyList()
+    return if (count > 0) children.get()!!.take(count) as List<LighterASTNode> else emptyList()
 }
 
 fun LighterASTNode.getSingleChildOrNull(tree: FlyweightCapableTreeStructure<LighterASTNode>): LighterASTNode? {
     val children = Ref<Array<LighterASTNode?>>(arrayOf(null))
     val count = tree.getChildren(this, children)
-    return if (count == 1) children.get()[0] else null
+    return if (count == 1) children.get()!![0] else null
 }
 
 fun LighterASTNode.getPreviousSibling(tree: FlyweightCapableTreeStructure<LighterASTNode>): LighterASTNode? {

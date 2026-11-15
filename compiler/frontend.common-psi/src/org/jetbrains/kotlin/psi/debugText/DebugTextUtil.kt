@@ -5,9 +5,44 @@
 
 package org.jetbrains.kotlin.psi.debugText
 
+import org.jetbrains.kotlin.psi.alias
+import org.jetbrains.kotlin.psi.body
+import org.jetbrains.kotlin.psi.boundTypeReference
+import org.jetbrains.kotlin.psi.calleeExpression
+import org.jetbrains.kotlin.psi.constructorReferenceExpression
+import org.jetbrains.kotlin.psi.extendsBound
+import org.jetbrains.kotlin.psi.importPath
+import org.jetbrains.kotlin.psi.initializerList
+import org.jetbrains.kotlin.psi.isRoot
+import org.jetbrains.kotlin.psi.modifierList
+import org.jetbrains.kotlin.psi.nameAsName
+import org.jetbrains.kotlin.psi.parameterList
+import org.jetbrains.kotlin.psi.primaryConstructorModifierList
+import org.jetbrains.kotlin.psi.qualifier
+import org.jetbrains.kotlin.psi.receiverTypeReference
+import org.jetbrains.kotlin.psi.referenceExpression
+import org.jetbrains.kotlin.psi.referencedName
+import org.jetbrains.kotlin.psi.returnTypeReference
+import org.jetbrains.kotlin.psi.subjectTypeParameterName
+import org.jetbrains.kotlin.psi.typeArgumentList
+import org.jetbrains.kotlin.psi.typeConstraintList
+import org.jetbrains.kotlin.psi.typeParameterList
+import org.jetbrains.kotlin.psi.typeReference
+import org.jetbrains.kotlin.psi.valueParameterList
+
+
+
+
+
+
+
+
+
 import com.intellij.openapi.diagnostic.Logger
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.*
+
+
 
 // invoke this instead of getText() when you need debug text to identify some place in PSI without storing the element itself
 // this is need to avoid unnecessary file parses
@@ -23,13 +58,13 @@ fun KtElement.getDebugText(): String {
         }
         return "package " + fqName.asString()
     }
-    return accept(DebugTextBuildingVisitor, Unit)
+    return accept(DebugTextBuildingVisitor, Unit)!!
 }
 
 
-private object DebugTextBuildingVisitor : KtVisitor<String, Unit>() {
+private object DebugTextBuildingVisitor : KtVisitor<String?, Unit?>() {
 
-    private val LOG = Logger.getInstance(this::class.java)
+    private val LOG = Logger.getInstance(this::class)
 
     override fun visitKtFile(file: KtFile, data: Unit?): String? {
         return "STUB file: ${file.name}"
@@ -37,7 +72,7 @@ private object DebugTextBuildingVisitor : KtVisitor<String, Unit>() {
 
     override fun visitKtElement(element: KtElement, data: Unit?): String? {
         if (element is KtElementImplStub<*>) {
-            LOG.error("getDebugText() is not defined for ${element::class.java}")
+            LOG.error("getDebugText() is not defined for ${element::class}")
         }
         return element.text
     }
@@ -162,7 +197,7 @@ private object DebugTextBuildingVisitor : KtVisitor<String, Unit>() {
     }
 
     override fun visitSimpleNameExpression(expression: KtSimpleNameExpression, data: Unit?): String? {
-        return expression.getReferencedName()
+        return expression.referencedName
     }
 
     override fun visitNullableType(nullableType: KtNullableType, data: Unit?): String? {
@@ -180,7 +215,7 @@ private object DebugTextBuildingVisitor : KtVisitor<String, Unit>() {
     }
 
     override fun visitPropertyAccessor(accessor: KtPropertyAccessor, data: Unit?): String? {
-        val containingProperty = KtStubbedPsiUtil.getContainingDeclaration(accessor, KtProperty::class.java)
+        val containingProperty = KtStubbedPsiUtil.getContainingDeclaration(accessor, KtProperty::class)
         val what = (if (accessor.isGetter) "getter" else "setter")
         return what + " for " + (containingProperty?.getDebugText() ?: "...")
     }

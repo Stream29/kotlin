@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.psi.stubs.factories
 
+import org.jetbrains.kotlin.psi.*
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -27,7 +29,7 @@ internal object KtImportDirectiveStubSerializingElementFactory :
         parent = parentStub,
         isAllUnder = psi.isAllUnder,
         importedFqNameRef = StringRef.fromString(psi.importedFqName?.asString()),
-        isValid = psi.isValidImport,
+        isValid = psi.isValidImport(),
     )
 
     override fun serialize(stub: KotlinImportDirectiveStubImpl, dataStream: StubOutputStream) {

@@ -9,6 +9,8 @@ import org.jetbrains.kotlin.builtins.StandardNames.DATA_CLASS_COMPONENT_PREFIX
 import org.jetbrains.kotlin.builtins.StandardNames.DATA_CLASS_COPY
 import org.jetbrains.kotlin.name.Name
 
+
+
 object DataClassResolver {
     fun createComponentName(index: Int): Name = Name.identifier(DATA_CLASS_COMPONENT_PREFIX + index)
 

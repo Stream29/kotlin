@@ -5,6 +5,15 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+import org.jetbrains.kotlin.psi.fqName
+import org.jetbrains.kotlin.psi.isTopLevel
+
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.io.StringRef
 import org.jetbrains.kotlin.KtNodeTypes
@@ -18,7 +27,7 @@ import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 @KtImplementationDetail
 class KotlinPropertyStubImpl(
     parent: StubElement<*>?,
-    private val name: StringRef?,
+    name: StringRef?,
     override val isVar: Boolean,
     override val isTopLevel: Boolean,
     override val hasDelegate: Boolean,
@@ -32,6 +41,7 @@ class KotlinPropertyStubImpl(
     override val hasBackingField: Boolean?,
     override val kdocText: String?,
 ) : KotlinStubBaseImpl<KtProperty>(parent, KtNodeTypes.PROPERTY), KotlinPropertyStub {
+    private val nameRef = name
 
     init {
         if (isTopLevel && fqName == null) {
@@ -42,12 +52,13 @@ class KotlinPropertyStubImpl(
         }
     }
 
-    override fun getName(): String? = StringRef.toString(name)
+    override val name: String?
+    get() = StringRef.toString(nameRef)
 
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinPropertyStubImpl = KotlinPropertyStubImpl(
         parent = newParent,
-        name = name,
+        name = nameRef,
         isVar = isVar,
         isTopLevel = isTopLevel,
         hasDelegate = hasDelegate,
@@ -65,7 +76,7 @@ class KotlinPropertyStubImpl(
     @KtImplementationDetail
     override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
         other is KotlinPropertyStubImpl &&
-                other.name == name &&
+                other.nameRef == nameRef &&
                 other.fqName == fqName &&
                 other.isTopLevel == isTopLevel &&
                 other.hasDelegate == hasDelegate &&

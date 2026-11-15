@@ -5,11 +5,22 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
+import org.jetbrains.kotlin.psi.arguments
+import org.jetbrains.kotlin.psi.classId
+import org.jetbrains.kotlin.psi.entries
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import org.jetbrains.kotlin.psi.KtProjectionKind
 import org.jetbrains.kotlin.psi.stubs.StubUtils
 import org.jetbrains.kotlin.psi.stubs.impl.*
+
+
 
 internal enum class KotlinTypeBeanKind {
     // The order of entries is important, as an entry's ordinal is used to serialize/deserialize it.

@@ -5,11 +5,20 @@
 
 package org.jetbrains.kotlin.lang
 
+
+import org.jetbrains.kotlin.util.NativeCollections as Collections
+
+
+
+
+
+
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import org.jetbrains.kotlin.lexer.KtToken
 import org.jetbrains.kotlin.lexer.KtTokens
-import java.util.*
+
+
 
 /**
  * The precedence levels of Kotlin's binary operators, ordered from the highest-binding ([AS]) to the lowest-binding ([ASSIGNMENT]).
@@ -65,7 +74,7 @@ enum class BinaryOperationPrecedence(val higherPriority: BinaryOperationPreceden
          * It's used for fast lookup over binary precedences by a provided token.
          * It works with O(1) complexity in a given use-site instead of O(N) where N is a number of binary precedences (currently 12).
          */
-        @JvmField
+
         val TOKEN_TO_BINARY_PRECEDENCE_MAP_WITH_SOFT_IDENTIFIERS: Map<KtToken, BinaryOperationPrecedence> =
             getTokensToBinaryPrecedenceMap(includeSoftIdentifiers = true)
 
@@ -73,7 +82,6 @@ enum class BinaryOperationPrecedence(val higherPriority: BinaryOperationPreceden
          * Maps each binary operator token to its [BinaryOperationPrecedence] for O(1) lookup. Soft-keyword identifiers are not included;
          * use [TOKEN_TO_BINARY_PRECEDENCE_MAP_WITH_SOFT_IDENTIFIERS] when they are needed.
          */
-        @JvmField
         val TOKEN_TO_BINARY_PRECEDENCE_MAP: Map<KtToken, BinaryOperationPrecedence> =
             getTokensToBinaryPrecedenceMap(includeSoftIdentifiers = false)
 
@@ -96,7 +104,7 @@ enum class BinaryOperationPrecedence(val higherPriority: BinaryOperationPreceden
                     if (type === KtTokens.IDENTIFIER && includeSoftIdentifiers) {
                         // Soft keywords work as identifiers (it's actual for INFIX functions).
                         // However, they are being remapped to IDENTIFIER during parsing.
-                        for (softKeyword in KtTokens.SOFT_KEYWORDS.getTypes()) {
+                        for (softKeyword in KtTokens.SOFT_KEYWORDS.types) {
                             register(softKeyword, entry)
                         }
                     }

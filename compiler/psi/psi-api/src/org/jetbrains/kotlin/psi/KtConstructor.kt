@@ -58,7 +58,7 @@ abstract class KtConstructor<T : KtConstructor<T>> : KtDeclarationStub<KotlinCon
     override fun isLocal() = false
 
     override fun getValueParameterList() =
-        getStubOrPsiChild(KtNodeTypes.VALUE_PARAMETER_LIST, KtParameterList::class.java)
+        getStubOrPsiChild(KtNodeTypes.VALUE_PARAMETER_LIST, KtParameterList::class)
 
     override fun getValueParameters() = valueParameterList?.parameters ?: emptyList()
 
@@ -131,8 +131,8 @@ abstract class KtConstructor<T : KtConstructor<T>> : KtDeclarationStub<KotlinCon
     /** Always empty: a constructor cannot declare type parameters. */
     override fun getTypeParameters() = emptyList<KtTypeParameter>()
 
-    /** A constructor has no name of its own; returns the name of its [containing class][getContainingClassOrObject]. */
-    override fun getName(): String? = getContainingClassOrObject().name
+    override val name: String?
+    get() = getContainingClassOrObject().name
 
     override fun getNameAsSafeName() = KtPsiUtil.safeName(name)
 
@@ -141,15 +141,14 @@ abstract class KtConstructor<T : KtConstructor<T>> : KtDeclarationStub<KotlinCon
 
     override fun getNameAsName() = nameAsSafeName
 
-    /** Always `null`: a constructor has no name identifier. */
-    override fun getNameIdentifier() = null
+    override val nameIdentifier: PsiElement? get() = null
 
-    override fun getIdentifyingElement(): PsiElement? = getConstructorKeyword()
+    override val identifyingElement: PsiElement? get() = getConstructorKeyword()
 
     @Throws(IncorrectOperationException::class)
     override fun setName(name: String): PsiElement = throw IncorrectOperationException("setName to constructor")
 
-    override fun getPresentation() = ItemPresentationProviders.getItemPresentation(this)
+    override val presentation get() = ItemPresentationProviders.getItemPresentation(this)
 
     /**
      * Returns the `constructor` keyword, or `null` if it is omitted (for a primary constructor without modifiers or annotations the keyword
@@ -172,13 +171,15 @@ abstract class KtConstructor<T : KtConstructor<T>> : KtDeclarationStub<KotlinCon
         return isLegacyContractPresentPsiCheck()
     }
 
-    override fun getTextOffset(): Int {
+    override val textOffset: Int
+    get() {
         return getConstructorKeyword()?.textOffset
             ?: valueParameterList?.textOffset
-            ?: super.getTextOffset()
+            ?: super<KtDeclarationStub>.textOffset
     }
 
-    override fun getUseScope(): SearchScope {
+    override val useScope: SearchScope
+    get() {
         return getContainingClassOrObject().useScope
     }
 }

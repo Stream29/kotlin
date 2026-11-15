@@ -25,7 +25,7 @@ class KotlinOperationReferenceExpressionStubImpl(
 ) : KotlinStubBaseImpl<KtOperationReferenceExpression>(parent, KtNodeTypes.OPERATION_REFERENCE),
     KotlinOperationReferenceExpressionStub {
     override val referencedName: String
-        get() = referencedNameRef.string
+        get() = referencedNameRef.string!!
 
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinOperationReferenceExpressionStubImpl =

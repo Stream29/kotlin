@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+
 import com.intellij.psi.stubs.StubElement
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.psi.KtDestructuringDeclaration

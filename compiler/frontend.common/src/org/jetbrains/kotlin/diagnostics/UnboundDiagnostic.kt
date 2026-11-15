@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.diagnostics
 
 import com.intellij.openapi.util.TextRange
 
+
+
 interface UnboundDiagnostic {
     val factory: DiagnosticFactory<*>
     val severity: Severity

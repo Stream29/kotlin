@@ -27,15 +27,13 @@ open class KotlinReferenceProvidersService {
         /**
          * Returns the service registered in the given [project], or a no-op fallback if none is registered.
          */
-        @JvmStatic
         fun getInstance(project: Project): KotlinReferenceProvidersService {
-            return project.getService(KotlinReferenceProvidersService::class.java) ?: NO_REFERENCES_SERVICE
+            return project.getService(KotlinReferenceProvidersService::class) ?: NO_REFERENCES_SERVICE
         }
 
         /**
          * A convenience shortcut that resolves the service for the element's project and returns its references.
          */
-        @JvmStatic
         fun getReferencesFromProviders(psiElement: PsiElement): Array<PsiReference> {
             return getInstance(psiElement.project).getReferences(psiElement)
         }

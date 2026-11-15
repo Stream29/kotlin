@@ -17,6 +17,8 @@ import org.jetbrains.kotlin.name.NameUtils
 import org.jetbrains.kotlin.psi.stubs.KotlinScriptStub
 import org.jetbrains.kotlin.psi.stubs.elements.KtTokenSets
 
+
+
 /**
  * Represents a Kotlin script file containing top-level statements and declarations.
  *
@@ -68,17 +70,18 @@ open class KtScript : KtNamedDeclarationStub<KotlinScriptStub>, KtDeclarationCon
             null
         }
 
-    override fun getName(): String = fqName.shortName().asString()
+    override val name: String
+    get() = fqName.shortName().asString()
 
     /**
      * The block holding the script's top-level statements and declarations.
      */
     val blockExpression: KtBlockExpression
-        get() = findNotNullChildByClass(KtBlockExpression::class.java)
+        get() = findNotNullChildByClass(KtBlockExpression::class)
 
     override fun getDeclarations(): List<KtDeclaration> {
-        return stub?.getChildrenByType(KtTokenSets.DECLARATION_TYPES, KtDeclaration.ARRAY_FACTORY)?.toList()
-            ?: PsiTreeUtil.getChildrenOfTypeAsList(this.blockExpression, KtDeclaration::class.java)
+        return stub?.getChildrenByType(KtTokenSets.DECLARATION_TYPES, KtDeclaration.ARRAY_FACTORY)?.filterNotNull()
+            ?: PsiTreeUtil.getChildrenOfTypeAsList(this.blockExpression, KtDeclaration::class)
     }
 
     override fun <R, D> accept(visitor: KtVisitor<R, D>, data: D): R {

@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.psi.psiUtil
 
 import org.jetbrains.kotlin.name.FqName
 
+
+
 /**
  * Copy of org.jetbrains.kotlin.fileClasses.JvmFileClassInfo
  */

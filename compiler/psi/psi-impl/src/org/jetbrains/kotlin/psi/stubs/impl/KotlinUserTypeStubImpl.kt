@@ -5,6 +5,12 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.name.ClassId
@@ -17,6 +23,8 @@ import org.jetbrains.kotlin.types.model.FlexibleTypeMarker
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
 import org.jetbrains.kotlin.types.model.SimpleTypeMarker
 import org.jetbrains.kotlin.types.model.TypeArgumentMarker
+
+
 
 /**
  * @param upperBound If [upperBound] exists, this [KotlinUserTypeStubImpl] is a *flexible type* with itself as the lower bound and

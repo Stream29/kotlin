@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.psi.stubs.KotlinPlaceHolderStub
 import org.jetbrains.kotlin.utils.exceptions.logErrorWithAttachment
 import org.jetbrains.kotlin.utils.exceptions.withPsiEntry
 
+
+
 /**
  * Represents a dot-qualified expression for member/extension access.
  *
@@ -74,6 +76,6 @@ class KtDotQualifiedExpression : KtExpressionImplStub<KotlinPlaceHolderStub<KtDo
     }
 
     companion object {
-        private val LOG = Logger.getInstance(KtDotQualifiedExpression::class.java)
+        private val LOG = Logger.getInstance(KtDotQualifiedExpression::class)
     }
 }

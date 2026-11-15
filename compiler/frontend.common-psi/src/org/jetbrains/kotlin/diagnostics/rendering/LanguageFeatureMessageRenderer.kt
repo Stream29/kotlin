@@ -5,11 +5,19 @@
 
 package org.jetbrains.kotlin.diagnostics.rendering
 
+
+
+
+
+
+
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersion
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 
-class LanguageFeatureMessageRenderer @JvmOverloads constructor(
+
+
+class LanguageFeatureMessageRenderer(
     private val type: Type,
     private val useHtml: Boolean = false
 ) : DiagnosticParameterRenderer<Pair<LanguageFeature, LanguageVersionSettings>> {
@@ -21,6 +29,8 @@ class LanguageFeatureMessageRenderer @JvmOverloads constructor(
         UNSUPPORTED,
         WARNING,
     }
+
+    private val featureToEnablingFlagMap by lazy { buildRuntimeFeatureToFlagMap() }
 
     override fun render(obj: Pair<LanguageFeature, LanguageVersionSettings>, renderingContext: RenderingContext): String {
         val [feature, settings] = obj

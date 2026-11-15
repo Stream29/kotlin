@@ -10,6 +10,8 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.resolve.PlatformDependentAnalyzerServices
 
+
+
 interface ModuleInfo {
     val name: Name
     val displayedName: String get() = name.asString()

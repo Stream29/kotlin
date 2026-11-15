@@ -20,6 +20,8 @@ import org.jetbrains.kotlin.psi.stubs.elements.KtTokenSets
 import org.jetbrains.kotlin.psi.utils.OperatorTokens
 import org.jetbrains.kotlin.resolution.KtResolvableCall
 
+
+
 /**
  * Represents an operator symbol in an expression.
  *
@@ -124,7 +126,7 @@ class KtOperationReferenceExpression :
 
     override fun getIdentifier(): PsiElement? = findChildByType(KtTokens.IDENTIFIER)
 
-    override fun getReferencedNameElement() = findChildByType<PsiElement?>(OPERATION_TOKENS) ?: this
+    override fun getReferencedNameElement() = findChildByType<PsiElement>(OPERATION_TOKENS) ?: this
 
     /**
      * The closest [KtExpression] sibling **before** this operation reference in the stub tree,

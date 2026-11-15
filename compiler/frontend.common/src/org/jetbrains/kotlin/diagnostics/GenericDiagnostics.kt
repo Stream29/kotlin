@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlin.diagnostics
 
+
+
+
+
 interface GenericDiagnostics<T : UnboundDiagnostic> : Iterable<T> {
     fun all(): Collection<T>
 

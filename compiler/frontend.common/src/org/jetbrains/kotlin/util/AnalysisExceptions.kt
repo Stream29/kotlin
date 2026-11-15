@@ -5,12 +5,15 @@
 
 package org.jetbrains.kotlin.util
 
+
 import com.intellij.lang.LighterASTNode
 import com.intellij.util.diff.FlyweightCapableTreeStructure
 import org.jetbrains.kotlin.KtRealSourceElementKind
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.psi
 import org.jetbrains.kotlin.utils.exceptions.shouldIjPlatformExceptionBeRethrown
+
+
 
 val Throwable.classNameAndMessage get() = "${this::class.qualifiedName}: $message"
 
@@ -20,7 +23,7 @@ class SourceCodeAnalysisException(val source: KtSourceElement, override val caus
 
 
 fun Throwable.wrapIntoSourceCodeAnalysisExceptionIfNeeded(element: KtSourceElement?): Throwable =
-    if (this is SourceCodeAnalysisException || shouldIjPlatformExceptionBeRethrown(this) || this is VirtualMachineError) {
+    if (this is SourceCodeAnalysisException || shouldIjPlatformExceptionBeRethrown(this) || this is OutOfMemoryError) {
         this
     } else {
         when (element?.kind) {
@@ -57,7 +60,7 @@ fun Throwable.wrapIntoFileAnalysisExceptionIfNeeded(
     }
     shouldIjPlatformExceptionBeRethrown(this) -> this
     this is FileAnalysisException -> this
-    this is VirtualMachineError -> this
+    this is OutOfMemoryError -> this
     else -> FileAnalysisException(filePath, this)
 }
 
@@ -77,8 +80,8 @@ private fun reportFileMismatch(source: KtSourceElement, fileSource: KtSourceElem
     val comparison = "This:\n\n${source.text.asQuote}\n\n...is not present in"
 
     val expectedFileMessage = if (thisPsi != null && otherPsi != null) {
-        val actualPath = thisPsi.containingFile.virtualFile.path
-        val expectedPath = otherPsi.containingFile.virtualFile.path
+        val actualPath = thisPsi.containingFile!!.virtualFile!!.path
+        val expectedPath = otherPsi.containingFile!!.virtualFile!!.path
         "$expectedPath, but rather in $actualPath"
     } else {
         "...${fileSource.text.asQuote}"

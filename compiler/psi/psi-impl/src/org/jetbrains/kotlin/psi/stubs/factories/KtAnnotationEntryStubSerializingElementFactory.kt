@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.psi.stubs.factories
 
+import org.jetbrains.kotlin.psi.*
+
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
@@ -28,7 +30,7 @@ internal object KtAnnotationEntryStubSerializingElementFactory :
     override fun createPsi(stub: KotlinAnnotationEntryStubImpl): KtAnnotationEntry = KtAnnotationEntry(stub)
 
     override fun createStub(psi: KtAnnotationEntry, parentStub: StubElement<*>?): KotlinAnnotationEntryStubImpl {
-        val shortName = psi.getShortName()
+        val shortName = psi.shortName
         val valueArgumentList = psi.valueArgumentList
         return KotlinAnnotationEntryStubImpl(
             parent = parentStub,

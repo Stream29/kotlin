@@ -18,6 +18,6 @@ internal object KtFileElementType : IFileElementType(KtFileElementType.NAME, Kot
         val project = psi.project
         val languageForParser = getLanguageForParser(psi)
         val builder = PsiBuilderFactory.getInstance().createBuilder(project, chameleon, null, languageForParser, chameleon.chars)
-        return KotlinParser.parse(builder, psi.containingFile).firstChildNode
+        return KotlinParser.parse(builder, psi.containingFile!!).firstChildNode
     }
 }

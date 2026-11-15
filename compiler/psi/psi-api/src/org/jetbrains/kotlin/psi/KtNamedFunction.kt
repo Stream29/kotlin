@@ -79,16 +79,16 @@ open class KtNamedFunction : KtTypeParameterListOwnerStub<KotlinFunctionStub>, K
         findChildByType(KtTokens.EQ)
 
     override fun getInitializer(): KtExpression? =
-        PsiTreeUtil.getNextSiblingOfType(/* sibling = */ equalsToken, /* aClass = */ KtExpression::class.java)
+        PsiTreeUtil.getNextSiblingOfType(/* sibling = */ equalsToken, /* aClass = */ KtExpression::class)
 
     override fun hasInitializer(): Boolean =
         initializer != null
 
-    override fun getPresentation(): ItemPresentation? =
-        ItemPresentationProviders.getItemPresentation(/* element = */ this)
+    override val presentation: ItemPresentation?
+        get() = ItemPresentationProviders.getItemPresentation(/* element = */ this)
 
     override fun getValueParameterList(): KtParameterList? =
-        getStubOrPsiChild(KtNodeTypes.VALUE_PARAMETER_LIST, KtParameterList::class.java)
+        getStubOrPsiChild(KtNodeTypes.VALUE_PARAMETER_LIST, KtParameterList::class)
 
     override fun getValueParameters(): List<KtParameter> =
         valueParameterList?.parameters.orEmpty()
@@ -100,10 +100,10 @@ open class KtNamedFunction : KtTypeParameterListOwnerStub<KotlinFunctionStub>, K
                 return null
             }
 
-            expressionFromStub?.let { return it }
+            getExpressionFromStub()?.let { return it }
         }
 
-        return findChildByClass(KtExpression::class.java)
+        return findChildByClass(KtExpression::class)
     }
 
     override fun getBodyBlockExpression(): KtBlockExpression? {
@@ -114,7 +114,7 @@ open class KtNamedFunction : KtTypeParameterListOwnerStub<KotlinFunctionStub>, K
             }
         }
 
-        return findChildByClass(KtExpression::class.java) as? KtBlockExpression
+        return findChildByClass(KtExpression::class) as? KtBlockExpression
     }
 
     override fun hasBody(): Boolean {
@@ -139,7 +139,7 @@ open class KtNamedFunction : KtTypeParameterListOwnerStub<KotlinFunctionStub>, K
         get() {
             var child = firstChild
             while (child != null) {
-                val tt = child.node.elementType
+                val tt = child.node?.elementType
                 if (tt == KtTokens.LPAR || tt == KtTokens.COLON) break
                 if (child is KtTypeReference) {
                     return child
@@ -217,7 +217,7 @@ open class KtNamedFunction : KtTypeParameterListOwnerStub<KotlinFunctionStub>, K
         false
 
     override fun getContractDescription(): KtContractEffectList? =
-        getStubOrPsiChild(KtNodeTypes.CONTRACT_EFFECT_LIST, KtContractEffectList::class.java)
+        getStubOrPsiChild(KtNodeTypes.CONTRACT_EFFECT_LIST, KtContractEffectList::class)
 
     @OptIn(KtImplementationDetail::class)
     override fun mayHaveContract(): Boolean {
@@ -240,7 +240,6 @@ open class KtNamedFunction : KtTypeParameterListOwnerStub<KotlinFunctionStub>, K
 
     companion object {
         /** A shared empty array, which can be reused to avoid unnecessary allocations. */
-        @JvmField
         val EMPTY_ARRAY: Array<KtNamedFunction> = emptyArray()
     }
 }

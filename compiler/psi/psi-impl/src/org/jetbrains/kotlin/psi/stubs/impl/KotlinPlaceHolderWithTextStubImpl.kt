@@ -21,7 +21,7 @@ class KotlinPlaceHolderWithTextStubImpl<T : KtElementImplStub<*>>(
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinPlaceHolderWithTextStubImpl<T> = KotlinPlaceHolderWithTextStubImpl(
         parent = newParent,
-        elementType = elementType,
+        elementType = elementType!!,
         text = text,
     )
 

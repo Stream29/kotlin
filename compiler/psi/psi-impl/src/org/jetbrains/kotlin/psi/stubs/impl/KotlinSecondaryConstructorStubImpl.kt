@@ -5,6 +5,15 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+import org.jetbrains.kotlin.psi.isDelegatedCallToThis
+import org.jetbrains.kotlin.psi.isExplicitDelegationCall
+
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.io.StringRef
 import org.jetbrains.kotlin.KtNodeTypes
@@ -26,7 +35,8 @@ class KotlinSecondaryConstructorStubImpl(
 ) : KotlinStubBaseImpl<KtSecondaryConstructor>(parent, KtNodeTypes.SECONDARY_CONSTRUCTOR),
     KotlinConstructorStub<KtSecondaryConstructor> {
     override val fqName: FqName? get() = null
-    override fun getName(): String? = StringRef.toString(containingClassName)
+    override val name: String?
+    get() = StringRef.toString(containingClassName)
     override val isTopLevel: Boolean get() = false
     override val isExtension: Boolean get() = false
 

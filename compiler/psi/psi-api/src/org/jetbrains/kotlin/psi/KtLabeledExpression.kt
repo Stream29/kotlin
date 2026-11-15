@@ -10,6 +10,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.search.LocalSearchScope
 
+
+
 /**
  * Represents a labeled expression with a label prefix.
  *
@@ -33,11 +35,11 @@ class KtLabeledExpression : KtExpressionWithLabel, PsiNameIdentifierOwner {
      */
     @get:IfNotParsed
     val baseExpression: KtExpression?
-        get() = findChildByClass(KtExpression::class.java)
+        get() = findChildByClass(KtExpression::class)
 
     override fun <R, D> accept(visitor: KtVisitor<R, D>, data: D) = visitor.visitLabeledExpression(this, data)
 
-    override fun getName() = getLabelName()
+    override val name: String? get() = getLabelName()
 
     @OptIn(KtIdeApi::class)
     override fun setName(name: String): PsiElement {
@@ -46,7 +48,7 @@ class KtLabeledExpression : KtExpressionWithLabel, PsiNameIdentifierOwner {
         return this
     }
 
-    override fun getNameIdentifier() = getTargetLabel()?.getIdentifier()
+    override val nameIdentifier: PsiElement? get() = getTargetLabel()?.getIdentifier()
 
-    override fun getUseScope() = LocalSearchScope(this)
+    override val useScope: LocalSearchScope get() = LocalSearchScope(this)
 }

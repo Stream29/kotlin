@@ -31,14 +31,14 @@ interface KtDoubleColonExpression : KtExpression, KtResolvable {
      * also represented as expressions. An empty left-hand side, as in `::foo`, has no receiver expression.
      */
     val receiverExpression: KtExpression?
-        get() = node.firstChildNode.psi as? KtExpression
+        get() = node!!.firstChildNode!!.psi as? KtExpression
 
     /**
      * `true` if the left-hand side is a nullable type, that is, a `?` appears before `::` (as in `String?::class`).
      */
     val hasQuestionMarks: Boolean
         get() {
-            for (element in generateSequence(node.firstChildNode, ASTNode::getTreeNext)) {
+            for (element in generateSequence(node!!.firstChildNode, ASTNode::treeNext)) {
                 when (element.elementType) {
                     KtTokens.QUEST -> return true
                     KtTokens.COLONCOLON -> return false

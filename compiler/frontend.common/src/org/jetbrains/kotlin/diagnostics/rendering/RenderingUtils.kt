@@ -5,8 +5,11 @@
 
 package org.jetbrains.kotlin.diagnostics.rendering
 
+
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.NO_ISSUE_SPECIFIED
+
+
 
 fun String.toDeprecationWarningMessage(deprecatingFeature: LanguageFeature): String {
     return buildString {

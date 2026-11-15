@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.resolve
 
 import org.jetbrains.kotlin.name.Name
 
+
+
 object CollectionNames {
     object Factories {
         val LIST_OF: Name = Name.identifier("listOf")

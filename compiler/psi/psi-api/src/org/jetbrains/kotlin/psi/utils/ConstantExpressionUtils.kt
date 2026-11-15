@@ -3,9 +3,13 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-@file:JvmName("ConstantExpressionUtils")
-
 package org.jetbrains.kotlin.psi.utils
+
+
+
+
+
+
 
 import com.intellij.util.text.LiteralFormatUtil
 import org.jetbrains.kotlin.KtNodeType
@@ -17,6 +21,8 @@ import org.jetbrains.kotlin.KtStubBasedElementTypes.NULL
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.stubs.ConstantValueKind
 import org.jetbrains.kotlin.utils.extractRadix
+
+
 
 /**
  * Checks whether the [text] representation of a number literal has a long number suffix.
@@ -90,9 +96,9 @@ private fun parseLongNumericLiteral(text: String): Long? {
         val (number, radix) = extractRadix(numberWithoutSuffix)
 
         if (isUnsigned) {
-            java.lang.Long.parseUnsignedLong(number, radix)
+            number.toULong(radix).toLong()
         } else {
-            java.lang.Long.parseLong(number, radix)
+            number.toLong(radix)
         }
     } catch (_: NumberFormatException) {
         null
@@ -108,7 +114,7 @@ private fun parseDecimalNumberLiteral(text: String): Number? {
 
 private fun parseDouble(text: String): Double? {
     return try {
-        java.lang.Double.parseDouble(text)
+        NativeFloatingLiteralParser.parseDouble(text)
     } catch (_: NumberFormatException) {
         null
     }
@@ -116,7 +122,7 @@ private fun parseDouble(text: String): Double? {
 
 private fun parseFloat(text: String): Float? {
     return try {
-        java.lang.Float.parseFloat(text)
+        NativeFloatingLiteralParser.parseFloat(text)
     } catch (_: NumberFormatException) {
         null
     }
@@ -127,7 +133,6 @@ private fun parseFloat(text: String): Float? {
  *
  * @throws IllegalStateException if the [text] does not represent a valid boolean value.
  */
-@Throws(IllegalStateException::class)
 fun parseBooleanLiteral(text: String): Boolean {
     return when (text) {
         "true" -> true

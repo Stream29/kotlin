@@ -3,6 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+@file:OptIn(kotlin.native.internal.InternalForKotlinNative::class)
+
 package org.jetbrains.kotlin.kdoc.psi.impl
 
 import com.intellij.lang.Language
@@ -19,13 +22,19 @@ import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
-class KDocImpl(buffer: CharSequence?) : LazyParseablePsiElement(KDocTokens.KDOC, buffer), KDoc {
 
-    override fun getLanguage(): Language = KotlinLanguage.INSTANCE
+
+class KDocImpl(buffer: CharSequence?) : LazyParseablePsiElement(KDocTokens.KDOC, buffer), KDoc {
+    protected override fun createUnlinkedClone(): KDocImpl =
+        kotlin.native.internal.createUninitializedInstance<KDocImpl>().also { copyLazyStateTo(it) }
+
+    override val language: Language
+    get() = KotlinLanguage.INSTANCE
 
     override fun toString(): String = node.elementType.toString()
 
-    override fun getTokenType(): IElementType = KtTokens.DOC_COMMENT
+    override val tokenType: IElementType
+    get() = KtTokens.DOC_COMMENT
 
     override fun getOwner(): KtDeclaration? = getParentOfType(true)
 

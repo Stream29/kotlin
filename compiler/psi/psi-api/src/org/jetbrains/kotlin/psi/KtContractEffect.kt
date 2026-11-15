@@ -10,6 +10,8 @@ import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
 import org.jetbrains.kotlin.psi.stubs.KotlinPlaceHolderStub
 
+
+
 /**
  * Represents a single effect declaration inside a contract block.
  *
@@ -32,7 +34,6 @@ class KtContractEffect : KtElementImplStub<KotlinPlaceHolderStub<KtContractEffec
 
     companion object {
         /** A shared empty array, which can be reused to avoid unnecessary allocations. */
-        @JvmField
         val EMPTY_ARRAY: Array<KtContractEffect> = emptyArray()
     }
 }

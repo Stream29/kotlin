@@ -30,5 +30,5 @@ class KtContainerNodeForControlStructureBody : KtContainerNode {
      * The body expression held by this container, or `null` if it is absent in incomplete code.
      */
     val expression: KtExpression?
-        get() = findChildByClass<KtExpression>(KtExpression::class.java)
+        get() = findChildByClass<KtExpression>(KtExpression::class)
 }

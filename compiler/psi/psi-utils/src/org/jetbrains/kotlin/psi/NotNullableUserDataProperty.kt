@@ -9,6 +9,8 @@ import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
 import kotlin.reflect.KProperty
 
+
+
 class NotNullableUserDataProperty<in R : UserDataHolder, T : Any>(val key: Key<T>, val defaultValue: T) {
     operator fun getValue(thisRef: R, desc: KProperty<*>) = thisRef.getUserData(key) ?: defaultValue
 

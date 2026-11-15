@@ -5,8 +5,16 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+import org.jetbrains.kotlin.psi.entries
+
+
+
+
+
+
+
 import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
-import org.jetbrains.kotlin.lexer.KtTokens.MODIFIER_KEYWORDS_ARRAY
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.MODIFIER_KEYWORDS_ARRAY
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.KtModifierList
 import org.jetbrains.kotlin.psi.stubs.KotlinModifierListStub
@@ -19,10 +27,8 @@ object ModifierMaskUtils {
         }
     }
 
-    @JvmStatic
     fun computeMaskFromModifierList(modifierList: KtModifierList): Long = computeMask { modifierList.hasModifier(it) }
 
-    @JvmStatic
     fun computeMask(hasModifier: (KtModifierKeywordToken) -> Boolean): Long {
         var mask = 0L
         for ([index, modifierKeywordToken] in MODIFIER_KEYWORDS_ARRAY.withIndex()) {
@@ -46,14 +52,13 @@ object ModifierMaskUtils {
         return mask
     }
 
-    @JvmStatic
     fun maskHasModifier(mask: Long, modifierToken: KtModifierKeywordToken): Boolean {
         val index = MODIFIER_KEYWORDS_ARRAY.indexOf(modifierToken)
         assert(index >= 0) { "All KtModifierKeywordTokens should be present in MODIFIER_KEYWORDS_ARRAY" }
         return maskHas(mask, index)
     }
 
-    @JvmStatic
+
     fun maskHasSpecialFlag(mask: Long, flag: KotlinModifierListStub.SpecialFlag): Boolean {
         val specialFlagOffset = MODIFIER_KEYWORDS_ARRAY.size
         return maskHas(mask, specialFlagOffset + flag.ordinal)
@@ -61,7 +66,6 @@ object ModifierMaskUtils {
 
     private fun maskHas(mask: Long, flagIndex: Int): Boolean = (mask and (1L shl flagIndex)) != 0L
 
-    @JvmStatic
     fun maskToString(mask: Long): String {
         val sb = StringBuilder()
         sb.append("[")

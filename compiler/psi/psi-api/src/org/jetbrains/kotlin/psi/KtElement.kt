@@ -30,7 +30,7 @@ interface KtElement : NavigatablePsiElement, KtPureElement {
      * This does not visit the element itself, nor does it recurse into grandchildren; the visitor decides whether to descend further. Use
      * [KtTreeVisitor] for automatic recursive traversal.
      */
-    fun <D> acceptChildren(visitor: KtVisitor<Void, D>, data: D)
+    fun <D> acceptChildren(visitor: KtVisitor<Nothing?, D>, data: D)
 
     /**
      * Dispatches this element to the corresponding `visit*` method of the given [visitor] and returns its result.
@@ -54,7 +54,7 @@ interface KtElement : NavigatablePsiElement, KtPureElement {
         message = "Don't use getReference() on KtElement for the choice is unpredictable",
         level = DeprecationLevel.ERROR,
     )
-    override fun getReference(): PsiReference?
+    override val reference: PsiReference?
 }
 
 /**
@@ -67,3 +67,5 @@ fun KtElement.getModificationStamp(): Long = when (this) {
     is KtSuperTypeList -> this.modificationStamp
     else -> (parent as KtElement).getModificationStamp()
 }
+
+val KtElement.modificationStamp: Long get() = getModificationStamp()

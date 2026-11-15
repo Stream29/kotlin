@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.psi.stubs.factories
 
+import org.jetbrains.kotlin.psi.*
+
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
@@ -36,7 +38,7 @@ internal object KtPropertyStubSerializingElementFactory :
      * We want to build stubs for all non-local properties to make them indexable
      */
     override fun shouldCreateStub(node: ASTNode): Boolean {
-        val parentNode = node.treeParent
+        val parentNode = node.treeParent ?: return false
         val parentElementType = parentNode.elementType
 
         // Simple check for non-local properties inside classes and files
@@ -46,18 +48,18 @@ internal object KtPropertyStubSerializingElementFactory :
 
         // Simple check for local and non-local properties inside blocks
         if (parentElementType == KtNodeTypes.BLOCK) {
-            when (parentNode.treeParent.elementType) {
+            when (parentNode.treeParent?.elementType) {
                 KtNodeTypes.SCRIPT -> return true
                 KtNodeTypes.FUN, KtNodeTypes.PROPERTY_ACCESSOR -> return false
             }
         }
 
         // Fallback for psi-based check
-        return !(node.psi as KtProperty).isLocal
+        return !(node.psi as KtProperty).isLocal()
     }
 
     override fun createStub(psi: KtProperty, parentStub: StubElement<*>?): KotlinPropertyStubImpl {
-        assert(!psi.isLocal) {
+        assert(!psi.isLocal()) {
             "Should not store local property: ${psi.text}, parent ${psi.parent?.text ?: "<no parent>"}"
         }
 

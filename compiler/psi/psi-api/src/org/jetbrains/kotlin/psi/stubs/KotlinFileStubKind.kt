@@ -5,9 +5,17 @@
 
 package org.jetbrains.kotlin.psi.stubs
 
+
+
+
+
+
+
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtIdeApi
 import org.jetbrains.kotlin.psi.KtImplementationDetail
+
+
 
 /**
  * Represents different kinds of Kotlin file stubs.
@@ -67,8 +75,7 @@ sealed interface KotlinFileStubKind {
              *
              * `foo.kt`:
              * ```kotlin
-             * @file:JvmName("Doo")
-             * package com.example
+             * * package com.example
              *
              * fun baz() {}
              * ```
@@ -77,8 +84,7 @@ sealed interface KotlinFileStubKind {
              *
              * `foo.kt`:
              * ```kotlin
-             * @file:JvmName("Doo")
-             * @file:JvmPackageName("another.pack")
+             * * @file:JvmPackageName("another.pack")
              * package com.example
              *
              * fun baz() {}

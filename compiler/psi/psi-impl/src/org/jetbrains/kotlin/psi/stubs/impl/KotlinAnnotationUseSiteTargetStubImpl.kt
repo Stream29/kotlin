@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.io.StringRef
 import org.jetbrains.kotlin.KtNodeTypes
@@ -19,7 +20,7 @@ class KotlinAnnotationUseSiteTargetStubImpl(
     private val useSiteTargetRef: StringRef,
 ) : KotlinStubBaseImpl<KtAnnotationUseSiteTarget>(parent, KtNodeTypes.ANNOTATION_TARGET), KotlinAnnotationUseSiteTargetStub {
     override val useSiteTarget: String
-        get() = useSiteTargetRef.string
+        get() = useSiteTargetRef.string!!
 
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinAnnotationUseSiteTargetStubImpl = KotlinAnnotationUseSiteTargetStubImpl(

@@ -5,6 +5,14 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+import org.jetbrains.kotlin.psi.classId
+import org.jetbrains.kotlin.psi.entries
+
+
+
+
+
+
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.DataInputOutputUtil

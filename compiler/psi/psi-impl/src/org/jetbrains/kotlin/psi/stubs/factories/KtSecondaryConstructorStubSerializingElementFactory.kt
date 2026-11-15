@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.psi.stubs.factories
 
+import org.jetbrains.kotlin.psi.*
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -31,8 +33,8 @@ internal object KtSecondaryConstructorStubSerializingElementFactory :
     ): KotlinSecondaryConstructorStubImpl {
         val hasBody = psi.hasBody()
         val delegationCall = psi.getDelegationCallOrNull()
-        val isDelegatedCallToThis = delegationCall?.isCallToThis ?: true
-        val isExplicitDelegationCall = delegationCall?.isImplicit == false
+        val isDelegatedCallToThis = delegationCall?.isCallToThis() ?: true
+        val isExplicitDelegationCall = delegationCall?.isImplicit() == false
         val mayHaveContract = psi.isLegacyContractPresentPsiCheck()
         return KotlinSecondaryConstructorStubImpl(
             parent = parentStub,

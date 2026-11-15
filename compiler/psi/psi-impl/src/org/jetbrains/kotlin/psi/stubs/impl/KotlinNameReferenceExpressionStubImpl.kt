@@ -20,7 +20,7 @@ class KotlinNameReferenceExpressionStubImpl(
     val isClassRef: Boolean,
 ) : KotlinStubBaseImpl<KtNameReferenceExpression>(parent, KtNodeTypes.REFERENCE_EXPRESSION), KotlinNameReferenceExpressionStub {
     override val referencedName: String
-        get() = referencedNameRef.string
+        get() = referencedNameRef.string!!
 
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinNameReferenceExpressionStubImpl = KotlinNameReferenceExpressionStubImpl(

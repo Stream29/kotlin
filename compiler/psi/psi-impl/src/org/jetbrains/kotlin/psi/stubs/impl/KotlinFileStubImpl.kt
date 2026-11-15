@@ -9,7 +9,7 @@ import com.intellij.psi.stubs.PsiFileStubImpl
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.kotlin.KtNodeTypes
-import org.jetbrains.kotlin.KtNodeTypes.IMPORT_LIST
+import org.jetbrains.kotlin.KtNodeTypes.Companion.IMPORT_LIST
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtImplementationDetail
@@ -30,8 +30,8 @@ class KotlinFileStubImpl internal constructor(
     val facadeFqName: FqName?
         get() = (kind as? KotlinFileStubKind.WithPackage.Facade)?.facadeFqName
 
-    override fun getFileElementType(): IElementType = KtNodeTypes.FILE
-    override fun getElementType(): IElementType = KtNodeTypes.FILE
+    override val fileElementType: IElementType get() = KtNodeTypes.FILE
+    override val elementType: IElementType get() = KtNodeTypes.FILE
 
     override fun toString(): String = "${STUB_TO_STRING_PREFIX}FILE[kind=$kind]"
 

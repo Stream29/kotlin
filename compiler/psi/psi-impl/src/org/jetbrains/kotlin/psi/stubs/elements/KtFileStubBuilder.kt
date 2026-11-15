@@ -4,6 +4,7 @@
  */
 package org.jetbrains.kotlin.psi.stubs.elements
 
+
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiFile
 import com.intellij.psi.stubs.DefaultStubBuilder
@@ -13,10 +14,12 @@ import org.jetbrains.kotlin.psi.psiUtil.JvmFileClassUtil
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinFileStubImpl
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinFileStubKindImpl
 
+
+
 class KtFileStubBuilder : DefaultStubBuilder() {
     override fun buildStubTree(file: PsiFile): StubElement<*> {
         (file as? KtFile)?.customStubBuilder?.let {
-            return it.buildStubTree(file)
+            return it.buildStubTree(file)!!
         }
 
         return super.buildStubTree(file)

@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 class KotlinEnumEntryStubImpl(
     parent: StubElement<*>?,
     private val qualifiedName: StringRef?,
-    private val name: StringRef?,
+    name: StringRef?,
 ) : KotlinStubBaseImpl<KtClass>(
     parent = parent,
     elementType = KtNodeTypes.ENUM_ENTRY,
@@ -40,7 +40,9 @@ class KotlinEnumEntryStubImpl(
     override val fqName: FqName?
         get() = qualifiedName?.string?.let(::FqName)
 
-    override fun getName(): String? = name?.string
+    private val nameRef = name
+    override val name: String?
+        get() = nameRef?.string
 
     override val superNames: List<String>
         get() {
@@ -61,13 +63,13 @@ class KotlinEnumEntryStubImpl(
     override fun copyInto(newParent: StubElement<*>?): KotlinEnumEntryStubImpl = KotlinEnumEntryStubImpl(
         parent = newParent,
         qualifiedName = qualifiedName,
-        name = name,
+        name = nameRef,
     )
 
     @KtImplementationDetail
     override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
         other is KotlinEnumEntryStubImpl &&
-                other.name == name &&
+                other.nameRef == nameRef &&
                 other.qualifiedName == qualifiedName &&
                 other.kdocText == kdocText
 }

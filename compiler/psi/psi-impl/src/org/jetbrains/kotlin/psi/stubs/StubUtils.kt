@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.contracts.description.KtContractDescriptionElement
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.KtClassLikeDeclaration
 import org.jetbrains.kotlin.psi.KtEnumEntry
 import org.jetbrains.kotlin.psi.KtObjectDeclaration
@@ -21,18 +22,15 @@ import org.jetbrains.kotlin.psi.stubs.impl.KotlinContractSerializationVisitor
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinTypeBean
 
 internal object StubUtils {
-    @JvmStatic
     fun deserializeClassId(dataStream: StubInputStream): ClassId? {
         val classId = dataStream.readName() ?: return null
-        return ClassId.fromString(classId.string)
+        return ClassId.fromString(classId.string!!)
     }
 
-    @JvmStatic
     fun serializeClassId(dataStream: StubOutputStream, classId: ClassId?) {
         dataStream.writeName(classId?.asString())
     }
 
-    @JvmStatic
     fun StubOutputStream.serializeKdocText(kdocText: String?) {
         writeBoolean(kdocText != null)
         if (kdocText != null) {
@@ -40,12 +38,11 @@ internal object StubUtils {
         }
     }
 
-    @JvmStatic
     fun StubInputStream.deserializeKdocText(): String? {
         return if (readBoolean()) readUTFFast() else null
     }
 
-    @JvmStatic
+
     fun createClassId(parentStub: StubElement<*>, currentDeclaration: KtClassLikeDeclaration): ClassId? {
         if (currentDeclaration is KtObjectDeclaration && currentDeclaration.isObjectLiteral()) {
             return null
@@ -86,7 +83,7 @@ internal object StubUtils {
         }
     }
 
-    @JvmStatic
+
     internal fun StubOutputStream.writeNullableBoolean(value: Boolean?) {
         val byte = when (value) {
             true -> 0
@@ -97,17 +94,14 @@ internal object StubUtils {
         writeByte(byte)
     }
 
-    @JvmStatic
     internal fun StubInputStream.readNullableBoolean(): Boolean? = when (readByte().toInt()) {
         0 -> true
         1 -> false
         else -> null
     }
 
-    @JvmStatic
     internal fun StubInputStream.readFqName(): FqName = FqName(readNameString()!!)
 
-    @JvmStatic
     internal inline fun <K : Any, V : Any> StubOutputStream.writeNullableMap(
         map: Map<K, V>?,
         keyWriter: StubOutputStream.(K) -> Unit,
@@ -122,7 +116,6 @@ internal object StubUtils {
         }
     }
 
-    @JvmStatic
     internal fun <K : Any, V : Any> StubInputStream.readNullableMap(
         keyReader: StubInputStream.() -> K,
         valueReader: StubInputStream.() -> V,
@@ -141,7 +134,6 @@ internal object StubUtils {
         }
     }
 
-    @JvmStatic
     internal inline fun <E : Any> StubOutputStream.writeNullableCollection(
         collection: Collection<E>?,
         elementWriter: StubOutputStream.(E) -> Unit,
@@ -152,7 +144,6 @@ internal object StubUtils {
         collection?.forEach { elementWriter(it) }
     }
 
-    @JvmStatic
     internal fun <E : Any> StubInputStream.readNullableCollection(
         elementReader: StubInputStream.() -> E,
     ): List<E>? = when (val nullableSize = readVarInt()) {
@@ -168,14 +159,12 @@ internal object StubUtils {
         }
     }
 
-    @JvmStatic
     internal fun StubOutputStream.writeContract(contract: List<KtContractDescriptionElement<KotlinTypeBean, Nothing?>>?) {
         writeNullableCollection(contract) { effect ->
             effect.accept(KotlinContractSerializationVisitor(this), null)
         }
     }
 
-    @JvmStatic
     internal fun StubInputStream.readContract(): List<KtContractDescriptionElement<KotlinTypeBean, Nothing?>>? = readNullableCollection {
         val effectType: KotlinContractEffectType = KotlinContractEffectType.entries[readVarInt()]
         effectType.deserialize(this@readContract)

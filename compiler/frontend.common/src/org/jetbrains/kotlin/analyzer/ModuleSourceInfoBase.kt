@@ -5,9 +5,15 @@
 
 package org.jetbrains.kotlin.analyzer
 
+
+
+
+
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.descriptors.ModuleCapability
 import org.jetbrains.kotlin.name.FqName
+
+
 
 interface PlatformAnalysisParameters {
     object Empty : PlatformAnalysisParameters
@@ -36,7 +42,7 @@ interface ResolverForModuleComputationTracker {
     companion object {
         @Suppress("DEPRECATION") // KT-68390
         fun getInstance(project: Project): ResolverForModuleComputationTracker? =
-            project.getComponent(ResolverForModuleComputationTracker::class.java)
+            project.getComponent(ResolverForModuleComputationTracker::class)
     }
 }
 

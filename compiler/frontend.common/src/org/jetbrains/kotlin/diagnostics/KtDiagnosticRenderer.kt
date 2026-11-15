@@ -8,7 +8,9 @@ package org.jetbrains.kotlin.diagnostics
 import org.jetbrains.kotlin.diagnostics.rendering.DiagnosticParameterRenderer
 import org.jetbrains.kotlin.diagnostics.rendering.RenderingContext
 import org.jetbrains.kotlin.diagnostics.rendering.renderParameter
-import java.text.MessageFormat
+import nativekotlin.host.format.NativeMessageFormat as MessageFormat
+
+
 
 sealed class KtDiagnosticRenderer {
     abstract val message: String

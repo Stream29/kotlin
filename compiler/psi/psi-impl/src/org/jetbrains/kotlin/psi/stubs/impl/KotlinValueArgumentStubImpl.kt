@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.psi.stubs.impl
 
+
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.kotlin.psi.KtImplementationDetail
@@ -21,7 +22,7 @@ class KotlinValueArgumentStubImpl<T : KtValueArgument>(
     @KtImplementationDetail
     override fun copyInto(newParent: StubElement<*>?): KotlinValueArgumentStubImpl<T> = KotlinValueArgumentStubImpl(
         parent = newParent,
-        elementType = elementType,
+        elementType = elementType!!,
         isSpread = isSpread,
     )
 

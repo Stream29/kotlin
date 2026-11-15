@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
-import com.intellij.openapi.components.serviceOrNull
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.psi.stubs.IndexSink
 import org.jetbrains.kotlin.psi.KtIdeApi
 import org.jetbrains.kotlin.psi.KtImplementationDetail
@@ -42,6 +42,6 @@ open class StubIndexService protected constructor() {
 
     companion object {
         @KtImplementationDetail
-        fun getInstance(): StubIndexService? = serviceOrNull()
+        fun getInstance(): StubIndexService? = ApplicationManager.getApplication().getService(StubIndexService::class)
     }
 }

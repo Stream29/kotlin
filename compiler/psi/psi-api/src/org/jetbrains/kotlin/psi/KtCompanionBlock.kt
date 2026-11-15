@@ -9,6 +9,8 @@ import com.intellij.lang.ASTNode
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.psi.stubs.KotlinPlaceHolderStub
 
+
+
 /**
  * Represents a companion block.
  *
@@ -43,7 +45,7 @@ class KtCompanionBlock : KtElementImplStub<KotlinPlaceHolderStub<KtCompanionBloc
      * The body of the companion block.
      */
     val body: KtClassBody
-        get() = getRequiredStubOrPsiChild(KtNodeTypes.CLASS_BODY, KtClassBody::class.java)
+        get() = getRequiredStubOrPsiChild(KtNodeTypes.CLASS_BODY, KtClassBody::class)
 
     /**
      * The list of declarations inside the companion block.
@@ -55,7 +57,6 @@ class KtCompanionBlock : KtElementImplStub<KotlinPlaceHolderStub<KtCompanionBloc
     @KtExperimentalApi
     companion object {
         /** A shared empty array, which can be reused to avoid unnecessary allocations. */
-        @JvmField
         val EMPTY_ARRAY: Array<KtCompanionBlock> = emptyArray()
     }
 }

@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.psi
 
+
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.KtNodeTypes
@@ -12,6 +13,8 @@ import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.stubs.KotlinPlaceHolderStub
 import org.jetbrains.kotlin.psi.stubs.elements.KtTokenSets
 import org.jetbrains.kotlin.resolution.KtResolvable
+
+
 
 /**
  * Represents a type reference.
@@ -156,7 +159,6 @@ class KtTypeReference : KtModifierListOwnerStub<KotlinPlaceHolderStub<KtTypeRefe
 
     companion object {
         /** A shared empty array, which can be reused to avoid unnecessary allocations. */
-        @JvmField
         val EMPTY_ARRAY: Array<KtTypeReference> = emptyArray()
     }
 }

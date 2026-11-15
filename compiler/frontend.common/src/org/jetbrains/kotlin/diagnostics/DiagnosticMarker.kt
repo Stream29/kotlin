@@ -9,6 +9,8 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.K1Deprecation
 
+
+
 interface DiagnosticMarker {
 
     /**

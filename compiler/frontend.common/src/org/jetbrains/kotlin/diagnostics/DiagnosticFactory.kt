@@ -6,7 +6,8 @@
 package org.jetbrains.kotlin.diagnostics
 
 import org.jetbrains.kotlin.diagnostics.rendering.DiagnosticRenderer
-import java.lang.IllegalArgumentException
+
+
 
 abstract class DiagnosticFactory<D : UnboundDiagnostic> protected constructor(
     private var _name: String?,
@@ -42,7 +43,6 @@ abstract class DiagnosticFactory<D : UnboundDiagnostic> protected constructor(
     }
 
     companion object {
-        @SafeVarargs
         fun <D : UnboundDiagnostic> cast(diagnostic: UnboundDiagnostic, vararg factories: DiagnosticFactory<out D>): D {
             return cast(diagnostic, listOf(*factories))
         }

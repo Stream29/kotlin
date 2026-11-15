@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.psi.stubs.KotlinContextReceiverStub
 import org.jetbrains.kotlin.utils.exceptions.requireWithAttachment
 import org.jetbrains.kotlin.utils.exceptions.withPsiEntry
 
+
+
 /**
  * Represents a single context receiver in a context receiver list.
  *
@@ -41,7 +43,7 @@ class KtContextReceiver : KtElementImplStub<KotlinContextReceiverStub> {
      * Returns the explicit label of this context receiver (as in `context(logger@ Logger)`), or `null` if it has no label.
      */
     fun targetLabel(): KtSimpleNameExpression? =
-        findChildByType<KtContainerNode?>(KtNodeTypes.LABEL_QUALIFIER)
+        findChildByType<KtContainerNode>(KtNodeTypes.LABEL_QUALIFIER)
             ?.findChildByType(KtNodeTypes.LABEL)
 
     /**
@@ -49,7 +51,7 @@ class KtContextReceiver : KtElementImplStub<KotlinContextReceiverStub> {
      */
     fun labelName(): String? {
         stub?.let { return it.label }
-        return targetLabel()?.getReferencedName()
+        return targetLabel()?.referencedName
     }
 
     /**
@@ -63,7 +65,7 @@ class KtContextReceiver : KtElementImplStub<KotlinContextReceiverStub> {
     /**
      * Returns the type reference of this context receiver, or `null` if it is absent in incomplete code.
      */
-    fun typeReference(): KtTypeReference? = getStubOrPsiChild(KtNodeTypes.TYPE_REFERENCE, KtTypeReference::class.java)
+    fun typeReference(): KtTypeReference? = getStubOrPsiChild(KtNodeTypes.TYPE_REFERENCE, KtTypeReference::class)
 
     /**
      * Returns the effective name used to reference this context receiver: the explicit [labelName] if present, otherwise the receiver
@@ -93,7 +95,6 @@ class KtContextReceiver : KtElementImplStub<KotlinContextReceiverStub> {
 
     companion object {
         /** A shared empty array, which can be reused to avoid unnecessary allocations. */
-        @JvmField
         val EMPTY_ARRAY: Array<KtContextReceiver> = emptyArray()
     }
 }
