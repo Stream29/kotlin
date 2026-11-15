@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.ir.util
 
 import org.jetbrains.kotlin.ir.IrLock
+import org.jetbrains.kotlin.ir.synchronized
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.IrBindableSymbol
@@ -50,7 +51,8 @@ abstract class SymbolTableSlice<Key, SymbolOwner, Symbol>(val lock: IrLock)
         synchronized(lock) {
             return get(key) ?: run {
                 val new = orElse()
-                assert(unboundSymbols.add(new)) { "Symbol for ${new.signature} was already referenced" }
+                val added = unboundSymbols.add(new)
+                assert(added) { "Symbol for ${new.signature} was already referenced" }
                 set(key, new)
                 new
             }

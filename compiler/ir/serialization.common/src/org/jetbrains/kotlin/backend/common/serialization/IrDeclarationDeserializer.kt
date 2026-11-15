@@ -33,7 +33,6 @@ import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.utils.compactIfPossible
 import org.jetbrains.kotlin.utils.memoryOptimizedMap
 import org.jetbrains.kotlin.utils.memoryOptimizedMapIndexed
-import kotlin.reflect.full.declaredMemberProperties
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrAnnotation as ProtoAnnotation
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrAnonymousInit as ProtoAnonymousInit
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrClass as ProtoClass
@@ -184,7 +183,7 @@ class IrDeclarationDeserializer(
     }
 
     private fun deserializeErrorType(proto: ProtoErrorType): IrErrorType {
-        if (!settings.allowErrorNodes) throw IrDisallowedErrorNode(IrErrorType::class.java)
+        if (!settings.allowErrorNodes) throw IrDisallowedErrorNode(IrErrorType::class)
         val annotations = deserializeAnnotations(proto.annotationList, null)
         return IrErrorTypeImpl(null, annotations, Variance.INVARIANT)
     }
@@ -832,12 +831,8 @@ class IrDeclarationDeserializer(
         /**
          * All [IrDeclarationOriginImpl]s declared in [IrDeclarationOrigin.Companion], indexed by name.
          */
-        val currentDeclarationOriginNames: Map<String, IrDeclarationOriginImpl> by lazy {
-            IrDeclarationOrigin.Companion::class
-                .declaredMemberProperties
-                .mapNotNull { it.get(IrDeclarationOrigin.Companion) as? IrDeclarationOriginImpl }
-                .associateBy { it.name }
-        }
+        val currentDeclarationOriginNames: Map<String, IrDeclarationOriginImpl>
+            get() = nativeIrDeclarationOriginIndex
 
         private val declarationOriginIndex: Map<String, IrDeclarationOrigin> by lazy {
             legacyDeclarationOriginNames + currentDeclarationOriginNames
@@ -913,7 +908,7 @@ class IrDeclarationDeserializer(
             return it(this, fallbackSymbolKind) as S
         }
 
-        throw IrSymbolTypeMismatchException(S::class.java, this)
+        throw IrSymbolTypeMismatchException(S::class, this)
     }
 
     private inline fun <Declaration : IrDeclaration, Symbol : IrBindableSymbol<*, Declaration>> createIfUnbound(

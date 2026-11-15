@@ -4,6 +4,9 @@
  */
 package org.jetbrains.kotlin.backend.konan
 
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.*
+
 import llvm.*
 import org.jetbrains.kotlin.backend.konan.llvm.*
 import org.jetbrains.kotlin.backend.konan.llvm.objc.patchObjCRuntimeModule
@@ -14,7 +17,8 @@ import org.jetbrains.kotlin.config.nativeBinaryOptions.CCallMode
 import org.jetbrains.kotlin.config.nativeBinaryOptions.CInterfaceGenerationMode
 import org.jetbrains.kotlin.config.nativeBinaryOptions.GC
 import org.jetbrains.kotlin.config.nativeBinaryOptions.GCSchedulerType
-import org.jetbrains.kotlin.konan.file.isBitcode
+import org.jetbrains.kotlin.konan.file.*
+import org.jetbrains.kotlin.library.KlibPath
 import org.jetbrains.kotlin.konan.library.components.bitcode
 import org.jetbrains.kotlin.konan.library.linkerOpts
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
@@ -24,9 +28,6 @@ import org.jetbrains.kotlin.konan.target.supportsLibBacktrace
 import org.jetbrains.kotlin.library.isNativeStdlib
 import org.jetbrains.kotlin.library.metadata.isCInteropLibrary
 import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
-import java.io.File
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.pathString
 
 /**
  * Supposed to be true for a single LLVM module within final binary.

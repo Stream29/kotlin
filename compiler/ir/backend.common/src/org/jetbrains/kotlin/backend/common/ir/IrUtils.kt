@@ -132,7 +132,7 @@ fun IrFunction.isInlineFunWithReifiedParameter() = isInline && typeParameters.an
 fun IrBranch.isUnconditional(): Boolean = (condition as? IrConst)?.value == true
 
 fun syntheticBodyIsNotSupported(declaration: IrDeclaration): Nothing =
-    compilationException("${IrSyntheticBody::class.java.simpleName} is not supported here", declaration)
+    compilationException("${IrSyntheticBody::class.simpleName} is not supported here", declaration)
 
 val IrFile.isJvmBuiltin: Boolean get() = hasAnnotation(StandardClassIds.Annotations.JvmBuiltin)
 

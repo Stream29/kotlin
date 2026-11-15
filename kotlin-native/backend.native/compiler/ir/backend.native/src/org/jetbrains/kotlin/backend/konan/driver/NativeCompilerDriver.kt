@@ -5,9 +5,12 @@
 
 package org.jetbrains.kotlin.backend.konan.driver
 
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.*
+import org.jetbrains.kotlin.library.readLines
+
 import org.jetbrains.kotlin.K1Deprecation
 import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.usingJvmCInteropCallbacks
 import llvm.*
 import org.jetbrains.kotlin.backend.common.phaser.PhaseEngine
 import org.jetbrains.kotlin.backend.konan.*
@@ -15,7 +18,6 @@ import org.jetbrains.kotlin.backend.konan.driver.phases.*
 import org.jetbrains.kotlin.backend.konan.llvm.parseBitcodeFile
 import org.jetbrains.kotlin.builtins.konan.KonanBuiltIns
 import org.jetbrains.kotlin.cli.CliDiagnostics
-import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.report
 import org.jetbrains.kotlin.config.nativeBinaryOptions.CInterfaceGenerationMode
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -25,8 +27,8 @@ import org.jetbrains.kotlin.util.PerformanceManager
 import org.jetbrains.kotlin.util.PhaseType
 import org.jetbrains.kotlin.util.tryMeasurePhaseTime
 import org.jetbrains.kotlin.utils.usingNativeMemoryAllocator
-import kotlin.io.path.Path
-import kotlin.io.path.readLines
+
+private inline fun <R> usingJvmCInteropCallbacks(@Suppress("UNUSED_PARAMETER") konanHome: String? = null, block: () -> R): R = block()
 
 /**
  * Driver orchestrates and connects different parts of the compiler into a complete pipeline.
@@ -123,7 +125,7 @@ internal class NativeCompilerDriver(private val performanceManager: PerformanceM
     private fun produceBinaryFromBitcode(engine: PhaseEngine<NativeBackendPhaseContext>, config: NativeSecondStageCompilationConfig, bitcodeFilePath: String) {
         loadLLVMStubs(config.configuration.konanHome)
         val llvmContext = LLVMContextCreate()!!
-        var llvmModule: CPointer<LLVMOpaqueModule>? = null
+        var llvmModule: LLVMModuleRef? = null
         try {
             llvmModule = parseBitcodeFile(engine.context, engine.context.diagnosticReporter, llvmContext, bitcodeFilePath)
             val context = BitcodePostProcessingContextImpl(config, llvmModule, llvmContext)

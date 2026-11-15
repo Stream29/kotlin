@@ -5,8 +5,8 @@
 
 package org.jetbrains.kotlin.backend.konan.util
 
-import it.unimi.dsi.fastutil.ints.IntArraySet
-import it.unimi.dsi.fastutil.ints.IntSet
+private typealias IntSet = MutableSet<Int>
+private fun IntArraySet(capacity: Int): MutableSet<Int> = LinkedHashSet(capacity)
 
 const val LAZY_CONVERSION_THRESHOLD = 8
 

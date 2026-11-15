@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.config.AnalysisFlags
 import org.jetbrains.kotlin.config.ExplicitApiMode
 import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
-import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.isPrivate
 import org.jetbrains.kotlin.descriptors.DescriptorVisibility
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.ir.IrDiagnosticRenderers
@@ -287,7 +286,7 @@ class SyntheticAccessorLowering(private val context: LoweringContext, isExecuted
 
     companion object {
         private fun IrFunction.isNonLocalPrivateFunction(): Boolean =
-            isPrivate(visibility) && !isLocal
+            DescriptorVisibilities.isPrivate(visibility) && !isLocal
 
         private fun IrField.isNonLocalBackingField(): Boolean =
             correspondingPropertySymbol?.owner?.isLocal == false

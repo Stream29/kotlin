@@ -24,10 +24,9 @@ import org.jetbrains.kotlin.library.metadata.KlibMetadataProtoBuf
 import org.jetbrains.kotlin.library.metadata.addMetadataFlagsToHeader
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.util.toMetadataVersion
-import java.io.File
-import java.util.*
-import kotlin.io.path.Path
-import kotlin.io.path.pathString
+import nativekotlin.host.files.NativeFile as File
+import org.jetbrains.kotlin.konan.properties.Properties
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 /**
  * Holds the binary data for a single Kotlin file to be written to a KLIB, i.e., its metadata and IR (unless it's a metadata-only KLIB).
@@ -81,7 +80,7 @@ class SerializerOutput(
 fun KtSourceFile.toIoFileOrNull(): File? = when (this) {
     is KtIoFileSourceFile -> file
     is KtVirtualFileSourceFile -> VfsUtilCore.virtualToIoFile(virtualFile)
-    is KtPsiSourceFile -> VfsUtilCore.virtualToIoFile(psiFile.virtualFile)
+    is KtPsiSourceFile -> VfsUtilCore.virtualToIoFile(psiFile.virtualFile!!)
     else -> path?.let(::File)
 }
 
@@ -164,9 +163,9 @@ fun <SourceFile> serializeModuleIntoKlib(
         emptyPackages = emptyList(),
     ).toByteArray()
 
-    val [fragmentNames, fragmentParts] = compiledKotlinFiles
+    val (fragmentNames, fragmentParts) = compiledKotlinFiles
         .groupBy { it.fqName }
-        .map { [fqn, serializedData] ->
+        .map { (fqn, serializedData) ->
             fqn to serializedData.sortedBy { it.path }.map { it.metadata }
         }
         .sortedBy { it.first }

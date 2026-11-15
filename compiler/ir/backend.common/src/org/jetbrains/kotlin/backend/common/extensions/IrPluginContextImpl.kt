@@ -53,7 +53,7 @@ open class IrPluginContextImpl(
         val classDescriptor =
             parentMemberScope.getContributedClassifier(fqName.shortName(), NoLookupLocation.FROM_BACKEND) as? ClassDescriptor ?: return null
 
-        return classDescriptor.unsubstitutedMemberScope
+        return classDescriptor.getUnsubstitutedMemberScope()
     }
 
     private fun <S : IrSymbol> resolveSymbol(fqName: FqName, referencer: (MemberScope) -> S?): S? {

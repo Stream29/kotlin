@@ -16,7 +16,6 @@ import org.jetbrains.kotlin.name.NativeRuntimeNames.Annotations.EscapesNothing
 /**
  * A representation of `@Escapes` and `@Escapes.Nothing` annotations.
  */
-@JvmInline
 value class Escapes private constructor(private val mask: Int) {
     constructor(mask: Int, signatureSize: Int) : this(mask) {
         assertIsValidFor(signatureSize)

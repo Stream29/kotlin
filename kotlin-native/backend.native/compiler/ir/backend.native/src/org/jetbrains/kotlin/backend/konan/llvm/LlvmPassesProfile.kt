@@ -36,7 +36,6 @@ private fun LLVMKotlinPassesProfileRef.parse(pipelineName: String) = LLVMKotlinP
             LlvmPassProfile(pass, Time(nanos, userNanos, cpuNanos))
         }
 
-@JvmInline
 internal value class LlvmPassesProfile private constructor(val entries: List<LlvmPassProfile>) {
     constructor(profile: LLVMKotlinPassesProfileRef, pipelineName: String) : this(profile.parse(pipelineName).toList())
 }

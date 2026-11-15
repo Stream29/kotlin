@@ -236,7 +236,7 @@ internal class GlobalHierarchyAnalysis(val context: NativeBackendContext, val ir
                     }
 
                     fun registerInterface(iface: IrClass) {
-                        interfaceIndices.computeIfAbsent(iface) {
+                        interfaceIndices.getOrPut(iface) {
                             forbidden.add(mutableListOf())
                             interfaces.add(iface)
                             interfaces.size - 1
@@ -277,7 +277,7 @@ internal fun IrField.requiredAlignment(llvm: CodegenLlvmHelpers): Int {
     val abiAlignment = if (llvmType == llvm.vector128Type) {
         8 // over-aligned objects are not supported now, and this worked somehow, so let's keep it as it for now
     } else {
-        LLVMABIAlignmentOfType(llvm.runtime.targetData, llvmType)
+        LLVMABIAlignmentOfType(llvm.runtime.targetData, llvmType).toInt()
     }
     return if (hasAnnotation(KonanFqNames.volatile)) {
         val size = LLVMABISizeOfType(llvm.runtime.targetData, llvmType).toInt()
@@ -421,7 +421,7 @@ internal class ClassLayoutBuilder(val irClass: IrClass, val context: NativeBacke
             if (context.ghaEnabled()) {
                 hierarchyInfo.interfaceId
             } else {
-                localHash(irClass.fqNameForIrSerialization.asString().toByteArray()).toInt()
+                localHash(irClass.fqNameForIrSerialization.asString().encodeToByteArray()).toInt()
             }
         }
         else -> {
@@ -460,7 +460,6 @@ internal class ClassLayoutBuilder(val irClass: IrClass, val context: NativeBacke
     private var fields: List<FieldInfo>? = null
 
     // Synchronization is needed due to potential deserialization invocation while building fields for the super classes.
-    @Synchronized
     private fun getFieldsInternal(llvm: CodegenLlvmHelpers): List<FieldInfo> {
         fields?.let { return it }
 

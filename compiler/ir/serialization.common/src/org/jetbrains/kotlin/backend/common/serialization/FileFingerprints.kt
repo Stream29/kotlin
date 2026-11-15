@@ -9,40 +9,40 @@ import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.SerializedIrFile
 import org.jetbrains.kotlin.library.components.KlibIrComponent
 import org.jetbrains.kotlin.library.components.irOrFail
-import java.io.File
-import java.nio.ByteBuffer
+import nativekotlin.host.files.NativeFile as File
 
-@JvmInline
 value class FingerprintHash(val hash: Hash128Bits) {
     override fun toString(): String {
-        return "${hash.lowBytes.toString(Character.MAX_RADIX)}$HASH_SEPARATOR${hash.highBytes.toString(Character.MAX_RADIX)}"
+        return "${hash.lowBytes.toString(36)}$HASH_SEPARATOR${hash.highBytes.toString(36)}"
     }
 
     fun toByteArray(): ByteArray {
-        val buffer = ByteBuffer.allocate(Long.SIZE_BYTES * 2)
-        buffer.putLong(hash.lowBytes.toLong())
-        buffer.putLong(Long.SIZE_BYTES, hash.highBytes.toLong())
-        return buffer.array()
+        return ByteArray(Long.SIZE_BYTES * 2) { index ->
+            val value = if (index < Long.SIZE_BYTES) hash.lowBytes else hash.highBytes
+            (value shr ((Long.SIZE_BYTES - 1 - index % Long.SIZE_BYTES) * 8)).toByte()
+        }
     }
 
     companion object {
         private const val HASH_SEPARATOR = "."
 
         fun fromString(s: String): FingerprintHash? {
-            val hashes = s.split(HASH_SEPARATOR).mapNotNull { it.toULongOrNull(Character.MAX_RADIX) }
+            val hashes = s.split(HASH_SEPARATOR).mapNotNull { it.toULongOrNull(36) }
             return hashes.takeIf { it.size == 2 }?.let { FingerprintHash(Hash128Bits(lowBytes = it[0], highBytes = it[1])) }
         }
 
         fun fromByteArray(bytes: ByteArray): FingerprintHash {
-            val buffer = ByteBuffer.wrap(bytes)
-            val lowBytes = buffer.getLong(0).toULong()
-            val highBytes = buffer.getLong(Long.SIZE_BYTES).toULong()
+            if (bytes.size < Long.SIZE_BYTES * 2) throw IndexOutOfBoundsException()
+            fun getLong(offset: Int): ULong = (offset until offset + Long.SIZE_BYTES).fold(0uL) { result, index ->
+                (result shl 8) or bytes[index].toUByte().toULong()
+            }
+            val lowBytes = getLong(0)
+            val highBytes = getLong(Long.SIZE_BYTES)
             return FingerprintHash(Hash128Bits(lowBytes, highBytes))
         }
     }
 }
 
-@JvmInline
 value class SerializedIrFileFingerprint private constructor(val fileFingerprint: FingerprintHash) {
     companion object {
         fun fromString(s: String): SerializedIrFileFingerprint? {
@@ -79,7 +79,6 @@ value class SerializedIrFileFingerprint private constructor(val fileFingerprint:
     }
 }
 
-@JvmInline
 value class SerializedKlibFingerprint(val klibFingerprint: FingerprintHash) {
     companion object {
         private fun List<SerializedIrFileFingerprint>.calculateKlibFingerprint(): FingerprintHash {
@@ -95,12 +94,12 @@ value class SerializedKlibFingerprint(val klibFingerprint: FingerprintHash) {
             var combinedHash = seed
 
             if (isDirectory) {
-                listFiles()!!.sortedBy { it.name }.forEach { f ->
+                serializationListFiles()!!.sortedBy { it.name }.forEach { f ->
                     val filePrefix = "$prefix${f.name}/"
-                    combinedHash = f.calculateKlibHash(filePrefix, cityHash128WithSeed(combinedHash, filePrefix.toByteArray()))
+                    combinedHash = f.calculateKlibHash(filePrefix, cityHash128WithSeed(combinedHash, filePrefix.serializationUtf8Bytes()))
                 }
             } else {
-                forEachBlock { buffer, bufferSize ->
+                serializationForEachBlock { buffer, bufferSize ->
                     combinedHash = cityHash128WithSeed(combinedHash, buffer, 0, bufferSize)
                 }
             }

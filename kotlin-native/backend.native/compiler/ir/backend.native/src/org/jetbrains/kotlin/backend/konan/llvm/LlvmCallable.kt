@@ -17,16 +17,16 @@ sealed class LlvmCallable(
 
     val name: String? by lazy { llvmValue.valueName }
     val returnType: LLVMTypeRef by lazy { LLVMGetReturnType(functionType)!! }
-    val numParams: Int by lazy { LLVMCountParamTypes(functionType) }
+    val numParams: Int by lazy { LLVMCountParamTypes(functionType).toInt() }
     val isConstant by lazy { llvmValue.isConst }
 
     fun buildCall(builder: LLVMBuilderRef, args: List<LLVMValueRef>, name: String = "") =
-            LLVMBuildCall2(builder, functionType, llvmValue, args.toCValues(), args.size, name)!!.also {
+            LLVMBuildCall2(builder, functionType, llvmValue, args.toCValues(), args.size.toUInt(), name)!!.also {
                 attributeProvider.addCallSiteAttributes(it)
             }
 
     fun buildInvoke(builder: LLVMBuilderRef, args: List<LLVMValueRef>, success: LLVMBasicBlockRef, catch: LLVMBasicBlockRef, name: String = "") =
-            LLVMBuildInvoke2(builder, functionType, llvmValue, args.toCValues(), args.size, success, catch, name)!!.also {
+            LLVMBuildInvoke2(builder, functionType, llvmValue, args.toCValues(), args.size.toUInt(), success, catch, name)!!.also {
                 attributeProvider.addCallSiteAttributes(it)
             }
 
@@ -63,11 +63,11 @@ sealed class LlvmFunction(
         require(i in 0 until numParams) {
             "Requested index $i but function '$name' got only $numParams params."
         }
-        return LLVMGetParam(llvmValue, i)!!
+        return LLVMGetParam(llvmValue, i.toUInt())!!
     }
 
     fun buildLandingpad(builder: LLVMBuilderRef, landingpadType: LLVMTypeRef, numClauses: Int, name: String = "") =
-            LLVMBuildLandingPad(builder, landingpadType, llvmValue, numClauses, name)!!
+            LLVMBuildLandingPad(builder, landingpadType, llvmValue, numClauses.toUInt(), name)!!
 
     /**
      * Function prototypes (or [declaration in LLVM terms](https://llvm.org/docs/LangRef.html#functions)) do not belong to a specific module.
@@ -117,11 +117,11 @@ sealed class LlvmFunction(
                 scope = scope,
                 function = llvmValue,
                 file = file,
-                lineNo = lineNo,
+                lineNo = lineNo.toUInt(),
                 type = type,
                 isLocal = isLocal,
                 isDefinition = isDefinition,
-                scopeLine = scopeLine,
+                scopeLine = scopeLine.toUInt(),
                 isTransparentStepping = if (isTransparentStepping) 1 else 0,
         )!!
     }

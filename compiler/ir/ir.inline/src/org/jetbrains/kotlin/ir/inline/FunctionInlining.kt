@@ -30,10 +30,9 @@ import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.util.isImmutable
 import org.jetbrains.kotlin.ir.visitors.*
-import org.jetbrains.kotlin.name.Name.identifier
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.util.OperatorNameConventions
 import org.jetbrains.kotlin.utils.addToStdlib.assignFrom
-import java.util.ArrayDeque
 
 @PhasePrerequisites(
     ArrayConstructorLowering::class,
@@ -94,7 +93,7 @@ abstract class FunctionInlining(
 
         return CallInlining(
             context = context,
-            currentFileEntry = fileEntriesStack.getLast(),
+            currentFileEntry = fileEntriesStack.last(),
             currentFile = data.file,
             parent = data as? IrDeclarationParent ?: data.parent
         ).inline(expression, actualCallee)
@@ -442,7 +441,7 @@ private class CallInlining(
                         IrDeclarationOrigin.IR_TEMPORARY_VARIABLE_FOR_INLINED_PARAMETER
                     }
                 ).apply {
-                    name = identifier(parameter.name.asStringStripSpecialMarkers())
+                    name = Name.identifier(parameter.name.asStringStripSpecialMarkers())
                 }
 
             parameterToTempVariable[parameter.symbol] = tempVarInsideInlineBlock.symbol

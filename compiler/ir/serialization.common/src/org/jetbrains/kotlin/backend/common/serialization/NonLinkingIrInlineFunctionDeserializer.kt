@@ -63,7 +63,7 @@ class NonLinkingIrInlineFunctionDeserializer(
         require(deserializedContainerSource is KlibContainerSourceComponentsProvider) {
             error {
                 "Cannot deserialize inline function from a non-Kotlin library: ${function.render()}\nFunction source: " +
-                        deserializedContainerSource?.let { "${it::class.java}, ${it.presentableString}" }
+                        deserializedContainerSource?.let { "${it::class}, ${it.presentableString}" }
             }
         }
 
@@ -124,7 +124,7 @@ class NonLinkingIrInlineFunctionDeserializer(
                 )
             }
 
-            for ((index, deserializer = value) in fileDeserializers.withIndex()) {
+            for ([index, deserializer] in fileDeserializers.withIndex()) {
                 val fileStream = inlinableFunctionsIr.irFile(index).codedInputStream
                 val fileProto = ProtoFile.parseFrom(fileStream, ExtensionRegistryLite.getEmptyRegistry())
                 for (idSigIndex in fileProto.declarationIdList) {

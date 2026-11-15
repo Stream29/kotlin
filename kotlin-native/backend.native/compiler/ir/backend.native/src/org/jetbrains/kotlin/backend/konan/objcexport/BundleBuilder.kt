@@ -5,12 +5,12 @@
 
 package org.jetbrains.kotlin.backend.konan.objcexport
 
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.*
+
 import org.jetbrains.kotlin.backend.konan.NativeSecondStageCompilationConfig
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.konan.target.Family
-import java.nio.file.Path
-import kotlin.io.path.createDirectories
-import kotlin.io.path.writeBytes
 
 /**
  * Builds Apple bundle directory.
@@ -36,7 +36,7 @@ internal class BundleBuilder(
 
         bundleContents.resolve("Info.plist").run {
             val infoPlistContents = infoPListBuilder.build(name, mainPackageGuesser, moduleDescriptor)
-            writeBytes(infoPlistContents.toByteArray())
+            writeBytes(infoPlistContents.encodeToByteArray())
         }
     }
 }

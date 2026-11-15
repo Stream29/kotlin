@@ -37,7 +37,6 @@ import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.serialization.deserialization.DeserializationConfiguration
 import org.jetbrains.kotlin.utils.addToStdlib.getOrSetIfNull
 import org.jetbrains.kotlin.utils.putToMultiMap
-import java.lang.ref.SoftReference
 import kotlin.metadata.*
 
 /**
@@ -188,7 +187,7 @@ internal class KonanInteropModuleDeserializer(
                         is KmClass -> transformer.transformTopLevelClass(kmDeclaration)
                         is KmFunction -> transformer.transformTopLevelFunction(kmDeclaration)
                         is KmProperty -> transformer.transformTopLevelProperty(kmDeclaration)
-                        else -> error(kmDeclaration.javaClass.name)
+                        else -> error(kmDeclaration::class.simpleName ?: kmDeclaration.toString())
                     }
                 }
             }
@@ -359,7 +358,7 @@ internal class KonanInteropModuleDeserializer(
         fun retrieveDeclarationsById(id: MetadataDeclarationId, removeMetadataRepresentation: Boolean): List<Any>? {
             ensureDeclarationIdsLoaded()
             val ref = if (removeMetadataRepresentation) {
-                allMetadataDeclarations.replace(id, null)
+                if (id in allMetadataDeclarations) allMetadataDeclarations.put(id, null) else null
             } else {
                 allMetadataDeclarations[id]
             } ?: return null
@@ -397,4 +396,7 @@ class DeserializedSecondStageInteropPackageDescriptor(
 ) : PackageFragmentDescriptorImpl(module, fqName) {
     override fun getMemberScope(): MemberScope = error("K1-specific functionality is not supported.")
     override fun getSource(): SourceElement = containerSource
+}
+private class SoftReference<T>(private val value: T) {
+    fun get(): T? = value
 }

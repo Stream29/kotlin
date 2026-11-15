@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.backend.common.serialization.encodings
 
-@JvmInline
 value class BinarySymbolData(val code: Long) {
     enum class SymbolKind {
         FUNCTION_SYMBOL,

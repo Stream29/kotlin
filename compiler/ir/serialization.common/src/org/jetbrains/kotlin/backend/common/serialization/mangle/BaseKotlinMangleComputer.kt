@@ -277,10 +277,10 @@ abstract class BaseKotlinMangleComputer<Declaration, Type, TypeParameter, ValueP
         }
     }
 
-    protected fun mangleTypeArguments(tBuilder: StringBuilder, type: Type, declarationSiteSession: Session) =
+    protected fun mangleTypeArguments(tBuilder: StringBuilder, type: Type, declarationSiteSession: Session): Unit =
         with(getTypeSystemContext(declarationSiteSession)) {
             val typeArguments = type.getArguments()
-            if (typeArguments.isEmpty()) return
+            if (typeArguments.isEmpty()) return@with
 
             val typeParameters = if (useEffectiveTypeVariances) type.typeConstructor().getParameters() else null
             @Suppress("UNUSED_DESTRUCTURED_PARAMETER_ENTRY")

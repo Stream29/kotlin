@@ -247,7 +247,7 @@ internal class BlockGenerator(private val codegen: CodeGenerator) {
 
         return Struct(codegen.runtime.blockDescriptorType,
                 codegen.LongInt(0L),
-                codegen.LongInt(LLVMStoreSizeOfType(codegen.runtime.targetData, blockLiteralType)),
+                codegen.LongInt(LLVMStoreSizeOfType(codegen.runtime.targetData, blockLiteralType).toLong()),
                 copyHelper.toConstPointer(),
                 disposeHelper.toConstPointer(),
                 codegen.staticData.cStringLiteral(signature),

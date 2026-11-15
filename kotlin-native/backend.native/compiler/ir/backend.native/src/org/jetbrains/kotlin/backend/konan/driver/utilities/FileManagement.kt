@@ -12,9 +12,8 @@ import org.jetbrains.kotlin.backend.konan.NativeSecondStageCompilationConfig
 import org.jetbrains.kotlin.backend.konan.serialization.PartialCacheInfo
 import org.jetbrains.kotlin.konan.TempFiles
 import org.jetbrains.kotlin.konan.config.temporaryFilesDir
-import java.io.File
-import kotlin.io.path.Path
-import kotlin.io.path.pathString
+import org.jetbrains.kotlin.konan.file.*
+import org.jetbrains.kotlin.library.Path
 
 internal fun createTempFiles(config: NativeSecondStageCompilationConfig, cacheInfo: PartialCacheInfo?): TempFiles {
     val pathToTempDir = config.configuration.temporaryFilesDir?.let {

@@ -41,6 +41,6 @@ class PsiIrFileEntry(val psiFile: PsiFile) : AbstractIrFileEntry() {
 
     fun <E : PsiElement> findPsiElement(irElement: IrElement, psiElementClass: KClass<E>): E? =
         findPsiElement(irElement)?.let {
-            PsiTreeUtil.getParentOfType(it, psiElementClass.java, false)
+            PsiTreeUtil.getParentOfType(it, psiElementClass, false)
         }
 }

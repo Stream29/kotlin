@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.backend.konan
 
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.*
+
 import org.jetbrains.kotlin.backend.common.serialization.FingerprintHash
 import org.jetbrains.kotlin.backend.common.serialization.Hash128Bits
 import org.jetbrains.kotlin.backend.common.serialization.SerializedKlibFingerprint
@@ -15,22 +18,12 @@ import org.jetbrains.kotlin.cli.CliDiagnostics
 import org.jetbrains.kotlin.cli.report
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.io.canonicalPathString
-import org.jetbrains.kotlin.io.listDirectoryEntriesIfDirectoryExists
 import org.jetbrains.kotlin.konan.config.filesToCache
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.isNativeStdlib
 import org.jetbrains.kotlin.library.uniqueName
-import java.nio.file.Path
-import kotlin.io.path.Path
-import kotlin.io.path.absolute
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.bufferedReader
-import kotlin.io.path.exists
-import kotlin.io.path.name
-import kotlin.io.path.readBytes
-import kotlin.io.path.readLines
 
 private class LibraryHashComputer {
     private val hashes = mutableListOf<FingerprintHash>()
@@ -103,18 +96,16 @@ class CachedLibraries(
         protected fun readMetadataOrNull(directory: Path): CacheMetadata? {
             val metadataFile = directory.resolve(METADATA_FILE_NAME)
             if (!metadataFile.exists()) return null
-            return metadataFile.bufferedReader().use {
-                CacheMetadataSerializer.deserialize(it)
-            }
+            return CacheMetadataSerializer.deserialize(metadataFile)
         }
 
         class Monolithic(target: KonanTarget, kind: Kind, path: String)
-            : Cache(target, kind, path, Path(path).parent.parent.absolutePathString())
+            : Cache(target, kind, path, Path(path).absolute().parent!!.parent!!.absolutePathString())
         {
             fun getMetadataOrNull(): CacheMetadata? = readMetadataOrNull(Path(rootDirectory))
 
             override fun computeBitcodeDependencies(): List<DependenciesTracker.UnresolvedDependency> {
-                val directory = Path(path).absolute().parent
+                val directory = Path(path).absolute().parent!!
                 val data = directory.resolve(BITCODE_DEPENDENCIES_FILE_NAME).readLines()
                 return DependenciesSerializer.deserialize(path, data)
             }
@@ -122,31 +113,31 @@ class CachedLibraries(
             override fun computeBinariesPaths() = listOf(path)
 
             override fun computeSerializedInlineFunctionBodies() = mutableListOf<SerializedInlineFunctionReference>().also {
-                val directory = Path(path).absolute().parent.parent
+                val directory = Path(path).absolute().parent!!.parent!!
                 val data = directory.resolve(PER_FILE_CACHE_IR_LEVEL_DIR_NAME).resolve(INLINE_FUNCTION_BODIES_FILE_NAME).readBytes()
                 InlineFunctionBodyReferenceSerializer.deserializeTo(data, it)
             }
 
             override fun computeSerializedClassFields() = mutableListOf<SerializedClassFields>().also {
-                val directory = Path(path).absolute().parent.parent
+                val directory = Path(path).absolute().parent!!.parent!!
                 val data = directory.resolve(PER_FILE_CACHE_IR_LEVEL_DIR_NAME).resolve(CLASS_FIELDS_FILE_NAME).readBytes()
                 ClassFieldsSerializer.deserializeTo(data, it)
             }
 
             override fun computeSerializedEagerInitializedFiles() = mutableListOf<SerializedEagerInitializedFile>().also {
-                val directory = Path(path).absolute().parent.parent
+                val directory = Path(path).absolute().parent!!.parent!!
                 val data = directory.resolve(PER_FILE_CACHE_IR_LEVEL_DIR_NAME).resolve(EAGER_INITIALIZED_PROPERTIES_FILE_NAME).readBytes()
                 EagerInitializedPropertySerializer.deserializeTo(data, it)
             }
 
             override fun computeSerializedTrivialGetters() = mutableListOf<SerializedTrivialGetter>().also {
-                val directory = Path(path).absolute().parent.parent
+                val directory = Path(path).absolute().parent!!.parent!!
                 val data = directory.resolve(PER_FILE_CACHE_IR_LEVEL_DIR_NAME).resolve(TRIVIAL_GETTERS_FILE_NAME).readBytes()
                 TrivialGettersSerializer.deserializeTo(data, it)
             }
 
             override fun computeSerializedObjCAdapters() = mutableListOf<SerializedObjCAdapter>().also {
-                val directory = Path(path).absolute().parent.parent
+                val directory = Path(path).absolute().parent!!.parent!!
                 val file = directory.resolve(PER_FILE_CACHE_IR_LEVEL_DIR_NAME).resolve(OBJC_ADAPTERS_FILE_NAME)
                 ObjCAdapterSerializer.deserializeTo(file.readBytes(), it)
             }
@@ -367,3 +358,6 @@ class CachedLibraries(
         const val PARTIAL_LINKAGE_ISSUES_FILE_NAME = "pl_issues"
     }
 }
+
+private fun Path.listDirectoryEntriesIfDirectoryExists(): List<Path> =
+    if (isDirectory()) listDirectoryEntries() else emptyList()

@@ -23,19 +23,39 @@ data class IrValidatorConfig(
 
     fun withCheckersByName(include: List<String>, candidateCheckers: List<IrChecker>): IrValidatorConfig = copy(
         checkers = this.checkers + candidateCheckers.filter { checker ->
-            include.intersect(getCheckerFilteringKeys(checker.javaClass)).isNotEmpty()
+            include.intersect(getCheckerFilteringKeys(checker)).isNotEmpty()
         }
     )
 
     fun withoutCheckersByName(exclude: List<String>) = copy(
         checkers = checkers.filterNot { checker ->
-            exclude.intersect(getCheckerFilteringKeys(checker.javaClass)).isNotEmpty()
+            exclude.intersect(getCheckerFilteringKeys(checker)).isNotEmpty()
         }.toSet()
     )
 
     companion object {
-        private fun getCheckerFilteringKeys(checkerClass: Class<*>): Set<String> =
-            setOf(checkerClass.simpleName) + checkerClass.annotations.mapNotNull { it.annotationClass.simpleName }
+        private val TYPE_CHECKERS = setOf(
+            IrConstTypeChecker,
+            IrStringConcatenationTypeChecker,
+            IrGetObjectValueTypeChecker,
+            IrGetValueTypeChecker,
+            IrUnitTypeExpressionChecker,
+            IrNothingTypeExpressionChecker,
+            IrGetFieldTypeChecker,
+            IrCallTypeChecker,
+            IrTypeOperatorTypeChecker,
+            IrDynamicTypeFieldAccessChecker,
+        )
+        private val VARARG_CHECKERS = setOf(
+            IrVarargTypesChecker,
+            IrValueParameterVarargTypesChecker,
+        )
+        private fun getCheckerFilteringKeys(checker: IrChecker): Set<String> = buildSet {
+            val simpleName = checker::class.simpleName
+            if (simpleName != null) add(simpleName)
+            if (checker in TYPE_CHECKERS) add("IrTypeCheckers")
+            if (checker in VARARG_CHECKERS) add("IrVarargCheckers")
+        }
     }
 }
 

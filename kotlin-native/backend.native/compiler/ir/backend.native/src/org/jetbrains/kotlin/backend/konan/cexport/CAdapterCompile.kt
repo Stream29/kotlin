@@ -6,8 +6,8 @@
 package org.jetbrains.kotlin.backend.konan.cexport
 
 import org.jetbrains.kotlin.konan.exec.*
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.target.*
-import java.io.File
 
 /**
  * Fourth phase of C export: compile runtime bindings to bitcode.
@@ -15,9 +15,9 @@ import java.io.File
 fun produceCAdapterBitcode(clang: ClangArgs, cppFile: File, bitcodeFile: File) {
     val clangCommand = clang.clangCXX(
             "-std=c++17",
-            cppFile.absoluteFile.normalize().path,
+            cppFile.absoluteFile.toPath().normalize().toFile().path,
             "-emit-llvm", "-c",
-            "-o", bitcodeFile.absoluteFile.normalize().path
+            "-o", bitcodeFile.absoluteFile.toPath().normalize().toFile().path
     )
     Command(clangCommand).execute()
 }

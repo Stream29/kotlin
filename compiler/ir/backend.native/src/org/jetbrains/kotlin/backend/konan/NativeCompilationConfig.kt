@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.config.metadataKlib
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.konan.config.NativeConfigurationKeys
 import org.jetbrains.kotlin.konan.config.konanIncludedBinaries
+import org.jetbrains.kotlin.konan.config.konanManifestNativeTargets
 import org.jetbrains.kotlin.konan.config.konanNativeLibraries
 import org.jetbrains.kotlin.konan.config.konanOutputPath
 import org.jetbrains.kotlin.konan.config.konanProducedArtifactKind
@@ -22,9 +23,8 @@ import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.konan.util.visibleName
 import org.jetbrains.kotlin.util.removeSuffixIfPresent
-import java.nio.file.Path
-import java.util.Properties
-import kotlin.io.path.Path
+import org.jetbrains.kotlin.konan.properties.Properties
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 /**
  * This interface exists not because it is a good abstraction. Rather, it emerged
@@ -58,7 +58,7 @@ interface NativeCompilationConfig {
         get() = configuration.konanWriteDependenciesOfProducedKlibTo
 
     val nativeTargetsForManifest: Collection<KonanTarget>?
-        get() = configuration[NativeConfigurationKeys.KONAN_MANIFEST_NATIVE_TARGETS]
+        get() = configuration.konanManifestNativeTargets.ifEmpty { null }
 
     val manifestProperties: Properties?
 

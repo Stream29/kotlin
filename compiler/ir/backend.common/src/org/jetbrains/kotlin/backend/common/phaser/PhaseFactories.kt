@@ -15,13 +15,13 @@ import org.jetbrains.kotlin.config.phaser.PhaserState
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import java.lang.reflect.ParameterizedType
+import kotlin.reflect.KClass
 
 fun <Context : LoweringContext> createFilePhases(
     vararg phases: ((Context) -> FileLoweringPass)?
 ): List<NamedCompilerPhase<Context, IrFile, IrFile>> {
     return phases.filterNotNull().map { phase ->
-        FileLoweringPhase(phase.extractReturnTypeArgument(), phase)
+        FileLoweringPhase(FileLoweringPass::class, phase)
     }
 }
 
@@ -29,28 +29,12 @@ fun <Context : LoweringContext> createModulePhases(
     vararg phases: ((Context) -> ModuleLoweringPass)?
 ): List<NamedCompilerPhase<Context, IrModuleFragment, IrModuleFragment>> {
     return phases.filterNotNull().map { phase ->
-        ModuleLoweringPhase(phase.extractReturnTypeArgument(), phase)
+        ModuleLoweringPhase(ModuleLoweringPass::class, phase)
     }
 }
 
-private inline fun <ReturnType, reified FunctionType : Function<ReturnType>>
-        FunctionType.extractReturnTypeArgument(): Class<out ReturnType> {
-    // Using Java reflection to extract the generic type argument from the function type.
-    // Note that we're not using kotlin-reflect because its initialization has some overhead.
-    val functionType = javaClass.genericInterfaces.singleOrNull {
-        it is ParameterizedType && it.rawType == FunctionType::class.java
-    } ?: error("Supertype ${FunctionType::class.java} is not found: " + javaClass.genericInterfaces.toList())
-    val returnType = (functionType as ParameterizedType).actualTypeArguments.last()
-    @Suppress("UNCHECKED_CAST")
-    return when (returnType) {
-        is Class<*> -> returnType
-        is ParameterizedType -> returnType.rawType
-        else -> error("Unexpected return type ${returnType.typeName}")
-    } as Class<out ReturnType>
-}
-
 private class FileLoweringPhase<Context : LoweringContext>(
-    loweringClass: Class<out FileLoweringPass>,
+    loweringClass: KClass<out FileLoweringPass>,
     createLoweringPass: (Context) -> FileLoweringPass,
 ) : LoweringPhase<Context, IrFile, FileLoweringPass>(loweringClass, createLoweringPass) {
     override fun phaseBody(context: Context, input: IrFile): IrFile {
@@ -60,7 +44,7 @@ private class FileLoweringPhase<Context : LoweringContext>(
 }
 
 private class ModuleLoweringPhase<Context : LoweringContext>(
-    loweringClass: Class<out ModuleLoweringPass>,
+    loweringClass: KClass<out ModuleLoweringPass>,
     createLoweringPass: (Context) -> ModuleLoweringPass,
 ) : LoweringPhase<Context, IrModuleFragment, ModuleLoweringPass>(loweringClass, createLoweringPass) {
     override fun phaseBody(context: Context, input: IrModuleFragment): IrModuleFragment {
@@ -70,10 +54,10 @@ private class ModuleLoweringPhase<Context : LoweringContext>(
 }
 
 abstract class LoweringPhase<Context : LoweringContext, Input : IrElement, Pass : ModuleLoweringPass>(
-    val loweringClass: Class<out Pass>,
+    val loweringClass: KClass<out Pass>,
     protected val createLoweringPass: (Context) -> Pass,
 ) : NamedCompilerPhase<Context, Input, Input>(
-    loweringClass.simpleName,
+    loweringClass.simpleName ?: "LoweringPhase",
     preactions = DEFAULT_IR_ACTIONS,
     postactions = DEFAULT_IR_ACTIONS.map { f ->
         fun(actionState: ActionState, data: Pair<Input, Input>, context: Context) = f(actionState, data.second, context)

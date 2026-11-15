@@ -5,18 +5,35 @@
 
 package org.jetbrains.kotlin.backend.konan.cexport
 
+import org.jetbrains.kotlin.backend.konan.forEachLine
+import org.jetbrains.kotlin.builtins.*
 import org.jetbrains.kotlin.builtins.UnsignedType
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
+import org.jetbrains.kotlin.descriptors.name
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.target.Family
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.isNothing
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
-import java.io.PrintWriter
-import java.io.File
 import org.jetbrains.kotlin.K1Deprecation
+
+private class PrintWriter(private val file: File) {
+    private val sb = StringBuilder()
+    fun print(s: String) {
+        sb.append(s)
+    }
+    fun println(s: String = "") {
+        sb.appendLine(s)
+    }
+    fun close() {
+        file.writeText(sb.toString())
+    }
+}
+
+private fun File.printWriter(): PrintWriter = PrintWriter(this)
 
 /**
  * Third phase of C export:

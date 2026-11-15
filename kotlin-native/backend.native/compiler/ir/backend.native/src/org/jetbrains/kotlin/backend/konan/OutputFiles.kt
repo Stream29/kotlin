@@ -4,19 +4,23 @@
  */
 package org.jetbrains.kotlin.backend.konan
 
-import org.jetbrains.kotlin.util.prefixBaseNameIfNot
-import org.jetbrains.kotlin.util.suffixIfNot
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.KonanTarget
-import java.nio.file.Path
-import kotlin.io.path.Path
-import kotlin.io.path.absolute
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.createDirectories
-import kotlin.io.path.name
-import kotlin.io.path.pathString
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.*
+import org.jetbrains.kotlin.util.suffixIfNot
 import kotlin.random.Random
 
+fun String.prefixBaseNameIfNot(prefix: String): String {
+    val file = File(this).absoluteFile
+    val name = file.name
+    val directory = file.parent
+    return "$directory/${name.prefixIfNot(prefix)}"
+}
+
+fun String.prefixIfNot(prefix: String) =
+    if (this.startsWith(prefix)) this else "$prefix$this"
 /**
  * Creates and stores terminal compiler outputs.
  */
@@ -98,7 +102,7 @@ class OutputFiles(val outputName: String, target: KonanTarget, val produce: Comp
     private fun String.prefixBaseNameAlways(prefix: String): String {
         val absolutePath: Path = Path(this).absolute()
         val name: String = absolutePath.name
-        val directory: Path = absolutePath.parent
+        val directory: Path = absolutePath.parent!!
         return directory.resolve("$prefix$name").pathString
     }
 

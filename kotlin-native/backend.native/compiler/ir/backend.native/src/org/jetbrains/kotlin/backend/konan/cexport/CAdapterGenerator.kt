@@ -11,7 +11,8 @@ import org.jetbrains.kotlin.backend.konan.*
 import org.jetbrains.kotlin.backend.konan.descriptors.getPackageFragments
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
-import org.jetbrains.kotlin.descriptors.konan.allParameters
+import org.jetbrains.kotlin.backend.konan.descriptors.allParameters
+import org.jetbrains.kotlin.backend.konan.descriptors.explicitParameters
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.metadata.CurrentKlibModuleOrigin
@@ -29,7 +30,7 @@ import org.jetbrains.kotlin.resolve.annotations.argumentValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.isEffectivelyPublicApi
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
-import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 
 internal enum class ScopeKind {
@@ -211,7 +212,7 @@ internal class ExportedElement(
 
         @OptIn(K1Deprecation::class)
         val returnedType = when {
-            original is ConstructorDescriptor -> typeTranslator.builtIns.unitType
+            original is ConstructorDescriptor -> typeTranslator.builtIns.getUnitType()
             else -> original.returnType!!
         }
 
@@ -403,7 +404,7 @@ internal class ExportedElement(
 internal class CAdapterGenerator(
         private val context: LinkKlibsContext,
         private val typeTranslator: CAdapterTypeTranslator,
-) : DeclarationDescriptorVisitor<Boolean, Void?> {
+) : DeclarationDescriptorVisitor<Boolean, Nothing?> {
     private val scopes = mutableListOf<ExportedElementScope>()
     internal val prefix = typeTranslator.prefix
     private val paramNamesRecorded = mutableMapOf<String, Int>()
@@ -434,19 +435,19 @@ internal class CAdapterGenerator(
         descriptor.accept(this, null)
     }
 
-    override fun visitConstructorDescriptor(descriptor: ConstructorDescriptor, ignored: Void?): Boolean {
+    override fun visitConstructorDescriptor(descriptor: ConstructorDescriptor, ignored: Nothing?): Boolean {
         if (!isExportedFunction(descriptor)) return true
         ExportedElement(ElementKind.FUNCTION, scopes.last(), descriptor, this, typeTranslator)
         return true
     }
 
-    override fun visitFunctionDescriptor(descriptor: FunctionDescriptor, ignored: Void?): Boolean {
+    override fun visitFunctionDescriptor(descriptor: FunctionDescriptor, ignored: Nothing?): Boolean {
         if (!isExportedFunction(descriptor)) return true
         ExportedElement(ElementKind.FUNCTION, scopes.last(), descriptor, this, typeTranslator)
         return true
     }
 
-    override fun visitClassDescriptor(descriptor: ClassDescriptor, ignored: Void?): Boolean {
+    override fun visitClassDescriptor(descriptor: ClassDescriptor, ignored: Nothing?): Boolean {
         if (!isExportedClass(descriptor)) return true
         // TODO: fix me!
         val shortName = descriptor.fqNameSafe.shortName()
@@ -463,28 +464,28 @@ internal class CAdapterGenerator(
         return true
     }
 
-    override fun visitPropertyDescriptor(descriptor: PropertyDescriptor, ignored: Void?): Boolean {
+    override fun visitPropertyDescriptor(descriptor: PropertyDescriptor, ignored: Nothing?): Boolean {
         if (descriptor.isExpect) return true
         descriptor.getter?.let { visitChildren(it) }
         descriptor.setter?.let { visitChildren(it) }
         return true
     }
 
-    override fun visitPropertyGetterDescriptor(descriptor: PropertyGetterDescriptor, ignored: Void?): Boolean {
+    override fun visitPropertyGetterDescriptor(descriptor: PropertyGetterDescriptor, ignored: Nothing?): Boolean {
         if (!isExportedFunction(descriptor)) return true
         ExportedElement(ElementKind.FUNCTION, scopes.last(), descriptor, this, typeTranslator)
         return true
     }
 
-    override fun visitPropertySetterDescriptor(descriptor: PropertySetterDescriptor, ignored: Void?): Boolean {
+    override fun visitPropertySetterDescriptor(descriptor: PropertySetterDescriptor, ignored: Nothing?): Boolean {
         if (!isExportedFunction(descriptor)) return true
         ExportedElement(ElementKind.FUNCTION, scopes.last(), descriptor, this, typeTranslator)
         return true
     }
 
-    override fun visitScriptDescriptor(descriptor: ScriptDescriptor, ignored: Void?) = true
+    override fun visitScriptDescriptor(descriptor: ScriptDescriptor, ignored: Nothing?) = true
 
-    override fun visitPackageViewDescriptor(descriptor: PackageViewDescriptor, ignored: Void?): Boolean {
+    override fun visitPackageViewDescriptor(descriptor: PackageViewDescriptor, ignored: Nothing?): Boolean {
         if (descriptor.module !in moduleDescriptors) return true
         // Sort fragments by their owning library's reverse-topological rank so declarations are emitted in a stable
         // dependency-first order regardless of the order the libraries happened to be passed on the command line.
@@ -508,29 +509,29 @@ internal class CAdapterGenerator(
         return true
     }
 
-    override fun visitValueParameterDescriptor(descriptor: ValueParameterDescriptor, ignored: Void?): Boolean {
+    override fun visitValueParameterDescriptor(descriptor: ValueParameterDescriptor, ignored: Nothing?): Boolean {
         TODO("visitValueParameterDescriptor() shall not be seen")
     }
 
-    override fun visitReceiverParameterDescriptor(descriptor: ReceiverParameterDescriptor?, ignored: Void?): Boolean {
+    override fun visitReceiverParameterDescriptor(descriptor: ReceiverParameterDescriptor, ignored: Nothing?): Boolean {
         TODO("visitReceiverParameterDescriptor() shall not be seen")
     }
 
-    override fun visitVariableDescriptor(descriptor: VariableDescriptor, ignored: Void?) = true
+    override fun visitVariableDescriptor(descriptor: VariableDescriptor, ignored: Nothing?) = true
 
-    override fun visitTypeParameterDescriptor(descriptor: TypeParameterDescriptor, ignored: Void?) = true
+    override fun visitTypeParameterDescriptor(descriptor: TypeParameterDescriptor, ignored: Nothing?) = true
 
     private val seenPackageFragments = mutableSetOf<PackageFragmentDescriptor>()
     private var currentPackageFragments: List<PackageFragmentDescriptor> = emptyList()
     private val packageScopes = mutableMapOf<FqName, ExportedElementScope>()
 
-    override fun visitModuleDeclaration(descriptor: ModuleDescriptor, ignored: Void?): Boolean {
+    override fun visitModuleDeclaration(descriptor: ModuleDescriptor, ignored: Nothing?): Boolean {
         TODO("Shall not be called directly")
     }
 
-    override fun visitTypeAliasDescriptor(descriptor: TypeAliasDescriptor, ignored: Void?) = true
+    override fun visitTypeAliasDescriptor(descriptor: TypeAliasDescriptor, ignored: Nothing?) = true
 
-    override fun visitPackageFragmentDescriptor(descriptor: PackageFragmentDescriptor, ignored: Void?): Boolean {
+    override fun visitPackageFragmentDescriptor(descriptor: PackageFragmentDescriptor, ignored: Nothing?): Boolean {
         val fqName = descriptor.fqName
         val packageScope = getPackageScope(fqName)
         scopes.push(packageScope)

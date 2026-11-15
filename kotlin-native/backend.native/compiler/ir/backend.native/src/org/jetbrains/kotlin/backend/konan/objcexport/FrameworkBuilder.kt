@@ -5,14 +5,13 @@
 
 package org.jetbrains.kotlin.backend.konan.objcexport
 
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.*
+
 import org.jetbrains.kotlin.backend.konan.NativeSecondStageCompilationConfig
+import org.jetbrains.kotlin.backend.konan.createAsSymlink
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.konan.target.Family
-import org.jetbrains.kotlin.io.ensureSymbolicLinkTo
-import kotlin.io.path.Path
-import java.nio.file.Path
-import kotlin.io.path.createDirectories
-import kotlin.io.path.writeBytes
 
 /**
  * Constructs an Apple framework without a binary.
@@ -51,7 +50,7 @@ internal class FrameworkBuilder(
 
         val moduleMap = moduleMapBuilder.build(frameworkName, moduleDependencies)
 
-        modules.resolve("module.modulemap").writeBytes(moduleMap.toByteArray())
+        modules.resolve("module.modulemap").writeBytes(moduleMap.encodeToByteArray())
 
         val directory = when (target.family) {
             Family.IOS,
@@ -64,7 +63,7 @@ internal class FrameworkBuilder(
 
         val infoPlistFile = directory.resolve("Info.plist")
         val infoPlistContents = infoPListBuilder.build(frameworkName, mainPackageGuesser, moduleDescriptor)
-        infoPlistFile.writeBytes(infoPlistContents.toByteArray())
+        infoPlistFile.writeBytes(infoPlistContents.encodeToByteArray())
         if (target.family == Family.OSX) {
             frameworkDirectory.resolve("Versions/Current").ensureSymbolicLinkTo(Path("A"))
             for (child in listOf(frameworkName, "Headers", "Modules", "Resources")) {

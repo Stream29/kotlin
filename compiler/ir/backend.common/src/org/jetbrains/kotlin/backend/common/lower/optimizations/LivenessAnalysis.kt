@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.ir.visitors.IrVisitor
 import org.jetbrains.kotlin.ir.visitors.IrVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
-import java.util.*
+import org.jetbrains.kotlin.utils.BitSet
 
 private fun BitSet.withBit(bit: Int) = if (get(bit)) this else copy().also { it.set(bit) }
 private fun BitSet.withOutBit(bit: Int) = if (!get(bit)) this else copy().also { it.clear(bit) }

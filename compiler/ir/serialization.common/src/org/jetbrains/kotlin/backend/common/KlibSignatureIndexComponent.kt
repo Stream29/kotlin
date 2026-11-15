@@ -26,12 +26,9 @@ import org.jetbrains.kotlin.library.writer.KlibComponentWriter
 import org.jetbrains.kotlin.library.writer.KlibWriter
 import org.jetbrains.kotlin.library.writer.KlibWriterSpec
 import org.jetbrains.kotlin.utils.newHashSetWithExpectedSize
-import java.nio.file.Path
+import org.jetbrains.kotlin.library.createDirectories
+import org.jetbrains.kotlin.library.KlibPath as Path
 import kotlin.collections.joinToString
-import kotlin.io.path.createDirectories
-import kotlin.io.path.exists
-import kotlin.io.path.outputStream
-import kotlin.io.path.readBytes
 import org.jetbrains.kotlin.backend.common.serialization.proto.CommonIdSignature as ProtoCommonIdSignature
 
 /**
@@ -87,7 +84,7 @@ class KlibSignatureIndexComponentWriterImpl(
     override fun writeTo(root: Path) {
         val layout = KlibSignatureIndexComponentLayout(root)
         layout.indicesDir.createDirectories()
-        layout.signatureIndexFile.outputStream().use { it.write(serializedSignatureIndex.signatureIndex) }
+        layout.signatureIndexFile.writeBytes(serializedSignatureIndex.signatureIndex)
     }
 
     companion object {
@@ -105,7 +102,7 @@ class KlibSignatureIndexComponentWriterImpl(
 
                 unorderedSignatures.mapTo(orderedSignatures) { signature ->
                     check(signature is IdSignature.CommonSignature) {
-                        "Unexpected signature type: ${signature.javaClass.name}, $signature"
+                        "Unexpected signature type: ${signature::class.qualifiedName}, $signature"
                     }
 
                     val sortingKey = signature.render(IdSignatureRenderer.DEFAULT)

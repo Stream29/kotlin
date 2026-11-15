@@ -87,7 +87,7 @@ internal open class StaticData(val module: LLVMModuleRef, private val llvm: Code
         }
 
         fun setAlignment(value: Int) {
-            LLVMSetAlignment(llvmGlobal, value)
+            LLVMSetAlignment(llvmGlobal, value.toUInt())
         }
 
         fun setSection(name: String) {
@@ -142,14 +142,14 @@ internal open class StaticData(val module: LLVMModuleRef, private val llvm: Code
         if (elements.isNotEmpty() || isExported) {
             val global = placeGlobalArray(name, elemType, elements, isExported)
             global.setConstant(true)
-            return global.pointer.getElementPtr(llvm, LLVMArrayType(elemType, elements.size)!!, 0)
+            return global.pointer.getElementPtr(llvm, LLVMArrayType(elemType, elements.size.toUInt())!!, 0)
         } else {
             return llvm.nullPointer
         }
     }
 
     internal fun placeCStringLiteral(value: String) : ConstPointer {
-        val chars = value.toByteArray(Charsets.UTF_8).map { llvm.constInt8(it) } + llvm.constInt8(0)
+        val chars = value.encodeToByteArray().map { llvm.constInt8(it) } + llvm.constInt8(0)
 
         return placeGlobalConstArray("", llvm.int8Type, chars)
     }

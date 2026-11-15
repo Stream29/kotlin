@@ -27,7 +27,8 @@ import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 import org.jetbrains.kotlin.utils.addToStdlib.applyIf
-import java.io.File
+import com.intellij.platform.native.NativeProperties
+import nativekotlin.host.files.NativeFile as File
 
 private val IrElement.elementName: String
     get() = when (this) {
@@ -59,7 +60,7 @@ private fun dumpIrElement(actionState: ActionState, data: IrElement): String {
     var dumpText = ""
     val elementName: String
 
-    val dumpStrategy = System.getProperty("org.jetbrains.kotlin.compiler.ir.dump.strategy")
+    val dumpStrategy = NativeProperties.get("org.jetbrains.kotlin.compiler.ir.dump.strategy")
     val dump: IrElement.() -> String = if (dumpStrategy == "KotlinLike") IrElement::dumpKotlinLike else IrElement::dump
 
     val dumpOnlyFqName = actionState.config.dumpOnlyFqName
@@ -150,9 +151,9 @@ fun <Data, Context : ErrorReportingContext> getIrDumper(): Action<Data, Context>
                     error("Can't create directory for IR dumps at $dumpDirectory")
 
             // Make dump files in a directory sorted by ID
-            val phaseIdFormatted = "%02d".format(state.phaseCount)
+            val phaseIdFormatted = state.phaseCount.toString().padStart(2, '0')
 
-            val dumpStrategy = System.getProperty("org.jetbrains.kotlin.compiler.ir.dump.strategy")
+            val dumpStrategy = NativeProperties.get("org.jetbrains.kotlin.compiler.ir.dump.strategy")
             val extPrefix = if (dumpStrategy == "KotlinLike") "kt." else ""
 
             val fileName = "${phaseIdFormatted}_${state.beforeOrAfter}.${state.phase.name}.${extPrefix}ir"

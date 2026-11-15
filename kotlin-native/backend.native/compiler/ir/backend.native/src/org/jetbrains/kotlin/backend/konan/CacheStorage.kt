@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlin.backend.konan
 
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.*
+import org.jetbrains.kotlin.konan.file.*
+
 import org.jetbrains.kotlin.backend.common.serialization.FingerprintHash
 import org.jetbrains.kotlin.backend.konan.serialization.CacheDeserializationStrategy
 import org.jetbrains.kotlin.backend.konan.serialization.CacheMetadata
@@ -23,14 +27,6 @@ import org.jetbrains.kotlin.konan.target.HostManager
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.isNativeStdlib
 import org.jetbrains.kotlin.library.newCompanionInitializationEnabled
-import java.io.File
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.bufferedWriter
-import kotlin.io.path.deleteRecursively
-import kotlin.io.path.exists
-import kotlin.io.path.pathString
-import kotlin.io.path.writeBytes
-import kotlin.io.path.writeLines
 import kotlin.random.Random
 
 private fun NativeGenerationState.generateCacheMetadata(): CacheMetadata {
@@ -60,7 +56,6 @@ internal class CacheStorage(private val generationState: NativeGenerationState) 
     private val outputFiles = generationState.outputFiles
 
     companion object {
-        @OptIn(ExperimentalPathApi::class)
         fun renameOutput(outputFiles: OutputFiles, overwrite: Boolean) {
             if (outputFiles.mainFile.exists()) {
                 if (!overwrite) {
@@ -94,9 +89,7 @@ internal class CacheStorage(private val generationState: NativeGenerationState) 
     }
 
     private fun saveMetadata() {
-        outputFiles.cacheMetadata!!.bufferedWriter().use {
-            CacheMetadataSerializer.serialize(it, generationState.generateCacheMetadata())
-        }
+        CacheMetadataSerializer.serialize(outputFiles.cacheMetadata!!, generationState.generateCacheMetadata())
     }
 
     private fun saveCacheBitcodeDependencies() {

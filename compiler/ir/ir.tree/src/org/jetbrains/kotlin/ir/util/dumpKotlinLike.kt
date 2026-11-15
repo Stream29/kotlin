@@ -245,10 +245,8 @@ private class KotlinLikeDumper(val p: Printer, val options: KotlinLikeDumpOption
         typeArg.printTypeArgumentWithNoIndent()
     }
 
-    @JvmName("orderedDeclarations") // Prevent JVM signature clash
     private fun List<IrDeclaration>.ordered() = if (options.stableOrder) stableOrdered() else this
 
-    @JvmName("orderedTypes") // Prevent JVM signature clash
     private fun List<IrType>.ordered(): List<IrType> {
         if (!options.stableOrder) return this
 
@@ -274,7 +272,7 @@ private class KotlinLikeDumper(val p: Printer, val options: KotlinLikeDumpOption
     }
 
     override fun visitElement(element: IrElement, data: IrDeclaration?) {
-        val e = "/* ERROR: unsupported element type: " + element.javaClass.simpleName + " */"
+        val e = "/* ERROR: unsupported element type: " + element::class.simpleName + " */"
         if (element is IrExpression) {
             // TODO move text to the message?
             // TODO better process expressions and statements

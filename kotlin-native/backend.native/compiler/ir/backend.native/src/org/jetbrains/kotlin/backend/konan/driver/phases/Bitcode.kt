@@ -28,8 +28,8 @@ import org.jetbrains.kotlin.backend.konan.llvm.valueName
 import org.jetbrains.kotlin.backend.konan.llvm.verifyModule
 import org.jetbrains.kotlin.backend.konan.optimizations.RemoveRedundantSafepointsPass
 import org.jetbrains.kotlin.config.nativeBinaryOptions.SanitizerKind
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.util.PerformanceManager
-import java.io.File
 import kotlin.sequences.forEach
 
 

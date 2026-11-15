@@ -59,11 +59,10 @@ import org.jetbrains.kotlin.ir.visitors.IrVisitor
 import org.jetbrains.kotlin.ir.visitors.IrVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
+import org.jetbrains.kotlin.utils.BitSet
 import org.jetbrains.kotlin.utils.atMostOne
 import org.jetbrains.kotlin.utils.copy
 import org.jetbrains.kotlin.utils.forEachBit
-import org.jetbrains.kotlin.utils.mapEachBit
-import java.util.BitSet
 
 @PhasePrerequisites(FinallyBlocksLowering::class)
 internal class ComputeTypesPass(val context: LoweringContext) : BodyLoweringPass {
@@ -206,9 +205,9 @@ internal class ComputeTypesPass(val context: LoweringContext) : BodyLoweringPass
                     if (!first) append(", ")
                     first = false
                     val (variable, value) = allVariablesWrites[it]
-                    append((variable as? IrVariable)?.name ?: variable::class.java)
+                    append((variable as? IrVariable)?.name ?: variable::class)
                     append(" = ")
-                    append(value::class.java)
+                    append(value::class)
                 }
                 append(']')
             }
@@ -522,4 +521,22 @@ internal class ComputeTypesPass(val context: LoweringContext) : BodyLoweringPass
             }
         })
     }
+}
+
+internal inline fun <R> BitSet.mapEachBit(block: (Int) -> R): List<R> = buildList {
+    this@mapEachBit.forEachBit { add(block(it)) }
+}
+
+internal fun BitSet.and(other: BitSet) {
+    var i = nextSetBit(0)
+    while (i >= 0) {
+        if (!other[i]) clear(i)
+        i = nextSetBit(i + 1)
+    }
+}
+
+internal fun BitSet.cardinality(): Int {
+    var count = 0
+    forEachBit { count++ }
+    return count
 }

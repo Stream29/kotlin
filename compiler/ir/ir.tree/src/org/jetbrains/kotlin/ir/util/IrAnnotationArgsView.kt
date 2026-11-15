@@ -10,9 +10,12 @@ import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
 import org.jetbrains.kotlin.name.Name
 
 class IrAnnotationArgsView(
-    private val original: ArrayList<IrExpression?>,
+    private val original: MutableList<IrExpression?>,
     private val symbol: IrConstructorSymbol
 ) : Map<Name, IrExpression?> {
+    constructor(original: ArrayList<IrExpression?>, symbol: IrConstructorSymbol) :
+            this(original as MutableList<IrExpression?>, symbol)
+
     private class Entry<K, V>(override val key: K, override val value: V) : Map.Entry<K, V>
 
     override val keys: Set<Name>

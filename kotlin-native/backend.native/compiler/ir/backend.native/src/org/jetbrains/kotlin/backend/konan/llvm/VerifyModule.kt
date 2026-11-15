@@ -2,8 +2,8 @@ package org.jetbrains.kotlin.backend.konan.llvm
 
 import kotlinx.cinterop.*
 import llvm.*
-import java.io.File
-import java.nio.file.Files
+import org.jetbrains.kotlin.backend.konan.appendBytes
+import org.jetbrains.kotlin.konan.file.*
 
 internal fun verifyModule(llvmModule: LLVMModuleRef, current: String = "") = memScoped {
     val errorRef = allocPointerTo<ByteVar>()
@@ -50,11 +50,11 @@ private fun StringBuilder.appendModuleVerificationFailureDetails(
 
     appendVerificationError(verificationError)
 
-    val moduleDumpFile = Files.createTempFile("kotlin_native_llvm_module_dump", ".ll").toFile()
+    val moduleDumpFile = createTempFile("kotlin_native_llvm_module_dump", ".ll")
 
     dumpModuleAndAppendDetails(llvmModule, moduleDumpFile)
 
-    moduleDumpFile.appendText(verificationError.orEmpty())
+    moduleDumpFile.appendBytes(verificationError.orEmpty().encodeToByteArray())
 }
 
 private fun StringBuilder.appendVerificationError(error: String?) {

@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.backend.common.serialization.encodings
 
-@JvmInline
 value class BinaryNameAndType(private val decoded: BinaryLattice) {
     val nameIndex: Int get() = decoded.first
     val typeIndex: Int get() = decoded.second

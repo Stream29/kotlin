@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.backend.common.*
 import org.jetbrains.kotlin.backend.konan.InteropFqNames
 import org.jetbrains.kotlin.backend.konan.NativeGenerationState
 import org.jetbrains.kotlin.backend.konan.ir.buildSimpleAnnotation
+import org.jetbrains.kotlin.descriptors.name
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrAnnotation
@@ -64,7 +65,7 @@ internal class InteropBridgesNameInventor(val generationState: NativeGenerationS
     private inner class InteropBridgeCollector(val irFile: IrFile?, val uniqueName: String) : IrElementTransformerVoid() {
         val uniquePrefix = buildString {
             append('_')
-            uniqueName.toByteArray().joinTo(this, "") {
+            uniqueName.encodeToByteArray().joinTo(this, "") {
                 (0xFF and it.toInt()).toString(16).padStart(2, '0')
             }
             append('_')

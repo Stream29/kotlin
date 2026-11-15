@@ -35,7 +35,7 @@ import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.util.profile
 import org.jetbrains.kotlin.utils.Printer
-import java.nio.file.Path
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 class KotlinResolvedModuleDescriptors(
         /**
@@ -206,7 +206,7 @@ class KlibResolvedModuleDescriptorsFactoryImpl(
         )
 
         if (builtIns == null) {
-            builtInsToUse.builtInsModule = moduleDescriptor
+            builtInsToUse.setBuiltInsModule(moduleDescriptor)
         }
 
         return moduleDescriptor
@@ -259,7 +259,7 @@ class ForwardDeclarationsPackageFragmentDescriptor(
         private fun findCinteropClass(name: Name): ClassDescriptor = findCinteropClassOrNull(name) ?: error("Class $name is not found")
 
         private fun findCinteropClassOrNull(name: Name): ClassDescriptor? {
-            return builtIns.builtInsModule.getPackage(NativeStandardInteropNames.cInteropPackage)
+            return builtIns.getBuiltInsModule().getPackage(NativeStandardInteropNames.cInteropPackage)
                     .memberScope
                     .getContributedClassifier(name, NoLookupLocation.FROM_BACKEND) as ClassDescriptor?
         }
@@ -293,7 +293,7 @@ class ForwardDeclarationsPackageFragmentDescriptor(
         override fun getContributedClassifier(name: Name, location: LookupLocation): ClassifierDescriptor = declarations(name)
 
         override fun printScopeStructure(p: Printer) {
-            p.println(this::class.java.simpleName, "{}")
+            p.println(this::class.simpleName, "{}")
         }
     }
 

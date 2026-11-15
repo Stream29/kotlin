@@ -18,7 +18,6 @@ package org.jetbrains.kotlin.ir
 
 import org.jetbrains.kotlin.ir.visitors.IrTransformer
 import org.jetbrains.kotlin.ir.visitors.IrVisitor
-import java.util.IdentityHashMap
 
 abstract class IrElementBase : IrElement {
     /**
@@ -156,7 +155,8 @@ abstract class IrElementBase : IrElement {
     internal fun copyAttributesFrom(other: IrElementBase, includeAll: Boolean) {
         val srcAttributes = other._attributes ?: return
         var dstAttributes = _attributes
-        val mergedAttributes = IdentityHashMap<IrAttribute<*, *>, Any?>((srcAttributes.size + (dstAttributes?.size ?: 0)) / 2)
+        // IrAttribute is final and retains Any identity equality/hashCode.
+        val mergedAttributes = HashMap<IrAttribute<*, *>, Any?>((srcAttributes.size + (dstAttributes?.size ?: 0)) / 2)
 
         if (dstAttributes != null) {
             for (i in dstAttributes.indices step 2) {

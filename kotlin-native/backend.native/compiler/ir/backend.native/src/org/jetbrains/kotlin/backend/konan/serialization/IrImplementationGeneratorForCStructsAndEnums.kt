@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.backend.konan.serialization
 
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
+import org.jetbrains.kotlin.backend.konan.InteropFqNames
 import org.jetbrains.kotlin.backend.konan.ir.BackendNativeSymbols
 import org.jetbrains.kotlin.backend.konan.lower.EnumClassLowering
 import org.jetbrains.kotlin.backend.konan.lower.EnumConstructorsLowering
@@ -33,6 +34,12 @@ private val cEnumEntryValueTypes = setOf(
         "Byte", "Short", "Int", "Long",
         "UByte", "UShort", "UInt", "ULong"
 )
+
+private fun IrClass.inheritsFromCStruct(): Boolean =
+        superTypes.any { it.classOrNull?.owner?.hasEqualFqName(InteropFqNames.cStructVar) == true }
+
+private fun IrClass.inheritsFromCEnum(): Boolean =
+        superTypes.any { it.classOrNull?.owner?.hasEqualFqName(InteropFqNames.cEnum) == true }
 
 /**
  * Creates implementation (mostly IR bodies) for C structs and C enums deserialized from C-interop Klib.

@@ -1,17 +1,15 @@
 package org.jetbrains.kotlin.backend.konan
 
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.*
+import org.jetbrains.kotlin.konan.file.File
+
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
-import org.jetbrains.kotlin.io.deleteOnExit
+import org.jetbrains.kotlin.konan.file.deleteOnExit
 import org.jetbrains.kotlin.ir.IrDiagnosticReporter
 import org.jetbrains.kotlin.konan.exec.Command
 import org.jetbrains.kotlin.konan.target.ClangArgs
 import org.jetbrains.kotlin.konan.target.KonanTarget
-import java.nio.file.Path
-import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.copyTo
-import kotlin.io.path.createTempFile
-import kotlin.io.path.writeLines
 
 private const val dumpBridges = false
 

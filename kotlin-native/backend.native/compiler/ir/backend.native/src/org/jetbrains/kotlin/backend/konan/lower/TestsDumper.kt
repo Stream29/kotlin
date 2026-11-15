@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.backend.konan.lower
 
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.*
+
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.konan.NativeLoweringContext
 import org.jetbrains.kotlin.backend.konan.ir.superClasses
@@ -18,9 +21,6 @@ import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.constructedClass
 import org.jetbrains.kotlin.ir.util.render
-import kotlin.io.path.appendLines
-import kotlin.io.path.createFile
-import kotlin.io.path.exists
 
 internal class TestsDumper(private val context: NativeLoweringContext) : FileLoweringPass {
     private val symbols = context.symbols

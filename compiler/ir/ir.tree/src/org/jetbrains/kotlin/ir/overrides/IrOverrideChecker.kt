@@ -32,7 +32,6 @@ class MemberWithOriginal(val member: IrOverridableMember, original: IrOverridabl
     override fun toString(): String = member.render()
 }
 
-@JvmInline
 value class OverridabilityResult(val overridable: Boolean)
 
 private inline val success get() = OverridabilityResult(true)
@@ -178,7 +177,7 @@ class IrOverrideChecker(
             when (result) {
                 INCOMPATIBLE -> return incompatible
                 OVERRIDABLE -> error(
-                    "Contract violation in ${externalCondition.javaClass} condition. It's not supposed to end with success"
+                    "Contract violation in ${externalCondition::class} condition. It's not supposed to end with success"
                 )
                 UNKNOWN -> {}
             }

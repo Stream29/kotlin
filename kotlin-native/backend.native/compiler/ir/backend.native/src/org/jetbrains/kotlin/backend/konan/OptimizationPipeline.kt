@@ -13,9 +13,11 @@ import org.jetbrains.kotlin.backend.konan.driver.NativeBackendPhaseContext
 import org.jetbrains.kotlin.backend.konan.llvm.*
 import org.jetbrains.kotlin.config.nativeBinaryOptions.StackProtectorMode
 import org.jetbrains.kotlin.konan.config.saveLlvmIr
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.target.*
 import org.jetbrains.kotlin.util.PerformanceManager
-import java.io.Closeable
+
+typealias Closeable = AutoCloseable
 
 enum class LlvmOptimizationLevel(val value: Int) {
     NONE(0),
@@ -51,7 +53,7 @@ data class LlvmPipelineConfig(
         val ltoPasses: String? = null,
         val sspMode: StackProtectorMode = StackProtectorMode.NO,
         val saveIrAfterPasses: List<String> = emptyList(),
-        val saveIrDirectory: java.io.File? = null,
+        val saveIrDirectory: File? = null,
         val runLLVMPassesInCompiler: Boolean,
         val shouldInlineSafepoints: Boolean = false,
 ) {
@@ -72,8 +74,8 @@ data class LlvmPipelineConfig(
                 null
             } else {
                 val dir = context.config.saveLlvmIrDirectory
-                if (dir.exists()) {
-                    dir.resolve(phase) // This subdirectory does not have to exist: llvm will create it itself
+                if (dir.exists) {
+                    dir.child(phase) // This subdirectory does not have to exist: llvm will create it itself
                 } else {
                     context.diagnosticReporter.report(
                             NativeBackendDiagnostics.LLVM_WARNING,
@@ -299,6 +301,23 @@ abstract class LlvmOptimizationPipeline(
             LLVMDisposeTargetMachine(targetMachine)
         }
         arena.clear()
+    }
+
+    companion object {
+        private var isInitialized: Boolean = false
+
+        private fun initLLVMTargets() {
+            memScoped {
+                LLVMKotlinInitializeTargets()
+            }
+        }
+
+        fun initLLVMOnce() {
+            if (!isInitialized) {
+                initLLVMTargets()
+                isInitialized = true
+            }
+        }
     }
 }
 

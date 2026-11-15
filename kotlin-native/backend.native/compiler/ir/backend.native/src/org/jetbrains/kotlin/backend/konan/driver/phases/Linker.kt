@@ -11,8 +11,7 @@ import org.jetbrains.kotlin.backend.konan.Linker
 import org.jetbrains.kotlin.backend.konan.driver.NativeBackendPhaseContext
 import org.jetbrains.kotlin.backend.konan.serialization.PartialCacheInfo
 import org.jetbrains.kotlin.konan.TempFiles
-import org.jetbrains.kotlin.konan.target.LinkerOutputKind
-import java.io.File
+import org.jetbrains.kotlin.konan.file.*
 
 internal data class LinkerPhaseInput(
         val outputFile: String,
@@ -55,7 +54,7 @@ internal data class PreLinkCachesInput(
 internal val PreLinkCachesPhase = createSimpleNamedCompilerPhase<NativeBackendPhaseContext, PreLinkCachesInput>(
         name = "PreLinkCaches",
 ) { context, input ->
-    val inputFiles = input.objectFiles.map { it.absoluteFile.normalize().path } + input.caches.static
-    val commands = context.config.platform.linker.preLinkCommands(inputFiles, input.outputObjectFile.absoluteFile.normalize().path)
+    val inputFiles = input.objectFiles.map { it.absoluteFile.toPath().normalize().toFile().path } + input.caches.static
+    val commands = context.config.platform.linker.preLinkCommands(inputFiles, input.outputObjectFile.absoluteFile.toPath().normalize().toFile().path)
     runLinkerCommands(context, commands, cachingInvolved = true)
 }

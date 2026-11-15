@@ -140,7 +140,6 @@ internal object IrActualizationDiagnosticRenderers {
         "@" + RenderIrElementVisitor().renderAsAnnotation(it)
     }
 
-    @JvmField
     val MODULE_WITH_PLATFORM = Renderer<ModuleInfoForDiagnostic> { module ->
         val platform = module.platform
         val platformNameIfAny = if (platform == null || platform.isCommon()) "" else " for " + platform.single().platformName

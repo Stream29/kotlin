@@ -21,6 +21,6 @@ import org.jetbrains.kotlin.ir.util.isExpect
  */
 class ExpectDeclarationsRemoveLowering(val context: LoweringContext) : FileLoweringPass {
     override fun lower(irFile: IrFile) {
-        irFile.declarations.removeIf { it.isExpect }
+        irFile.declarations.removeAll { it.isExpect }
     }
 }

@@ -1,9 +1,15 @@
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+
 /*
  * Copyright 2010-2022 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.backend.konan
+
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.*
+import platform.posix.*
 
 import org.jetbrains.kotlin.analyzer.CompilationErrorException
 import org.jetbrains.kotlin.backend.common.IdSignaturesExtractorFromKlibWithIndices
@@ -29,24 +35,7 @@ import org.jetbrains.kotlin.library.isNativeStdlib
 import org.jetbrains.kotlin.library.metadata.isCInteropLibrary
 import org.jetbrains.kotlin.library.newCompanionInitializationEnabled
 import org.jetbrains.kotlin.library.uniqueName
-import java.nio.channels.FileChannel
-import java.nio.channels.FileLock
-import java.nio.channels.OverlappingFileLockException
-import java.nio.file.Path
-import java.nio.file.StandardOpenOption
-import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
 import org.jetbrains.kotlin.io.canonicalPathString
-import org.jetbrains.kotlin.konan.config.NativeConfigurationKeys.DEBUG_PREFIX_MAP
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.absolute
-import kotlin.io.path.createDirectories
-import kotlin.io.path.deleteRecursively
-import kotlin.io.path.exists
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.name
-import kotlin.io.path.pathString
-import kotlin.io.path.writeText
 
 /** Libraries whose per-file caches are fully built by a single batched compilation, mapped from canonical paths to dependency fingerprints. */
 internal val CACHE_BATCH = CompilerConfigurationKey.create<Map<String, FingerprintHash>>("per-file cache batch")
@@ -176,7 +165,6 @@ class CacheBuilder(
         }
     }
 
-    @OptIn(ExperimentalPathApi::class)
     fun build() {
         val externalLibrariesToCache = mutableListOf<KotlinLibrary>()
         val icedLibraries = mutableListOf<KotlinLibrary>()
@@ -535,7 +523,11 @@ class CacheBuilder(
                 for (signature in loaded.signatures()) {
                     // Note: although here group-wide signatureOwners is used, a conflict can only be inside the closure because
                     // otherwise it would have been found in the previous loop and current group wouldn't have been picked.
-                    val owner = group.signatureOwners.putIfAbsent(signature, loaded) ?: continue
+                    val owner = group.signatureOwners[signature]
+                    if (owner == null) {
+                        group.signatureOwners[signature] = loaded
+                        continue
+                    }
                     if (!group.sealed) {
                         group.sealed = true
                         configuration.reportLog(
@@ -559,7 +551,6 @@ class CacheBuilder(
                     .declaredSignatures
 
     /** Builds the per-file caches of [batch] in a single spawned compilation and returns their binary archives. */
-    @OptIn(ExperimentalPathApi::class)
     private fun buildCacheBatch(batch: List<KotlinLibrary>): List<Path> {
         val batchSet = batch.toSet()
         val cacheDirectory = config.incrementalCacheDirectory!!
@@ -583,7 +574,7 @@ class CacheBuilder(
                 outputs = outputs.values.toList(),
         ) {
             put(CACHE_BATCH, batch.associate { it.canonicalPath.pathString to computeDependenciesFingerprint(it) })
-            putIfNotNull(DEBUG_PREFIX_MAP, config.configuration[DEBUG_PREFIX_MAP])
+            putIfNotNull(NativeConfigurationKeys.DEBUG_PREFIX_MAP, config.configuration[NativeConfigurationKeys.DEBUG_PREFIX_MAP])
         }
 
         val rebuiltArchives = mutableListOf<Path>()
@@ -707,34 +698,24 @@ class CacheBuilder(
             return buildAction()
         }
 
-        FileChannel.open(
-                lockFile.absolute(),
-                StandardOpenOption.CREATE,
-                StandardOpenOption.READ,
-                StandardOpenOption.WRITE
-        ).use { channel ->
-            channel.acquireLockWithRetry().use {
+        val fd = open(lockFile.absolutePathString(), O_CREAT or O_RDWR, 438)
+        if (fd < 0) {
+            if (skipBuildAction()) return
+            return buildAction()
+        }
+        try {
+            lockf(fd, F_LOCK, 0)
+            try {
                 if (skipBuildAction()) return
                 buildAction()
+            } finally {
+                lockf(fd, F_ULOCK, 0)
             }
+        } finally {
+            close(fd)
         }
     }
 
-    private fun FileChannel.acquireLockWithRetry(): FileLock {
-        while (true) {
-            try {
-                return this.lock()
-            } catch (_: OverlappingFileLockException) {
-                // Another thread in the same JVM holds the lock. Just wait:
-                // — if that thread dies with a crash, the whole process dies.
-                // - if that thread fails with an exception, the lock is released.
-                // - if that thread hangs, we might be tight on resources, so waiting is wise.
-                Thread.sleep(200L)
-            }
-        }
-    }
-
-    @OptIn(ExperimentalPathApi::class)
     private fun tryBuildingLibraryCache(
             library: KotlinLibrary,
             dependencies: List<KotlinLibrary>,
@@ -772,7 +753,7 @@ class CacheBuilder(
             }
             if (library.isSubjectOfIC) {
                 cachedLibraryDependenciesFingerprint = computeDependenciesFingerprint(library).toString()
-                putIfNotNull(DEBUG_PREFIX_MAP, config.configuration[DEBUG_PREFIX_MAP])
+                putIfNotNull(NativeConfigurationKeys.DEBUG_PREFIX_MAP, config.configuration[NativeConfigurationKeys.DEBUG_PREFIX_MAP])
             }
             if (filesToCache.isNotEmpty())
                 this.filesToCache = filesToCache
@@ -788,7 +769,6 @@ class CacheBuilder(
      * against the [dependencies] cached at [dependencyCaches].
      * [setupConfiguration] adds the options specific to the particular build.
      */
-    @OptIn(ExperimentalPathApi::class)
     private fun trySpawningCacheBuild(
             libraries: List<KotlinLibrary>,
             dependencies: List<KotlinLibrary>,

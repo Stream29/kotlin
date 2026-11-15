@@ -6,8 +6,7 @@
 package org.jetbrains.kotlin.backend.konan.serialization
 
 import org.jetbrains.kotlin.name.FqName
-import kotlin.io.path.Path
-import kotlin.io.path.name
+import org.jetbrains.kotlin.library.Path
 
 sealed class CacheDeserializationStrategy {
     abstract fun contains(filePath: String): Boolean

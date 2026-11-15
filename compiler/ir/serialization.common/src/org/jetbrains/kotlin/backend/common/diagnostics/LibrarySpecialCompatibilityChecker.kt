@@ -12,11 +12,7 @@ import org.jetbrains.kotlin.library.*
 import org.jetbrains.kotlin.tooling.core.KotlinToolingVersion
 import org.jetbrains.kotlin.tooling.core.isDev
 import org.jetbrains.kotlin.tooling.core.isSnapshot
-import java.io.ByteArrayInputStream
-import java.nio.file.Path
-import java.util.jar.Manifest
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.readBytes
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 /** See KT-68322 for details. */
 abstract class LibrarySpecialCompatibilityChecker {
@@ -169,7 +165,7 @@ private class JarManifestComponent(
 ) : KlibComponent {
     val jarManifest: Manifest?
         get() = layoutReader.readInPlaceOrFallback(null) {
-            ByteArrayInputStream(it.jarManifestFile.readBytes()).use(::Manifest)
+            Manifest(it.jarManifestFile.readBytes())
         }
 
     object Kind : KlibComponent.Kind<JarManifestComponent, JarManifestComponentLayout> {

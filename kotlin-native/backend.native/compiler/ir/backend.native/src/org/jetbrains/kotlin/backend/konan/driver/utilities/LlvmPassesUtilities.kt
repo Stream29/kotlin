@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.backend.konan.llvm.verifyModule
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.konan.config.saveLlvmIr
 import org.jetbrains.kotlin.konan.config.verifyBitcode
-import java.io.File
+import org.jetbrains.kotlin.konan.file.*
 
 /**
  * Implementation of this interface in phase context, input or output
@@ -42,7 +42,7 @@ private fun <Data, Context : NativeBackendPhaseContext> createLlvmDumperAction()
                 }
                 val moduleName: String = llvmModule.getName()
                 val parentDirectory = context.config.saveLlvmIrDirectory
-                if (!parentDirectory.exists()) {
+                if (!parentDirectory.exists) {
                     context.diagnosticReporter.report(
                             NativeBackendDiagnostics.LLVM_WARNING,
                             "Cannot dump LLVM IR to non-existent location: ${parentDirectory.absolutePath}")

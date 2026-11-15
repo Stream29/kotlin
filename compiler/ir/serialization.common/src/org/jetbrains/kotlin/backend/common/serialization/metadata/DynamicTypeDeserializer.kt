@@ -6,6 +6,8 @@
 package org.jetbrains.kotlin.backend.common.serialization.metadata
 
 import org.jetbrains.kotlin.metadata.ProtoBuf
+import org.jetbrains.kotlin.builtins.nothingType
+import org.jetbrains.kotlin.builtins.nullableAnyType
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.serialization.deserialization.DYNAMIC_TYPE_DESERIALIZER_ID
 import org.jetbrains.kotlin.serialization.deserialization.FlexibleTypeDeserializer

@@ -5,10 +5,7 @@
 
 package org.jetbrains.kotlin.backend.common.serialization
 
-import it.unimi.dsi.fastutil.Hash
-import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet
 import org.jetbrains.kotlin.name.Name
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import org.jetbrains.kotlin.ir.IrFileEntry
 import org.jetbrains.kotlin.ir.util.NaiveSourceBasedFileEntryImpl
 
@@ -17,18 +14,17 @@ import org.jetbrains.kotlin.ir.util.NaiveSourceBasedFileEntryImpl
  * to save memory by eliminating duplicates of instances of those classes
  */
 class IrInterningService {
-    /**
-     * We use here an open-addressing map, because it consumes at least twice lesser memory than with bucket-based implementation:
-     * - Open-addressing (cost per entry): ref to key + ref to value
-     * - Bucket-based (cost per entry): hash code + ref to key + ref to value + ref to the next node + class header with memory alignment
-     */
-    private val strings by lazy { ObjectOpenHashSet<String>() }
-    private val names by lazy { ObjectOpenHashSet<Name>() }
-    private val fileEntries by lazy { ObjectOpenCustomHashSet(object : Hash.Strategy<IrFileEntry> {
-            override fun hashCode(o: IrFileEntry?): Int {
+    // Native maps retain canonical instances with the original content-equality policy.
+    private val strings by lazy { HashMap<String, String>() }
+    private val names by lazy { HashMap<Name, Name>() }
+    private val fileEntries by lazy { HashMap<FileEntryKey, IrFileEntry>() }
+
+    private class FileEntryKey(val entry: IrFileEntry) {
+            override fun hashCode(): Int {
+                val o = entry
                 if (o !is NaiveSourceBasedFileEntryImpl) return o.hashCode()
 
-                var result = super.hashCode()
+                var result = 1
                 result = 31 * result + o.maxOffset
                 result = 31 * result + o.firstRelevantLineIndex
                 result = 31 * result + o.name.hashCode()
@@ -36,7 +32,10 @@ class IrInterningService {
                 return result
             }
 
-            override fun equals(a: IrFileEntry?, b: IrFileEntry?): Boolean {
+            override fun equals(other: Any?): Boolean {
+                if (other !is FileEntryKey) return false
+                val a = entry
+                val b = other.entry
                 if (a === b) return true
                 if (a == null || b == null) return false
                 if (a !is NaiveSourceBasedFileEntryImpl || b !is NaiveSourceBasedFileEntryImpl) return a == b
@@ -48,19 +47,18 @@ class IrInterningService {
 
                 return true
             }
-        })
     }
 
     fun string(string: String): String {
-        return strings.addOrGet(string)
+        return strings.getOrPut(string) { string }
     }
 
     fun name(name: Name): Name {
-        return names.addOrGet(name)
+        return names.getOrPut(name) { name }
     }
 
     fun fileEntry(file: IrFileEntry): IrFileEntry {
-        return fileEntries.addOrGet(file)
+        return fileEntries.getOrPut(FileEntryKey(file)) { file }
     }
 
     /**

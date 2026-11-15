@@ -8,11 +8,8 @@ package org.jetbrains.kotlin.backend.konan.serialization
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
+import org.jetbrains.kotlin.descriptors.source
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
-import org.jetbrains.kotlin.fir.declarations.FirCallableDeclaration
-import org.jetbrains.kotlin.fir.declarations.FirClassLikeDeclaration
-import org.jetbrains.kotlin.fir.declarations.FirMemberDeclaration
-import org.jetbrains.kotlin.fir.declarations.utils.sourceElement
 import org.jetbrains.kotlin.fir.descriptors.FirPackageFragmentDescriptor
 import org.jetbrains.kotlin.fir.lazy.AbstractFir2IrLazyDeclaration
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
@@ -59,11 +56,7 @@ fun DeclarationDescriptor.isFromCInteropLibrary(): Boolean {
 }
 
 private fun getSourceElementFromFir(topLevelLazyFir2IrDeclaration: AbstractFir2IrLazyDeclaration<*>): SourceElement? =
-    when (val firDeclaration = topLevelLazyFir2IrDeclaration.fir as? FirMemberDeclaration) {
-        is FirCallableDeclaration -> firDeclaration.containerSource
-        is FirClassLikeDeclaration -> firDeclaration.sourceElement
-        else -> null
-    }
+    topLevelLazyFir2IrDeclaration.containerSourceElement
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 private fun getSourceElementFromDescriptor(topLevelDeclaration: IrDeclaration): SourceElement? {

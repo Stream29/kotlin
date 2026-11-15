@@ -44,7 +44,6 @@ import org.jetbrains.kotlin.utils.addToStdlib.assignFrom
 import org.jetbrains.kotlin.utils.memoryOptimizedMap
 import org.jetbrains.kotlin.utils.memoryOptimizedMapIndexed
 import org.jetbrains.kotlin.utils.memoryOptimizedPlus
-import java.io.StringWriter
 
 /**
  * Binds all arguments represented in the IR to the parameters of the accessed function.
@@ -714,7 +713,7 @@ fun ir2string(ir: IrElement?): String = ir?.render() ?: ""
 
 @Suppress("unused") // Used in kotlin-native
 fun ir2stringWhole(ir: IrElement?): String {
-    val strWriter = StringWriter()
+    val strWriter = StringBuilder()
     ir?.accept(DumpIrTreeVisitor(strWriter), "")
     return strWriter.toString()
 }
@@ -1452,7 +1451,7 @@ fun IrElement.extractRelatedDeclaration(): IrDeclaration? {
 }
 
 inline fun <reified Symbol : IrSymbol> IrSymbol.unexpectedSymbolKind(): Nothing {
-    throw IllegalArgumentException("Unexpected kind of ${Symbol::class.java.typeName}: $this")
+    throw IllegalArgumentException("Unexpected kind of ${Symbol::class.qualifiedName}: $this")
 }
 
 inline fun <reified T> convertTo(value: Any): T {
@@ -1610,7 +1609,7 @@ fun IrMemberAccessExpression<IrFunctionSymbol>.copyValueArgumentsFrom(
     arguments.assignFrom(src.arguments)
 }
 
-@DeprecatedForRemovalCompilerApi(CompilerVersionOfApiDeprecation._2_5_0, message = "Use IrConstImpl.TYPE instead")
+@DeprecatedForRemovalCompilerApi(CompilerVersionOfApiDeprecation._2_4_20, message = "Use IrConstImpl.TYPE instead")
 public fun Any?.toIrConstOrNull(irType: IrType, startOffset: Int = SYNTHETIC_OFFSET, endOffset: Int = SYNTHETIC_OFFSET): IrConst? {
     if (this == null) return IrConstImpl.constNull(startOffset, endOffset, irType)
 
@@ -1637,7 +1636,7 @@ public fun Any?.toIrConstOrNull(irType: IrType, startOffset: Int = SYNTHETIC_OFF
     }
 }
 
-@DeprecatedForRemovalCompilerApi(CompilerVersionOfApiDeprecation._2_5_0, message = "Use IrConstImpl.TYPE instead")
+@DeprecatedForRemovalCompilerApi(CompilerVersionOfApiDeprecation._2_4_20, message = "Use IrConstImpl.TYPE instead")
 fun Any?.toIrConst(irType: IrType, startOffset: Int = SYNTHETIC_OFFSET, endOffset: Int = SYNTHETIC_OFFSET): IrConst =
     toIrConstOrNull(irType, startOffset, endOffset)
         ?: throw UnsupportedOperationException("Unsupported const element type ${irType.makeNotNull().render()}")

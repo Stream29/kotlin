@@ -5,13 +5,16 @@
 
 package org.jetbrains.kotlin.backend.konan
 
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.*
+import org.jetbrains.kotlin.konan.file.*
+
 import com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.backend.common.linkage.partial.setupPartialLinkageConfig
 import org.jetbrains.kotlin.cli.CliDiagnostics.KONAN_ARGUMENT_ERROR
 import org.jetbrains.kotlin.cli.CliDiagnostics.KONAN_ARGUMENT_STRONG_WARNING
 import org.jetbrains.kotlin.cli.CliDiagnostics.KONAN_ARGUMENT_WARNING
-import org.jetbrains.kotlin.cli.common.arguments.K2NativeCompilerArguments
-import org.jetbrains.kotlin.cli.common.arguments.cliArgument
+import org.jetbrains.kotlin.cli.common.arguments.*
 import org.jetbrains.kotlin.cli.report
 import org.jetbrains.kotlin.cli.reportLog
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
@@ -22,9 +25,6 @@ import org.jetbrains.kotlin.konan.config.*
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.util.visibleName
 import org.jetbrains.kotlin.native.pipeline.NativeKlibConfigurationUpdater
-import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.exists
 
 fun CompilerConfiguration.setupFromArguments(arguments: K2NativeCompilerArguments, rootDisposable: Disposable) = with(NativeConfigurationKeys) {
     NativeKlibConfigurationUpdater.fillConfiguration(arguments, rootDisposable, this@setupFromArguments)
@@ -48,7 +48,7 @@ fun CompilerConfiguration.setupFromArguments(arguments: K2NativeCompilerArgument
     arguments.mainPackage?.let { konanEntryPoint = it }
     arguments.runtimeFile?.let { put(RUNTIME_FILE, it) }
     arguments.temporaryFilesDir?.let { put(TEMPORARY_FILES_DIR, it) }
-    put(SAVE_LLVM_IR, arguments.saveLlvmIrAfter.toList())
+    put(SAVE_LLVM_IR, arguments.saveLlvmIrAfter.toNonNullList())
 
     if (arguments.optimization && arguments.debug) {
         report(KONAN_ARGUMENT_WARNING, "Unsupported combination of flags: -opt and -g. Please pick one.")
@@ -139,13 +139,13 @@ fun CompilerConfiguration.setupFromArguments(arguments: K2NativeCompilerArgument
     val incrementalCacheDir = arguments.incrementalCacheDir
     if ((incrementalCacheDir != null) xor (arguments.incrementalCompilation == true))
         report(KONAN_ARGUMENT_ERROR, "For incremental compilation both flags should be supplied: " +
-                "-Xenable-incremental-compilation and ${K2NativeCompilerArguments::incrementalCacheDir.cliArgument}")
+                "-Xenable-incremental-compilation and -Xic-cache-dir")
     incrementalCacheDir?.let { put(INCREMENTAL_CACHE_DIR, it) }
     arguments.dumpBuiltCachesTo?.let { put(DUMP_BUILT_CACHES_TO, it) }
-    put(FILES_TO_CACHE, arguments.filesToCache.toList())
+    put(FILES_TO_CACHE, arguments.filesToCache.toNonNullList())
     put(MAKE_PER_FILE_CACHE, arguments.makePerFileCache)
-    val nThreadsRaw = parseBackendThreads(arguments.backendThreads)
-    val availableProcessors = Runtime.getRuntime().availableProcessors()
+    val nThreadsRaw = parseBackendThreads(arguments.backendThreads ?: "1")
+    val availableProcessors = 1
     val nThreads = if (nThreadsRaw == 0) availableProcessors else nThreadsRaw
     if (nThreads > 1) {
         reportLog("Running backend in parallel with $nThreads threads")
@@ -164,7 +164,7 @@ fun CompilerConfiguration.setupFromArguments(arguments: K2NativeCompilerArgument
         "stms" -> GC.STOP_THE_WORLD_MARK_AND_SWEEP
         "cms" -> GC.PARALLEL_MARK_CONCURRENT_SWEEP
         else -> {
-            val validValues = enumValues<GC>().joinToString("|") {
+            val validValues = GC.entries.joinToString("|") {
                 val fullName = "$it".lowercase()
                 it.shortcut.let { short ->
                     "$fullName (or: $short)"
@@ -229,7 +229,7 @@ fun CompilerConfiguration.setupFromArguments(arguments: K2NativeCompilerArgument
                 report(KONAN_ARGUMENT_ERROR, "`-Xllvm-variant` should be `user`, `dev` or an absolute path. Got: $variant")
                 null
             } else {
-                LlvmVariant.Custom(file)
+                LlvmVariant.Custom(file.toFile())
             }
         }
     })
@@ -256,7 +256,7 @@ fun CompilerConfiguration.setupFromArguments(arguments: K2NativeCompilerArgument
     }
 }
 
-private fun String.absoluteNormalizedFile() = java.io.File(this).absoluteFile.normalize()
+private fun String.absoluteNormalizedFile() = File(this).absoluteFile.toPath().normalize().toFile()
 
 internal fun CompilerConfiguration.setupCommonOptionsForCaches(config: NativeSecondStageCompilationConfig) = with(NativeConfigurationKeys) {
     konanTarget = config.target.toString()
@@ -294,6 +294,9 @@ internal fun CompilerConfiguration.setupCommonOptionsForCaches(config: NativeSec
 
 private fun Array<String>?.toNonNullList() = this?.asList().orEmpty()
 
+private fun String?.toNonNullList(): List<String> =
+        this?.split(":", ",")?.filterNot(String::isEmpty).orEmpty()
+
 private fun selectFrameworkType(
         configuration: CompilerConfiguration,
         arguments: K2NativeCompilerArguments,
@@ -302,7 +305,7 @@ private fun selectFrameworkType(
     return if (outputKind != CompilerOutputKind.FRAMEWORK && arguments.staticFramework) {
         configuration.report(
                 KONAN_ARGUMENT_STRONG_WARNING,
-                "'${K2NativeCompilerArguments::staticFramework.cliArgument}' is only supported when producing frameworks, " +
+                "'-Xstatic-framework' is only supported when producing frameworks, " +
                         "but the compiler is producing ${outputKind.name.lowercase()}"
         )
         false
@@ -327,12 +330,12 @@ private fun parsePreLinkCachesValue(
 private fun parseCachedLibraries(
         arguments: K2NativeCompilerArguments,
         configuration: CompilerConfiguration
-): Map<String, String> = arguments.cachedLibraries.asList().mapNotNull {
+): Map<String, String> = arguments.cachedLibraries.toNonNullList().mapNotNull {
     val libraryAndCache = it.split(",")
     if (libraryAndCache.size != 2) {
         configuration.report(
                 KONAN_ARGUMENT_ERROR,
-                "incorrect ${K2NativeCompilerArguments::cachedLibraries.cliArgument} format: expected '<library>,<cache>', got '$it'"
+                "incorrect -Xcached-library format: expected '<library>,<cache>', got '$it'"
         )
         null
     } else {
@@ -351,7 +354,7 @@ private fun parseBackendThreads(stringValue: String): Int {
 private fun parseDebugPrefixMap(
         arguments: K2NativeCompilerArguments,
         configuration: CompilerConfiguration
-): Map<String, String> = arguments.debugPrefixMap.asList().mapNotNull {
+): Map<String, String> = arguments.debugPrefixMap.toNonNullList().mapNotNull {
     val libraryAndCache = it.split("=")
     if (libraryAndCache.size != 2) {
         configuration.report(KONAN_ARGUMENT_ERROR, "incorrect debug prefix map format: expected '<old>=<new>', got '$it'")
@@ -369,7 +372,7 @@ fun parseBinaryOptions(
         arguments: K2NativeCompilerArguments,
         configuration: CompilerConfiguration
 ): List<BinaryOptionWithValue<*>> = parseBinaryOptions(
-        arguments.binaryOptions,
+        arguments.binaryOptions.toNonNullList().toTypedArray(),
         reportWarning = { configuration.report(KONAN_ARGUMENT_STRONG_WARNING, it) },
         reportError = { configuration.report(KONAN_ARGUMENT_ERROR, it) },
 )

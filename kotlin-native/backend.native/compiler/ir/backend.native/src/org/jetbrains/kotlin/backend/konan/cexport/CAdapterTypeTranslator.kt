@@ -6,12 +6,13 @@
 package org.jetbrains.kotlin.backend.konan.cexport
 
 import org.jetbrains.kotlin.backend.konan.*
+import org.jetbrains.kotlin.builtins.*
 import org.jetbrains.kotlin.builtins.UnsignedType
 import org.jetbrains.kotlin.builtins.konan.KonanBuiltIns
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.resolve.descriptorUtil.classId
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.typeUtil.isNothing
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 import org.jetbrains.kotlin.K1Deprecation

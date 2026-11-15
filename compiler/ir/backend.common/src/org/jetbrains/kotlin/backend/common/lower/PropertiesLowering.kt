@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.backend.common.lower
 
-import com.intellij.util.containers.addIfNotNull
+import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.backend.common.BodyLoweringPass
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.DeclarationTransformer

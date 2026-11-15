@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.ir.expressions.IrConst
 
 private fun ConstPointer.addBits(llvm: CodegenLlvmHelpers, bits: Int): ConstPointer {
     // Only pointer arithmetic via GEP works on constant pointers in LLVM.
-    val withBits = LLVMConstGEP2(llvm.int8Type, this.llvm, cValuesOf(llvm.int32(bits)), 1)!!
+    val withBits = LLVMConstGEP2(llvm.int8Type, this.llvm, cValuesOf(llvm.int32(bits)), 1u)!!
     return constPointer(withBits)
 }
 

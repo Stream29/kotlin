@@ -33,14 +33,14 @@ internal class Runtime(
 
     private fun createStructType(name: String, vararg fieldTypes: LLVMTypeRef): LLVMTypeRef {
         val result = LLVMStructCreateNamed(llvmContext, name) ?: error("failed to create struct $name")
-        LLVMStructSetBody(result, fieldTypes.toList().toCValues(), fieldTypes.size, 0)
+        LLVMStructSetBody(result, fieldTypes.toList().toCValues(), fieldTypes.size.toUInt(), 0)
         return result
     }
 
     private fun createOpaqueStructType(name: String): LLVMTypeRef =
             LLVMStructCreateNamed(llvmContext, name) ?: error("failed to create struct $name")
 
-    val pointerType = LLVMPointerTypeInContext(llvmContext, 0)!!
+    val pointerType = LLVMPointerTypeInContext(llvmContext, 0u)!!
     val typeInfoType = getStructType("TypeInfo")
     val extendedTypeInfoType = getStructType("ExtendedTypeInfo")
     val writableTypeInfoType = getStructTypeOrNull("WritableTypeInfo")
@@ -105,14 +105,14 @@ internal class Runtime(
     val blockDescriptorType by lazy { getStructType("Block_descriptor_1") }
 
     fun sizeOf(type: LLVMTypeRef) = LLVMABISizeOfType(targetData, type).toInt()
-    fun alignOf(type: LLVMTypeRef) = LLVMABIAlignmentOfType(targetData, type)
-    fun offsetOf(type: LLVMTypeRef, index: Int) = LLVMOffsetOfElement(targetData, type, index).toInt()
+    fun alignOf(type: LLVMTypeRef) = LLVMABIAlignmentOfType(targetData, type).toInt()
+    fun offsetOf(type: LLVMTypeRef, index: Int) = LLVMOffsetOfElement(targetData, type, index.toUInt()).toInt()
 
     val pointerSize: Int by lazy { sizeOf(pointerType) }
     val pointerAlignment: Int by lazy { alignOf(pointerType) }
 
     val stringHeaderExtraSize: Int by lazy {
-        offsetOf(stringHeaderType, LLVMCountStructElementTypes(stringHeaderType) - 1) - sizeOf(arrayHeaderType)
+        offsetOf(stringHeaderType, LLVMCountStructElementTypes(stringHeaderType).toInt() - 1) - sizeOf(arrayHeaderType)
     }
 
     // Must match kObjectAlignment in runtime

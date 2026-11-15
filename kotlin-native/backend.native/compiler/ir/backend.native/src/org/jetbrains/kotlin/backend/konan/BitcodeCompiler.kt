@@ -9,8 +9,8 @@ import org.jetbrains.kotlin.backend.konan.driver.NativeBackendPhaseContext
 import org.jetbrains.kotlin.config.nativeBinaryOptions.BinaryOptions
 import org.jetbrains.kotlin.konan.config.overrideClangOptions
 import org.jetbrains.kotlin.konan.exec.Command
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.konan.target.*
-import java.io.File
 
 typealias ObjectFile = String
 
@@ -32,7 +32,7 @@ internal class BitcodeCompiler(
 
     private fun runTool(vararg command: String) =
             Command(*command)
-                    .logWith(context::log)
+                    .logWith { context.log(it()) }
                     .execute()
 
     private fun targetTool(tool: String, vararg arg: String) {

@@ -22,7 +22,6 @@ import org.jetbrains.kotlin.konan.library.KlibNativeManifestTransformer
 import org.jetbrains.kotlin.konan.library.isFromKotlinNativeDistribution
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.library.KotlinAbiVersion
-import org.jetbrains.kotlin.library.KotlinAbiVersion.Companion.FIRST_SUPPORTED_COMPILER_VERSION
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.irProviderName
 import org.jetbrains.kotlin.library.loader.KlibLoader
@@ -33,8 +32,8 @@ import org.jetbrains.kotlin.library.loader.KlibPlatformChecker
 import org.jetbrains.kotlin.library.metadata.isCInteropLibrary
 import org.jetbrains.kotlin.utils.KotlinNativePaths
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
-import java.io.File
-import kotlin.io.path.pathString
+import nativekotlin.host.files.NativeFile as File
+import org.jetbrains.kotlin.backend.common.serialization.serializationAbsoluteFile
 import kotlin.reflect.KProperty1
 
 /**
@@ -52,7 +51,7 @@ fun loadNativeKlibs(
     val loadPlatformLibs = !configuration.konanNoDefaultLibs
 
     val nativeHome = configuration.konanHome?.let(::File) ?: KotlinNativePaths.homePath
-    val distributionLibrariesProvider = KlibNativeDistributionLibraryProvider(nativeHome) {
+    val distributionLibrariesProvider = KlibNativeDistributionLibraryProvider(nativeHome.serializationAbsoluteFile()) {
         runIf(loadStdlib) { withStdlib() }
         runIf(loadPlatformLibs) { withPlatformLibs(nativeTarget) }
     }
@@ -66,7 +65,7 @@ fun loadNativeKlibs(
         libraryProviders(distributionLibrariesProvider)
         libraryPaths(configuration.konanLibraries)
         platformChecker(platformChecker)
-        minPermittedAbiVersion(KotlinAbiVersion.FIRST_SUPPORTED, FIRST_SUPPORTED_COMPILER_VERSION)
+        minPermittedAbiVersion(KotlinAbiVersion(1, 6, 0), "1.6.0")
         maxPermittedAbiVersion(KotlinAbiVersion.CURRENT)
         configuration.zipFileSystemAccessor?.let { zipFileSystemAccessor(it) }
         manifestTransformer(KlibNativeManifestTransformer(nativeTarget))

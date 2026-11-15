@@ -8,4 +8,16 @@ package org.jetbrains.kotlin.ir
 /*
     Lock protecting accesses to global IR structures during by-file lowerings.
  */
-class IrLock
+class IrLock {
+    @PublishedApi
+    internal val nativeLock = org.jetbrains.kotlin.storage.ReentrantLock()
+}
+
+inline fun <T> synchronized(lock: IrLock, block: () -> T): T {
+    lock.nativeLock.lock()
+    try {
+        return block()
+    } finally {
+        lock.nativeLock.unlock()
+    }
+}

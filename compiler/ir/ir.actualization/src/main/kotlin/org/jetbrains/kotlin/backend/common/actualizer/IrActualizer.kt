@@ -127,7 +127,7 @@ class IrActualizer(
         val removedExpectDeclarations = mutableListOf<IrDeclaration>()
         for (fragment in dependentFragments) {
             for (file in fragment.files) {
-                file.declarations.removeIf {
+                file.declarations.removeAll {
                     if (shouldRemoveExpectDeclaration(it, expectActualMap)) {
                         removedExpectDeclarations.add(it)
                         true

@@ -148,7 +148,7 @@ abstract class IrMemberAccessExpression<S : IrSymbol> : IrDeclarationReference()
                 arguments[0] = value
             } else {
                 require(value == null) {
-                    "${this.javaClass.simpleName} has no argument slot for the corresponding dispatch receiver parameter. " +
+                    "${this::class.simpleName} has no argument slot for the corresponding dispatch receiver parameter. " +
                             "If you are sure you want to add it (most likely for when the parameter has been added to the function since), " +
                             "use insertDispatchReceiver() instead."
                 }
@@ -205,7 +205,15 @@ abstract class IrMemberAccessExpression<S : IrSymbol> : IrDeclarationReference()
     }
 
 
-    inner class ValueArgumentsList : ArrayList<IrExpression?>(0) {
+    inner class ValueArgumentsList private constructor(
+        private val values: ArrayList<IrExpression?>,
+    ) : MutableList<IrExpression?> by values, RandomAccess {
+        constructor() : this(ArrayList(0))
+
+        override fun equals(other: Any?): Boolean = values == other
+        override fun hashCode(): Int = values.hashCode()
+        override fun toString(): String = values.toString()
+
         operator fun get(parameter: IrValueParameter): IrExpression? {
             checkIndexingByParameter(parameter)
             return this[parameter.indexInParameters]

@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.backend.common.serialization.encodings
 
 import org.jetbrains.kotlin.types.Variance
 
-@JvmInline
 value class BinaryTypeProjection(val code: Long) {
 
     private fun varianceId(): Int = (code and 0x3L).toInt() - 1

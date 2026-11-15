@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlin.backend.konan.driver.phases
 
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.*
+import org.jetbrains.kotlin.konan.file.*
+
 import llvm.LLVMModuleRef
 import org.jetbrains.kotlin.backend.common.ModuleLoweringPass
 import org.jetbrains.kotlin.backend.common.lower.RedundantCastsRemoverLowering
@@ -23,7 +27,6 @@ import org.jetbrains.kotlin.backend.konan.lower.*
 import org.jetbrains.kotlin.backend.konan.serialization.CacheDeserializationStrategy
 import org.jetbrains.kotlin.backend.konan.serialization.PartialCacheInfo
 import org.jetbrains.kotlin.cli.common.config.kotlinSourceRoots
-import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.LoggingContext
 import org.jetbrains.kotlin.config.phaser.NamedCompilerPhase
 import org.jetbrains.kotlin.ir.IrBasedFunctionFactory.Companion.isFunctionInterfaceFile
@@ -43,16 +46,8 @@ import org.jetbrains.kotlin.konan.target.Family
 import org.jetbrains.kotlin.library.isNativeStdlib
 import org.jetbrains.kotlin.util.*
 import org.jetbrains.kotlin.utils.atMostOne
-import java.util.concurrent.Callable
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicReference
-import kotlin.io.path.Path
-import kotlin.io.path.createFile
-import kotlin.io.path.name
-import kotlin.io.path.writeLines
 
-private fun TempFiles.createBitcodeFile(fileName: String) = create(fileName, ".bc").toFile()
+private fun TempFiles.createBitcodeFile(fileName: String) = create(fileName, ".bc").javaFile()
 
 internal fun PhaseEngine<NativeBackendPhaseContext>.runK1Frontend(config: NativeSecondStageCompilationConfig, environment: KotlinCoreEnvironment): K1FrontendPhaseOutput? {
     val languageVersion = config.languageVersionSettings.languageVersion
@@ -212,7 +207,7 @@ internal fun <C : NativeBackendPhaseContext> PhaseEngine<C>.runBackend(backendCo
                     val bitcodeFile = tempFiles.createBitcodeFile(generationState.llvmModuleName)
                     val cExportFiles = if (config.produceCInterface) {
                         CExportFiles(
-                                cppAdapter = tempFiles.create("api", ".cpp").toFile(),
+                                cppAdapter = tempFiles.create("api", ".cpp").javaFile(),
                                 bitcodeAdapter = tempFiles.createBitcodeFile("api"),
                                 header = outputFiles.cAdapterHeader.toFile(),
                                 def = if (config.target.family == Family.MINGW) outputFiles.cAdapterDef.toFile() else null,
@@ -248,31 +243,9 @@ internal fun <C : NativeBackendPhaseContext> PhaseEngine<C>.runBackend(backendCo
                 runAfterLowerings(fragment, generationState)
             }
         } else {
-            if (fragmentsList.size == 1) {
-                runAfterLowerings(fragmentsList.first(), generationStates.first())
-            } else {
-                // We'd love to run entire pipeline in parallel, but it's difficult (mainly because of the lowerings,
-                // which need cross-file access all the time and it's not easy to overcome this). So, for now,
-                // we split the pipeline into two parts - everything before lowerings (including them)
-                // which is run sequentially, and everything else which is run in parallel.
-                val executor = Executors.newFixedThreadPool(threadsCount)
-                val thrownFromThread = AtomicReference<Throwable?>(null)
-                val tasks = fragmentsList.zip(generationStates).map { [fragment, generationState] ->
-                    Callable {
-                        try {
-                            // Currently, it's not possible to initialize the correct thread on `PerformanceManager` creation
-                            // because new threads are spawned here when `fragment` with its `PerformanceManager` is already initialized.
-                            fragment.performanceManager?.initializeCurrentThread()
-                            runAfterLowerings(fragment, generationState)
-                        } catch (t: Throwable) {
-                            thrownFromThread.set(t)
-                        }
-                    }
-                }
-                executor.invokeAll(tasks.toList())
-                executor.shutdown()
-                executor.awaitTermination(1, TimeUnit.DAYS)
-                thrownFromThread.get()?.let { throw it }
+            fragmentsList.zip(generationStates).forEach { [fragment, generationState] ->
+                fragment.performanceManager?.initializeCurrentThread()
+                runAfterLowerings(fragment, generationState)
             }
         }
 
@@ -400,7 +373,7 @@ private fun <C : NativeBackendPhaseContext> PhaseEngine<C>.runInsertEntryPointAl
 }
 
 internal data class ModuleCompilationOutput(
-        val bitcodeFile: java.io.File,
+        val bitcodeFile: File,
         val dependenciesTrackingResult: DependenciesTrackingResult,
 )
 
@@ -414,7 +387,7 @@ internal data class ModuleCompilationOutput(
 internal fun PhaseEngine<NativeGenerationState>.compileModule(
         module: IrModuleFragment,
         irBuiltIns: IrBuiltIns,
-        bitcodeFile: java.io.File,
+        bitcodeFile: File,
         cExportFiles: CExportFiles?,
 ) {
     runBackendCodegen(module, irBuiltIns, cExportFiles)
@@ -437,7 +410,7 @@ internal fun <C : NativeBackendPhaseContext> PhaseEngine<C>.compileAndLink(
         temporaryFiles: TempFiles,
         cacheInfo: PartialCacheInfo?,
 ) {
-    val compilationResult = temporaryFiles.create(Path(outputFiles.nativeBinaryFile).name, ".o").toFile()
+    val compilationResult = temporaryFiles.create(Path(outputFiles.nativeBinaryFile).name, ".o").javaFile()
     runAndMeasurePhase(ObjectFilesPhase, ObjectFilesPhaseInput(moduleCompilationOutput.bitcodeFile, compilationResult))
     val linkerOutputKind = determineLinkerOutput(context)
     val [linkerInput, cacheBinaries] = run {
@@ -447,7 +420,7 @@ internal fun <C : NativeBackendPhaseContext> PhaseEngine<C>.compileAndLink(
                 compilationResult to ResolvedCacheBinaries(emptyList(), emptyList())
             }
             shouldPerformPreLink(context.config, resolvedCacheBinaries, linkerOutputKind) -> {
-                val prelinkResult = temporaryFiles.create("withStaticCaches", ".o").toFile()
+                val prelinkResult = temporaryFiles.create("withStaticCaches", ".o").javaFile()
                 runAndMeasurePhase(PreLinkCachesPhase, PreLinkCachesInput(listOf(compilationResult), resolvedCacheBinaries, prelinkResult))
                 // Static caches are linked into binary, so we don't need to pass them.
                 prelinkResult to ResolvedCacheBinaries(emptyList(), resolvedCacheBinaries.dynamic)

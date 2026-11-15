@@ -63,7 +63,7 @@ class K1KlibMetadataModuleDescriptorFactoryImpl {
         )
 
         if (builtIns == null) {
-            builtInsToUse.builtInsModule = moduleDescriptor
+            builtInsToUse.setBuiltInsModule(moduleDescriptor)
         }
 
         val provider = createPackageFragmentProvider(
@@ -218,7 +218,7 @@ private fun createDeserializedPackageFragments(
                 library, header, configuration, packageFqName, incompatibility = library.getIncompatibility(configuration.metadataVersion)
         )
         val parts = metadata.getPackageFragmentNames(packageFqName.asString())
-        val isBuiltInModule = moduleDescriptor.builtIns.builtInsModule === moduleDescriptor
+        val isBuiltInModule = moduleDescriptor.builtIns.getBuiltInsModule() === moduleDescriptor
         parts.map { partName ->
             if (isBuiltInModule)
                 BuiltInKlibMetadataDeserializedPackageFragment(

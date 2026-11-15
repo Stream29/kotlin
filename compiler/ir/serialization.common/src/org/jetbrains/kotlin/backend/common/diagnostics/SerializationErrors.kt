@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.diagnostics.rendering.BaseDiagnosticRendererFactory
 import org.jetbrains.kotlin.diagnostics.rendering.CommonRenderers
 import org.jetbrains.kotlin.diagnostics.rendering.Renderer
 import org.jetbrains.kotlin.diagnostics.strongWarningWithoutSource
-import org.jetbrains.kotlin.fir.analysis.diagnostics.FirDiagnosticRenderers
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.descriptors.IrBasedDeclarationDescriptor
 import org.jetbrains.kotlin.ir.descriptors.toIrBasedDescriptor
@@ -52,13 +51,15 @@ internal object KtDefaultSerializationErrorMessages : BaseDiagnosticRendererFact
 }
 
 internal object SerializationDiagnosticRenderers {
+    var declarationSymbolRenderer: ((DeclarationSymbolMarker) -> String)? = null
+
     val CONFLICTING_KLIB_SIGNATURES_DATA =
         CommonRenderers.renderConflictingSignatureData<DeclarationDescriptor, ConflictingKlibSignaturesData>(
             signatureKind = "IR",
             sortUsing = MemberComparator.INSTANCE,
             declarationRenderer = Renderer { descriptor ->
-                getDeclarationSymbol(descriptor)?.let {
-                    FirDiagnosticRenderers.SYMBOL_WITH_LOCATION.render(it).ifEmpty { null }
+                getDeclarationSymbol(descriptor)?.let { symbol ->
+                    declarationSymbolRenderer?.invoke(symbol)?.ifEmpty { null }
                 } ?: DescriptorRenderer.WITHOUT_MODIFIERS.render(descriptor)
             },
             renderSignature = { append(it.signature.render()) },

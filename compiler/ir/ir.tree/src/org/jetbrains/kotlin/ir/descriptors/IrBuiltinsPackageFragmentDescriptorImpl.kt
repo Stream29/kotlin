@@ -39,10 +39,10 @@ class IrBuiltinsPackageFragmentDescriptorImpl(
     override val annotations: Annotations = Annotations.EMPTY
 
     override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R {
-        return visitor.visitPackageFragmentDescriptor(this, data)
+        return platformVisitorResult(visitor.visitPackageFragmentDescriptor(this, data))
     }
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>) {
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
         visitor.visitPackageFragmentDescriptor(this, null)
     }
 

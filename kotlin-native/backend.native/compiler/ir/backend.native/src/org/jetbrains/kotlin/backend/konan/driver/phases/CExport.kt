@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.backend.common.phaser.createSimpleNamedCompilerPhase
 import org.jetbrains.kotlin.backend.konan.LinkKlibsContext
 import org.jetbrains.kotlin.backend.konan.cexport.*
 import org.jetbrains.kotlin.backend.konan.driver.NativeBackendPhaseContext
-import java.io.File
+import org.jetbrains.kotlin.konan.file.*
 
 internal val BuildCExports = createSimpleNamedCompilerPhase<LinkKlibsContext, K1FrontendPhaseOutput, CAdapterExportedElements>(
         "BuildCExports",

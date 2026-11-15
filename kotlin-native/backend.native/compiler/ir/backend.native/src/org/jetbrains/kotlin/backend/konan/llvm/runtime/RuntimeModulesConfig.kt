@@ -5,10 +5,11 @@
 
 package org.jetbrains.kotlin.backend.konan.llvm.runtime
 
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.*
+
 import org.jetbrains.kotlin.backend.konan.NativeSecondStageCompilationConfig
 import org.jetbrains.kotlin.konan.config.runtimeFile
-import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
 
 class RuntimeModulesConfig(private val config: NativeSecondStageCompilationConfig) {
     /**

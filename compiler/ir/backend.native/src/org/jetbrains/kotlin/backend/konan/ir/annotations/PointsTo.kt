@@ -22,7 +22,6 @@ import org.jetbrains.kotlin.name.NativeRuntimeNames
  *   3      p1.intestines -> p2
  *   4      p1.intestines -> p2.intestines
  */
-@JvmInline
 value class PointsToKind private constructor(private val value: Int) {
     val sourceIsDirect: Boolean
         get() = value < 3
@@ -43,7 +42,6 @@ value class PointsToKind private constructor(private val value: Int) {
 /**
  * A representation of `@PointsTo` annotation.
  */
-@JvmInline
 value class PointsTo private constructor(private val elements: IntArray) {
     constructor(elements: List<Int>, signatureSize: Int) : this(elements.toIntArray()) {
         assertIsValidFor(signatureSize)

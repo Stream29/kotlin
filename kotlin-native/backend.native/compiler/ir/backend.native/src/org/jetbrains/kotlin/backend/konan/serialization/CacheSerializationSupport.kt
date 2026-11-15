@@ -31,9 +31,12 @@ import org.jetbrains.kotlin.library.impl.IrArrayReader
 import org.jetbrains.kotlin.library.impl.IrArrayWriter
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
-import java.io.Reader
-import java.io.Writer
-import java.util.Properties
+import org.jetbrains.kotlin.io.readProperties
+import org.jetbrains.kotlin.konan.file.*
+import org.jetbrains.kotlin.konan.file.javaPath
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.writeLines
+import org.jetbrains.kotlin.konan.properties.Properties
 import kotlin.collections.set
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclaration as ProtoDeclaration
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrField as ProtoField
@@ -255,7 +258,7 @@ internal class ClassFieldsDeserializer(
 ) {
     private val lock = Any()
 
-    fun deserializeClassFields(irClass: IrClass, outerThisFieldInfo: ClassLayoutBuilder.FieldInfo?): List<ClassLayoutBuilder.FieldInfo> = synchronized(lock) {
+    fun deserializeClassFields(irClass: IrClass, outerThisFieldInfo: ClassLayoutBuilder.FieldInfo?): List<ClassLayoutBuilder.FieldInfo> = run {
         val signature = irClass.symbol.signature
                 ?: error("No signature for ${irClass.render()}")
         val serializedClassFields = classesFields[signature]
@@ -694,10 +697,12 @@ class CacheMetadata(
 )
 
 object CacheMetadataSerializer {
-    fun serialize(writer: Writer, metadata: CacheMetadata) {
+    fun serialize(file: File, metadata: CacheMetadata) = serialize(file.javaPath, metadata)
+
+    fun serialize(file: Path, metadata: CacheMetadata) {
         // Serializing as `Properties` prepends current date. This makes the resulting artifact
         // depend on more than just the inputs, breaking reproducibility.
-        listOfNotNull(
+        val lines = listOfNotNull(
                 "hash" to metadata.hash.toString(),
                 "host" to metadata.host.toString(),
                 "target" to metadata.target.toString(),
@@ -705,14 +710,16 @@ object CacheMetadataSerializer {
                 metadata.runtimeFingerprint?.let { "runtimeFingerprint" to it },
                 metadata.dependenciesFingerprint?.let { "dependenciesFingerprint" to it.toString() },
                 ("newCompanionInitialization" to "true").takeIf { metadata.newCompanionInitialization },
-        ).forEach { [key, value] ->
-            writer.appendLine("$key=$value")
+        ).map { [key, value] ->
+            "$key=$value"
         }
+        file.writeLines(lines)
     }
 
-    fun deserialize(reader: Reader): CacheMetadata {
-        return Properties().run {
-            load(reader)
+    fun deserialize(file: File): CacheMetadata = deserialize(file.javaPath)
+
+    fun deserialize(file: Path): CacheMetadata {
+        return file.readProperties().run {
             CacheMetadata(
                     hash = FingerprintHash.fromString(this["hash"] as String)!!,
                     host = KonanTarget.predefinedTargets[this["host"] as String]!!,

@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlin.backend.konan
 
-import org.jetbrains.kotlin.konan.target.LinkerOutputKind
-
 /**
  * Check if we should link static caches into an object file before running full linkage.
  */

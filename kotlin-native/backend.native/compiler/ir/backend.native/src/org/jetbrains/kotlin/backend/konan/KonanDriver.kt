@@ -5,29 +5,95 @@
 
 package org.jetbrains.kotlin.backend.konan
 
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.components.NativeServiceManager
+import com.intellij.openapi.extensions.NativeExtensionRegistry
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.kotlin.backend.common.reportLoadingProblemsIfAny
 import org.jetbrains.kotlin.backend.common.serialization.*
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrFile
 import org.jetbrains.kotlin.backend.konan.driver.NativeCompilerDriver
 import org.jetbrains.kotlin.cli.CliDiagnostics
 import org.jetbrains.kotlin.cli.common.config.kotlinSourceRoots
-import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.report
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.KlibAbiCompatibilityLevel
+import org.jetbrains.kotlin.config.klibAbiCompatibilityLevel
 import org.jetbrains.kotlin.config.moduleName
 import org.jetbrains.kotlin.config.zipFileSystemAccessor
 import org.jetbrains.kotlin.konan.config.*
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.library.KotlinAbiVersion
-import org.jetbrains.kotlin.library.KotlinAbiVersion.Companion.FIRST_SUPPORTED_COMPILER_VERSION
 import org.jetbrains.kotlin.library.components.irOrFail
 import org.jetbrains.kotlin.library.loader.KlibLoader
 import org.jetbrains.kotlin.library.uniqueName
 import org.jetbrains.kotlin.protobuf.ExtensionRegistryLite
+import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.util.PerformanceManager
 import org.jetbrains.kotlin.util.PhaseType
+
+enum class EnvironmentConfigFiles {
+    NATIVE_CONFIG_FILES
+}
+
+private class BackendNativeProject : NativeServiceManager(null), Project {
+    override val name: String = "KotlinNativeBackendProject"
+    override val extensionArea: NativeExtensionRegistry = NativeExtensionRegistry(this)
+    override val baseDir: VirtualFile? get() = null
+    override val basePath: String? get() = null
+    override val projectFile: VirtualFile? get() = null
+    override val projectFilePath: String? get() = null
+    override val workspaceFile: VirtualFile? get() = null
+    override val locationHash: String get() = name
+    override fun save() {}
+    override val isOpen: Boolean get() = !isDisposed
+    override val isInitialized: Boolean get() = !isDisposed
+    override fun dispose() {
+        try {
+            extensionArea.dispose()
+        } finally {
+            super.dispose()
+        }
+    }
+}
+
+class KotlinCoreEnvironment(
+        val project: Project,
+        val configuration: CompilerConfiguration
+) {
+    private val sourceFiles = mutableListOf<KtFile>()
+
+    fun getSourceFiles(): List<KtFile> = sourceFiles
+
+    fun countLinesOfCode(@Suppress("UNUSED_PARAMETER") sourceFiles: List<KtFile>): Int = 0
+
+    fun addKotlinSourceRoots(@Suppress("UNUSED_PARAMETER") roots: List<Any>) {}
+
+    companion object {
+        fun createForProduction(
+                parentDisposable: Disposable,
+                configuration: CompilerConfiguration,
+                @Suppress("UNUSED_PARAMETER") configFiles: EnvironmentConfigFiles = EnvironmentConfigFiles.NATIVE_CONFIG_FILES
+        ): KotlinCoreEnvironment {
+            val project = BackendNativeProject()
+            Disposer.register(parentDisposable, project)
+            return KotlinCoreEnvironment(project, configuration)
+        }
+    }
+}
+
+internal fun CompilerConfiguration.prohibitExportKlibToOlderAbiVersionAtSecondStage() {
+    val abiCompatibilityLevel = klibAbiCompatibilityLevel
+    if (abiCompatibilityLevel < KlibAbiCompatibilityLevel.LATEST_STABLE) {
+        report(
+                CliDiagnostics.KONAN_ARGUMENT_ERROR,
+                "Exporting KLIBs to older ABI version ($abiCompatibilityLevel) is not supported at the second stage of compilation"
+        )
+    }
+}
 
 private val softDeprecatedTargets = setOf(
         KonanTarget.LINUX_ARM32_HFP,
@@ -49,6 +115,12 @@ class KonanDriver(
         val performanceManager: PerformanceManager?,
         val compilationSpawner: CompilationSpawner
 ) {
+    constructor(
+            project: Project,
+            configuration: CompilerConfiguration,
+            performanceManager: PerformanceManager?,
+            compilationSpawner: CompilationSpawner
+    ) : this(project, KotlinCoreEnvironment(project, configuration), configuration, performanceManager, compilationSpawner)
     fun run() {
         val isCompilingFromBitcode = configuration.compileFromBitcode != null
         val hasSourceRoots = configuration.kotlinSourceRoots.isNotEmpty()
@@ -67,7 +139,7 @@ class KonanDriver(
                 configuration.makePerFileCache -> {
                     val result = KlibLoader {
                         libraryPaths(libPath)
-                        minPermittedAbiVersion(KotlinAbiVersion.FIRST_SUPPORTED, FIRST_SUPPORTED_COMPILER_VERSION)
+                        minPermittedAbiVersion(KotlinAbiVersion(1, 6, 0), "1.6.0")
                         maxPermittedAbiVersion(KotlinAbiVersion.CURRENT)
                         configuration.zipFileSystemAccessor?.let(::zipFileSystemAccessor)
                     }.load()

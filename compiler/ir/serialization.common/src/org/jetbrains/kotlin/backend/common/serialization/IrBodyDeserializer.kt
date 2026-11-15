@@ -34,7 +34,6 @@ import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.utils.addToStdlib.assignFrom
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
 import org.jetbrains.kotlin.utils.memoryOptimizedMap
-import kotlin.reflect.full.declaredMemberProperties
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrAnnotation as ProtoAnnotation
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrBlock as ProtoBlock
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrBlockBody as ProtoBlockBody
@@ -1094,12 +1093,8 @@ class IrBodyDeserializer(
          * All [IrStatementOrigin]s declared in [IrStatementOrigin.Companion], indexed by [IrStatementOrigin.debugName],
          * which is the name written to KLIBs.
          */
-        val currentStatementOriginNames: Map<String, IrStatementOrigin> by lazy {
-            IrStatementOrigin.Companion::class
-                .declaredMemberProperties
-                .mapNotNull { it.get(IrStatementOrigin.Companion) as? IrStatementOrigin }
-                .associateBy { it.debugName }
-        }
+        val currentStatementOriginNames: Map<String, IrStatementOrigin>
+            get() = nativeIrStatementOriginIndex
 
         private val statementOriginIndex: Map<String, IrStatementOrigin> by lazy {
             legacyStatementOriginNames + currentStatementOriginNames
