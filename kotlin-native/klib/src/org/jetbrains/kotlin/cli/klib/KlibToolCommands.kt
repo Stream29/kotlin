@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.ir.symbols.impl.IrFileSymbolImpl
 import org.jetbrains.kotlin.ir.types.defaultTypeWithoutArguments
 import org.jetbrains.kotlin.ir.types.makeNullable
 import org.jetbrains.kotlin.ir.util.*
-import org.jetbrains.kotlin.konan.library.components.bitcode
+import org.jetbrains.kotlin.native.interop.gen.klib.bitcode
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.library.*
 import org.jetbrains.kotlin.library.abi.*
@@ -38,8 +38,6 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.utils.Printer
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
-import java.util.*
-import kotlin.io.path.absolute
 import org.jetbrains.kotlin.metadata.ProtoBuf.PackageFragment as PackageFragmentProto
 
 internal sealed class KlibToolCommand(
@@ -104,8 +102,10 @@ internal class Info(output: KlibToolOutput, args: ParsedArguments) : KlibToolCom
             removeAll(stillRemainingEmptyPackageFQNs)
         }.sorted()
 
-        val manifestProperties: SortedMap<String, String> = args.library.manifestProperties.entries
-                .associateTo(sortedMapOf()) { it.key.toString() to it.value.toString() }
+        val manifestProperties: Map<String, String> = args.library.manifestProperties.entries
+            .map { it.key.toString() to it.value.toString() }
+            .sortedBy { it.first }
+            .toMap()
 
         output.appendLine("Full path: ${args.library.path.toRealPath()}")
         metadataHeader?.let { output.appendLine("Module name (metadata): ${it.moduleName}") }

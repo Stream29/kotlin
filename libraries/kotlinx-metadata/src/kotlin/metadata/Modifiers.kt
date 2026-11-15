@@ -25,22 +25,22 @@ public enum class Visibility(kind: Int) {
     /**
      * Signifies that the corresponding declaration is `internal`.
      */
-    INTERNAL(ProtoVisibility.INTERNAL_VALUE),
+    INTERNAL(ProtoVisibility.INTERNAL.number),
 
     /**
      * Signifies that the corresponding declaration is `private`.
      */
-    PRIVATE(ProtoVisibility.PRIVATE_VALUE),
+    PRIVATE(ProtoVisibility.PRIVATE.number),
 
     /**
      * Signifies that the corresponding declaration is `protected`.
      */
-    PROTECTED(ProtoVisibility.PROTECTED_VALUE),
+    PROTECTED(ProtoVisibility.PROTECTED.number),
 
     /**
      * Signifies that the corresponding declaration is `public`.
      */
-    PUBLIC(ProtoVisibility.PUBLIC_VALUE),
+    PUBLIC(ProtoVisibility.PUBLIC.number),
 
     /**
      * Signifies that the corresponding declaration is "private-to-this", which is a non-denotable visibility of
@@ -62,13 +62,13 @@ public enum class Visibility(kind: Int) {
      *  }
      *  ```
      */
-    PRIVATE_TO_THIS(ProtoVisibility.PRIVATE_TO_THIS_VALUE),
+    PRIVATE_TO_THIS(ProtoVisibility.PRIVATE_TO_THIS.number),
 
     /**
      * Signifies that the corresponding declaration is local, i.e., declared inside a code block,
      * and not visible from the outside.
      */
-    LOCAL(ProtoVisibility.LOCAL_VALUE)
+    LOCAL(ProtoVisibility.LOCAL.number)
     ;
 
     internal val flag = FlagImpl(ProtoFlags.VISIBILITY, kind)
@@ -83,17 +83,17 @@ public enum class Modality(kind: Int) {
     /**
      * Signifies that the corresponding declaration is `final`.
      */
-    FINAL(ProtoModality.FINAL_VALUE),
+    FINAL(ProtoModality.FINAL.number),
 
     /**
      * Signifies that the corresponding declaration is `open`.
      */
-    OPEN(ProtoModality.OPEN_VALUE),
+    OPEN(ProtoModality.OPEN.number),
 
     /**
      * Signifies that the corresponding declaration is `abstract`.
      */
-    ABSTRACT(ProtoModality.ABSTRACT_VALUE),
+    ABSTRACT(ProtoModality.ABSTRACT.number),
 
     /**
      * Signifies that the corresponding declaration is `sealed`.
@@ -101,7 +101,7 @@ public enum class Modality(kind: Int) {
      * Pay attention that this modality is not applicable to class members.
      * Setting it as a value for member modality leads to an undefined behavior.
      */
-    SEALED(ProtoModality.SEALED_VALUE)
+    SEALED(ProtoModality.SEALED.number)
     ;
 
     internal val flag = FlagImpl(ProtoFlags.MODALITY, kind)
@@ -114,37 +114,37 @@ public enum class ClassKind(kind: Int) {
     /**
      * Signifies that the corresponding class is a usual or anonymous class.
      */
-    CLASS(ProtoClassKind.CLASS_VALUE),
+    CLASS(ProtoClassKind.CLASS.number),
 
     /**
      * Signifies that the corresponding class is an `interface`.
      */
-    INTERFACE(ProtoClassKind.INTERFACE_VALUE),
+    INTERFACE(ProtoClassKind.INTERFACE.number),
 
     /**
      * Signifies that the corresponding class is an `enum class`.
      */
-    ENUM_CLASS(ProtoClassKind.ENUM_CLASS_VALUE),
+    ENUM_CLASS(ProtoClassKind.ENUM_CLASS.number),
 
     /**
      * Signifies that the corresponding class is an enum entry.
      */
-    ENUM_ENTRY(ProtoClassKind.ENUM_ENTRY_VALUE),
+    ENUM_ENTRY(ProtoClassKind.ENUM_ENTRY.number),
 
     /**
      * Signifies that the corresponding class is an `annotation class`.
      */
-    ANNOTATION_CLASS(ProtoClassKind.ANNOTATION_CLASS_VALUE),
+    ANNOTATION_CLASS(ProtoClassKind.ANNOTATION_CLASS.number),
 
     /**
      * Signifies that the corresponding class is a non-companion, singleton `object`.
      */
-    OBJECT(ProtoClassKind.OBJECT_VALUE),
+    OBJECT(ProtoClassKind.OBJECT.number),
 
     /**
      * Signifies that the corresponding class is a `companion object`.
      */
-    COMPANION_OBJECT(ProtoClassKind.COMPANION_OBJECT_VALUE)
+    COMPANION_OBJECT(ProtoClassKind.COMPANION_OBJECT.number)
     ;
 
     internal val flag = FlagImpl(ProtoFlags.CLASS_KIND, kind)
@@ -160,7 +160,7 @@ public enum class MemberKind(kind: Int) {
     /**
      * Signifies that the corresponding function or property is explicitly declared in the containing class.
      */
-    DECLARATION(ProtoMemberKind.DECLARATION_VALUE),
+    DECLARATION(ProtoMemberKind.DECLARATION.number),
 
     /**
      * Signifies that the corresponding function or property exists in the containing class because a function with a suitable
@@ -168,7 +168,7 @@ public enum class MemberKind(kind: Int) {
      * This flag is not written by the Kotlin compiler and normally cannot be encountered in binary metadata.
      * Its effects are unspecified.
      */
-    FAKE_OVERRIDE(ProtoMemberKind.FAKE_OVERRIDE_VALUE),
+    FAKE_OVERRIDE(ProtoMemberKind.FAKE_OVERRIDE.number),
 
     /**
      * Signifies that the corresponding function or property exists in the containing class because it has been produced
@@ -176,7 +176,7 @@ public enum class MemberKind(kind: Int) {
      *
      * Not to be confused with property delegation which is denoted by [KmProperty.isDelegated].
      */
-    DELEGATION(ProtoMemberKind.DELEGATION_VALUE),
+    DELEGATION(ProtoMemberKind.DELEGATION.number),
 
     /**
      * Signifies that the corresponding function or property exists in the containing class because it has been synthesized
@@ -184,7 +184,7 @@ public enum class MemberKind(kind: Int) {
      *
      * An example of such a function can be `component1()` of a data class.
      */
-    SYNTHESIZED(ProtoMemberKind.SYNTHESIZED_VALUE)
+    SYNTHESIZED(ProtoMemberKind.SYNTHESIZED.number)
     ;
 
     internal val flag = FlagImpl(ProtoFlags.MEMBER_KIND, kind)

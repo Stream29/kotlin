@@ -25,7 +25,7 @@ public class KmExtensionType(private val klass: KClass<out KmExtension>) {
         klass.hashCode()
 
     override fun toString(): String =
-        klass.java.name
+        klass.qualifiedName ?: klass.toString()
 }
 
 /**

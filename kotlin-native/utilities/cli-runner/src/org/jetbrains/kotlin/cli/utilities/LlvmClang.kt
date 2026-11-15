@@ -5,6 +5,7 @@
 package org.jetbrains.kotlin.cli.utilities
 
 import org.jetbrains.kotlin.konan.exec.Command
+import org.jetbrains.kotlin.konan.file.absolutePath
 import org.jetbrains.kotlin.konan.target.PlatformManager
 import org.jetbrains.kotlin.utils.KotlinNativePaths
 

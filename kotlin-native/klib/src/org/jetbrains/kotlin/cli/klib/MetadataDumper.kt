@@ -24,8 +24,6 @@ import org.jetbrains.kotlin.kotlinp.klib.*
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.components.metadata
 import org.jetbrains.kotlin.library.metadataVersion
-import java.util.LinkedList
-import java.util.Queue
 import kotlin.metadata.KmAnnotation
 import kotlin.metadata.KmClass
 import kotlin.metadata.KmEnumEntry
@@ -179,7 +177,7 @@ private class UltracompactKlibKotlinp : Kotlinp(
                 showVarargTypes = false,
         )
 ) {
-    private val fullyQualifiedDeclarationNamesQueue: Queue<Pair<DeclarationKind, String>> = LinkedList()
+    private val fullyQualifiedDeclarationNamesQueue = ArrayDeque<Pair<DeclarationKind, String>>()
 
     fun renderModule(moduleMetadata: KlibModuleMetadata, printer: Printer) {
         for (fragment in moduleMetadata.fragments) {
@@ -221,7 +219,7 @@ private class UltracompactKlibKotlinp : Kotlinp(
     }
 
     override fun Printer.appendName(clazz: KmClass): Printer {
-        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.poll()
+        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.removeFirst()
 
         check(declarationKind == DeclarationKind.CLASS)
         check(fullName == clazz.name)
@@ -230,7 +228,7 @@ private class UltracompactKlibKotlinp : Kotlinp(
     }
 
     override fun Printer.appendName(constructor: KmConstructor): Printer {
-        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.poll()
+        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.removeFirst()
 
         check(declarationKind == DeclarationKind.CONSTRUCTOR)
 
@@ -238,7 +236,7 @@ private class UltracompactKlibKotlinp : Kotlinp(
     }
 
     override fun Printer.appendName(function: KmFunction): Printer {
-        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.poll()
+        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.removeFirst()
 
         check(declarationKind == DeclarationKind.FUNCTION)
         check(fullName.endsWithSimpleName(function.name))
@@ -247,7 +245,7 @@ private class UltracompactKlibKotlinp : Kotlinp(
     }
 
     override fun Printer.appendName(property: KmProperty): Printer {
-        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.poll()
+        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.removeFirst()
 
         check(declarationKind == DeclarationKind.PROPERTY)
         check(fullName.endsWithSimpleName(property.name))
@@ -256,7 +254,7 @@ private class UltracompactKlibKotlinp : Kotlinp(
     }
 
     override fun Printer.appendGetterName(property: KmProperty): Printer {
-        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.poll()
+        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.removeFirst()
 
         check(declarationKind == DeclarationKind.PROPERTY_ACCESSOR)
         check(fullName.endsWith(".<get-${property.name}>"))
@@ -265,7 +263,7 @@ private class UltracompactKlibKotlinp : Kotlinp(
     }
 
     override fun Printer.appendSetterName(property: KmProperty): Printer {
-        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.poll()
+        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.removeFirst()
 
         check(declarationKind == DeclarationKind.PROPERTY_ACCESSOR)
         check(fullName.endsWith(".<set-${property.name}>"))
@@ -274,7 +272,7 @@ private class UltracompactKlibKotlinp : Kotlinp(
     }
 
     override fun Printer.appendName(typeAlias: KmTypeAlias): Printer {
-        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.poll()
+        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.removeFirst()
 
         check(declarationKind == DeclarationKind.TYPEALIAS)
         check(fullName.endsWithSimpleName(typeAlias.name))
@@ -283,7 +281,7 @@ private class UltracompactKlibKotlinp : Kotlinp(
     }
 
     override fun Printer.appendName(enumEntry: KmEnumEntry): Printer {
-        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.poll()
+        val [declarationKind, fullName] = fullyQualifiedDeclarationNamesQueue.removeFirst()
 
         check(declarationKind == DeclarationKind.ENUM_ENTRY)
         check(fullName.endsWith(".${enumEntry.name}"))

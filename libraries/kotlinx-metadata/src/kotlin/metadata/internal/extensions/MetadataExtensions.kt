@@ -6,7 +6,6 @@
 package kotlin.metadata.internal.extensions
 
 import org.jetbrains.kotlin.metadata.ProtoBuf
-import java.util.*
 import kotlin.metadata.*
 import kotlin.metadata.internal.ReadContext
 import kotlin.metadata.internal.WriteContext
@@ -90,13 +89,7 @@ public interface MetadataExtensions {
     // 'internal' is not applicable inside an interface: KT-59796
     public companion object {
         internal val INSTANCES: List<MetadataExtensions> by lazy {
-            ServiceLoader.load(MetadataExtensions::class.java, MetadataExtensions::class.java.classLoader).toList().also {
-                if (it.isEmpty()) error(
-                    "No MetadataExtensions instances found in the classpath. Please ensure that the META-INF/services/ " +
-                            "is not stripped from your application and that the Java virtual machine is not running " +
-                            "under a security manager"
-                )
-            }
+            listOf(kotlinx.metadata.klib.impl.KlibMetadataExtensions())
         }
     }
 }

@@ -6,41 +6,39 @@
 package org.jetbrains.kotlin.cli.bc
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.util.Disposer
-import org.jetbrains.annotations.NotNull
 import org.jetbrains.kotlin.CoreEnvironmentDeprecation
 import org.jetbrains.kotlin.analyzer.CompilationErrorException
 import org.jetbrains.kotlin.backend.common.linkage.partial.partialLinkageConfig
 import org.jetbrains.kotlin.backend.common.linkage.partial.setupPartialLinkageConfig
-import org.jetbrains.kotlin.backend.konan.CompilationSpawner
 import org.jetbrains.kotlin.backend.konan.KonanCompilationException
 import org.jetbrains.kotlin.backend.konan.KonanDriver
-import org.jetbrains.kotlin.backend.konan.parseBinaryOptions
 import org.jetbrains.kotlin.backend.konan.setupFromArguments
 import org.jetbrains.kotlin.cli.CliDiagnostics
 import org.jetbrains.kotlin.cli.common.*
-import org.jetbrains.kotlin.cli.common.arguments.K2NativeCompilerArguments
-import org.jetbrains.kotlin.cli.common.arguments.isNativeSecondStage
-import org.jetbrains.kotlin.cli.common.arguments.parseCommandLineArguments
+import org.jetbrains.kotlin.cli.common.arguments.*
 import org.jetbrains.kotlin.cli.common.environment.setIdeaIoUseFallback
+import org.jetbrains.kotlin.konan.file.*
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.LOGGING
 import org.jetbrains.kotlin.cli.common.messages.GroupingMessageCollector
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.cli.common.messages.MessageCollectorUtil
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
+import org.jetbrains.kotlin.cli.common.messages.GRADLE_STYLE
+import org.jetbrains.kotlin.cli.common.messages.XCODE_STYLE
 import org.jetbrains.kotlin.cli.create
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.jvm.plugins.PluginCliParser
-import org.jetbrains.kotlin.cli.jvm.plugins.PluginsLoader
 import org.jetbrains.kotlin.cli.pipeline.CheckCompilationErrors.CheckDiagnosticCollector
 import org.jetbrains.kotlin.cli.report
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.config.nativeBinaryOptions.BinaryOptions
-import org.jetbrains.kotlin.io.canonicalPathString
 import org.jetbrains.kotlin.ir.validation.IrValidationException
 import org.jetbrains.kotlin.konan.KonanPendingCompilationError
-import org.jetbrains.kotlin.konan.config.NativeConfigurationKeys
+import org.jetbrains.kotlin.konan.config.*
 import org.jetbrains.kotlin.konan.config.konanProducedArtifactKind
 import org.jetbrains.kotlin.konan.config.overrideKonanProperties
 import org.jetbrains.kotlin.metadata.deserialization.BinaryVersion
@@ -51,6 +49,7 @@ import org.jetbrains.kotlin.platform.konan.NativePlatforms
 import org.jetbrains.kotlin.progress.CompilationCanceledException
 import org.jetbrains.kotlin.progress.CompilationCanceledStatus
 import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStatus
+import org.jetbrains.kotlin.psi.impl.KotlinPsiBootstrap
 import org.jetbrains.kotlin.util.CompilerType
 import org.jetbrains.kotlin.util.PerformanceManagerImpl
 import org.jetbrains.kotlin.util.forEachStringMeasurement
@@ -119,9 +118,13 @@ class K2Native : CLICompiler<K2NativeCompilerArguments>() {
                     return ExitCode.COMPILATION_ERROR
                 }
 
-                val canceledStatus = services[CompilationCanceledStatus::class.java]
+                val canceledStatus = services[CompilationCanceledStatus::class]
                 ProgressIndicatorAndCompilationCanceledStatus.setCompilationCanceledStatus(canceledStatus)
 
+                var ownedRuntime: Disposable? = null
+                if (ApplicationManager.getApplicationOrNull() == null) {
+                    ownedRuntime = KotlinPsiBootstrap.install(PluginId.getId("org.jetbrains.kotlin.native.cli"))
+                }
                 try {
                     setIdeaIoUseFallback()
 
@@ -151,13 +154,15 @@ class K2Native : CLICompiler<K2NativeCompilerArguments>() {
                     } else {
                         throw e
                     }
+                } finally {
+                    ownedRuntime?.dispose()
                 }
             }
         } catch (_: CompilationErrorException) {
             return ExitCode.COMPILATION_ERROR
         } catch (t: Throwable) {
             MessageCollectorUtil.reportException(collector, t)
-            return if (t is OutOfMemoryError || t.hasOOMCause()) ExitCode.OOM_ERROR else ExitCode.INTERNAL_ERROR
+            return if (t.hasOOMCause()) ExitCode.OOM_ERROR else ExitCode.INTERNAL_ERROR
         } finally {
             collector.flush()
         }
@@ -168,10 +173,10 @@ class K2Native : CLICompiler<K2NativeCompilerArguments>() {
     }
 
     private fun doExecute(
-        @NotNull arguments: K2NativeCompilerArguments,
-        @NotNull configuration: CompilerConfiguration,
-        @NotNull rootDisposable: Disposable,
-        services: Services,
+        arguments: K2NativeCompilerArguments,
+        configuration: CompilerConfiguration,
+        rootDisposable: Disposable,
+        @Suppress("UNUSED_PARAMETER") services: Services,
     ): ExitCode {
 
         if (arguments.version) {
@@ -187,7 +192,6 @@ class K2Native : CLICompiler<K2NativeCompilerArguments>() {
                 arguments.pluginOrderConstraints,
                 configuration,
                 rootDisposable,
-                services[PluginsLoader::class.java],
             )
             if (pluginLoadResult != ExitCode.OK) return pluginLoadResult
 
@@ -206,7 +210,7 @@ class K2Native : CLICompiler<K2NativeCompilerArguments>() {
             // - intermediate Klib is compiled to binary by K2/Native backend
             if (isOneStageCompilation(arguments)) {
                 val intermediateKlib = createIntermediateKlib()
-                val klibArgs = prepareKlibArgumentsForOneStage(arguments, intermediateKlib.canonicalPathString())
+                val klibArgs = prepareKlibArgumentsForOneStage(arguments, intermediateKlib.absolutePathString())
                 val klibCompilationExitCode = doExecutePhasedKlibCompilation(
                     klibArgs, Services.EMPTY, @OptIn(MessageCollectorAccess::class) configuration.messageCollector,
                     isOneStageCompilation = true
@@ -280,8 +284,9 @@ class K2Native : CLICompiler<K2NativeCompilerArguments>() {
         rootDisposable: Disposable,
     ) {
         val perfManager = configuration.perfManager
+        val backendEnvironment = org.jetbrains.kotlin.backend.konan.KotlinCoreEnvironment(environment.project, configuration)
 
-        val konanDriver = KonanDriver(environment.project, environment, configuration, perfManager) { arguments, setupConfiguration ->
+        val konanDriver = KonanDriver(environment.project, backendEnvironment, configuration, perfManager) { arguments, setupConfiguration ->
             val spawnedArguments = K2NativeCompilerArguments()
             parseCommandLineArguments(arguments, spawnedArguments)
             val spawnedConfiguration = CompilerConfiguration.create()
@@ -340,11 +345,11 @@ class K2Native : CLICompiler<K2NativeCompilerArguments>() {
             // A little hack: produce == null is assumed to be treated as produce == "program" later in the pipeline.
             val producingExecutable = produce == null || produce == "program"
             // KT-68673: It is legal to store entry point in one of the libraries.
-            if (producingExecutable && libraries.isNotEmpty()) {
+            if (producingExecutable && !libraries.isNullOrEmpty()) {
                 return true
             }
-            return includes.isNotEmpty()
-                    || exportedLibraries.isNotEmpty()
+            return !includes.isNullOrEmpty()
+                    || !exportedLibraries.isNullOrEmpty()
                     || libraryToAddToCache != null
                     || !compileFromBitcode.isNullOrEmpty()
         }
@@ -354,14 +359,12 @@ class K2Native : CLICompiler<K2NativeCompilerArguments>() {
     override fun executableScriptFileName() = "kotlinc-native"
 
     companion object {
-        @JvmStatic
         fun main(args: Array<String>) {
             profile("Total compiler main()") {
                 doMain(K2Native(), args)
             }
         }
 
-        @JvmStatic
         fun mainNoExit(args: Array<String>) {
             profile("Total compiler main()") {
                 if (doMainNoExit(K2Native(), args) != ExitCode.OK) {
@@ -370,7 +373,6 @@ class K2Native : CLICompiler<K2NativeCompilerArguments>() {
             }
         }
 
-        @JvmStatic
         fun mainNoExitWithRenderer(args: Array<String>, messageRenderer: MessageRenderer) {
             profile("Total compiler main()") {
                 if (doMainNoExit(K2Native(), args, messageRenderer) != ExitCode.OK) {
@@ -396,7 +398,7 @@ typealias BinaryOptionWithValue<T> = org.jetbrains.kotlin.config.nativeBinaryOpt
 fun parseBinaryOptions(
     arguments: K2NativeCompilerArguments,
     configuration: CompilerConfiguration,
-): List<BinaryOptionWithValue<*>> = parseBinaryOptions(arguments, configuration)
+): List<BinaryOptionWithValue<*>> = org.jetbrains.kotlin.backend.konan.parseBinaryOptions(arguments, configuration)
 
 fun main(args: Array<String>) = K2Native.main(args)
 fun mainNoExitWithGradleRenderer(args: Array<String>) = K2Native.mainNoExitWithRenderer(args, MessageRenderer.GRADLE_STYLE)

@@ -11,13 +11,13 @@ import org.jetbrains.kotlin.cli.pipeline.PerformanceNotifications
 import org.jetbrains.kotlin.cli.pipeline.PipelinePhase
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.io.canonicalPathString
+import org.jetbrains.kotlin.library.KlibPath as Path
 import org.jetbrains.kotlin.konan.config.konanGeneratedHeaderKlibPath
 import org.jetbrains.kotlin.native.FirSerializerInput
 import org.jetbrains.kotlin.native.KlibWriterInput
 import org.jetbrains.kotlin.native.NativeFirstStagePhaseContext
 import org.jetbrains.kotlin.native.firSerializerBase
 import org.jetbrains.kotlin.native.writeKlib
-import kotlin.io.path.Path
 
 /**
  * Serialization phase for native klib compilation.

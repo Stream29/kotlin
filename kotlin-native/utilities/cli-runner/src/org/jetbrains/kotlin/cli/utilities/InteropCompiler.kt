@@ -6,16 +6,15 @@ package org.jetbrains.kotlin.cli.utilities
 
 import org.jetbrains.kotlin.cli.common.arguments.K2NativeCompilerArguments
 import org.jetbrains.kotlin.cli.common.arguments.cliArgument
+import org.jetbrains.kotlin.konan.file.absolutePath
 import org.jetbrains.kotlin.konan.target.PlatformManager
-import org.jetbrains.kotlin.utils.KotlinNativePaths
+import org.jetbrains.kotlin.library.Path
 import org.jetbrains.kotlin.native.interop.gen.jvm.InternalInteropOptions
 import org.jetbrains.kotlin.native.interop.gen.jvm.Interop
 import org.jetbrains.kotlin.native.interop.tool.*
-import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.pathString
+import org.jetbrains.kotlin.utils.KotlinNativePaths
 
-// TODO: this function should eventually be eliminated from 'utilities'. 
+// TODO: this function should eventually be eliminated from 'utilities'.
 // The interaction of interop and the compiler should be streamlined.
 
 /**
@@ -39,23 +38,27 @@ fun invokeInterop(flavor: String, args: Array<String>, runFromDaemon: Boolean): 
     val generatedDir = buildDir.resolve("kotlin")
     val nativesDir = buildDir.resolve("natives")
     val manifest = buildDir.resolve("manifest.properties")
-    val cstubsName ="cstubs"
+    val cstubsName = "cstubs"
     val libraries = arguments.library
     val targetRequest = arguments.target
     val target = PlatformManager(
         KotlinNativePaths.homePath.absolutePath,
-        konanDataDir = arguments.konanDataDir).targetManager(targetRequest).target
+        konanDataDir = arguments.konanDataDir
+    ).targetManager(targetRequest).target
 
-    val cinteropArgsToCompiler = Interop().interop("native", args,
-            InternalInteropOptions(generatedDir.absolutePathString(),
-                    nativesDir.absolutePathString(), manifest.pathString,
-                    cstubsName
-            ),
-            runFromDaemon
+    val cinteropArgsToCompiler = Interop().interop(
+        "native", args,
+        InternalInteropOptions(
+            generatedDir.absolutePathString(),
+            nativesDir.absolutePathString(),
+            manifest.pathString,
+            cstubsName
+        ),
+        runFromDaemon
     ) ?: return null // There is no need in compiler invocation if we're generating only metadata.
 
     val nativeStubs =
-            arrayOf("-native-library", nativesDir.resolve("$cstubsName.bc").pathString)
+        arrayOf("-native-library", nativesDir.resolve("$cstubsName.bc").pathString)
 
     return arrayOf(
         generatedDir.pathString,
@@ -64,7 +67,8 @@ fun invokeInterop(flavor: String, args: Array<String>, runFromDaemon: Boolean): 
         "-target", target.visibleName,
         "-manifest", manifest.pathString,
         "-opt-in=kotlin.native.SymbolNameIsInternal",
-        "-Xtemporary-files-dir=$temporaryFilesDir") +
+        "-Xtemporary-files-dir=$temporaryFilesDir"
+    ) +
         nativeStubs +
         cinteropArgsToCompiler +
         libraries.flatMap { listOf("-library", it) } +
@@ -74,5 +78,3 @@ fun invokeInterop(flavor: String, args: Array<String>, runFromDaemon: Boolean): 
         shortModuleName?.let { arrayOf("${K2NativeCompilerArguments::shortModuleName.cliArgument}=$it") }.orEmpty() +
         arguments.kotlincOption
 }
-
-

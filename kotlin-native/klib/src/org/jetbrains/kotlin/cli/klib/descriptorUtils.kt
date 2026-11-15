@@ -23,6 +23,6 @@ internal fun createFakeModuleDescriptor(library: KotlinLibrary): ModuleDescripto
             capabilities = mapOf(KlibModuleOrigin.CAPABILITY to DeserializedKlibModuleOrigin(library)),
     )
     moduleDescriptor.setDependencies(moduleDescriptor)
-    builtIns.builtInsModule = moduleDescriptor
+    builtIns.setBuiltInsModule(moduleDescriptor)
     return moduleDescriptor
 }

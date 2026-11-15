@@ -24,7 +24,7 @@ public fun ProtoBuf.Annotation.readAnnotation(strings: NameResolver): KmAnnotati
     )
 
 public fun ProtoBuf.Annotation.Argument.Value.readAnnotationArgument(strings: NameResolver): KmAnnotationArgument? {
-    if (Flags.IS_UNSIGNED[flags]) {
+    if (Flags.IS_UNSIGNED.get(flags)) {
         return when (type) {
             BYTE -> KmAnnotationArgument.UByteValue(intValue.toByte().toUByte())
             SHORT -> KmAnnotationArgument.UShortValue(intValue.toShort().toUShort())

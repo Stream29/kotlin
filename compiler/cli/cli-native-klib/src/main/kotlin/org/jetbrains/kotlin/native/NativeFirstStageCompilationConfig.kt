@@ -15,7 +15,6 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.config.moduleName
 import org.jetbrains.kotlin.config.perfManager
-import org.jetbrains.kotlin.io.readProperties
 import org.jetbrains.kotlin.ir.IrDiagnosticReporter
 import org.jetbrains.kotlin.ir.KtDiagnosticReporterWithImplicitIrBasedContext
 import org.jetbrains.kotlin.konan.config.konanManifestAddend
@@ -23,9 +22,9 @@ import org.jetbrains.kotlin.konan.config.konanTarget
 import org.jetbrains.kotlin.konan.target.HostManager
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.util.PerformanceManager
-import java.util.Properties
-import kotlin.io.path.Path
-import kotlin.io.path.name
+import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.properties.Properties
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 class NativeFirstStageCompilationConfig private constructor(
     override val configuration: CompilerConfiguration,
@@ -38,7 +37,7 @@ class NativeFirstStageCompilationConfig private constructor(
 
     override val manifestProperties: Properties?
         get() = configuration.konanManifestAddend?.let {
-            Path(it).readProperties()
+            Properties().apply { load(File(it).readBytes()) }
         }
 
     fun withConfiguration(newConfiguration: CompilerConfiguration): NativeFirstStageCompilationConfig {

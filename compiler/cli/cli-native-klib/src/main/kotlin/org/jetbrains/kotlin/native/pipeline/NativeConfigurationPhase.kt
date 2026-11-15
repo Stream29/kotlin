@@ -11,9 +11,7 @@ import org.jetbrains.kotlin.backend.common.linkage.partial.setupPartialLinkageCo
 import org.jetbrains.kotlin.backend.konan.NativeBackendDiagnostics
 import org.jetbrains.kotlin.cli.CliDiagnostics.KONAN_ARGUMENT_ERROR
 import org.jetbrains.kotlin.cli.CliDiagnostics.KONAN_ARGUMENT_STRONG_WARNING
-import org.jetbrains.kotlin.cli.common.arguments.K2NativeCompilerArguments
-import org.jetbrains.kotlin.cli.common.arguments.cliArgument
-import org.jetbrains.kotlin.cli.common.arguments.isNativeSecondStage
+import org.jetbrains.kotlin.cli.common.arguments.*
 import org.jetbrains.kotlin.cli.common.checkForUnexpectedKlibLibraries
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
 import org.jetbrains.kotlin.cli.common.config.kotlinSourceRoots
@@ -31,9 +29,13 @@ import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.konan.target.isCache
 import org.jetbrains.kotlin.metadata.deserialization.BinaryVersion
 import org.jetbrains.kotlin.metadata.deserialization.MetadataVersion
-import org.jetbrains.kotlin.platform.konan.NativePlatforms
+import org.jetbrains.kotlin.platform.konan.*
 import org.jetbrains.kotlin.utils.addIfNotNull
-import java.io.File
+import org.jetbrains.kotlin.konan.file.File
+import org.jetbrains.kotlin.konan.file.toPath
+
+private val pathSeparator: String
+    get() = if (Platform.osFamily == OsFamily.WINDOWS) ";" else ":"
 
 /**
  * Configuration phase for native klib compilation pipeline.
@@ -84,10 +86,10 @@ object NativeKlibConfigurationUpdater : ConfigurationUpdater<K2NativeCompilerArg
     }
 
     private fun CompilerConfiguration.setupSources(arguments: K2NativeCompilerArguments) {
-        val commonSources = arguments.commonSources.toSet().map { File(it).absoluteFile.normalize() }
+        val commonSources = arguments.commonSources.toSet().map { File(it).toPath().toAbsolutePath().normalize() }
         val hmppModuleStructure = this[CommonConfigurationKeys.HMPP_MODULE_STRUCTURE]
         arguments.freeArgs.forEach { path ->
-            val normalizedPath = File(path).absoluteFile.normalize()
+            val normalizedPath = File(path).toPath().toAbsolutePath().normalize()
             addKotlinSourceRoot(path, normalizedPath in commonSources, hmppModuleStructure?.getModuleNameForSource(path))
         }
     }
@@ -129,7 +131,7 @@ object NativeKlibConfigurationUpdater : ConfigurationUpdater<K2NativeCompilerArg
         val regularLibraries = arguments.libraries.toList()
 
         arguments.friendModules?.let {
-            konanFriendLibraries = it.split(File.pathSeparator).filterNot(String::isEmpty)
+            konanFriendLibraries = it.split(pathSeparator).filterNot(String::isEmpty)
             checkForUnexpectedKlibLibraries(
                 librariesToCheck = konanFriendLibraries,
                 librariesToCheckArgument = K2NativeCompilerArguments::friendModules.cliArgument,
@@ -198,7 +200,7 @@ object NativeKlibConfigurationUpdater : ConfigurationUpdater<K2NativeCompilerArg
 
     private fun CompilerConfiguration.parseManifestNativeTargets(targetStrings: Array<String>): List<KonanTarget> {
         val trimmedTargetStrings = targetStrings.map { it.trim() }
-        val [recognizedTargetNames, unrecognizedTargetNames] = trimmedTargetStrings.partition {
+        val (recognizedTargetNames, unrecognizedTargetNames) = trimmedTargetStrings.partition {
             it in KonanTarget.predefinedTargets.keys
         }
 

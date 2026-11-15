@@ -45,7 +45,7 @@ class KlibMetadataVersion(val major: Int, val minor: Int, val patch: Int) : Comp
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other == null || this::class != other::class) return false
 
         other as KlibMetadataVersion
 

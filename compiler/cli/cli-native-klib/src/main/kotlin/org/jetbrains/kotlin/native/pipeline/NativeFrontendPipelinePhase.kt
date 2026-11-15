@@ -23,11 +23,11 @@ import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
 import org.jetbrains.kotlin.fir.pipeline.*
 import org.jetbrains.kotlin.fir.resolve.ImplicitIntegerCoercionModuleCapability
 import org.jetbrains.kotlin.konan.config.konanPrintFiles
+import org.jetbrains.kotlin.konan.file.absolutePath
 import org.jetbrains.kotlin.library.metadata.isCInteropLibrary
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.native.NativeFirstStageCompilationConfig
 import org.jetbrains.kotlin.native.NativeFirstStagePhaseContext
-import kotlin.io.path.absolutePathString
 
 object NativeFrontendPipelinePhase : PipelinePhase<ConfigurationPipelineArtifact, NativeFrontendArtifact>(
     name = "NativeFrontendPhase",
@@ -46,7 +46,12 @@ object NativeFrontendPipelinePhase : PipelinePhase<ConfigurationPipelineArtifact
             EnvironmentConfigFiles.NATIVE_CONFIG_FILES
         )
 
-        val firOutput = phaseContext.firFrontend(environment, configuration)
+        val app = com.intellij.openapi.application.ApplicationManager.getApplicationOrNull()
+        val firOutput = if (app != null && !app.isReadAccessAllowed) {
+            app.runReadAction { phaseContext.firFrontend(environment, configuration) }
+        } else {
+            phaseContext.firFrontend(environment, configuration)
+        }
         return NativeFrontendArtifact(
             firOutput,
             configuration = configuration,
@@ -68,7 +73,7 @@ object NativeFrontendPipelinePhase : PipelinePhase<ConfigurationPipelineArtifact
         val mainModuleName = Name.special("<${config.moduleId}>")
         files.forEach { checkSyntaxErrors(it) }
         val dependencyList = DependencyListForCliModule.build {
-            val [interopLibs, regularLibs] = config.loadedKlibs.all.partition { it.isCInteropLibrary() }
+            val (interopLibs, regularLibs) = config.loadedKlibs.all.partition { it.isCInteropLibrary() }
             defaultDependenciesSet(mainModuleName) {
                 dependencies(regularLibs.map { it.path.absolutePathString() })
                 friendDependencies(config.loadedKlibs.friends.map { it.path.absolutePathString() })
@@ -97,7 +102,9 @@ object NativeFrontendPipelinePhase : PipelinePhase<ConfigurationPipelineArtifact
             fileBelongsToModule = fileBelongsToModule,
         )
 
-        val outputs = sessionsWithSources.map { (val session, val sources = files) ->
+        val outputs = sessionsWithSources.map { sessionWithSources ->
+            val session = sessionWithSources.session
+            val sources = sessionWithSources.files
             buildResolveAndCheckFir(session, sources, configuration.diagnosticsCollector).also {
                 if (config.configuration.konanPrintFiles) {
                     it.fir.forEach { file -> println(file.render()) }

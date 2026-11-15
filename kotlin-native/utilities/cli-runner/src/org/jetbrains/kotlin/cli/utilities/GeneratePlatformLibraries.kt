@@ -2,39 +2,33 @@
  * Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the LICENSE file.
  */
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 
 package org.jetbrains.kotlin.cli.utilities
 
-import org.jetbrains.kotlin.cli.bc.K2Native
-import java.util.concurrent.*
 import kotlinx.cli.*
 import org.jetbrains.kotlin.backend.konan.CachedLibraries
 import org.jetbrains.kotlin.backend.konan.OutputFiles
-import org.jetbrains.kotlin.backend.konan.files.renameAtomic
+import org.jetbrains.kotlin.cli.bc.K2Native
+import org.jetbrains.kotlin.konan.file.absolutePath
 import org.jetbrains.kotlin.konan.target.*
-import org.jetbrains.kotlin.utils.KotlinNativePaths
-import org.jetbrains.kotlin.konan.util.PlatformLibsInfo
 import org.jetbrains.kotlin.konan.util.visibleName
+import org.jetbrains.kotlin.library.KlibPath as Path
+import org.jetbrains.kotlin.library.*
+import org.jetbrains.kotlin.library.createDirectories
+import org.jetbrains.kotlin.library.createTempDirectory
+import org.jetbrains.kotlin.library.createTempFile
+import org.jetbrains.kotlin.library.forEachLine
 import org.jetbrains.kotlin.native.interop.gen.jvm.parseKeyValuePairs
 import org.jetbrains.kotlin.native.interop.tool.SHORT_MODULE_NAME
-import org.jetbrains.kotlin.io.listDirectoryEntriesIfDirectoryExists
-import java.io.PrintWriter
-import java.io.StringWriter
-import java.nio.file.Files
-import java.util.concurrent.atomic.AtomicInteger
-import kotlin.system.exitProcess
+import org.jetbrains.kotlin.utils.KotlinNativePaths
 import org.jetbrains.kotlin.utils.usingNativeMemoryAllocator
-import java.nio.file.Path
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.Path
-import kotlin.io.path.absolute
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.createDirectories
-import kotlin.io.path.deleteRecursively
-import kotlin.io.path.exists
-import kotlin.io.path.extension
-import kotlin.io.path.forEachLine
-import kotlin.io.path.name
+import platform.posix.rename
+import kotlin.system.exitProcess
+
+private object PlatformLibsInfo {
+    const val namePrefix = "org.jetbrains.kotlin.native.platform."
+}
 
 // TODO: We definitely need to unify logging in different parts of the compiler.
 private class Logger(val level: Level = Level.NORMAL) {
@@ -56,7 +50,7 @@ private class Logger(val level: Level = Level.NORMAL) {
 
 private fun Logger.logFailedLibraries(built: Map<DefFile, ProcessingStatus>) {
     log("Processing platform libraries finished with errors.")
-    built.forEach { [def, status] ->
+    built.forEach { (def, status) ->
         if (status is ProcessingStatus.FAIL) {
             log("    ${def.name}: ${status.error}")
         }
@@ -64,9 +58,7 @@ private fun Logger.logFailedLibraries(built: Map<DefFile, ProcessingStatus>) {
 }
 
 private fun Logger.logStackTrace(error: Throwable) {
-    val stringWriter = StringWriter()
-    error.printStackTrace(PrintWriter(stringWriter))
-    verbose(stringWriter.toString())
+    verbose(error.stackTraceToString())
 }
 
 private enum class CacheKind(val outputKind: CompilerOutputKind) {
@@ -148,13 +140,13 @@ fun generatePlatformLibraries(args: Array<String>) = usingNativeMemoryAllocator 
     val targetCacheArgs = platformManager.let {
         target.let(it::loader).additionalCacheFlags
     }
-    val inputDirectory = inputDirectoryPath?.let(::Path)
+    val inputDirectory = inputDirectoryPath?.let { Path(it) }
             ?: Path(distribution.konanSubdir, "platformDef", target.visibleName)
 
-    val outputDirectory = outputDirectoryPath?.let(::Path)
+    val outputDirectory = outputDirectoryPath?.let { Path(it) }
             ?: Path(distribution.klib, "platform", target.visibleName)
 
-    val cacheDirectory = cacheDirectoryPath?.let(::Path)
+    val cacheDirectory = cacheDirectoryPath?.let { Path(it) }
 
     if (!inputDirectory.exists()) throw Error("input directory doesn't exist")
     if (!outputDirectory.exists()) {
@@ -164,7 +156,7 @@ fun generatePlatformLibraries(args: Array<String>) = usingNativeMemoryAllocator 
         cacheDirectory.createDirectories()
     }
 
-    val stdlibFile = stdlibPath?.let(::Path) ?: Path(distribution.stdlib)
+    val stdlibFile = stdlibPath?.let { Path(it) } ?: Path(distribution.stdlib)
 
     val logger = Logger(if (verbose) Logger.Level.VERBOSE else Logger.Level.NORMAL)
 
@@ -194,9 +186,9 @@ fun generatePlatformLibraries(args: Array<String>) = usingNativeMemoryAllocator 
 }
 
 private sealed class ProcessingStatus {
-    object WAIT: ProcessingStatus()
-    object SUCCESS: ProcessingStatus()
-    object FAILED_DEPENDENCIES: ProcessingStatus()
+    object WAIT : ProcessingStatus()
+    object SUCCESS : ProcessingStatus()
+    object FAILED_DEPENDENCIES : ProcessingStatus()
     class FAIL(val error: Throwable) : ProcessingStatus()
 }
 
@@ -214,13 +206,18 @@ private class DefFile(val name: String, val depends: MutableList<DefFile>) {
         get() = name
 }
 
-private fun createTempDir(prefix: String, parent: Path): Path = Files.createTempDirectory(parent.absolute(), prefix)
+private fun renameAtomic(from: String, to: String, replaceExisting: Boolean): Boolean {
+    if (!replaceExisting && Path(to).exists()) return false
+    return rename(from, to) == 0
+}
 
-@OptIn(ExperimentalPathApi::class)
+private fun createTempDir(prefix: String, parent: Path): Path =
+    createTempDirectory(parent.absolute(), prefix)
+
 private fun Path.deleteAtomicallyIfPossible(tmpDirectory: Path) {
     // Try to atomically delete the old directory.
-    val tmpToDelete = Files.createTempFile(tmpDirectory.absolute(), null, null).toFile()
-    if (renameAtomic(this.absolutePathString(), tmpToDelete.absolutePath, replaceExisting = true)) {
+    val tmpToDelete = createTempFile(tmpDirectory.absolute(), "delete-", "")
+    if (renameAtomic(this.absolutePathString(), tmpToDelete.absolutePathString(), replaceExisting = true)) {
         tmpToDelete.deleteRecursively()
     } else {
         // Can't move to a tmp directory -> delete in a regular way.
@@ -253,7 +250,6 @@ private fun topoSort(defFiles: List<DefFile>): List<DefFile> {
     return result
 }
 
-@OptIn(ExperimentalPathApi::class)
 private fun generateLibrary(
         target: KonanTarget,
         cinteropOptions: CInteropOptions,
@@ -283,7 +279,7 @@ private fun generateLibrary(
                 "-Xdisable-experimental-annotation",
                 *cinteropOptions.additionalArguments.toTypedArray(),
                 "-$SHORT_MODULE_NAME", def.shortLibraryName,
-                *def.depends.flatMap { listOf("-l", "$outputDirectory/${it.libraryName}") }.toTypedArray()
+                *def.depends.flatMap { listOf("-l", "${outputDirectory.pathString}/${it.libraryName}") }.toTypedArray()
         )
         logger.verbose("Run cinterop with args: ${cinteropArgs.joinToString(separator = " ")}")
         invokeInterop("native", cinteropArgs, runFromDaemon = false)?.let { K2Native.mainNoExit(it) }
@@ -312,7 +308,6 @@ private fun getLibraryCacheDir(
     return OutputFiles(cacheDirectory.resolve(cacheBaseName).absolutePathString(), target, cacheOutputKind).mainFile
 }
 
-@OptIn(ExperimentalPathApi::class)
 private fun buildCache(
         target: KonanTarget,
         def: DefFile,
@@ -368,7 +363,6 @@ private fun buildStdlibCache(
     K2Native.mainNoExit(compilerArgs)
 }
 
-@OptIn(ExperimentalPathApi::class)
 private fun generatePlatformLibraries(
         target: KonanTarget,
         cinteropOptions: CInteropOptions,
@@ -383,19 +377,12 @@ private fun generatePlatformLibraries(
         buildStdlibCache(target, stdlib, cacheInfo, logger)
     }
 
-    logger.verbose("Generating platform libraries from $inputDirectory to $outputDirectory for ${target.visibleName}")
+    logger.verbose("Generating platform libraries from ${inputDirectory.pathString} to ${outputDirectory.pathString} for ${target.visibleName}")
     if (cacheInfo != null) {
-        logger.verbose("Precompiling platform libraries to ${cacheInfo.cacheDirectory} (cache kind: ${cacheInfo.cacheKind})")
+        logger.verbose("Precompiling platform libraries to ${cacheInfo.cacheDirectory.pathString} (cache kind: ${cacheInfo.cacheKind})")
     }
 
     val tmpDirectory = createTempDir("build-", outputDirectory)
-    // Delete the tmp directory in case of execution interruption.
-    val deleteTmpHook = Thread {
-        if (!saveTemps) {
-            tmpDirectory.deleteRecursively()
-        }
-    }
-    Runtime.getRuntime().addShutdownHook(deleteTmpHook)
 
     // Build dependencies graph.
     val defFiles = mutableMapOf<String, DefFile>()
@@ -417,46 +404,31 @@ private fun generatePlatformLibraries(
         }
     }
     val sorted = topoSort(defFiles.values.toList())
-    val numCores = Runtime.getRuntime().availableProcessors()
-    val executorPool = ThreadPoolExecutor(numCores, numCores,
-            10, TimeUnit.SECONDS, ArrayBlockingQueue(1000),
-            Executors.defaultThreadFactory(), RejectedExecutionHandler { r, _ ->
-        logger.log("Execution rejected: $r")
-        throw Error("Must not happen!")
-    })
-    val built = ConcurrentHashMap(sorted.associateWith<DefFile, ProcessingStatus> { ProcessingStatus.WAIT })
+    val built = sorted.associateWithTo(mutableMapOf<DefFile, ProcessingStatus>()) { ProcessingStatus.WAIT }
     // Now run interop tool on toposorted dependencies.
     val countTotal = sorted.size
-    val countProcessed = AtomicInteger(0)
+    var countProcessed = 0
     try {
         tmpDirectory.createDirectories()
         sorted.forEach { def ->
-            executorPool.execute {
-                // A bit ugly, we just block here until all dependencies are built.
-                while (def.depends.any { built[it] == ProcessingStatus.WAIT }) {
-                    Thread.sleep(100)
+            try {
+                if (def.depends.any { built[it] is ProcessingStatus.FAIL || built[it] is ProcessingStatus.FAILED_DEPENDENCIES }) {
+                    built[def] = ProcessingStatus.FAILED_DEPENDENCIES
+                    return@forEach
                 }
-                try {
-                    if (def.depends.any { built[it] is ProcessingStatus.FAIL }) {
-                        built[def] = ProcessingStatus.FAILED_DEPENDENCIES
-                        return@execute
-                    }
 
-                    logger.log("Processing ${def.name} (${countProcessed.incrementAndGet()}/$countTotal)...")
-                    generateLibrary(target, cinteropOptions, def, directories, tmpDirectory, rebuild, logger)
-                    if (cacheInfo != null) {
-                        buildCache(target, def, outputDirectory, cacheInfo, rebuild, logger, konanDataDir)
-                    }
-
-                    built[def] = ProcessingStatus.SUCCESS
-                } catch (e: Throwable) {
-                    built[def] = ProcessingStatus.FAIL(e)
-                    logger.logStackTrace(e)
+                logger.log("Processing ${def.name} (${++countProcessed}/$countTotal)...")
+                generateLibrary(target, cinteropOptions, def, directories, tmpDirectory, rebuild, logger)
+                if (cacheInfo != null) {
+                    buildCache(target, def, outputDirectory, cacheInfo, rebuild, logger, konanDataDir)
                 }
+
+                built[def] = ProcessingStatus.SUCCESS
+            } catch (e: Throwable) {
+                built[def] = ProcessingStatus.FAIL(e)
+                logger.logStackTrace(e)
             }
         }
-        executorPool.shutdown()
-        executorPool.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS)
 
         if (built.values.any { it != ProcessingStatus.SUCCESS }) {
             logger.logFailedLibraries(built)
@@ -467,6 +439,8 @@ private fun generatePlatformLibraries(
         if (!saveTemps) {
             tmpDirectory.deleteRecursively()
         }
-        Runtime.getRuntime().removeShutdownHook(deleteTmpHook)
     }
 }
+
+private fun Path.listDirectoryEntriesIfDirectoryExists(): List<Path> =
+    if (isDirectory()) listDirectoryEntries() else emptyList()

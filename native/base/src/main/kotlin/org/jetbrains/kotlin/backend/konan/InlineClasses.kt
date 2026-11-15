@@ -100,7 +100,6 @@ abstract class InlineClassesSupport<Class : Any, Type : Any> {
     protected abstract fun getName(clazz: Class): Name?
     abstract fun isTopLevelClass(clazz: Class): Boolean
 
-    @JvmName("classIsInlined")
     fun isInlined(clazz: Class): Boolean = getInlinedClass(clazz) != null
     fun isInlined(type: Type): Boolean = getInlinedClass(type) != null
 
@@ -147,7 +146,6 @@ abstract class InlineClassesSupport<Class : Any, Type : Any> {
         }
     }
 
-    @JvmName("classGetInlinedClass")
     private fun getInlinedClass(clazz: Class): Class? =
         if (hasInlineModifier(clazz) || isImplicitInlineClass(clazz)) {
             clazz
@@ -235,7 +233,7 @@ object KotlinTypeInlineClassesSupport : InlineClassesSupport<ClassDescriptor, Ko
     // Like `IrTypeInlineClassesSupport`, this treats full value classes compatible with inline classes as inline classes.
     @OptIn(ValueClassBackendAgnosticApi::class)
     override fun hasInlineModifier(clazz: ClassDescriptor): Boolean =
-        clazz.valueClassRepresentation?.interpretAsInlineClassRepresentationOrNull(treatCompatibleFullValueClassesAsInline = true) {
+        clazz.getValueClassRepresentation()?.interpretAsInlineClassRepresentationOrNull(treatCompatibleFullValueClassesAsInline = true) {
             clazz.getSuperClassNotAny() != null
         } != null
 

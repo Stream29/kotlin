@@ -17,7 +17,6 @@
 package org.jetbrains.kotlin.compiler.plugin
 
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
-import java.util.regex.Pattern
 
 interface AbstractCliOption {
     val optionName: String
@@ -76,23 +75,13 @@ data class CliOptionValue(
 }
 
 fun parseLegacyPluginOption(argumentValue: String): CliOptionValue? {
-    val pattern = Pattern.compile("""^plugin:([^:]*):([^=]*)=(.*)$""")
-    val matcher = pattern.matcher(argumentValue)
-    if (matcher.matches()) {
-        return CliOptionValue(matcher.group(1), matcher.group(2), matcher.group(3))
-    }
-
-    return null
+    val match = Regex("""^plugin:([^:]*):([^=]*)=(.*)$""").matchEntire(argumentValue) ?: return null
+    return CliOptionValue(match.groupValues[1], match.groupValues[2], match.groupValues[3])
 }
 
 fun parseModernPluginOption(argumentValue: String): CliOptionValue? {
-    val pattern = Pattern.compile("""^([^=]*)=(.*)$""")
-    val matcher = pattern.matcher(argumentValue)
-    if (matcher.matches()) {
-        return CliOptionValue("<NO_ID>", matcher.group(1), matcher.group(2))
-    }
-
-    return null
+    val match = Regex("""^([^=]*)=(.*)$""").matchEntire(argumentValue) ?: return null
+    return CliOptionValue("<NO_ID>", match.groupValues[1], match.groupValues[2])
 }
 
 fun getPluginOptionString(pluginId: String, key: String, value: String): String {

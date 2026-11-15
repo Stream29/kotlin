@@ -30,10 +30,10 @@ import org.jetbrains.kotlin.library.uniqueName
 import org.jetbrains.kotlin.library.writer.KlibWriter
 import org.jetbrains.kotlin.library.writer.includeIr
 import org.jetbrains.kotlin.library.writer.includeMetadata
+import org.jetbrains.kotlin.konan.properties.Properties
+import org.jetbrains.kotlin.library.KlibPath as Path
 import org.jetbrains.kotlin.util.metadataVersion
-import java.util.Properties
-import kotlin.io.path.Path
-import kotlin.io.path.writeLines
+import org.jetbrains.kotlin.library.writeLines
 
 fun NativePhaseContext.writeKlib(input: KlibWriterInput) {
     val suffix = ".klib"
