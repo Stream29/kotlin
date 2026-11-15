@@ -5,18 +5,16 @@
 
 package org.jetbrains.kotlin.serialization.deserialization.builtins
 
-import java.io.InputStream
 import org.jetbrains.kotlin.K1Deprecation
+import org.jetbrains.kotlin.serialization.deserialization.ByteArrayInputStream
+import org.jetbrains.kotlin.serialization.deserialization.InputStream
 
 @K1Deprecation
 class BuiltInsResourceLoader {
     fun loadResource(path: String): InputStream? {
-        val classLoader = this::class.java.classLoader ?: return ClassLoader.getSystemResourceAsStream(path)
-
-        // Do not use getResourceAsStream because URLClassLoader's implementation creates InputStream instances which refer to
-        // a globally cached JarFile instance, which is closed as soon as URLClassLoader is closed, which instantly invalidates all
-        // input streams referring to that JarFile and breaks kotlin-reflect in case it's used from different class loaders.
-        val resource = classLoader.getResource(path) ?: return null
-        return resource.openConnection().apply { useCaches = false }.getInputStream()
+        // Fixed stage0 resources, with one independent byte buffer and cursor for each request.
+        // This preserves the upstream non-shared stream lifetime (useCaches=false), without a JAR handle.
+        val bytes = GeneratedBuiltInsResourceData.get(path) ?: return null
+        return ByteArrayInputStream(bytes)
     }
 }

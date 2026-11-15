@@ -23,7 +23,7 @@ class DisjointKeysUnionTypeSubstitution private constructor(
     private val second: TypeSubstitution
 ) : TypeSubstitution() {
     companion object {
-        @JvmStatic fun create(first: TypeSubstitution, second: TypeSubstitution): TypeSubstitution {
+        fun create(first: TypeSubstitution, second: TypeSubstitution): TypeSubstitution {
             if (first.isEmpty()) return second
             if (second.isEmpty()) return first
 

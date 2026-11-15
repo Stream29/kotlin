@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.descriptors.annotations
 
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name

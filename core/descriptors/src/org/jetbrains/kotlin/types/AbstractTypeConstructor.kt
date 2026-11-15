@@ -117,7 +117,7 @@ abstract class AbstractTypeConstructor(storageManager: StorageManager) : Classif
     protected abstract val supertypeLoopChecker: SupertypeLoopChecker
     protected open fun reportSupertypeLoopError(type: KotlinType) {}
 
-    protected open fun processSupertypesWithoutCycles(supertypes: List<@JvmSuppressWildcards KotlinType>): List<KotlinType> = supertypes
+    protected open fun processSupertypesWithoutCycles(supertypes: List<KotlinType>): List<KotlinType> = supertypes
 
     // TODO: overload in AbstractTypeParameterDescriptor?
     protected open fun reportScopesLoopError(type: KotlinType) {}

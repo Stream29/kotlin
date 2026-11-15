@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.resolve.sam
 
+import org.jetbrains.kotlin.descriptors.impl.*
+
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations.Companion.EMPTY
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
@@ -13,7 +15,6 @@ import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
-import java.util.*
 
 fun createSamConstructorFunction(
     owner: DeclarationDescriptor,

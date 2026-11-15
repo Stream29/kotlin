@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.types
 
+import org.jetbrains.kotlin.builtins.*
+
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.container.DefaultImplementation
 import org.jetbrains.kotlin.container.PlatformSpecificExtension

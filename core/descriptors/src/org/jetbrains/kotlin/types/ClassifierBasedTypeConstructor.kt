@@ -5,12 +5,15 @@
 
 package org.jetbrains.kotlin.types
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.types.error.ErrorUtils
+import kotlin.native.identityHashCode
 
 abstract class ClassifierBasedTypeConstructor : TypeConstructor {
     private var hashCode = 0
@@ -25,7 +28,7 @@ abstract class ClassifierBasedTypeConstructor : TypeConstructor {
         val computedHashCode = if (hasMeaningfulFqName(descriptor)) {
             DescriptorUtils.getFqName(descriptor).hashCode()
         } else {
-            System.identityHashCode(this)
+            this.identityHashCode()
         }
 
         return computedHashCode.also { hashCode = it }
@@ -79,3 +82,5 @@ abstract class ClassifierBasedTypeConstructor : TypeConstructor {
     private fun hasMeaningfulFqName(descriptor: ClassifierDescriptor): Boolean =
         !ErrorUtils.isError(descriptor) && !DescriptorUtils.isLocal(descriptor)
 }
+
+val ClassifierBasedTypeConstructor.declarationDescriptor: ClassifierDescriptor get() = getDeclarationDescriptor()

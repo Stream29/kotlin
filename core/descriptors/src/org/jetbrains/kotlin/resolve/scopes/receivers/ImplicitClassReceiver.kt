@@ -16,9 +16,10 @@
 
 package org.jetbrains.kotlin.resolve.scopes.receivers
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.types.KotlinType
-import java.lang.UnsupportedOperationException
 
 /**
  * Describes any "this" receiver inside a class

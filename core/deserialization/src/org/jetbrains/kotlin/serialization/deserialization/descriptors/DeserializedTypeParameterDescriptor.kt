@@ -16,6 +16,10 @@
 
 package org.jetbrains.kotlin.serialization.deserialization.descriptors
 
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.SupertypeLoopChecker

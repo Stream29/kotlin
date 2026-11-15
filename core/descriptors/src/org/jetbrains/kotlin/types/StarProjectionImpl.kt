@@ -16,6 +16,9 @@
 
 package org.jetbrains.kotlin.types
 
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptorWithTypeParameters
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor

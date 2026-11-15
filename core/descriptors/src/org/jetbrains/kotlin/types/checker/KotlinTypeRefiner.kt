@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.types.checker
 
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.container.DefaultImplementation
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.name.ClassId

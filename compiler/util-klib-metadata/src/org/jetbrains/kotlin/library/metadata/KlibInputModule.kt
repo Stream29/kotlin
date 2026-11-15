@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.library.metadata
 
-import java.nio.file.Path
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 data class KlibInputModule<Config>(
     val name: String,

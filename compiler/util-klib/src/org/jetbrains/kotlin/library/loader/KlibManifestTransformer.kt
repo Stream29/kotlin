@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.library.loader
 
-import java.util.Properties
+import org.jetbrains.kotlin.konan.properties.Properties
 
 /**
  * An extension of [KlibLoader] that allows doing some pre-processing of the manifest properties.

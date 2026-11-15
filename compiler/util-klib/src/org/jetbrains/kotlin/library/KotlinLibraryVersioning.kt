@@ -2,7 +2,7 @@ package org.jetbrains.kotlin.library
 
 import org.jetbrains.kotlin.metadata.deserialization.BinaryVersion
 import org.jetbrains.kotlin.metadata.deserialization.MetadataVersion
-import java.util.Properties
+import org.jetbrains.kotlin.konan.properties.Properties
 
 data class KotlinLibraryVersioning(
     val compilerVersion: String?,

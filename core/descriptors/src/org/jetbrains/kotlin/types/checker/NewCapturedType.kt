@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.types.checker
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
@@ -268,7 +270,7 @@ class NewCapturedTypeConstructor(
             projection.refine(kotlinTypeRefiner),
             supertypesComputation?.let {
                 {
-                    supertypes.map { it.refine(kotlinTypeRefiner) }
+                    getSupertypes().map { it.refine(kotlinTypeRefiner) }
                 }
             },
             original ?: this,
@@ -277,7 +279,7 @@ class NewCapturedTypeConstructor(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other == null || this::class != other::class) return false
 
         other as NewCapturedTypeConstructor
 

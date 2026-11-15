@@ -16,10 +16,11 @@
 
 package org.jetbrains.kotlin.resolve
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.utils.DFS
 import org.jetbrains.kotlin.utils.SmartSet
-import java.util.*
 
 fun <D : CallableDescriptor> D.findTopMostOverriddenDescriptors(): List<D> {
     return DFS.dfs(
@@ -50,7 +51,7 @@ fun <H : Any> Collection<H>.selectMostSpecificInEachOverridableGroup(
     descriptorByHandle: H.() -> CallableDescriptor
 ): Collection<H> {
     if (size <= 1) return this
-    val queue = LinkedList<H>(this)
+    val queue = ArrayList<H>(this)
     val result = SmartSet.create<H>()
 
     while (queue.isNotEmpty()) {

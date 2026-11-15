@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.types
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
@@ -71,8 +73,6 @@ object KotlinTypeFactory {
         }
     }
 
-    @JvmStatic
-    @JvmOverloads
     @OptIn(TypeRefinement::class)
     fun simpleType(
         attributes: TypeAttributes,
@@ -96,7 +96,6 @@ object KotlinTypeFactory {
         }
     }
 
-    @JvmStatic
     fun TypeAliasDescriptor.computeExpandedType(arguments: List<TypeProjection>): SimpleType {
         return TypeAliasExpander(TypeAliasExpansionReportStrategy.DO_NOTHING, false).expand(
             TypeAliasExpansion.create(null, this, arguments), TypeAttributes.Empty
@@ -122,7 +121,6 @@ object KotlinTypeFactory {
 
     private class ExpandedTypeOrRefinedConstructor(val expandedType: SimpleType?, val refinedConstructor: TypeConstructor?)
 
-    @JvmStatic
     @OptIn(TypeRefinement::class)
     fun simpleTypeWithNonTrivialMemberScope(
         attributes: TypeAttributes,
@@ -149,7 +147,6 @@ object KotlinTypeFactory {
                 SimpleTypeWithAttributes(it, attributes)
         }
 
-    @JvmStatic
     fun simpleTypeWithNonTrivialMemberScope(
         attributes: TypeAttributes,
         constructor: TypeConstructor,
@@ -166,14 +163,12 @@ object KotlinTypeFactory {
                     SimpleTypeWithAttributes(it, attributes)
             }
 
-    @JvmStatic
     fun simpleNotNullType(
         attributes: TypeAttributes,
         descriptor: ClassDescriptor,
         arguments: List<TypeProjection>
     ): SimpleType = simpleType(attributes, descriptor.typeConstructor, arguments, nullable = false)
 
-    @JvmStatic
     fun simpleType(
         baseType: SimpleType,
         annotations: TypeAttributes = baseType.attributes,
@@ -182,13 +177,11 @@ object KotlinTypeFactory {
         nullable: Boolean = baseType.isMarkedNullable
     ): SimpleType = simpleType(annotations, constructor, arguments, nullable)
 
-    @JvmStatic
     fun flexibleType(lowerBound: SimpleType, upperBound: SimpleType): UnwrappedType {
         if (lowerBound == upperBound) return lowerBound
         return FlexibleTypeImpl(lowerBound, upperBound)
     }
 
-    @JvmStatic
     fun integerLiteralType(
         attributes: TypeAttributes,
         constructor: IntegerLiteralTypeConstructor,

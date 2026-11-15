@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.resolve.jvm
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation

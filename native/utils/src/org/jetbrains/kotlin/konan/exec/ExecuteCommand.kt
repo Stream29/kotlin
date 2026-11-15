@@ -13,39 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 
 package org.jetbrains.kotlin.konan.exec
 
+import kotlinx.cinterop.toKString
 import org.jetbrains.kotlin.konan.KonanExternalToolFailure
-import java.io.BufferedReader
-import java.io.File
-import java.io.InputStreamReader
-import java.lang.ProcessBuilder.Redirect
-import java.nio.file.Files
-
+import org.jetbrains.kotlin.konan.host.NativeFile as File
+import org.jetbrains.kotlin.konan.host.NativeFiles as Files
+import org.jetbrains.kotlin.konan.host.runNativeProcess
+import platform.posix.getenv
+import platform.posix.setenv
+import platform.posix.unsetenv
 
 open class Command(
     initialCommand: List<String>,
     val redirectInputFile: File? = null,
-    /**
-     * Working directory for the spawned process. When `null`, the current process working directory is inherited.
-     * See [ProcessBuilder.directory].
-     */
     val workingDirectory: File? = null,
-    /**
-     * Extra environment variables for the spawned process, merged into the inherited environment (values here win).
-     * See [ProcessBuilder.environment].
-     */
     val environment: Map<String, String> = emptyMap(),
 ) {
 
-    constructor(tool: String) : this(listOf(tool)) 
-    constructor(vararg command: String) : this(command.toList<String>()) 
+    constructor(tool: String) : this(listOf(tool))
+    constructor(vararg command: String) : this(command.toList<String>())
     protected val command = initialCommand.toMutableList()
 
     val argsWithExecutable: List<String> = command
 
-    val args: List<String> 
+    val args: List<String>
         get() = command.drop(1)
 
     operator fun String.unaryPlus(): Command {
@@ -58,35 +52,43 @@ open class Command(
         return this@Command
     }
 
-    var logger: ((() -> String)->Unit)? = null
+    var logger: ((() -> String) -> Unit)? = null
 
     private var stdError: List<String> = emptyList()
 
-    fun logWith(newLogger: ((() -> String)->Unit)): Command {
+    fun logWith(newLogger: ((() -> String) -> Unit)): Command {
         logger = newLogger
         return this
     }
 
+    private inline fun <T> withEnvironment(block: () -> T): T {
+        if (environment.isEmpty()) return block()
+        val previous = LinkedHashMap<String, String?>(environment.size)
+        for ((k, v) in environment) {
+            previous[k] = getenv(k)?.toKString()
+            setenv(k, v, 1)
+        }
+        try {
+            return block()
+        } finally {
+            for ((k, old) in previous) {
+                if (old == null) unsetenv(k) else setenv(k, old, 1)
+            }
+        }
+    }
+
     open fun runProcess(): Int {
         stdError = emptyList()
-        val builder = ProcessBuilder(command)
-
-        workingDirectory?.let { builder.directory(it) }
-        builder.environment().putAll(environment)
-        builder.redirectOutput(Redirect.INHERIT)
-        if (redirectInputFile == null) {
-            builder.redirectInput(Redirect.INHERIT)
-        } else {
-            builder.redirectInput(redirectInputFile)
+        val errors = Files.createTempFile(null, null).toFile()
+        try {
+            val exitCode = withEnvironment {
+                runNativeProcess(command, workingDirectory, redirectInputFile, null, errors, false)
+            }
+            stdError = errors.readLines()
+            return exitCode
+        } finally {
+            errors.delete()
         }
-
-        val process = builder.start()
-
-        val reader = BufferedReader(InputStreamReader(process.errorStream))
-        stdError = reader.readLines()
-
-        val exitCode = process.waitFor()
-        return exitCode
     }
 
     open fun execute() {
@@ -99,7 +101,7 @@ open class Command(
      * If withErrors is true then output from error stream will be added
      */
     fun getOutputLines(withErrors: Boolean = false): List<String> =
-            getResult(withErrors, handleError = true).outputLines
+        getResult(withErrors, handleError = true).outputLines
 
     fun getResult(withErrors: Boolean, handleError: Boolean = false): Result {
         log()
@@ -108,24 +110,9 @@ open class Command(
         outputFile.deleteOnExit()
 
         try {
-            val builder = ProcessBuilder(command)
-
-            workingDirectory?.let { builder.directory(it) }
-            builder.environment().putAll(environment)
-            if (redirectInputFile == null) {
-                builder.redirectInput(Redirect.INHERIT)
-            } else {
-                builder.redirectInput(redirectInputFile)
+            val code = withEnvironment {
+                runNativeProcess(command, workingDirectory, redirectInputFile, outputFile, null, withErrors)
             }
-            builder.redirectError(Redirect.INHERIT)
-            builder.redirectOutput(Redirect.to(outputFile))
-                    .redirectErrorStream(withErrors)
-            // Note: getting process output could be done without redirecting to temporary file,
-            // however this would require managing a thread to read `process.inputStream` because
-            // it may have limited capacity.
-
-            val process = builder.start()
-            val code = process.waitFor()
             if (handleError) handleExitCode(code, outputFile.readLines())
 
             return Result(code, outputFile.readLines())

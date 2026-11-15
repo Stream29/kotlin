@@ -16,6 +16,9 @@
 
 package org.jetbrains.kotlin.resolve.constants
 
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -88,7 +91,7 @@ class CharValue(value: Char) : IntegerValueConstant<Char>(value) {
 
     override fun <R, D> accept(visitor: AnnotationArgumentVisitor<R, D>, data: D) = visitor.visitCharValue(this, data)
 
-    override fun toString() = "\\u%04X ('%s')".format(value.code, getPrintablePart(value))
+    override fun toString() = "\\u${value.code.toString(16).uppercase().padStart(4, '0')} ('${getPrintablePart(value)}')"
 
     private fun getPrintablePart(c: Char): String = when (c) {
         '\b' -> "\\b"
@@ -101,14 +104,14 @@ class CharValue(value: Char) : IntegerValueConstant<Char>(value) {
     }
 
     private fun isPrintableUnicode(c: Char): Boolean {
-        val t = Character.getType(c).toByte()
-        return t != Character.UNASSIGNED &&
-               t != Character.LINE_SEPARATOR &&
-               t != Character.PARAGRAPH_SEPARATOR &&
-               t != Character.CONTROL &&
-               t != Character.FORMAT &&
-               t != Character.PRIVATE_USE &&
-               t != Character.SURROGATE
+        val t = c.category
+        return t != CharCategory.UNASSIGNED &&
+               t != CharCategory.LINE_SEPARATOR &&
+               t != CharCategory.PARAGRAPH_SEPARATOR &&
+               t != CharCategory.CONTROL &&
+               t != CharCategory.FORMAT &&
+               t != CharCategory.PRIVATE_USE &&
+               t != CharCategory.SURROGATE
     }
 }
 
@@ -240,7 +243,7 @@ class LongValue(value: Long) : IntegerValueConstant<Long>(value) {
     override fun toString() = "$value.toLong()"
 }
 
-class NullValue : ConstantValue<Void?>(null) {
+class NullValue : ConstantValue<Nothing?>(null) {
     override fun getType(module: ModuleDescriptor) = module.builtIns.nullableNothingType
 
     override fun <R, D> accept(visitor: AnnotationArgumentVisitor<R, D>, data: D) = visitor.visitNullValue(this, data)

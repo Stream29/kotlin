@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.resolve.sam
 
+import org.jetbrains.kotlin.descriptors.impl.*
+
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
 

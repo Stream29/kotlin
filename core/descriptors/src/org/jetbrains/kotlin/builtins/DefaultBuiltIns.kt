@@ -26,7 +26,6 @@ class DefaultBuiltIns(loadBuiltInsFromCurrentClassLoader: Boolean = true) : Kotl
     }
 
     companion object {
-        @JvmStatic
         val Instance: DefaultBuiltIns by lazy {
             DefaultBuiltIns()
         }

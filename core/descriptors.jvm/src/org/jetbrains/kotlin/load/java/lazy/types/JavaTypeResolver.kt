@@ -34,7 +34,9 @@ import org.jetbrains.kotlin.load.java.structure.*
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.types.*
-import org.jetbrains.kotlin.types.TypeUtils.makeStarProjection
+import org.jetbrains.kotlin.types.TypeUtils.Companion.makeStarProjection
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.builtins.*
 import org.jetbrains.kotlin.types.Variance.*
 import org.jetbrains.kotlin.types.error.ErrorUtils
 import org.jetbrains.kotlin.types.error.ErrorTypeKind

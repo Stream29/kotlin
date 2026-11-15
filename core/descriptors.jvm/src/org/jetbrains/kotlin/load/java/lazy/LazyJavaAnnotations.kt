@@ -16,6 +16,9 @@
 
 package org.jetbrains.kotlin.load.java.lazy
 
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.builtins.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.annotations.Annotations

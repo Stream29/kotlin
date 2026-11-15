@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.library.writer
 
-import java.nio.file.Path
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 /**
  * A "writer" of a specific component of the constructed Klib library.

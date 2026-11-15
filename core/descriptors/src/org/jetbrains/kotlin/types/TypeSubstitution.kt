@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.types
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.annotations.FilteredAnnotations
@@ -26,7 +28,6 @@ import org.jetbrains.kotlin.types.model.typeConstructor
 
 abstract class TypeSubstitution {
     companion object {
-        @JvmField
         val EMPTY: TypeSubstitution = object : TypeSubstitution() {
             override fun get(key: KotlinType): Nothing? = null
             override fun isEmpty() = true
@@ -66,8 +67,6 @@ abstract class TypeConstructorSubstitution : TypeSubstitution() {
     abstract fun get(key: TypeConstructor): TypeProjection?
 
     companion object {
-        @JvmStatic
-        @JvmOverloads
         fun createByConstructorsMap(
             map: Map<TypeConstructor, TypeProjection>,
             approximateCapturedTypes: Boolean = false
@@ -78,17 +77,14 @@ abstract class TypeConstructorSubstitution : TypeSubstitution() {
                 override fun approximateCapturedTypes() = approximateCapturedTypes
             }
 
-        @JvmStatic
         fun createByParametersMap(map: Map<TypeParameterDescriptor, TypeProjection>): TypeConstructorSubstitution =
             object : TypeConstructorSubstitution() {
                 override fun get(key: TypeConstructor) = map[key.declarationDescriptor]
                 override fun isEmpty() = map.isEmpty()
             }
 
-        @JvmStatic
         fun create(kotlinType: KotlinType) = create(kotlinType.constructor, kotlinType.arguments)
 
-        @JvmStatic
         fun create(typeConstructor: TypeConstructor, arguments: List<TypeProjection>): TypeSubstitution {
             val parameters = typeConstructor.parameters
 
@@ -142,7 +138,6 @@ class IndexedParametersSubstitution(
     }
 }
 
-@JvmOverloads
 fun KotlinType.replace(
     newArguments: List<TypeProjection> = arguments,
     newAnnotations: Annotations = annotations,
@@ -164,7 +159,6 @@ fun KotlinType.replace(
     }
 }
 
-@JvmOverloads
 fun SimpleType.replace(
     newArguments: List<TypeProjection> = arguments,
     newAttributes: TypeAttributes = attributes

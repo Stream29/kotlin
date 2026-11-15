@@ -1,0 +1,2 @@
+headers = h2a_binary.h
+package = nativekotlin.host.format.binaryc

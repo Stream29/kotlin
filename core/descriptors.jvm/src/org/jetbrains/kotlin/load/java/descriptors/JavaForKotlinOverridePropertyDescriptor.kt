@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.load.java.descriptors
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor

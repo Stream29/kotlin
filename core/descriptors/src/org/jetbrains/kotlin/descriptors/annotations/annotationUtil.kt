@@ -16,6 +16,10 @@
 
 package org.jetbrains.kotlin.descriptors.annotations
 
+import org.jetbrains.kotlin.builtins.*
+
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.name.ClassId

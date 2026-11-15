@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.load.java.lazy.descriptors
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -88,7 +90,7 @@ class JvmPackageScope(
     }
 
     override fun printScopeStructure(p: Printer) {
-        p.println(this::class.java.simpleName, " {")
+        p.println(this::class.simpleName, " {")
         p.pushIndent()
 
         p.println("containingDeclaration: $packageFragment")

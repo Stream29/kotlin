@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.load.java.lazy.descriptors
 
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.*
 
 // Currently getter is null iff it's loaded from Java field
 @K1Deprecation

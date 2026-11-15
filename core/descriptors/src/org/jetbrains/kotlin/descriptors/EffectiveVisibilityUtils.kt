@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.descriptors
 
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.resolve.descriptorUtil.isPublishedApi
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.checker.SimpleClassicTypeSystemContext

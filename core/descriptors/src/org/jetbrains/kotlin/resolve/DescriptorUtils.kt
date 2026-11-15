@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.resolve.descriptorUtil
 
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.resolve.scopes.receivers.*
+
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.builtins.StandardNames.ENUM_VALUE_OF
@@ -21,7 +24,7 @@ import org.jetbrains.kotlin.name.FqNameUnsafe
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.resolve.DescriptorUtils
-import org.jetbrains.kotlin.resolve.DescriptorUtils.getContainingClass
+import org.jetbrains.kotlin.resolve.DescriptorUtils.Companion.getContainingClass
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.resolve.constants.EnumValue
 import org.jetbrains.kotlin.resolve.isInlineClass

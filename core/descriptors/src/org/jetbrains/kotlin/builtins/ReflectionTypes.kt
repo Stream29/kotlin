@@ -97,7 +97,7 @@ class ReflectionTypes(module: ModuleDescriptor, private val notFoundClasses: Not
 
     companion object {
         fun isReflectionClass(descriptor: ClassDescriptor): Boolean {
-            val containingPackage = DescriptorUtils.getParentOfType(descriptor, PackageFragmentDescriptor::class.java)
+            val containingPackage = DescriptorUtils.getParentOfType(descriptor, PackageFragmentDescriptor::class)
             return containingPackage != null && containingPackage.fqName == KOTLIN_REFLECT_FQ_NAME
         }
 
@@ -114,7 +114,6 @@ class ReflectionTypes(module: ModuleDescriptor, private val notFoundClasses: Not
                     ReflectionTypes.hasKMutablePropertyTypeFqName(type) ||
                     ReflectionTypes.hasKCallableTypeFqName(type)
 
-        @JvmStatic
         fun isNumberedKPropertyOrKMutablePropertyType(type: KotlinType): Boolean =
                 isNumberedKPropertyType(type) || isNumberedKMutablePropertyType(type)
 

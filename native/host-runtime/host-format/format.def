@@ -1,0 +1,2 @@
+headers = h2a_format.h
+package = nativekotlin.host.format.c

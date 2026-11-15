@@ -103,37 +103,31 @@ abstract class DescriptorRenderer {
             return DescriptorRendererImpl(options)
         }
 
-        @JvmField
         val WITHOUT_MODIFIERS: DescriptorRenderer = withOptions {
             modifiers = emptySet()
         }
 
-        @JvmField
         val COMPACT_WITH_MODIFIERS: DescriptorRenderer = withOptions {
             withDefinedIn = false
         }
 
-        @JvmField
         val COMPACT: DescriptorRenderer = withOptions {
             withDefinedIn = false
             modifiers = emptySet()
         }
 
-        @JvmField
         val COMPACT_WITHOUT_SUPERTYPES: DescriptorRenderer = withOptions {
             withDefinedIn = false
             modifiers = emptySet()
             withoutSuperTypes = true
         }
 
-        @JvmField
         val COMPACT_WITH_SHORT_TYPES: DescriptorRenderer = withOptions {
             modifiers = emptySet()
             classifierNamePolicy = ClassifierNamePolicy.SHORT
             parameterNameRenderingPolicy = ParameterNameRenderingPolicy.ONLY_NON_SYNTHESIZED
         }
 
-        @JvmField
         val ONLY_NAMES_WITH_SHORT_TYPES: DescriptorRenderer = withOptions {
             withDefinedIn = false
             modifiers = emptySet()
@@ -146,30 +140,25 @@ abstract class DescriptorRenderer {
             startFromName = true
         }
 
-        @JvmField
         val FQ_NAMES_IN_TYPES: DescriptorRenderer = withOptions {
             modifiers = DescriptorRendererModifier.ALL_EXCEPT_ANNOTATIONS
         }
 
-        @JvmField
         val FQ_NAMES_IN_TYPES_WITH_ANNOTATIONS: DescriptorRenderer = withOptions {
             modifiers = DescriptorRendererModifier.ALL
         }
 
-        @JvmField
         val SHORT_NAMES_IN_TYPES: DescriptorRenderer = withOptions {
             classifierNamePolicy = ClassifierNamePolicy.SHORT
             parameterNameRenderingPolicy = ParameterNameRenderingPolicy.ONLY_NON_SYNTHESIZED
         }
 
-        @JvmField
         val DEBUG_TEXT: DescriptorRenderer = withOptions {
             debugMode = true
             classifierNamePolicy = ClassifierNamePolicy.FULLY_QUALIFIED
             modifiers = DescriptorRendererModifier.ALL
         }
 
-        @JvmField
         val HTML: DescriptorRenderer = withOptions {
             textFormat = RenderingFormat.HTML
             modifiers = DescriptorRendererModifier.ALL
@@ -321,10 +310,8 @@ enum class DescriptorRendererModifier(val includeByDefault: Boolean) {
     ;
 
     companion object {
-        @JvmField
         val ALL_EXCEPT_ANNOTATIONS = values().filter { it.includeByDefault }.toSet()
 
-        @JvmField
         val ALL = values().toSet()
     }
 }

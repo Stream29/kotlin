@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.sam.SamConversionResolverImpl
 import org.jetbrains.kotlin.serialization.deserialization.*
 import org.jetbrains.kotlin.storage.StorageManager
-import java.io.InputStream
 
 @K1Deprecation
 class BuiltInsLoaderImpl : BuiltInsLoader {

@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.load.java
 
+import org.jetbrains.kotlin.builtins.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.jvm.JavaToKotlinClassMap
 import org.jetbrains.kotlin.descriptors.*

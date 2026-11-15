@@ -16,6 +16,9 @@
 
 package org.jetbrains.kotlin.resolve.constants
 
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.PrimitiveType
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor

@@ -1,0 +1,75 @@
+/*
+ * Copyright 2010-2024 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
+ */
+
+package org.jetbrains.kotlin.resolve
+
+import org.jetbrains.kotlin.K1Deprecation
+import org.jetbrains.kotlin.config.AnalysisFlags
+import org.jetbrains.kotlin.config.KotlinCompilerVersion
+import org.jetbrains.kotlin.config.LanguageFeature
+import org.jetbrains.kotlin.config.LanguageVersion
+import org.jetbrains.kotlin.config.LanguageVersionSettings
+import org.jetbrains.kotlin.descriptors.ModuleCapability
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.metadata.deserialization.MetadataVersion
+import org.jetbrains.kotlin.serialization.deserialization.DeserializationConfiguration
+
+private val LANGUAGE_TO_METADATA_VERSION = mutableMapOf<LanguageVersion, MetadataVersion>().apply {
+    val oldMetadataVersion = MetadataVersion(1, 1, 18)
+    this[LanguageVersion.KOTLIN_1_0] = oldMetadataVersion
+    this[LanguageVersion.KOTLIN_1_1] = oldMetadataVersion
+    this[LanguageVersion.KOTLIN_1_2] = oldMetadataVersion
+    this[LanguageVersion.KOTLIN_1_3] = oldMetadataVersion
+    this[LanguageVersion.KOTLIN_1_4] = MetadataVersion(1, 4, 3)
+    this[LanguageVersion.KOTLIN_1_5] = MetadataVersion(1, 5, 1)
+    this[LanguageVersion.KOTLIN_1_6] = MetadataVersion(1, 6, 0)
+    this[LanguageVersion.KOTLIN_1_7] = MetadataVersion(1, 7, 0)
+    this[LanguageVersion.KOTLIN_1_8] = MetadataVersion(1, 8, 0)
+    this[LanguageVersion.KOTLIN_1_9] = MetadataVersion(1, 9, 0)
+    this[LanguageVersion.KOTLIN_2_0] = MetadataVersion(2, 0, 0)
+    this[LanguageVersion.KOTLIN_2_1] = MetadataVersion(2, 1, 0)
+    this[LanguageVersion.KOTLIN_2_2] = MetadataVersion(2, 2, 0)
+    this[LanguageVersion.KOTLIN_2_3] = MetadataVersion(2, 3, 0)
+    this[LanguageVersion.KOTLIN_2_4] = MetadataVersion.INSTANCE
+    this[LanguageVersion.KOTLIN_2_5] = MetadataVersion(2, 5, 0)
+    this[LanguageVersion.KOTLIN_2_6] = MetadataVersion(2, 6, 0)
+
+    check(size == LanguageVersion.entries.size) {
+        "Please add mappings from the missing LanguageVersion instances to the corresponding MetadataVersion " +
+                "in `LANGUAGE_TO_METADATA_VERSION`"
+    }
+}
+
+private fun LanguageVersion.toMetadataVersion(): MetadataVersion = LANGUAGE_TO_METADATA_VERSION.getValue(this)
+
+class CommonCompilerDeserializationConfiguration(
+    val languageVersionSettings: LanguageVersionSettings,
+) : DeserializationConfiguration {
+    override val metadataVersion: MetadataVersion = languageVersionSettings.languageVersion.toMetadataVersion()
+
+    override val skipMetadataVersionCheck = languageVersionSettings.getFlag(AnalysisFlags.skipMetadataVersionCheck)
+
+    override val skipPrereleaseCheck = languageVersionSettings.getFlag(AnalysisFlags.skipPrereleaseCheck)
+
+    override val reportErrorsOnPreReleaseDependencies =
+        !skipPrereleaseCheck && !languageVersionSettings.isPreRelease() && !KotlinCompilerVersion.isPreRelease()
+
+    override val allowUnstableDependencies = languageVersionSettings.getFlag(AnalysisFlags.allowUnstableDependencies)
+
+    override val typeAliasesAllowed = languageVersionSettings.supportsFeature(LanguageFeature.TypeAliases)
+
+    override val isJvmPackageNameSupported = languageVersionSettings.supportsFeature(LanguageFeature.JvmPackageName)
+
+    override val readDeserializedContracts: Boolean =
+        languageVersionSettings.supportsFeature(LanguageFeature.ReadDeserializedContracts)
+}
+
+@K1Deprecation
+object ImplicitIntegerCoercion {
+    val MODULE_CAPABILITY = ModuleCapability<Boolean>("ImplicitIntegerCoercion")
+
+    fun isEnabledForModule(module: ModuleDescriptor): Boolean =
+        module.getCapability(MODULE_CAPABILITY) == true
+}

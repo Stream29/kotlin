@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 
-class ErrorType @JvmOverloads internal constructor(
+class ErrorType internal constructor(
     override val constructor: TypeConstructor,
     override val memberScope: MemberScope,
     val kind: ErrorTypeKind,
@@ -17,7 +17,7 @@ class ErrorType @JvmOverloads internal constructor(
     override val isMarkedNullable: Boolean = false,
     vararg val formatParams: String
 ) : SimpleType() {
-    val debugMessage = String.format(kind.debugMessage, *formatParams)
+    val debugMessage = formatErrorMessage(kind.debugMessage, *formatParams)
 
     override val attributes: TypeAttributes
         get() = TypeAttributes.Empty

@@ -1,0 +1,3 @@
+headers = nfc.h
+headerFilter = nfc.h
+package = nativekotlin.host.normalization.c

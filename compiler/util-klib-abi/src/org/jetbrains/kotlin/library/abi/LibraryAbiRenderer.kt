@@ -47,6 +47,6 @@ class AbiRenderingSettings(
     val renderDeclarations: Boolean = true,
     val indentationString: String = "    ",
     val whenSignatureNotFound: (AbiDeclaration, AbiSignatureVersion) -> String = { declaration, signatureVersion ->
-        error("No signature $signatureVersion for ${declaration::class.java}, $declaration")
+        error("No signature $signatureVersion for ${declaration::class}, $declaration")
     }
 )

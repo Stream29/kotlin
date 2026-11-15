@@ -7,5 +7,5 @@ package org.jetbrains.kotlin.utils
 
 @Suppress("JUnitTestCaseWithNoTests") // The tests are inherited from the super class.
 class UnsafeBasedMemoryAccessTest : UnsafeMemoryAccessTest() {
-    override val memory: UnsafeMemoryAccess = UnsafeBasedMemoryAccess
+    override val memory: UnsafeMemoryAccess = unsafeMemoryAccess
 }

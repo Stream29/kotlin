@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.types
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
@@ -83,7 +85,6 @@ fun KotlinType.upperIfFlexible(): SimpleType = with(unwrap()) {
 
 class FlexibleTypeImpl(lowerBound: SimpleType, upperBound: SimpleType) : FlexibleType(lowerBound, upperBound), CustomTypeParameter {
     companion object {
-        @JvmField
         var RUN_SLOW_ASSERTIONS = false
     }
 

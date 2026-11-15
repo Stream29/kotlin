@@ -5,10 +5,9 @@
 
 package org.jetbrains.kotlin.resolve.jvm
 
-// JLS 3.9 Keywords, plus the reserved literals `true`, `false` and `null` (JLS 3.10.3, 3.10.8)
-// and the reserved identifier `_` (JLS 3.8).
-// Contextual keywords (`record`, `yield`, `sealed`, `permits`, `var`, ...) are deliberately absent:
-// they are valid identifiers in Java.
+import nativekotlin.host.text.jdkJavaIdentifierPart
+import nativekotlin.host.text.jdkJavaIdentifierStart
+
 private val JAVA_KEYWORDS = setOf(
     "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const",
     "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float",
@@ -20,22 +19,32 @@ private val JAVA_KEYWORDS = setOf(
     "_",
 )
 
-/**
- * Whether [name] can be used as an identifier in Java source code.
- */
+private fun codePointAt(text: String, index: Int): Int {
+    val high = text[index]
+    if (high.isHighSurrogate() && index + 1 < text.length) {
+        val low = text[index + 1]
+        if (low.isLowSurrogate()) {
+            return ((high.code - 0xD800) shl 10) + (low.code - 0xDC00) + 0x10000
+        }
+    }
+    return high.code
+}
+
+private fun charCount(codePoint: Int): Int = if (codePoint >= 0x10000) 2 else 1
+
 fun isValidJavaIdentifier(name: String): Boolean {
     if (name.isEmpty()) return false
     if (name in JAVA_KEYWORDS) return false
 
     var index = 0
-    val firstCodePoint = name.codePointAt(index)
-    if (!Character.isJavaIdentifierStart(firstCodePoint)) return false
-    index += Character.charCount(firstCodePoint)
+    val firstCodePoint = codePointAt(name, index)
+    if (!jdkJavaIdentifierStart(firstCodePoint)) return false
+    index += charCount(firstCodePoint)
 
     while (index < name.length) {
-        val codePoint = name.codePointAt(index)
-        if (!Character.isJavaIdentifierPart(codePoint)) return false
-        index += Character.charCount(codePoint)
+        val codePoint = codePointAt(name, index)
+        if (!jdkJavaIdentifierPart(codePoint)) return false
+        index += charCount(codePoint)
     }
     return true
 }

@@ -39,7 +39,7 @@ import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.storage.NullableLazyValue
 import org.jetbrains.kotlin.utils.alwaysTrue
-import java.util.*
+import org.jetbrains.kotlin.descriptors.*
 
 @K1Deprecation
 class LazyJavaPackageScope(

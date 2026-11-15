@@ -12,7 +12,6 @@ import org.jetbrains.kotlin.builtins.functions.BuiltInFunctionArity
 import org.jetbrains.kotlin.builtins.functions.FunctionTypeKind
 import org.jetbrains.kotlin.name.*
 import org.jetbrains.kotlin.resolve.jvm.JvmPrimitiveType
-import java.util.concurrent.atomic.*
 
 object JavaToKotlinClassMap {
     private val NUMBERED_FUNCTION_PREFIX: String =
@@ -28,7 +27,7 @@ object JavaToKotlinClassMap {
     val FUNCTION_N_FQ_NAME: FqName = FUNCTION_N_CLASS_ID.asSingleFqName()
     private val K_FUNCTION_CLASS_ID: ClassId = StandardClassIds.KFunction
     private val K_CLASS_CLASS_ID: ClassId = StandardClassIds.KClass
-    private val CLASS_CLASS_ID: ClassId = classId(Class::class.java)
+    private val CLASS_CLASS_ID: ClassId = ClassId.topLevel(FqName("java.lang.Class"))
 
     private val javaToKotlin = HashMap<FqNameUnsafe, ClassId>()
     private val kotlinToJava = HashMap<FqNameUnsafe, ClassId>()
@@ -48,34 +47,35 @@ object JavaToKotlinClassMap {
         val kotlinMutable: ClassId
     )
 
-    private inline fun <reified T> mutabilityMapping(kotlinReadOnly: ClassId, kotlinMutable: FqName): PlatformMutabilityMapping {
+    private fun mutabilityMapping(javaClass: ClassId, kotlinReadOnly: ClassId, kotlinMutable: FqName): PlatformMutabilityMapping {
         val mutableClassId = ClassId(kotlinReadOnly.packageFqName, kotlinMutable.tail(kotlinReadOnly.packageFqName), isLocal = false)
-        return PlatformMutabilityMapping(classId(T::class.java), kotlinReadOnly, mutableClassId)
+        return PlatformMutabilityMapping(javaClass, kotlinReadOnly, mutableClassId)
     }
 
     val mutabilityMappings = listOf(
-        mutabilityMapping<Iterable<*>>(ClassId.topLevel(FqNames.iterable), FqNames.mutableIterable),
-        mutabilityMapping<Iterator<*>>(ClassId.topLevel(FqNames.iterator), FqNames.mutableIterator),
-        mutabilityMapping<Collection<*>>(ClassId.topLevel(FqNames.collection), FqNames.mutableCollection),
-        mutabilityMapping<List<*>>(ClassId.topLevel(FqNames.list), FqNames.mutableList),
-        mutabilityMapping<Set<*>>(ClassId.topLevel(FqNames.set), FqNames.mutableSet),
-        mutabilityMapping<ListIterator<*>>(ClassId.topLevel(FqNames.listIterator), FqNames.mutableListIterator),
-        mutabilityMapping<Map<*, *>>(ClassId.topLevel(FqNames.map), FqNames.mutableMap),
-        mutabilityMapping<Map.Entry<*, *>>(
+        mutabilityMapping(ClassId.topLevel(FqName("java.lang.Iterable")), ClassId.topLevel(FqNames.iterable), FqNames.mutableIterable),
+        mutabilityMapping(ClassId.topLevel(FqName("java.util.Iterator")), ClassId.topLevel(FqNames.iterator), FqNames.mutableIterator),
+        mutabilityMapping(ClassId.topLevel(FqName("java.util.Collection")), ClassId.topLevel(FqNames.collection), FqNames.mutableCollection),
+        mutabilityMapping(ClassId.topLevel(FqName("java.util.List")), ClassId.topLevel(FqNames.list), FqNames.mutableList),
+        mutabilityMapping(ClassId.topLevel(FqName("java.util.Set")), ClassId.topLevel(FqNames.set), FqNames.mutableSet),
+        mutabilityMapping(ClassId.topLevel(FqName("java.util.ListIterator")), ClassId.topLevel(FqNames.listIterator), FqNames.mutableListIterator),
+        mutabilityMapping(ClassId.topLevel(FqName("java.util.Map")), ClassId.topLevel(FqNames.map), FqNames.mutableMap),
+        mutabilityMapping(
+            ClassId.topLevel(FqName("java.util.Map")).createNestedClassId(Name.identifier("Entry")),
             ClassId.topLevel(FqNames.map).createNestedClassId(FqNames.mapEntry.shortName()), FqNames.mutableMapEntry
         )
     )
 
     init {
-        addTopLevel(Any::class.java, FqNames.any)
-        addTopLevel(String::class.java, FqNames.string)
-        addTopLevel(CharSequence::class.java, FqNames.charSequence)
-        addTopLevel(Throwable::class.java, FqNames.throwable)
-        addTopLevel(Cloneable::class.java, FqNames.cloneable)
-        addTopLevel(Number::class.java, FqNames.number)
-        addTopLevel(Comparable::class.java, FqNames.comparable)
-        addTopLevel(Enum::class.java, FqNames._enum)
-        addTopLevel(Annotation::class.java, FqNames.annotation)
+        addTopLevel("java.lang.Object", FqNames.any)
+        addTopLevel("java.lang.String", FqNames.string)
+        addTopLevel("java.lang.CharSequence", FqNames.charSequence)
+        addTopLevel("java.lang.Throwable", FqNames.throwable)
+        addTopLevel("java.lang.Cloneable", FqNames.cloneable)
+        addTopLevel("java.lang.Number", FqNames.number)
+        addTopLevel("java.lang.Comparable", FqNames.comparable)
+        addTopLevel("java.lang.Enum", FqNames._enum)
+        addTopLevel("java.lang.annotation.Annotation", FqNames.annotation)
 
         for (platformCollection in mutabilityMappings) {
             addMapping(platformCollection)
@@ -103,15 +103,15 @@ object JavaToKotlinClassMap {
             addKotlinToJava(FqName(NUMBERED_K_SUSPEND_FUNCTION_PREFIX + i), K_FUNCTION_CLASS_ID)
         }
 
-        addKotlinToJava(FqName("kotlin.concurrent.atomics.AtomicInt"), classId(AtomicInteger::class.java))
-        addKotlinToJava(FqName("kotlin.concurrent.atomics.AtomicLong"), classId(AtomicLong::class.java))
-        addKotlinToJava(FqName("kotlin.concurrent.atomics.AtomicBoolean"), classId(AtomicBoolean::class.java))
-        addKotlinToJava(FqName("kotlin.concurrent.atomics.AtomicReference"), classId(AtomicReference::class.java))
-        addKotlinToJava(FqName("kotlin.concurrent.atomics.AtomicIntArray"), classId(AtomicIntegerArray::class.java))
-        addKotlinToJava(FqName("kotlin.concurrent.atomics.AtomicLongArray"), classId(AtomicLongArray::class.java))
-        addKotlinToJava(FqName("kotlin.concurrent.atomics.AtomicArray"), classId(AtomicReferenceArray::class.java))
+        addKotlinToJava(FqName("kotlin.concurrent.atomics.AtomicInt"), ClassId.topLevel(FqName("java.util.concurrent.atomic.AtomicInteger")))
+        addKotlinToJava(FqName("kotlin.concurrent.atomics.AtomicLong"), ClassId.topLevel(FqName("java.util.concurrent.atomic.AtomicLong")))
+        addKotlinToJava(FqName("kotlin.concurrent.atomics.AtomicBoolean"), ClassId.topLevel(FqName("java.util.concurrent.atomic.AtomicBoolean")))
+        addKotlinToJava(FqName("kotlin.concurrent.atomics.AtomicReference"), ClassId.topLevel(FqName("java.util.concurrent.atomic.AtomicReference")))
+        addKotlinToJava(FqName("kotlin.concurrent.atomics.AtomicIntArray"), ClassId.topLevel(FqName("java.util.concurrent.atomic.AtomicIntegerArray")))
+        addKotlinToJava(FqName("kotlin.concurrent.atomics.AtomicLongArray"), ClassId.topLevel(FqName("java.util.concurrent.atomic.AtomicLongArray")))
+        addKotlinToJava(FqName("kotlin.concurrent.atomics.AtomicArray"), ClassId.topLevel(FqName("java.util.concurrent.atomic.AtomicReferenceArray")))
 
-        addKotlinToJava(FqNames.nothing.toSafe(), classId(Void::class.java))
+        addKotlinToJava(FqNames.nothing.toSafe(), ClassId.topLevel(FqName("java.lang.Void")))
     }
 
     /**
@@ -196,12 +196,12 @@ object JavaToKotlinClassMap {
         addKotlinToJava(kotlinClassId.asSingleFqName(), javaClassId)
     }
 
-    private fun addTopLevel(javaClass: Class<*>, kotlinFqName: FqNameUnsafe) {
+    private fun addTopLevel(javaClass: String, kotlinFqName: FqNameUnsafe) {
         addTopLevel(javaClass, kotlinFqName.toSafe())
     }
 
-    private fun addTopLevel(javaClass: Class<*>, kotlinFqName: FqName) {
-        add(classId(javaClass), ClassId.topLevel(kotlinFqName))
+    private fun addTopLevel(javaClass: String, kotlinFqName: FqName) {
+        add(ClassId.topLevel(FqName(javaClass)), ClassId.topLevel(kotlinFqName))
     }
 
     private fun addJavaToKotlin(javaClassId: ClassId, kotlinClassId: ClassId) {
@@ -231,12 +231,4 @@ object JavaToKotlinClassMap {
 
     fun getReadOnlyAsJava(): Set<FqName> = readOnlyToMutable.keys.mapTo(mutableSetOf()) { kotlinToJava[it]!!.asSingleFqName() }
 
-    private fun classId(clazz: Class<*>): ClassId {
-        assert(!clazz.isPrimitive && !clazz.isArray) { "Invalid class: $clazz" }
-        val outer = clazz.declaringClass
-        return if (outer == null)
-            ClassId.topLevel(FqName(clazz.canonicalName))
-        else
-            classId(outer).createNestedClassId(Name.identifier(clazz.simpleName))
-    }
 }

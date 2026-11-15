@@ -1,0 +1,2 @@
+headers = h2a_bigint.h
+package = nativekotlin.host.bigint.c

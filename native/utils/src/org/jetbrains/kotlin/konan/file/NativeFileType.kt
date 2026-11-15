@@ -16,8 +16,7 @@
 
 package org.jetbrains.kotlin.konan.file
 
-import java.nio.file.Path
-import kotlin.io.path.name
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 val String.isUnixStaticLib
     get() = this.endsWith(".a")

@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.builtins
 
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.resolve.scopes.receivers.*
+
 import org.jetbrains.kotlin.builtins.StandardNames.BUILT_INS_PACKAGE_NAME
 import org.jetbrains.kotlin.builtins.functions.FunctionTypeKind
 import org.jetbrains.kotlin.builtins.functions.FunctionTypeKindExtractor
@@ -243,7 +246,6 @@ fun getFunctionTypeArgumentProjections(
     return arguments
 }
 
-@JvmOverloads
 fun createFunctionType(
     builtIns: KotlinBuiltIns,
     annotations: Annotations,

@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.descriptors
 
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.descriptorUtil.parents
 import org.jetbrains.kotlin.types.KotlinType

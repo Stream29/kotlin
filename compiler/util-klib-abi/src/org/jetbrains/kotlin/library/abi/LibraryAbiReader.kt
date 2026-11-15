@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.library.abi
 
 import org.jetbrains.kotlin.library.abi.impl.LibraryAbiReaderImpl
-import java.io.File
+import org.jetbrains.kotlin.konan.file.File
 
 /** The default implementation of [LibraryAbi] reader. */
 @ExperimentalLibraryAbiReader

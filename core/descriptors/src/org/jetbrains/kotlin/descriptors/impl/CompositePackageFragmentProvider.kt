@@ -18,7 +18,6 @@ package org.jetbrains.kotlin.descriptors.impl
 
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.name.FqName
-import java.util.*
 import org.jetbrains.kotlin.name.Name
 
 class CompositePackageFragmentProvider(// can be modified from outside

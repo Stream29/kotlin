@@ -32,5 +32,5 @@ object ErrorModuleDescriptor : ModuleDescriptor {
     override fun shouldSeeInternalsOf(targetModule: ModuleDescriptor): Boolean = false
     override fun assertValid() = throw InvalidModuleException("ERROR_MODULE is not a valid module")
     override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R? = null
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>) {}
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {}
 }

@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.descriptors.impl
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ModuleAwareClassDescriptor.Companion.getRefinedMemberScopeIfPossible
@@ -15,9 +17,9 @@ import org.jetbrains.kotlin.types.TypeSubstitution
 import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 
 abstract class ModuleAwareClassDescriptor : ClassDescriptor {
-    protected abstract fun getUnsubstitutedMemberScope(kotlinTypeRefiner: KotlinTypeRefiner): MemberScope
-    protected abstract fun getMemberScope(typeSubstitution: TypeSubstitution, kotlinTypeRefiner: KotlinTypeRefiner): MemberScope
-    protected abstract fun getMemberScope(typeArguments: List<TypeProjection>, kotlinTypeRefiner: KotlinTypeRefiner): MemberScope
+    abstract fun getUnsubstitutedMemberScope(kotlinTypeRefiner: KotlinTypeRefiner): MemberScope
+    abstract fun getMemberScope(typeSubstitution: TypeSubstitution, kotlinTypeRefiner: KotlinTypeRefiner): MemberScope
+    abstract fun getMemberScope(typeArguments: List<TypeProjection>, kotlinTypeRefiner: KotlinTypeRefiner): MemberScope
 
     companion object {
         internal fun ClassDescriptor.getRefinedUnsubstitutedMemberScopeIfPossible(

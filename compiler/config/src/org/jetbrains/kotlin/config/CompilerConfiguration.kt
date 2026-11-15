@@ -5,18 +5,15 @@
 
 package org.jetbrains.kotlin.config
 
-import com.intellij.openapi.util.Key
-import java.util.*
-
 class CompilerConfiguration {
     companion object {
         private fun <T> T.unmodifiable(): T {
             @Suppress("UNCHECKED_CAST")
             return when (this) {
-                is List<*> -> Collections.unmodifiableList(this)
-                is Map<*, *> -> Collections.unmodifiableMap(this)
-                is Set<*> -> Collections.unmodifiableSet(this)
-                is Collection<*> -> Collections.unmodifiableCollection(this)
+                is List<*> -> ConfigurationListView(this)
+                is Map<*, *> -> ConfigurationMapView(this)
+                is Set<*> -> ConfigurationSetView(this)
+                is Collection<*> -> ConfigurationCollectionView(this)
                 else -> this
             } as T
         }
@@ -25,7 +22,7 @@ class CompilerConfiguration {
     @Internals("Consider using `CompilerConfiguration.create()` from :cli-base module instead")
     constructor()
 
-    private val map: MutableMap<Key<*>, Any> = LinkedHashMap()
+    private val map: MutableMap<ConfigurationIdentityKey<*>, Any> = LinkedHashMap()
     var isReadOnly = false
 
     operator fun <T : Any> get(key: CompilerConfigurationKey<T>): T? {

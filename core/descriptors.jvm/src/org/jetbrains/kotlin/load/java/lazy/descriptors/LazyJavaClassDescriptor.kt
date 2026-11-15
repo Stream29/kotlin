@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.load.java.lazy.descriptors
 
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.descriptors.impl.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.StandardNames

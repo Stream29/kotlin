@@ -10,4 +10,4 @@ import org.jetbrains.kotlin.name.Name
 
 val FORWARD_DECLARATIONS_MODULE_NAME = Name.special("<forward declarations>")
 val ModuleDescriptor.isForwardDeclarationModule: Boolean
-    get() = name == FORWARD_DECLARATIONS_MODULE_NAME
+    get() = getName() == FORWARD_DECLARATIONS_MODULE_NAME

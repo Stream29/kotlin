@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.resolve.constants
 
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.builtins.UnsignedTypes

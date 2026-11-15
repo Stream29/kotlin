@@ -29,7 +29,6 @@ class TypeMappingMode @TypeMappingModeInternals constructor(
         /**
          * kotlin.Int is mapped to Ljava/lang/Integer;
          */
-        @JvmField
         val GENERIC_ARGUMENT = TypeMappingMode()
 
         /**
@@ -37,34 +36,29 @@ class TypeMappingMode @TypeMappingModeInternals constructor(
          * @see SUPER_TYPE_AS_IS
          * @see SUPER_TYPE_KOTLIN_COLLECTIONS_AS_IS
          */
-        @JvmField
         val GENERIC_ARGUMENT_FOR_SUPER_TYPES_AS_IS = TypeMappingMode(ignoreTypeArgumentsBounds = true)
 
         /**
          * kotlin.Int is mapped to Ljava/lang/Integer;
          * Type aliases are mapped to their expanded form
          */
-        @JvmField
         val GENERIC_ARGUMENT_UAST = TypeMappingMode(mapTypeAliases = true)
 
         /**
          * see KotlinTypeMapper.forceBoxedReturnType()
          * This configuration should be called only for method return type
          */
-        @JvmField
         val RETURN_TYPE_BOXED = TypeMappingMode(needInlineClassWrapping = true)
 
         /**
          * kotlin.Int is mapped to I
          */
-        @JvmField
         val DEFAULT = TypeMappingMode(genericArgumentMode = GENERIC_ARGUMENT, needPrimitiveBoxing = false, needInlineClassWrapping = false)
 
         /**
          * kotlin.Int is mapped to I
          * Type aliases are mapped to their expanded form
          */
-        @JvmField
         val DEFAULT_UAST = TypeMappingMode(
             genericArgumentMode = GENERIC_ARGUMENT_UAST,
             needPrimitiveBoxing = false,
@@ -77,7 +71,6 @@ class TypeMappingMode @TypeMappingModeInternals constructor(
          * inline class Foo(val x: Int) is mapped to LFoo;
          * but in signature fun bar(f: Foo), Foo is mapped to I
          */
-        @JvmField
         val CLASS_DECLARATION = TypeMappingMode(
             genericArgumentMode = GENERIC_ARGUMENT,
             needPrimitiveBoxing = false,
@@ -88,7 +81,6 @@ class TypeMappingMode @TypeMappingModeInternals constructor(
          * kotlin.Int is mapped to Ljava/lang/Integer;
          * No projections allowed in immediate arguments
          */
-        @JvmField
         val SUPER_TYPE = TypeMappingMode(skipDeclarationSiteWildcards = true, genericArgumentMode = GENERIC_ARGUMENT)
 
 
@@ -97,14 +89,12 @@ class TypeMappingMode @TypeMappingModeInternals constructor(
          *
          * @see SUPER_TYPE
          * */
-        @JvmField
         val SUPER_TYPE_AS_IS = TypeMappingMode(
             skipDeclarationSiteWildcards = true,
             genericArgumentMode = GENERIC_ARGUMENT_FOR_SUPER_TYPES_AS_IS,
             ignoreTypeArgumentsBounds = true,
         )
 
-        @JvmField
         val SUPER_TYPE_KOTLIN_COLLECTIONS_AS_IS = TypeMappingMode(
             skipDeclarationSiteWildcards = true,
             genericArgumentMode = GENERIC_ARGUMENT_FOR_SUPER_TYPES_AS_IS,
@@ -117,7 +107,6 @@ class TypeMappingMode @TypeMappingModeInternals constructor(
          * primitive types and inline class types are not boxed because types in annotations cannot be nullable
          * Other types mapped as DEFAULT
          */
-        @JvmField
         val VALUE_FOR_ANNOTATION = TypeMappingMode(
             isForAnnotationParameter = true,
             needPrimitiveBoxing = false,
@@ -131,19 +120,16 @@ class TypeMappingMode @TypeMappingModeInternals constructor(
          * Primitive types and inline classes are boxed, Kotlin colelctions are mapped to Java collections;
          * the generic types can only be used with the star projection (`<*>`).
          */
-        @JvmField
         val INVOKE_DYNAMIC_BOOTSTRAP_ARGUMENT = TypeMappingMode(
             needPrimitiveBoxing = true,
             needInlineClassWrapping = true,
             kotlinCollectionsToJavaCollections = true
         )
 
-        @JvmStatic
         fun getModeForReturnTypeNoGeneric(
             isAnnotationMethod: Boolean
         ): TypeMappingMode = if (isAnnotationMethod) VALUE_FOR_ANNOTATION else DEFAULT
 
-        @JvmStatic
         fun createWithConstantDeclarationSiteWildcardsMode(
             skipDeclarationSiteWildcards: Boolean,
             isForAnnotationParameter: Boolean,

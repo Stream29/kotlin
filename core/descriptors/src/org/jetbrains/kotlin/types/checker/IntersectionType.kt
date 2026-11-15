@@ -16,10 +16,11 @@
 
 package org.jetbrains.kotlin.types.checker
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.resolve.constants.IntegerLiteralTypeConstructor
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.error.ErrorTypeKind
-import java.util.*
 import kotlin.collections.LinkedHashSet
 import org.jetbrains.kotlin.types.error.ErrorUtils
 

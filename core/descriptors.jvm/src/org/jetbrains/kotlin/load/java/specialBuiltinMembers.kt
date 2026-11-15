@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-@file:JvmName("SpecialBuiltinMembers")
 
 package org.jetbrains.kotlin.load.java
 
@@ -37,7 +36,6 @@ object BuiltinMethodsWithSpecialGenericSignature : SpecialGenericSignatures() {
     private val CallableMemberDescriptor.hasErasedValueParametersInJava: Boolean
         get() = computeJvmSignature() in ERASED_VALUE_PARAMETERS_SIGNATURES
 
-    @JvmStatic
     fun getOverriddenBuiltinFunctionWithErasedValueParametersInJava(
         functionDescriptor: FunctionDescriptor
     ): FunctionDescriptor? {
@@ -48,7 +46,6 @@ object BuiltinMethodsWithSpecialGenericSignature : SpecialGenericSignatures() {
     val Name.sameAsBuiltinMethodWithErasedValueParameters: Boolean
         get() = this in ERASED_VALUE_PARAMETERS_SHORT_NAMES
 
-    @JvmStatic
     internal fun CallableMemberDescriptor.getSpecialSignatureInfo(): SpecialSignatureInfo? {
         if (name !in ERASED_VALUE_PARAMETERS_SHORT_NAMES) return null
 

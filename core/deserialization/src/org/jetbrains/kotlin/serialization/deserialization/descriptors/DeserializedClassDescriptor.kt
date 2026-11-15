@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.serialization.deserialization.descriptors
 
+import org.jetbrains.kotlin.descriptors.impl.*
+import org.jetbrains.kotlin.resolve.scopes.receivers.*
+
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations

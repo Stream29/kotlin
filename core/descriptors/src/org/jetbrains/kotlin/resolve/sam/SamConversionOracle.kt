@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.resolve.sam
 
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.container.DefaultImplementation
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor

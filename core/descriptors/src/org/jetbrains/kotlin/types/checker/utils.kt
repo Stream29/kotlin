@@ -16,13 +16,14 @@
 
 package org.jetbrains.kotlin.types.checker
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.resolve.calls.inference.wrapWithCapturingSubstitution
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.typesApproximation.approximateCapturedTypes
-import java.util.*
 
 private class SubtypePathNode(val type: KotlinType, val previous: SubtypePathNode?)
 
@@ -36,7 +37,7 @@ fun findCorrespondingSupertype(
     val supertypeConstructor = supertype.constructor
 
     while (!queue.isEmpty()) {
-        val lastPathNode = queue.poll()
+        val lastPathNode = queue.removeFirst()
         val currentSubtype = lastPathNode.type
         val constructor = currentSubtype.constructor
 
@@ -91,12 +92,12 @@ private fun TypeConstructor.debugInfo() = buildString {
 
     + "type: ${this@debugInfo}"
     + "hashCode: ${this@debugInfo.hashCode()}"
-    + "javaClass: ${this@debugInfo::class.java.canonicalName}"
+    + "javaClass: ${this@debugInfo::class.qualifiedName}"
     var declarationDescriptor: DeclarationDescriptor? = declarationDescriptor
     while (declarationDescriptor != null) {
 
         + "fqName: ${DescriptorRenderer.FQ_NAMES_IN_TYPES.render(declarationDescriptor)}"
-        + "javaClass: ${declarationDescriptor::class.java.canonicalName}"
+        + "javaClass: ${declarationDescriptor::class.qualifiedName}"
 
         declarationDescriptor = declarationDescriptor.containingDeclaration
     }

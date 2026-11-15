@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.util.collectionUtils
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptorWithTypeParameters
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
@@ -82,10 +84,15 @@ inline fun <Scope> forEachScope(scope1: Scope?, scope2: Scope?, action: (Scope) 
 }
 
 fun listOfNonEmptyScopes(vararg scopes: MemberScope?): SmartList<MemberScope> =
-    scopes.filterTo(SmartList<MemberScope>()) { it != null && it !== MemberScope.Empty }
+    listOfNonEmptyScopes(scopes.asIterable())
 
-fun listOfNonEmptyScopes(scopes: Iterable<MemberScope?>): SmartList<MemberScope> =
-    scopes.filterTo(SmartList<MemberScope>()) { it != null && it !== MemberScope.Empty }
+fun listOfNonEmptyScopes(scopes: Iterable<MemberScope?>): SmartList<MemberScope> {
+    val result = SmartList<MemberScope>()
+    for (scope in scopes) {
+        if (scope != null && scope !== MemberScope.Empty) result.add(scope)
+    }
+    return result
+}
 
 inline fun <Scope, T : ClassifierDescriptor> getFirstClassifierDiscriminateHeaders(scopes: Array<Scope>, callback: (Scope) -> T?): T? {
     // NOTE: This is performance-sensitive; please don't replace with map().firstOrNull()

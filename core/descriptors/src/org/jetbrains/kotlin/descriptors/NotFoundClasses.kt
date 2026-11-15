@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.descriptors
 
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorBase
 import org.jetbrains.kotlin.descriptors.impl.EmptyPackageFragmentDescriptor

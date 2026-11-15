@@ -8,7 +8,6 @@ package org.jetbrains.kotlin.library.impl
 import org.jetbrains.kotlin.library.KlibLayoutReader
 import org.jetbrains.kotlin.library.components.KlibIrComponent
 import org.jetbrains.kotlin.library.components.KlibIrComponentLayout
-import kotlin.io.path.exists
 
 internal abstract class AbstractKlibIrComponentImpl() : KlibIrComponent {
     protected abstract val irFiles: IrArrayReader

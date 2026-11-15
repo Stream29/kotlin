@@ -19,12 +19,9 @@ import org.jetbrains.kotlin.library.components.KlibIrConstants.KLIB_IR_STRINGS_F
 import org.jetbrains.kotlin.library.components.KlibIrConstants.KLIB_IR_TYPES_FILE_NAME
 import org.jetbrains.kotlin.library.components.KlibMetadataConstants.KLIB_METADATA_FOLDER_NAME
 import org.jetbrains.kotlin.library.components.KlibNativeConstants.KLIB_TARGETS_FOLDER_NAME
-import java.nio.file.Files
-import java.nio.file.Path
-import kotlin.io.path.isDirectory
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.name
+import org.jetbrains.kotlin.io.klibPath
+import org.jetbrains.kotlin.library.KlibFiles as Files
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 /**
  * [size] is always in bytes.
@@ -63,7 +60,7 @@ fun loadSizeInfo(klibPath: Path): KlibElementWithSize? {
     return when {
         klibPath.isRegularFile() -> KlibElementWithSize(
             "KLIB file cumulative size",
-            klibPath.withZipFileSystem { fs -> fs.getPath("/").collectTopLevelElements() }
+            klibPath.withZipFileSystem { fs -> fs.klibPath("/").collectTopLevelElements() }
         )
 
         !klibPath.isDirectory() -> null

@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.library.KLIB_PROPERTY_METADATA_FLAGS
 import org.jetbrains.kotlin.library.writer.KlibManifestWriterSpec
 import org.jetbrains.kotlin.library.writer.KlibWriter
-import java.util.Properties
+import org.jetbrains.kotlin.konan.properties.Properties
 
 /**
  * Metadata flags are stored in two places (see KT-87443):

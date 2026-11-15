@@ -76,7 +76,6 @@ interface AbiSignatures {
  * Examples: "TopLevelClass", "topLevelFun", "List", "EMPTY".
  */
 @ExperimentalLibraryAbiReader
-@JvmInline
 value class AbiSimpleName(val value: String) : Comparable<AbiSimpleName> {
     init {
         require(AbiCompoundName.SEPARATOR !in value && AbiQualifiedName.SEPARATOR !in value) {
@@ -93,7 +92,6 @@ value class AbiSimpleName(val value: String) : Comparable<AbiSimpleName> {
  * Examples: "TopLevelClass", "topLevelFun", "List", "CharRange.Companion.EMPTY".
  */
 @ExperimentalLibraryAbiReader
-@JvmInline
 value class AbiCompoundName(val value: String) : Comparable<AbiCompoundName> {
     init {
         require(AbiQualifiedName.SEPARATOR !in value) { "Compound name contains illegal characters: $value" }

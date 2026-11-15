@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.config.phaser
 
 import org.jetbrains.kotlin.config.LoggingContext
-import kotlin.system.measureTimeMillis
+import kotlin.time.measureTime
 
 /**
  * Represents global compilation context and stores information about phases that were executed.
@@ -135,11 +135,11 @@ abstract class NamedCompilerPhase<in Context : LoggingContext, Input, Output>(
 
     private fun runAndProfile(phaseConfig: PhaseConfig, phaserState: PhaserState, context: Context, source: Input): Output {
         val result: Output
-        val msec = measureTimeMillis {
+        val msec = measureTime {
             result = phaserState.downlevel(nlevels) {
                 phaseBody(context, source)
             }
-        }
+        }.inWholeMilliseconds
         // TODO: use a proper logger
         println("${"\t".repeat(phaserState.depth)}$name: $msec msec")
         return result

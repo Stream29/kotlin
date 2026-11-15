@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.descriptors.deserialization.AdditionalClassPartsProv
 import org.jetbrains.kotlin.descriptors.deserialization.ClassDescriptorFactory
 import org.jetbrains.kotlin.descriptors.deserialization.PlatformDependentDeclarationFilter
 import org.jetbrains.kotlin.storage.StorageManager
-import java.util.*
+import org.jetbrains.kotlin.serialization.deserialization.builtins.BuiltInsLoaderImpl
 
 interface BuiltInsLoader {
     fun createPackageFragmentProvider(
@@ -36,11 +36,9 @@ interface BuiltInsLoader {
 
     companion object {
         val Instance: BuiltInsLoader by lazy(LazyThreadSafetyMode.PUBLICATION) {
-            val implementations = ServiceLoader.load(BuiltInsLoader::class.java, BuiltInsLoader::class.java.classLoader)
-            implementations.firstOrNull() ?: throw IllegalStateException(
-                "No BuiltInsLoader implementation was found. Please ensure that the META-INF/services/ is not stripped " +
-                        "from your application and that the Java virtual machine is not running under a security manager"
-            )
+            // Fixed-closure assembly: the pinned stage0 service file contains this sole provider.
+            // Descriptors and deserialization must be compiled together; this is not dynamic discovery.
+            BuiltInsLoaderImpl()
         }
     }
 }

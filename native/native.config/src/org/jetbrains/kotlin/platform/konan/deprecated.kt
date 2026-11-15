@@ -3,8 +3,6 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-@file:JvmName("KonanPlatformKt")
-
 package org.jetbrains.kotlin.platform.konan
 
 import org.jetbrains.kotlin.platform.TargetPlatform
@@ -15,5 +13,4 @@ import org.jetbrains.kotlin.platform.TargetPlatform
     replaceWith = ReplaceWith("org.jetbrains.kotlin.platform.konan.NativePlatformKt.isNative"),
     level = DeprecationLevel.ERROR
 )
-@JvmName("isNative")
 fun TargetPlatform.deprecatedIsNative(): Boolean = isNative()

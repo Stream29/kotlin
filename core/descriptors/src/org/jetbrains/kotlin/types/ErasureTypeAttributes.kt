@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.types
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 
 open class ErasureTypeAttributes(

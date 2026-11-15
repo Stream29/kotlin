@@ -22,7 +22,10 @@ import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.KotlinRetention
 import org.jetbrains.kotlin.descriptors.annotations.KotlinTarget
-import org.jetbrains.kotlin.load.java.JvmAnnotationNames.*
+import org.jetbrains.kotlin.load.java.JvmAnnotationNames.TARGET_ANNOTATION
+import org.jetbrains.kotlin.load.java.JvmAnnotationNames.RETENTION_ANNOTATION
+import org.jetbrains.kotlin.load.java.JvmAnnotationNames.DOCUMENTED_ANNOTATION
+import org.jetbrains.kotlin.load.java.JvmAnnotationNames.DEPRECATED_ANNOTATION
 import org.jetbrains.kotlin.load.java.descriptors.PossiblyExternalAnnotationDescriptor
 import org.jetbrains.kotlin.load.java.lazy.LazyJavaResolverContext
 import org.jetbrains.kotlin.load.java.lazy.descriptors.LazyJavaAnnotationDescriptor
@@ -38,7 +41,10 @@ import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.types.error.ErrorTypeKind
 import org.jetbrains.kotlin.types.error.ErrorUtils
 import org.jetbrains.kotlin.types.SimpleType
-import java.util.*
+import org.jetbrains.kotlin.utils.addToStdlib.EnumSet
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.builtins.*
+import org.jetbrains.kotlin.types.*
 
 @K1Deprecation
 object JavaAnnotationMapper {
@@ -141,7 +147,7 @@ class JavaRetentionAnnotationDescriptor(
 @K1Deprecation
 object JavaAnnotationTargetMapper {
     private val targetNameLists = mapOf(
-        "PACKAGE" to EnumSet.noneOf(KotlinTarget::class.java),
+        "PACKAGE" to emptySet<KotlinTarget>(),
         "TYPE" to EnumSet.of(KotlinTarget.CLASS, KotlinTarget.FILE),
         "ANNOTATION_TYPE" to EnumSet.of(KotlinTarget.ANNOTATION_CLASS),
         "TYPE_PARAMETER" to EnumSet.of(KotlinTarget.TYPE_PARAMETER),

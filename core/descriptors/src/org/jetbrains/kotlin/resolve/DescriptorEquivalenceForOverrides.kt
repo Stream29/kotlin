@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.resolve
 
+import org.jetbrains.kotlin.types.*
+
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.resolve.OverridingUtil.OverrideCompatibilityInfo
 import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
@@ -56,7 +58,6 @@ object DescriptorEquivalenceForOverrides {
         return a.typeConstructor == b.typeConstructor
     }
 
-    @JvmOverloads
     fun areTypeParametersEquivalent(
         a: TypeParameterDescriptor,
         b: TypeParameterDescriptor,

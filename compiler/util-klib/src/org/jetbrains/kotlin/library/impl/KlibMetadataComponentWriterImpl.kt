@@ -8,9 +8,7 @@ package org.jetbrains.kotlin.library.impl
 import org.jetbrains.kotlin.library.SerializedMetadata
 import org.jetbrains.kotlin.library.components.KlibMetadataComponentLayout
 import org.jetbrains.kotlin.library.writer.KlibComponentWriter
-import java.nio.file.Path
-import kotlin.io.path.createDirectories
-import kotlin.io.path.writeBytes
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 /**
  * An implementation of [KlibComponentWriter] that writes [SerializedMetadata] to the constructed Klib library.
@@ -32,7 +30,7 @@ internal class KlibMetadataComponentWriterImpl(
             val packageFragmentParts: List<ByteArray> = metadata.fragments[index]
 
             val padding: Int = packageFragmentParts.size.toString().length
-            fun withPadding(packageFragmentPartIndex: Int) = String.format("%0${padding}d", packageFragmentPartIndex)
+            fun withPadding(packageFragmentPartIndex: Int) = packageFragmentPartIndex.toString().padStart(padding, '0')
 
             packageFragmentParts.forEachIndexed { packageFragmentPartIndex, packageFragmentPart ->
                 layout.getPackageFragmentFile(

@@ -5,10 +5,12 @@
 
 package org.jetbrains.kotlin.types
 
+import org.jetbrains.kotlin.descriptors.*
+
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
-import org.jetbrains.kotlin.types.TypeUtils.makeStarProjection
+import org.jetbrains.kotlin.types.TypeUtils.Companion.makeStarProjection
 import org.jetbrains.kotlin.types.checker.intersectTypes
 import org.jetbrains.kotlin.types.error.ErrorUtils
 import org.jetbrains.kotlin.types.error.ErrorTypeKind

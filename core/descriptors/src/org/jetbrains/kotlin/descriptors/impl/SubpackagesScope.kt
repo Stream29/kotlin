@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.MemberScopeImpl
 import org.jetbrains.kotlin.utils.Printer
 import org.jetbrains.kotlin.utils.addIfNotNull
-import java.util.*
 
 open class SubpackagesScope(private val moduleDescriptor: ModuleDescriptor, private val fqName: FqName) : MemberScopeImpl() {
 
@@ -60,7 +59,7 @@ open class SubpackagesScope(private val moduleDescriptor: ModuleDescriptor, priv
     override fun getClassifierNames(): Set<Name> = emptySet()
 
     override fun printScopeStructure(p: Printer) {
-        p.println(this::class.java.simpleName, " {")
+        p.println(this::class.simpleName, " {")
         p.pushIndent()
 
         p.popIndent()
