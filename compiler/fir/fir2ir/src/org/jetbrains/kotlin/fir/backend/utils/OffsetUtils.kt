@@ -23,7 +23,6 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirRegularPropertySymbol
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.lexer.KtTokens
-import org.jetbrains.kotlin.lexer.KtTokens.VAL_VAR
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.psiUtil.startOffsetSkippingComments
 import org.jetbrains.kotlin.util.getChildren
@@ -44,7 +43,7 @@ internal inline fun <T : IrElement> FirElement.convertWithOffsets(f: (startOffse
     val tokenSet = when (this) {
         is FirNamedFunction -> FUNCTION_KEYWORD_TOKENS
         is FirConstructor -> CONSTRUCTOR_KEYWORD_TOKENS
-        is FirVariable -> VAL_VAR
+        is FirVariable -> KtTokens.VAL_VAR
         else -> null
     }
     return source.convertWithOffsets(tokenSet, f)
@@ -75,7 +74,7 @@ internal fun <T : IrElement> FirPropertyAccessor?.convertWithOffsets(
         }
     }
 
-    return source.convertWithOffsets(VAL_VAR, f)
+    return source.convertWithOffsets(KtTokens.VAL_VAR, f)
 }
 
 internal inline fun <T : IrElement> KtSourceElement?.convertWithOffsets(
@@ -184,7 +183,7 @@ private fun FirProperty.computeOffsetsWithoutInitializer(): Pair<Int, Int>? {
     }
 
     val endOffset = lastMeaningfulChild.endOffset
-    val startOffset = propertySource.startOffsetSkippingComments(VAL_VAR)
+    val startOffset = propertySource.startOffsetSkippingComments(KtTokens.VAL_VAR)
         ?: propertySource.startOffset
     return startOffset to endOffset
 }

@@ -33,7 +33,6 @@ import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.util.OperatorNameConventions
 import org.jetbrains.kotlin.utils.addToStdlib.applyIf
 import org.jetbrains.kotlin.utils.addToStdlib.shouldNotBeCalled
-import java.util.*
 
 @OptIn(DirectDeclarationsAccess::class, RenderingInternals::class)
 class FirRenderer(
@@ -706,7 +705,7 @@ class FirRenderer(
             whileLoop.block.accept(this)
         }
 
-        private val loopJumpStack = Stack<FirLoopJump>()
+        private val loopJumpStack = mutableListOf<FirLoopJump>()
 
         override fun visitLoopJump(loopJump: FirLoopJump) {
             if (loopJumpStack.contains(loopJump)) {
@@ -721,13 +720,13 @@ class FirRenderer(
                 // That `break` condition is `when` expression, and while visiting its branch result, we will see the same `break` again.
                 return
             }
-            loopJumpStack.push(loopJump)
+            loopJumpStack.add(loopJump)
             val target = loopJump.target
             val labeledElement = target.labeledElement
             print("@@@[")
             labeledElement.condition.accept(this)
             print("] ")
-            loopJumpStack.pop()
+            loopJumpStack.removeAt(loopJumpStack.lastIndex)
         }
 
         override fun visitBreakExpression(breakExpression: FirBreakExpression) {
@@ -749,7 +748,7 @@ class FirRenderer(
                     is FirExpressionStub -> "STUB"
                     is FirUnitExpression -> "Unit"
                     is FirElseIfTrueCondition -> "else"
-                    else -> "??? ${expression.javaClass}"
+                    else -> "??? ${expression::class}"
                 }
             )
         }

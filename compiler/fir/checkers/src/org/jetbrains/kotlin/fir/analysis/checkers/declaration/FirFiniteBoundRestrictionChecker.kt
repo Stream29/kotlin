@@ -97,9 +97,10 @@ object FirFiniteBoundRestrictionChecker : FirRegularClassChecker(MppCheckerKind.
 
         val dfsNeighbors = DFS.Neighbors<ConeKotlinType> { edges[it] ?: emptyList() }
 
-        val dfsVisited = object : DFS.VisitedWithSet<ConeKotlinType>() {
+        val visitedSet = DFS.VisitedWithSet<ConeKotlinType>()
+        val dfsVisited = object : DFS.Visited<ConeKotlinType> {
             override fun checkAndMarkVisited(current: ConeKotlinType): Boolean {
-                val added = super.checkAndMarkVisited(current)
+                val added = visitedSet.checkAndMarkVisited(current)
                 if (!added && current == start) {
                     containsCycle = true
                 }

@@ -280,12 +280,12 @@ object FirCliExceptionHandler : FirExceptionHandler() {
          * So, considering that `wrapIntoSourceCodeAnalysisExceptionIfNeeded` skips VM errors anyway,
          * is's ok to check for it earlier.
          */
-        if (throwable is VirtualMachineError) throw throwable
+        if (throwable is OutOfMemoryError) throw throwable
         throw throwable.wrapIntoSourceCodeAnalysisExceptionIfNeeded(element.source)
     }
 
     override fun handleExceptionOnFileAnalysis(file: FirFile, throwable: Throwable): Nothing {
-        if (throwable is VirtualMachineError) throw throwable
+        if (throwable is OutOfMemoryError) throw throwable
         throw throwable.wrapIntoFileAnalysisExceptionIfNeeded(
             file.sourceFile?.path,
             file.source,
@@ -293,7 +293,6 @@ object FirCliExceptionHandler : FirExceptionHandler() {
     }
 }
 
-@JvmInline
 value class MutableOrEmptyList<out T>(internal val list: MutableList<@UnsafeVariance T>?) : List<T> {
 
     private constructor(list: Nothing?) : this(list as MutableList<T>?)

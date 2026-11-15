@@ -231,7 +231,7 @@ private class ControlFlowGraphRenderer(
         .replace("&", "&amp;")
         .replace(">", "&gt;")
         .replace("<", "&lt;")
-        .replace(System.lineSeparator(), "<BR/>")
+        .replace("\n", "<BR/>")
 
     private enum class VisitState {
         VISITING,

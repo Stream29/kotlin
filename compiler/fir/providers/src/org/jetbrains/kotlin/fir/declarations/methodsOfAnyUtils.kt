@@ -65,8 +65,6 @@ val FirNamedFunctionSymbol.isMethodOfAny: Boolean
 context(_: SessionHolder)
 val FirNamedFunction.isMethodOfAny: Boolean
     get() = symbol.isMethodOfAny
-
-@JvmName("setEqualityBoundTypeFromOverriddenSymbols")
 fun FirNamedFunction.setEqualityBoundTypeFromOverridden(
     overridden: Collection<FirCallableSymbol<*>>,
     session: FirSession,

@@ -5,9 +5,9 @@
 
 package org.jetbrains.kotlin.fir.extensions
 
-import com.google.common.collect.LinkedHashMultimap
-import com.google.common.collect.Multimap
 import kotlinx.collections.immutable.PersistentList
+import org.jetbrains.kotlin.fir.util.SetMultimap
+import org.jetbrains.kotlin.fir.util.setMultimapOf
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.NoMutableState
 import org.jetbrains.kotlin.fir.declarations.*
@@ -184,17 +184,17 @@ class FirPredicateBasedProviderImpl(private val session: FirSession) : FirPredic
     // ---------------------------------- Cache ----------------------------------
 
     private class Cache {
-        val declarationByAnnotation: Multimap<AnnotationFqn, FirDeclaration> = LinkedHashMultimap.create()
-        val annotationsOfDeclaration: LinkedHashMultimap<FirDeclaration, AnnotationFqn> = LinkedHashMultimap.create()
+        val declarationByAnnotation: SetMultimap<AnnotationFqn, FirDeclaration> = setMultimapOf()
+        val annotationsOfDeclaration: SetMultimap<FirDeclaration, AnnotationFqn> = setMultimapOf()
 
-        val declarationsUnderAnnotated: Multimap<AnnotationFqn, FirDeclaration> = LinkedHashMultimap.create()
-        val annotationsOfUnderAnnotated: LinkedHashMultimap<FirDeclaration, AnnotationFqn> = LinkedHashMultimap.create()
+        val declarationsUnderAnnotated: SetMultimap<AnnotationFqn, FirDeclaration> = setMultimapOf()
+        val annotationsOfUnderAnnotated: SetMultimap<FirDeclaration, AnnotationFqn> = setMultimapOf()
 
-        val declarationsParentAnnotated: Multimap<AnnotationFqn, FirDeclaration> = LinkedHashMultimap.create()
-        val annotationsOfParentAnnotated: Multimap<FirDeclaration, AnnotationFqn> = LinkedHashMultimap.create()
+        val declarationsParentAnnotated: SetMultimap<AnnotationFqn, FirDeclaration> = setMultimapOf()
+        val annotationsOfParentAnnotated: SetMultimap<FirDeclaration, AnnotationFqn> = setMultimapOf()
 
-        val declarationsHasAnnotated: Multimap<AnnotationFqn, FirDeclaration> = LinkedHashMultimap.create()
-        val annotationsOfHasAnnotated: Multimap<FirDeclaration, AnnotationFqn> = LinkedHashMultimap.create()
+        val declarationsHasAnnotated: SetMultimap<AnnotationFqn, FirDeclaration> = setMultimapOf()
+        val annotationsOfHasAnnotated: SetMultimap<FirDeclaration, AnnotationFqn> = setMultimapOf()
 
         val ownersForDeclaration: MutableMap<FirDeclaration, PersistentList<FirDeclaration>> = mutableMapOf()
 

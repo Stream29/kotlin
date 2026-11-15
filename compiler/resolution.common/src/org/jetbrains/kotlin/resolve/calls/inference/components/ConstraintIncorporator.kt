@@ -16,7 +16,6 @@ import org.jetbrains.kotlin.types.TypeApproximatorConfiguration
 import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.util.OnlyForDefaultLanguageFeatureDisabled
 import org.jetbrains.kotlin.utils.SmartSet
-import java.util.*
 
 // todo problem: intersection types in constrains: A <: Number, B <: Inv<A & Any> =>? B <: Inv<out Number & Any>
 class ConstraintIncorporator(
@@ -472,15 +471,15 @@ private inline fun KotlinTypeMarker.anyNestedArgument(predicate: (TypeArgumentMa
 
     when (this) {
         is FlexibleTypeMarker -> {
-            stack.push(c.createTypeArgument(this.lowerBound(), TypeVariance.INV))
+            stack.addFirst(c.createTypeArgument(this.lowerBound(), TypeVariance.INV))
             if (!c.isTriviallyFlexible(this)) {
-                stack.push(c.createTypeArgument(this.upperBound(), TypeVariance.INV))
+                stack.addFirst(c.createTypeArgument(this.upperBound(), TypeVariance.INV))
             }
         }
-        else -> stack.push(c.createTypeArgument(this, TypeVariance.INV))
+        else -> stack.addFirst(c.createTypeArgument(this, TypeVariance.INV))
     }
 
-    stack.push(c.createTypeArgument(this, TypeVariance.INV))
+    stack.addFirst(c.createTypeArgument(this, TypeVariance.INV))
 
     val addArgumentsToStack = { projectedType: KotlinTypeMarker ->
         for (argumentIndex in 0 until projectedType.argumentsCount()) {
@@ -489,7 +488,7 @@ private inline fun KotlinTypeMarker.anyNestedArgument(predicate: (TypeArgumentMa
     }
 
     while (!stack.isEmpty()) {
-        val typeProjection = stack.pop()
+        val typeProjection = stack.removeFirst()
         val typeProjectionType = typeProjection.getType() ?: continue
 
         if (predicate(typeProjection)) return true

@@ -184,7 +184,7 @@ internal fun FirVariable.buildImportedVersion(importedClassId: ClassId): FirVari
             this
         }
         else -> {
-            throw IllegalStateException("Unexpected variable in buildImportedCopy: ${render()} of type ${this::class.java}")
+            throw IllegalStateException("Unexpected variable in buildImportedCopy: ${render()} of type ${this::class}")
         }
     }
 }

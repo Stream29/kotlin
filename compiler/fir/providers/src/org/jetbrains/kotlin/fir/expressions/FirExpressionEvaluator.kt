@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.fir.expressions
 
 import org.jetbrains.kotlin.AbstractKtSourceElement
+import org.jetbrains.kotlin.fir.platform.FirThreadLocal
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.contracts.description.LogicOperationKind
@@ -100,7 +101,7 @@ object FirExpressionEvaluator {
      * }
      * ```
      */
-    private val visitedCallables: ThreadLocal<HashSet<FirCallableSymbol<*>>> = ThreadLocal.withInitial(::hashSetOf)
+    private val visitedCallables: FirThreadLocal<HashSet<FirCallableSymbol<*>>> = FirThreadLocal.withInitial(::hashSetOf)
 
     fun evaluatePropertyInitializer(property: FirProperty, session: FirSession, firFile: FirFile? = null): FirEvaluatorResult? {
         property.evaluatedInitializer?.let { return it }
@@ -918,8 +919,8 @@ private fun evaluateBinary(
 context(sessionHolder: SessionHolder)
 private fun Any?.normalize(): Any? {
     if (!nanNormalizationFeatureEnabled) return this
-    if (this is Float && this.isNaN()) return java.lang.Float.NaN
-    if (this is Double && this.isNaN()) return java.lang.Double.NaN
+    if (this is Float && this.isNaN()) return Float.NaN
+    if (this is Double && this.isNaN()) return Double.NaN
     return this
 }
 

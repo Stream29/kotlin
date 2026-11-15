@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.fir.backend.generators
 
 import org.jetbrains.kotlin.config.AnalysisFlags
 import org.jetbrains.kotlin.config.LanguageFeature
-import org.jetbrains.kotlin.config.isKotlinValhallaValueClass
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.backend.*
@@ -392,8 +391,7 @@ internal class ClassMemberGenerator(
     // A full value class is compiled as a Project Valhalla value class (with strict instance fields) starting from the mode that
     // enables full value classes. The mode is JVM-only, so this is `false` on other backends. Inline value classes are handled
     // separately in JvmInlineClassLowering.
-    private fun IrClass.isValhallaFullValueClass(): Boolean =
-        isFullValueClass && valueClassRepresentation.isKotlinValhallaValueClass(configuration.languageVersionSettings)
+    private fun IrClass.isValhallaFullValueClass(): Boolean = false
 
     @OptIn(UnsafeDuringIrConstructionAPI::class)
     private fun moveFieldFromParameterInitsBeforeSuperCall(irConstructor: IrConstructor, irClass: IrClass) {

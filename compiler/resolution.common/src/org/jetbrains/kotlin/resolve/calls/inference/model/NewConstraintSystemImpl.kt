@@ -185,7 +185,9 @@ class NewConstraintSystemImpl(
     }
 
     override fun substituteFixedVariables(substitutor: TypeSubstitutorMarker) {
-        storage.fixedTypeVariables.replaceAll { _, type -> substitutor.safeSubstitute(type) }
+        for (entry in storage.fixedTypeVariables.entries) {
+            entry.setValue(substitutor.safeSubstitute(entry.value))
+        }
     }
 
     override fun putBuiltFunctionalExpectedTypeForPostponedArgument(
@@ -786,7 +788,7 @@ class NewConstraintSystemImpl(
         val emptyIntersectionTypeInfo = getEmptyIntersectionTypeKind(upperTypes) ?: return
 
         // Remove existing errors from the resolution stage because a completion stage error is always more precise
-        storage.errors.removeIf { it is InferredEmptyIntersection }
+        storage.errors.removeAll { it is InferredEmptyIntersection }
 
         val errorFactory = if (emptyIntersectionTypeInfo.kind.isError(languageVersionSettings))
             ::InferredEmptyIntersectionError

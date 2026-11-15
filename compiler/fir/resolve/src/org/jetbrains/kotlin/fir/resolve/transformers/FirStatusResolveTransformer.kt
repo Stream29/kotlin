@@ -325,7 +325,7 @@ abstract class AbstractFirStatusResolveTransformer(
             is FirRegularClass -> declaration.declarations
             is FirAnonymousObject -> declaration.declarations
             is FirFile -> declaration.declarations
-            else -> errorWithAttachment("Unsupported declaration: ${declaration::class.java}") {
+            else -> errorWithAttachment("Unsupported declaration: ${declaration::class}") {
                 withFirEntry("declaration", declaration)
             }
         }

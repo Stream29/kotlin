@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.fir.deserialization
 
 import org.jetbrains.kotlin.fir.FirModuleData
-import java.nio.file.Path
+import org.jetbrains.kotlin.library.KlibPath as Path
 
 abstract class ModuleDataProvider {
     abstract val allModuleData: Collection<FirModuleData>

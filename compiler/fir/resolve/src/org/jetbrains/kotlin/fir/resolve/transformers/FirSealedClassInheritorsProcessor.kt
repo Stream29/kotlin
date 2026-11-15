@@ -61,14 +61,14 @@ class FirSealedClassInheritorsProcessor(
             regularClass.declarations.forEach { it.accept(this, data) }
 
             val sealedInheritors = runIf(regularClass.modality == Modality.SEALED) {
-                data.computeIfAbsent(regularClass) { mutableSetOf() }
+                data.getOrPut(regularClass) { mutableSetOf() }
             }
 
             for (typeRef in regularClass.superTypeRefs) {
                 val parent = extractClassFromTypeRef(typeRef).takeIf { it?.modality == Modality.SEALED } ?: continue
                 // Inheritors of sealed class are allowed only in same package
                 if (parent.classId.packageFqName != regularClass.classId.packageFqName) continue
-                val inheritors = data.computeIfAbsent(parent) { mutableSetOf() }
+                val inheritors = data.getOrPut(parent) { mutableSetOf() }
                 inheritors += regularClass.symbol.classId
             }
 
@@ -81,7 +81,7 @@ class FirSealedClassInheritorsProcessor(
             if (!typeAlias.isActual) return
             val expansionClass = typeAlias.expandedTypeRef.coneType.toRegularClassSymbol(session)?.fir ?: return
             if (expansionClass.modality != Modality.SEALED) return
-            collectInheritorsOfCorrespondingExpectSealedClass(typeAlias.classId, data.computeIfAbsent(expansionClass) { mutableSetOf() })
+            collectInheritorsOfCorrespondingExpectSealedClass(typeAlias.classId, data.getOrPut(expansionClass) { mutableSetOf() })
         }
 
         private fun collectInheritorsOfCorrespondingExpectSealedClass(expectClassId: ClassId, inheritors: MutableSet<ClassId>) {

@@ -37,7 +37,8 @@ object FirPrefixAndSuffixSyntaxChecker : FirExpressionSyntaxChecker<FirStatement
     context(context: CheckerContext, reporter: DiagnosticReporter)
     override fun checkPsi(element: FirStatement, source: KtPsiSourceElement, psi: KtExpression) {
         fun check(affix: PsiElement, prefix: Boolean) {
-            if (KtLiteralPrefixAndSuffix.isProhibitedPrefixOrSuffix(affix.node.elementType)) {
+            val affixType = affix.node?.elementType
+            if (affixType != null && KtLiteralPrefixAndSuffix.isProhibitedPrefixOrSuffix(affixType)) {
                 reporter.reportOn(
                     affix.toKtPsiSourceElement(),
                     if (prefix) FirSyntaxErrors.TRAILING_WHITESPACE_REQUIRED else FirSyntaxErrors.LEADING_WHITESPACE_REQUIRED

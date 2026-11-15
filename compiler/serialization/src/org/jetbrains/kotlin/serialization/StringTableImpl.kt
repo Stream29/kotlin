@@ -22,8 +22,9 @@ import org.jetbrains.kotlin.name.ClassId
 @K1Deprecation
 open class StringTableImpl : DescriptorAwareStringTable, SerializableStringTable() {
 
-    override fun getQualifiedClassNameIndex(classId: ClassId): Int = getClassIdIndex(classId)
-
     override val isLocalClassIdReplacementKeptGeneric: Boolean
         get() = false
 }
+
+@K1Deprecation
+fun SerializableStringTable.getClassIdIndex(classId: ClassId): Int = getQualifiedClassNameIndex(classId)

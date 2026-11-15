@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.utils.addToStdlib.shouldNotBeCalled
 
-open class FirPackageFragmentDescriptor(override val fqName: FqName, val moduleDescriptor: ModuleDescriptor) : PackageFragmentDescriptor {
+open class Fir2IrPackageFragmentDescriptor(override val fqName: FqName, val moduleDescriptor: ModuleDescriptor) : FirPackageFragmentDescriptor {
     override fun getContainingDeclaration(): ModuleDescriptor {
         return moduleDescriptor
     }
@@ -29,20 +29,22 @@ open class FirPackageFragmentDescriptor(override val fqName: FqName, val moduleD
         return fqName.shortName()
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D): R {
-        return visitor?.visitPackageFragmentDescriptor(this, data) as R
+    override fun <R, D> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R? {
+        return visitor.visitPackageFragmentDescriptor(this, data)
     }
 
     override fun getSource(): SourceElement {
         shouldNotBeCalled()
     }
 
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
-        visitor?.visitPackageFragmentDescriptor(this, null)
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Nothing?, Nothing?>) {
+        visitor.visitPackageFragmentDescriptor(this, null)
     }
 
     override val annotations: Annotations
         get() = Annotations.EMPTY
 
 }
+
+fun FirPackageFragmentDescriptor(fqName: FqName, moduleDescriptor: ModuleDescriptor): Fir2IrPackageFragmentDescriptor =
+    Fir2IrPackageFragmentDescriptor(fqName, moduleDescriptor)

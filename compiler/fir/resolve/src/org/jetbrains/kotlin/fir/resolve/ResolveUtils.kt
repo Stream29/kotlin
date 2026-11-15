@@ -194,7 +194,7 @@ fun FirAnonymousFunction.addReturnToLastStatementIfNeeded(session: FirSession) {
         target = returnTarget
     }
     body.transformStatements(
-        object : FirTransformer<Nothing?>() {
+        object : FirNodeReplacingTransformer<Nothing?>() {
             override fun <E : FirElement> transformElement(element: E, data: Nothing?): E =
                 @Suppress("UNCHECKED_CAST")
                 if (element == lastStatement) returnExpression as E else element
@@ -512,7 +512,7 @@ private fun BodyResolveComponents.typeFromSymbol(symbol: FirBasedSymbol<*>): Con
         is FirClassifierSymbol<*> -> {
             symbol.constructType()
         }
-        else -> errorWithAttachment("Failed to extract type from symbol: ${symbol::class.java}") {
+        else -> errorWithAttachment("Failed to extract type from symbol: ${symbol::class}") {
             withFirEntry("declaration", symbol.fir)
         }
     }

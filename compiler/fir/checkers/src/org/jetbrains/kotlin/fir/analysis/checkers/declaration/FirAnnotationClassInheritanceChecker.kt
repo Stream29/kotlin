@@ -36,7 +36,9 @@ object FirAnnotationClassInheritanceChecker : FirClassChecker(MppCheckerKind.Com
         ) { supertype, inheritor ->
             val superSymbol = supertype.toClassLikeSymbol()
                 ?: return@forEachSupertypeWithInheritor
-            originatingImmediateSupertypeSource.putIfAbsent(superSymbol, originatingImmediateSupertypeSource[inheritor])
+            if (originatingImmediateSupertypeSource[superSymbol] == null) {
+                originatingImmediateSupertypeSource[superSymbol] = originatingImmediateSupertypeSource[inheritor]
+            }
 
             if (superSymbol !is FirRegularClassSymbol || superSymbol.classKind != ClassKind.ANNOTATION_CLASS) {
                 return@forEachSupertypeWithInheritor

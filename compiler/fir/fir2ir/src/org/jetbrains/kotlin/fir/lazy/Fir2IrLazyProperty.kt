@@ -51,7 +51,7 @@ class Fir2IrLazyProperty(
     symbols: PropertySymbols,
     parent: IrDeclarationParent,
     override var isFakeOverride: Boolean,
-) : IrProperty(), AbstractFir2IrLazyDeclaration<FirProperty>, Fir2IrComponents by c {
+) : IrProperty(), Fir2IrLazyDeclaration<FirProperty>, Fir2IrComponents by c {
     override val symbol: IrPropertySymbol = symbols.propertySymbol
 
     init {

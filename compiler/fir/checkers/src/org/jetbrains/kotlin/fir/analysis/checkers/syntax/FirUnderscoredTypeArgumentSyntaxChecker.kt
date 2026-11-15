@@ -32,11 +32,11 @@ object FirUnderscoredTypeArgumentSyntaxChecker : FirExpressionSyntaxChecker<FirF
     ) {
         for (typeProjection in element.typeArguments) {
             val psiTypeArgument = typeProjection.source?.psi as? KtTypeProjection ?: continue
-            val typeReference = psiTypeArgument.typeReference ?: continue
+            val typeReference = psiTypeArgument.getTypeReference() ?: continue
 
             if (!typeReference.isPlaceholder) continue
 
-            for (annotation in typeReference.annotationEntries) {
+            for (annotation in typeReference.getAnnotationEntries()) {
                 reporter.reportOn(
                     annotation.toKtPsiSourceElement(), FirErrors.UNSUPPORTED,
                     MESSAGE

@@ -106,7 +106,7 @@ class FirKLibSerializerExtension(
             val kidsRef = Ref<Array<LighterASTNode?>>()
             source.treeStructure.getChildren(source.lighterASTNode, kidsRef)
             // Use the first attached KDoc.
-            val docComment = kidsRef.get().firstOrNull { it?.tokenType == KtTokens.DOC_COMMENT } ?: return@let null
+            val docComment = kidsRef.get()?.firstOrNull { it?.tokenType == KtTokens.DOC_COMMENT } ?: return@let null
             source.treeStructure.toString(docComment).toString()
         }
 

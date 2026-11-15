@@ -34,7 +34,7 @@ class Fir2IrLazyConstructor(
     override val fir: FirConstructor,
     override val symbol: IrConstructorSymbol,
     parent: IrDeclarationParent,
-) : IrConstructor(), AbstractFir2IrLazyDeclaration<FirConstructor>, Fir2IrTypeParametersContainer,
+) : IrConstructor(), Fir2IrLazyDeclaration<FirConstructor>, Fir2IrTypeParametersContainer,
     Fir2IrComponents by c {
     init {
         this.parent = parent

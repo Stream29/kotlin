@@ -175,7 +175,6 @@ fun withExpectedType(
     hintForContextSensitiveResolution: ConeKotlinType? = null,
 ): ResolutionMode = withExpectedType(expectedTypeRef, arrayLiteralPosition = null, hintForContextSensitiveResolution)
 
-@JvmName("withExpectedTypeNullable")
 fun withExpectedType(coneType: ConeKotlinType?, lastStatementInBlock: Boolean = false): ResolutionMode {
     return coneType?.let { withExpectedType(it, lastStatementInBlock) } ?: ResolutionMode.ContextDependent
 }

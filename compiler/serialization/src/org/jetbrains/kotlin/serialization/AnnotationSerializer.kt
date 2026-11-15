@@ -58,7 +58,7 @@ open class AnnotationSerializer(private val stringTable: DescriptorAwareStringTa
         constant.accept(object : AnnotationArgumentVisitor<Unit, Unit> {
             override fun visitAnnotationValue(value: AnnotationValue, data: Unit) {
                 type = Type.ANNOTATION
-                annotation = serializeAnnotation(value.value)
+                serializeAnnotation(value.value)?.let { annotation = it }
             }
 
             override fun visitArrayValue(value: ArrayValue, data: Unit) {
@@ -157,25 +157,25 @@ open class AnnotationSerializer(private val stringTable: DescriptorAwareStringTa
                 stringValue = stringTable.getStringIndex(value.value)
             }
 
-            override fun visitUByteValue(value: UByteValue, data: Unit?) {
+            override fun visitUByteValue(value: UByteValue, data: Unit) {
                 type = Type.BYTE
                 intValue = value.value.toLong()
                 flags = Flags.IS_UNSIGNED.toFlags(true)
             }
 
-            override fun visitUShortValue(value: UShortValue, data: Unit?) {
+            override fun visitUShortValue(value: UShortValue, data: Unit) {
                 type = Type.SHORT
                 intValue = value.value.toLong()
                 flags = Flags.IS_UNSIGNED.toFlags(true)
             }
 
-            override fun visitUIntValue(value: UIntValue, data: Unit?) {
+            override fun visitUIntValue(value: UIntValue, data: Unit) {
                 type = Type.INT
                 intValue = value.value.toLong()
                 flags = Flags.IS_UNSIGNED.toFlags(true)
             }
 
-            override fun visitULongValue(value: ULongValue, data: Unit?) {
+            override fun visitULongValue(value: ULongValue, data: Unit) {
                 type = Type.LONG
                 intValue = value.value
                 flags = Flags.IS_UNSIGNED.toFlags(true)

@@ -93,7 +93,6 @@ abstract class FirInferenceSession {
             }
         }
 
-        @JvmStatic
         protected fun prepareSharedBaseSystem(
             outerSystem: NewConstraintSystemImpl,
             components: InferenceComponents,

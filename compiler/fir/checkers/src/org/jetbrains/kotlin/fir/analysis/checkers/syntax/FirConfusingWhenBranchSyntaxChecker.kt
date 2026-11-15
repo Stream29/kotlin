@@ -14,7 +14,12 @@ import org.jetbrains.kotlin.AbstractKtSourceElement
 import org.jetbrains.kotlin.ElementTypeUtils.getOperationSymbol
 import org.jetbrains.kotlin.ElementTypeUtils.isExpression
 import org.jetbrains.kotlin.KtLightSourceElement
-import org.jetbrains.kotlin.KtNodeTypes.*
+import org.jetbrains.kotlin.KtNodeTypes.Companion.BINARY_EXPRESSION
+import org.jetbrains.kotlin.KtNodeTypes.Companion.IS_EXPRESSION
+import org.jetbrains.kotlin.KtNodeTypes.Companion.OPERATION_REFERENCE
+import org.jetbrains.kotlin.KtNodeTypes.Companion.WHEN_CONDITION_EXPRESSION
+import org.jetbrains.kotlin.KtNodeTypes.Companion.WHEN_CONDITION_IN_RANGE
+import org.jetbrains.kotlin.KtNodeTypes.Companion.WHEN_ENTRY
 import org.jetbrains.kotlin.KtPsiSourceElement
 import org.jetbrains.kotlin.KtRealPsiSourceElement
 import org.jetbrains.kotlin.diagnostics.DiagnosticContext
@@ -26,7 +31,18 @@ import org.jetbrains.kotlin.fir.expressions.FirWhenExpression
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.isBooleanOrNullableBoolean
 import org.jetbrains.kotlin.fir.types.resolvedType
-import org.jetbrains.kotlin.lexer.KtTokens.*
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.ANDAND
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.EQEQ
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.EQEQEQ
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.EXCLEQ
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.EXCLEQEQEQ
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.GT
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.GTEQ
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.IN_KEYWORD
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.LT
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.LTEQ
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.NOT_IN
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.OROR
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.util.getChildren
 

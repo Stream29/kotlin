@@ -225,12 +225,11 @@ class FirNameConflictsTrackerImpl : FirNameConflictsTracker() {
         prevSymbol: FirClassLikeSymbol<*>,
         prevSymbolFile: FirFile?,
     ) {
-        redeclaredClassifiers.merge(
-            classId,
-            linkedSetOf(
-                ClassifierRedeclarationImpl(newSymbol, newSymbolFile),
-                ClassifierRedeclarationImpl(prevSymbol, prevSymbolFile),
-            ),
-        ) { a, b -> a + b }
+        val added = linkedSetOf(
+            ClassifierRedeclarationImpl(newSymbol, newSymbolFile),
+            ClassifierRedeclarationImpl(prevSymbol, prevSymbolFile),
+        )
+        val existing = redeclaredClassifiers[classId]
+        redeclaredClassifiers[classId] = if (existing == null) added else existing + added
     }
 }

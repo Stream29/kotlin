@@ -5,14 +5,11 @@
 
 package org.jetbrains.kotlin.fir.resolve.calls.tower
 
-import java.lang.Long.compareUnsigned
-import java.lang.Long.toBinaryString
-
 sealed class TowerGroupKind(val index: Byte) : Comparable<TowerGroupKind> {
     abstract class WithDepth(index: Byte, val depth: Int) : TowerGroupKind(index) {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            if (javaClass != other?.javaClass) return false
+            if (other == null || this::class != other::class) return false
 
             other as WithDepth
 
@@ -79,12 +76,15 @@ private constructor(
     companion object {
 
         private const val KIND_MASK = 0b1111
-        private val KIND_SIZE_BITS: Int = Integer.bitCount(KIND_MASK)
+        private val KIND_SIZE_BITS: Int = KIND_MASK.countOneBits()
         private const val DEPTH_MASK = 0xFFFF // 16bit
-        private val DEPTH_SIZE_BITS: Int = Integer.bitCount(DEPTH_MASK)
+        private val DEPTH_SIZE_BITS: Int = DEPTH_MASK.countOneBits()
         private const val USED_BITS_MASK: Long = 0b111111 // max size 64 bits
         private const val TOTAL_BITS = 64
-        private val USABLE_BITS = java.lang.Long.numberOfLeadingZeros(USED_BITS_MASK)
+        private val USABLE_BITS = USED_BITS_MASK.countLeadingZeroBits()
+
+        private fun compareUnsigned(a: Long, b: Long): Int = a.toULong().compareTo(b.toULong())
+        private fun toBinaryString(code: Long): String = code.toULong().toString(2)
 
         private val EMPTY_KIND_ARRAY = emptyArray<TowerGroupKind>()
 
@@ -326,7 +326,7 @@ private constructor(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other == null || this::class != other::class) return false
 
         other as TowerGroup
 

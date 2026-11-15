@@ -5,14 +5,15 @@
 
 package org.jetbrains.kotlin.fir.lightTree
 
+import com.intellij.platform.native.vfs.NativeVfsPath as Path
+import nativekotlin.host.files.NativeFile as File
 import org.jetbrains.kotlin.KtIoFileSourceFile
 import org.jetbrains.kotlin.KtSourceFile
 import org.jetbrains.kotlin.KtSourceFileLinesMapping
+import org.jetbrains.kotlin.SourceFileReader
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirFile
 import org.jetbrains.kotlin.readSourceFileWithMapping
-import java.io.File
-import java.nio.file.Path
 
 abstract class AbstractTree2Fir {
     abstract val session: FirSession
@@ -23,7 +24,7 @@ abstract class AbstractTree2Fir {
 
     fun buildFirFile(file: File): FirFile {
         val sourceFile = KtIoFileSourceFile(file)
-        val [code, linesMapping] = file.inputStream().reader(Charsets.UTF_8).use {
+        val [code, linesMapping] = SourceFileReader(sourceFile.getContentsAsStream()).use {
             it.readSourceFileWithMapping()
         }
         return buildFirFile(code, sourceFile, linesMapping)

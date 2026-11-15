@@ -5,9 +5,9 @@
 
 package org.jetbrains.kotlin.fir.extensions
 
-import com.google.common.collect.LinkedHashMultimap
-import com.google.common.collect.Multimap
 import org.jetbrains.kotlin.descriptors.ClassKind
+import org.jetbrains.kotlin.fir.util.SetMultimap
+import org.jetbrains.kotlin.fir.util.setMultimapOf
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSessionComponent
 import org.jetbrains.kotlin.fir.NoMutableState
@@ -127,7 +127,7 @@ class FirRegisteredPluginAnnotationsImpl(session: FirSession) : AbstractFirRegis
     override val annotations: MutableSet<AnnotationFqn> = mutableSetOf()
 
     // MetaAnnotation -> Annotations
-    private val userDefinedAnnotations: Multimap<AnnotationFqn, AnnotationFqn> = LinkedHashMultimap.create()
+    private val userDefinedAnnotations: SetMultimap<AnnotationFqn, AnnotationFqn> = setMultimapOf()
 
     override fun getAnnotationsWithMetaAnnotation(metaAnnotation: AnnotationFqn): Collection<AnnotationFqn> {
         return userDefinedAnnotations[metaAnnotation]

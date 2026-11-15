@@ -29,7 +29,7 @@ object FirFunctionTypeParametersSyntaxChecker : FirDeclarationSyntaxChecker<FirN
         source: KtPsiSourceElement,
         psi: KtFunction,
     ) {
-        val typeParamsNode = psi.typeParameterList
+        val typeParamsNode = psi.getTypeParameterList()
         val nameNode = psi.nameIdentifier
 
         if (typeParamsNode != null && nameNode != null && typeParamsNode.startOffset > nameNode.startOffset) {

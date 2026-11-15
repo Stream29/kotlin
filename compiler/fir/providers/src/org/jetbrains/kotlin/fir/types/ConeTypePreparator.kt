@@ -23,7 +23,7 @@ class ConeTypePreparator(val session: FirSession) : AbstractTypePreparator() {
 
     override fun prepareType(type: KotlinTypeMarker): ConeKotlinType {
         if (type !is ConeKotlinType) {
-            throw AssertionError("Unexpected type in ConeTypePreparator: ${this::class.java}")
+            throw AssertionError("Unexpected type in ConeTypePreparator: ${this::class}")
         }
         return when (type) {
             is ConeFlexibleType -> type.mapTypesOrSelf(session.typeContext, dropIdentity = true) { prepareType(it) }

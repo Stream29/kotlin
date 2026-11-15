@@ -34,7 +34,12 @@ import org.jetbrains.kotlin.protobuf.GeneratedMessageLite.GeneratedExtension
 import org.jetbrains.kotlin.resolve.CommonCompilerDeserializationConfiguration
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
 import org.jetbrains.kotlin.serialization.deserialization.getClassId
-import java.lang.ref.SoftReference
+
+@OptIn(kotlin.experimental.ExperimentalNativeApi::class)
+private class SoftReference<T : Any>(value: T) {
+    private val ref = kotlin.native.ref.WeakReference(value)
+    fun get(): T? = ref.value
+}
 
 abstract class MetadataLibraryBasedSymbolProvider<L>(
     session: FirSession,

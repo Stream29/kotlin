@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.types.model.TypeConstructorMarker
 import org.jetbrains.kotlin.types.model.TypeVariableMarker
 import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.utils.addToStdlib.trimToSize
-import java.util.*
 
 private typealias Context = ConstraintSystemMarker
 
@@ -344,14 +343,14 @@ internal class MutableConstraintStorage : ConstraintStorage {
 }
 
 fun <T> identityHashSetFromSum(first: List<T>, second: List<T>): Set<T> =
-    IdentityHashMap<T, Boolean>().apply {
+    NativeIdentitySet<T>().apply {
         for (elem in first) {
-            put(elem, true)
+            add(elem)
         }
         for (elem in second) {
-            put(elem, true)
+            add(elem)
         }
-    }.keys
+    }
 
 /**
  * Annotated member is used only for assertion purposes and does not affect semantics

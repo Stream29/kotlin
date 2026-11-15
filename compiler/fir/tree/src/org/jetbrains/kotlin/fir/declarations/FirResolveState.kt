@@ -8,7 +8,8 @@ package org.jetbrains.kotlin.fir.declarations
 import org.jetbrains.kotlin.fir.FirElementWithResolveState
 import org.jetbrains.kotlin.fir.declarations.synthetic.FirSyntheticProperty
 import org.jetbrains.kotlin.fir.declarations.synthetic.FirSyntheticPropertyAccessor
-import java.util.concurrent.CountDownLatch
+import org.jetbrains.kotlin.fir.platform.FirCountDownLatch
+import kotlin.concurrent.Volatile
 
 /**
  * The current lazy resolve state of some [org.jetbrains.kotlin.fir.FirElementWithResolveState].
@@ -100,7 +101,7 @@ class FirInProcessOfResolvingToPhaseStateWithoutBarrier private constructor(
  * @see FirResolveState
  */
 class FirInProcessOfResolvingToPhaseStateWithBarrier(override val resolvingTo: FirResolvePhase) : FirInProcessOfResolvingToPhaseState() {
-    val barrier: CountDownLatch = CountDownLatch(1)
+    val barrier: FirCountDownLatch = FirCountDownLatch(1)
 
     init {
         require(resolvingTo != FirResolvePhase.RAW_FIR) {
@@ -125,7 +126,7 @@ class FirInProcessOfResolvingToPhaseStateWithBarrier(override val resolvingTo: F
  * @see FirResolveState
  */
 class FirInProcessOfResolvingToJumpingPhaseState(override val resolvingTo: FirResolvePhase) : FirInProcessOfResolvingToPhaseState() {
-    val latch: CountDownLatch = CountDownLatch(1)
+    val latch: FirCountDownLatch = FirCountDownLatch(1)
 
     @Volatile
     var waitingFor: FirInProcessOfResolvingToJumpingPhaseState? = null

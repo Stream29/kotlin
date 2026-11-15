@@ -64,7 +64,6 @@ class LenientModeMissingActualDeclarationProvider(
         classifierStorage.getIrClassSymbol(firSymbol)
     }
 
-    @Throws()
     override fun provideSymbolForMissingActual(
         expectSymbol: IrSymbol,
         containingExpectClassSymbol: IrClassSymbol?,

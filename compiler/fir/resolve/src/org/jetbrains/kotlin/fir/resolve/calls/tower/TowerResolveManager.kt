@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.fir.resolve.calls.tower
 
 import org.jetbrains.kotlin.fir.resolve.calls.candidate.CandidateCollector
-import java.util.*
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -19,7 +18,55 @@ class TowerResolveManager private constructor(private val shouldStopAtTheLevel: 
 
     constructor(collector: CandidateCollector) : this(collector::shouldStopAtTheGroup)
 
-    private val queue = PriorityQueue<SuspendedResolverTask>()
+    private class TaskPriorityQueue {
+        private val heap = ArrayList<SuspendedResolverTask>()
+
+        fun clear() {
+            heap.clear()
+        }
+
+        fun isNotEmpty(): Boolean = heap.isNotEmpty()
+
+        fun peek(): SuspendedResolverTask? = heap.firstOrNull()
+
+        operator fun plusAssign(x: SuspendedResolverTask) {
+            var k = heap.size
+            heap.add(x)
+            while (k > 0) {
+                val parent = (k - 1) ushr 1
+                val e = heap[parent]
+                if (x >= e) break
+                heap[k] = e
+                k = parent
+            }
+            heap[k] = x
+        }
+
+        fun poll(): SuspendedResolverTask {
+            val result = heap[0]
+            val x = heap.removeAt(heap.lastIndex)
+            if (heap.isNotEmpty()) {
+                var k = 0
+                val half = heap.size ushr 1
+                while (k < half) {
+                    var child = (k shl 1) + 1
+                    var c = heap[child]
+                    val right = child + 1
+                    if (right < heap.size && c > heap[right]) {
+                        child = right
+                        c = heap[child]
+                    }
+                    if (x <= c) break
+                    heap[k] = c
+                    k = child
+                }
+                heap[k] = x
+            }
+            return result
+        }
+    }
+
+    private val queue = TaskPriorityQueue()
 
     fun reset() {
         queue.clear()

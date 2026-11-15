@@ -38,11 +38,11 @@ class KotlinLightAstNode(
     val tree: LightSyntaxTree,
     val node: LightNode,
 ) : LighterASTNode {
-    override fun getTokenType(): IElementType = KOTLIN_DIRECT_PLACEHOLDER_TYPE
+    override val tokenType: IElementType get() = KOTLIN_DIRECT_PLACEHOLDER_TYPE
 
-    override fun getStartOffset(): Int = tree.getStartOffset(node)
+    override val startOffset: Int get() = tree.getStartOffset(node)
 
-    override fun getEndOffset(): Int = tree.getEndOffset(node)
+    override val endOffset: Int get() = tree.getEndOffset(node)
 
     // mirrors [org.jetbrains.kotlin.java.direct.model.JavaElementOverAst]
     // semantics, so that distinct java-direct nodes yield distinct source elements.
@@ -63,22 +63,22 @@ class KotlinLightTreeStructure(val tree: LightSyntaxTree) : FlyweightCapableTree
 
     private fun wrap(node: LightNode): LighterASTNode = KotlinLightAstNode(tree, node)
 
-    override fun getRoot(): LighterASTNode = wrap(tree.getRoot())
+    override val root: LighterASTNode get() = wrap(tree.getRoot())
 
     override fun getParent(node: LighterASTNode): LighterASTNode? =
         tree.getParent(unwrap(node))?.let(::wrap)
 
-    override fun getChildren(parent: LighterASTNode, into: Ref<Array<LighterASTNode>>): Int {
+    override fun getChildren(parent: LighterASTNode, into: Ref<Array<LighterASTNode?>>): Int {
         val children = tree.getChildren(unwrap(parent))
         if (children.isEmpty()) {
             into.set(LighterASTNode.EMPTY_ARRAY)
             return 0
         }
-        into.set(Array(children.size) { wrap(children[it]) })
+        into.set(Array<LighterASTNode?>(children.size) { wrap(children[it]) })
         return children.size
     }
 
-    override fun disposeChildren(nodes: Array<out LighterASTNode>?, count: Int) {
+    override fun disposeChildren(nodes: Array<LighterASTNode?>?, count: Int) {
     }
 
     override fun toString(node: LighterASTNode): CharSequence = tree.getText(unwrap(node))

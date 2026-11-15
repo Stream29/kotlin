@@ -71,7 +71,7 @@ fun FirBasedSymbol<*>.toInvisibleReferenceDiagnostic(source: KtSourceElement?, s
             symbol.classId.outerClassId,
             session
         )
-        else -> shouldNotBeCalled("Unexpected receiver $javaClass")
+        else -> shouldNotBeCalled("Unexpected receiver ${this::class}")
     }
 
 fun ConeDiagnostic.toFirDiagnostics(
@@ -724,7 +724,7 @@ private fun ConeDiagnostic.mapOtherDiagnostic(
         val incompatibleBound = this.bound.substituteTypeVariableTypes(this.containingCandidate, session.typeContext)
         FirErrors.UNRESOLVED_COLLECTION_LITERAL.createOn(source, incompatibleBound, session)
     }
-    else -> throw IllegalArgumentException("Unsupported diagnostic type: ${this.javaClass}")
+    else -> throw IllegalArgumentException("Unsupported diagnostic type: ${this::class}")
 }
 
 private fun inapplicableNullableReceiver(
@@ -808,7 +808,7 @@ private fun unexpectedTrailingLambdaOnNewLineOrNull(argument: FirExpression, ses
     }
 
     return when (val argumentSource = argument.source) {
-        is KtPsiSourceElement if argumentSource.psi.let { it is KtLambdaExpression && it.isTrailingLambdaOnNewLine }
+        is KtPsiSourceElement if argumentSource.psi.let { it is KtLambdaExpression && it.isTrailingLambdaOnNewLine() }
             -> FirErrors.UNEXPECTED_TRAILING_LAMBDA_ON_A_NEW_LINE.createOn(argumentSource, session)
         is KtLightSourceElement if argumentSource.isTrailingLambdaOnNewLine()
             -> FirErrors.UNEXPECTED_TRAILING_LAMBDA_ON_A_NEW_LINE.createOn(argumentSource, session)

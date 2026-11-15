@@ -22,9 +22,9 @@ import org.jetbrains.kotlin.fir.utils.exceptions.withFirEntry
 import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.resolve.DataClassResolver
 import org.jetbrains.kotlin.resolve.ReturnValueStatus
+import org.jetbrains.kotlin.utils.addToStdlib.EnumSet
 import org.jetbrains.kotlin.utils.exceptions.errorWithAttachment
 import org.jetbrains.kotlin.utils.exceptions.requireWithAttachment
-import java.util.*
 
 class FirStatusResolver(
     override val session: FirSession,
@@ -68,7 +68,7 @@ class FirStatusResolver(
             is FirConstructor -> resolveStatus(declaration, containingClass, isLocal)
             is FirField -> resolveStatus(declaration, containingClass, isLocal)
             is FirBackingField -> resolveStatus(declaration, containingClass, isLocal)
-            else -> errorWithAttachment("Unsupported declaration type: ${declaration::class.java}") {
+            else -> errorWithAttachment("Unsupported declaration type: ${declaration::class}") {
                 withFirEntry("declaration", declaration)
             }
         }

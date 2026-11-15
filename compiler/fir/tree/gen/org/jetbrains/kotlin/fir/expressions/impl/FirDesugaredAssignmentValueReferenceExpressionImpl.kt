@@ -47,7 +47,7 @@ internal class FirDesugaredAssignmentValueReferenceExpressionImpl(
     }
 
     override fun replaceConeTypeOrNull(newConeTypeOrNull: ConeKotlinType?) {
-        require(newConeTypeOrNull == coneTypeOrNull) { "${javaClass.simpleName}.replaceConeTypeOrNull() called with invalid type '${newConeTypeOrNull}'. Current type is '$coneTypeOrNull'" }
+        require(newConeTypeOrNull == coneTypeOrNull) { "${this::class.simpleName}.replaceConeTypeOrNull() called with invalid type '${newConeTypeOrNull}'. Current type is '$coneTypeOrNull'" }
     }
 
     override fun replaceAnnotations(newAnnotations: List<FirAnnotation>) {

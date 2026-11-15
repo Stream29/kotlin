@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.name.FqName
 class FirBuiltInsPackageFragment(
     fqName: FqName,
     moduleDescriptor: ModuleDescriptor
-) : FirPackageFragmentDescriptor(fqName, moduleDescriptor), BuiltInsPackageFragment {
+) : Fir2IrPackageFragmentDescriptor(fqName, moduleDescriptor), BuiltInsPackageFragment {
     override val isFallback: Boolean
         get() = false
 }

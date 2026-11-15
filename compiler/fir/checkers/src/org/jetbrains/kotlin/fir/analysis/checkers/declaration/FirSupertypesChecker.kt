@@ -220,7 +220,7 @@ object FirSupertypesChecker : FirClassChecker(MppCheckerKind.Platform) {
         } else {
             val source = source
             require(source is KtPsiSourceElement)
-            val psi = source.psi.findDescendantOfType<KtParameter> { it.nameAsName == name } ?: return null
+            val psi = source.psi.findDescendantOfType<KtParameter> { it.getNameAsName() == name } ?: return null
             return psi.nameIdentifier?.toKtPsiSourceElement()
         }
     }

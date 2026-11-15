@@ -27,7 +27,7 @@ object FirLocalVariableTypeParametersSyntaxChecker : FirDeclarationSyntaxChecker
         source: KtPsiSourceElement,
         psi: KtExpression,
     ) {
-        if (psi is KtProperty && psi.typeParameterList != null) {
+        if (psi is KtProperty && psi.getTypeParameterList() != null) {
             reporter.reportOn(source, FirErrors.LOCAL_VARIABLE_WITH_TYPE_PARAMETERS)
         }
     }

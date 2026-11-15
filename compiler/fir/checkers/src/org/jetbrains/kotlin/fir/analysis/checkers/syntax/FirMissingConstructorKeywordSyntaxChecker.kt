@@ -30,7 +30,7 @@ object FirMissingConstructorKeywordSyntaxChecker : FirDeclarationSyntaxChecker<F
         source: KtPsiSourceElement,
         psi: KtDeclaration,
     ) {
-        if (psi is KtConstructor<*> && psi.modifierList != null && psi.getConstructorKeyword() == null) {
+        if (psi is KtConstructor<*> && psi.getModifierList() != null && psi.getConstructorKeyword() == null) {
             reporter.reportOn(source, FirErrors.MISSING_CONSTRUCTOR_KEYWORD)
         }
     }

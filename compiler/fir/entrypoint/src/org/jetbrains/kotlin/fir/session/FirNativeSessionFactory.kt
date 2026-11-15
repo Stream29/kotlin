@@ -26,7 +26,10 @@ import org.jetbrains.kotlin.fir.scopes.FirPlatformClassMapper
 import org.jetbrains.kotlin.fir.scopes.impl.FirEnumEntriesSupport
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.metadata.FORWARD_DECLARATIONS_MODULE_NAME
-import org.jetbrains.kotlin.resolve.konan.platform.NativeDefaultImportsProvider
+import org.jetbrains.kotlin.K1Deprecation
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.resolve.DefaultImportsProvider
+import org.jetbrains.kotlin.resolve.ImportPath
 
 @OptIn(SessionConfiguration::class)
 abstract class FirNativeSessionFactory : AbstractFirKlibSessionFactory<Nothing?>() {
@@ -112,5 +115,14 @@ abstract class FirNativeSessionFactory : AbstractFirKlibSessionFactory<Nothing?>
         register(PlatformConflictDeclarationsDiagnosticDispatcher::class, NativeConflictDeclarationsDiagnosticDispatcher)
         register(FirOverrideChecker::class, FirNativeOverrideChecker(this))
         register(FirDefaultImportsProviderHolder.of(NativeDefaultImportsProvider))
+    }
+}
+
+@K1Deprecation
+private object NativeDefaultImportsProvider : DefaultImportsProvider() {
+    override val platformSpecificDefaultImports: List<ImportPath> = listOf(ImportPath.fromString("kotlin.native.*"))
+
+    override val excludedImports: List<FqName> = listOf("identityHashCode").map {
+        FqName("kotlin.native.$it")
     }
 }

@@ -93,7 +93,7 @@ class FirActualizingScope(
         // from binary dependencies.
         // It's important not to touch expect declarations from sources because they could match declarations from dependencies on accident.
         // See compiler/fir/analysis-tests/testData/resolve/multiplatform/redeclarationOfExpectActualFromDependency.kt
-        expectSymbols.removeIf { expectSymbol ->
+        expectSymbols.removeAll { expectSymbol ->
             expectSymbol.isFromLibrary() && expectSymbol.hasEquivalentNotActualFromLibrary(notExpectSymbols)
         }
 

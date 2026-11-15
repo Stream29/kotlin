@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.library.components.KlibMetadataComponent
 import org.jetbrains.kotlin.library.metadata.KlibMetadataProtoBuf
 import org.jetbrains.kotlin.library.metadata.parsePackageFragment
 import org.jetbrains.kotlin.utils.checkWithAttachment
-import java.io.File
+import nativekotlin.host.files.NativeFile as File
 
 class KlibIcData(
     private val metadata: KlibIcMetadataComponent,
@@ -34,9 +34,9 @@ class KlibIcMetadataComponent(
     private val fragments: Map<String, Map<String, ByteArray>> by lazy {
         val result = mutableMapOf<String, MutableMap<String, ByteArray>>()
 
-        nonDirtyPreviousPackageFragments
-            .toSortedMap() // This is so that IC is more deterministic
-            .forEach { [file, metadata] ->
+        nonDirtyPreviousPackageFragments.entries
+            .sortedBy { it.key.path } // This is so that IC is more deterministic
+            .forEach { (file, metadata) ->
                 val proto = parsePackageFragment(metadata)
                 val fqName = proto.getExtension(KlibMetadataProtoBuf.fqName)
                 val key = file.path

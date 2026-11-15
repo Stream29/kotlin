@@ -15,7 +15,8 @@ import org.jetbrains.kotlin.ElementTypeUtils.isExpression
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.builder.Context
 import org.jetbrains.kotlin.kmp.utils.kmpId
-import org.jetbrains.kotlin.lexer.KtTokens.*
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.DOT
+import org.jetbrains.kotlin.lexer.KtTokens.Companion.SAFE_ACCESS
 import org.jetbrains.kotlin.util.getChildren
 
 abstract class AbstractLightTreeRawFirBuilder(
@@ -82,6 +83,6 @@ abstract class AbstractLightTreeRawFirBuilder(
     override fun LighterASTNode.getChildrenAsArray(): Array<out LighterASTNode?> {
         val kidsRef = Ref<Array<LighterASTNode?>>()
         tree.getChildren(this, kidsRef)
-        return kidsRef.get()
+        return kidsRef.get()!!
     }
 }

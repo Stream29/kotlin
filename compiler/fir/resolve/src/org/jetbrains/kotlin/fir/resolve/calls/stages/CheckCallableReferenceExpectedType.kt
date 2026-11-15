@@ -333,7 +333,7 @@ private fun varargParameterTypeByExpectedParameter(
     varargMappingState: VarargMappingState?, // `null` means calling it for the first time
 ): Pair<ConeKotlinType?, VarargMappingState> {
     val elementType = parameterOfReferencedFunction.returnTypeRef.coneType.arrayElementType()
-        ?: errorWithAttachment("Vararg parameter ${parameterOfReferencedFunction::class.java} does not have vararg type") {
+        ?: errorWithAttachment("Vararg parameter ${parameterOfReferencedFunction::class} does not have vararg type") {
             withConeTypeEntry("expectedParameterType", expectedParameterType)
             withFirEntry("parameterOfReferencedFunction", parameterOfReferencedFunction)
             withEntry("varargMappingState", varargMappingState.toString())

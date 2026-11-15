@@ -65,7 +65,7 @@ private inline fun ConeKotlinType.isFunctionTypeWithPredicate(
     predicate: (FunctionTypeKind) -> Boolean
 ): Boolean {
     val kind = functionTypeKind(session)
-        ?: if (errorOnNotFunctionType) errorWithAttachment("${this::class.java} is not a function type") {
+        ?: if (errorOnNotFunctionType) errorWithAttachment("${this::class} is not a function type") {
             withConeTypeEntry("type", this@isFunctionTypeWithPredicate)
         } else return false
     return predicate(kind)

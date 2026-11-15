@@ -67,7 +67,7 @@ sealed class FirModifier<Node : Any>(val node: Node, val token: KtModifierKeywor
         token: KtModifierKeywordToken
     ) : FirModifier<ASTNode>(node, token) {
         override val source: KtSourceElement
-            get() = node.psi.toKtPsiSourceElement()
+            get() = node.psi!!.toKtPsiSourceElement()
     }
 
     class FirLightModifier(
@@ -103,7 +103,7 @@ fun KtSourceElement?.getModifierList(): FirModifierList? {
                 }
             }
 
-            modifierListOwner?.modifierList?.let { FirModifierList.FirPsiModifierList(it) }
+            modifierListOwner?.getModifierList()?.let { FirModifierList.FirPsiModifierList(it) }
         }
         is KtLightSourceElement -> {
             val modifierListNode = lighterASTNode.getChildren(treeStructure).find { it.tokenType == KtNodeTypes.MODIFIER_LIST }
@@ -131,6 +131,6 @@ fun FirBasedSymbol<*>.hasModifier(token: KtModifierKeywordToken): Boolean = fir.
 internal val KtSourceElement?.valOrVarKeyword: KtKeywordToken?
     get() = when (this) {
         null -> null
-        is KtPsiSourceElement -> (psi as? KtValVarKeywordOwner)?.valOrVarKeyword?.let { it.node?.elementType as? KtKeywordToken }
+        is KtPsiSourceElement -> (psi as? KtValVarKeywordOwner)?.getValOrVarKeyword()?.let { it.node?.elementType as? KtKeywordToken }
         is KtLightSourceElement -> treeStructure.valOrVarKeyword(lighterASTNode)?.tokenType as? KtKeywordToken
     }
